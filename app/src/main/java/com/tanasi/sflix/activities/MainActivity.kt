@@ -1,7 +1,8 @@
-package com.tanasi.sflix
+package com.tanasi.sflix.activities
 
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
+import com.tanasi.sflix.R
 import com.tanasi.sflix.fragments.home.HomeFragment
 
 class MainActivity : FragmentActivity() {
