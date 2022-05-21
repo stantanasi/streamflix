@@ -11,7 +11,13 @@ import com.tanasi.sflix.models.Movie
 class MoviePresenter : Presenter() {
 
     override fun onCreateViewHolder(parent: ViewGroup): ViewHolder {
-        return VhMovie(ItemMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        return VhMovie(
+            ItemMovieBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
