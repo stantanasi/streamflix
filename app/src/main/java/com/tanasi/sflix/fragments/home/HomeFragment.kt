@@ -1,9 +1,10 @@
-package com.tanasi.sflix
+package com.tanasi.sflix.fragments.home
 
 import android.os.Bundle
 import androidx.leanback.app.BrowseSupportFragment
+import com.tanasi.sflix.R
 
-class MainFragment : BrowseSupportFragment() {
+class HomeFragment : BrowseSupportFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
