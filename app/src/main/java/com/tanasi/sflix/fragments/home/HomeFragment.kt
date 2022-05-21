@@ -21,5 +21,7 @@ class HomeFragment : BrowseSupportFragment() {
                 }
             }
         }
+
+        viewModel.fetchHome()
     }
 }
