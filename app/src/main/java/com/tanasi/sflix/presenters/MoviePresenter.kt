@@ -14,8 +14,10 @@ class MoviePresenter : Presenter() {
         return VhMovie(ItemMovieBinding.inflate(LayoutInflater.from(parent.context), parent, false))
     }
 
-    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any?) {
-        TODO("Not yet implemented")
+    override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
+        when (viewHolder) {
+            is VhMovie -> viewHolder.bind(item as Movie)
+        }
     }
 
     override fun onUnbindViewHolder(viewHolder: ViewHolder) {
