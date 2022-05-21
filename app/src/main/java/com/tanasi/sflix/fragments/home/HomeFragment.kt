@@ -13,5 +13,13 @@ class HomeFragment : BrowseSupportFragment() {
         super.onActivityCreated(savedInstanceState)
 
         title = getString(R.string.app_name)
+
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                HomeViewModel.State.Loading -> {}
+                is HomeViewModel.State.SuccessLoading -> {
+                }
+            }
+        }
     }
 }
