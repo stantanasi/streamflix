@@ -16,4 +16,8 @@ class JsoupConverterFactory : Converter.Factory() {
         Document::class.java -> JsoupConverter(retrofit.baseUrl().toString())
         else -> null
     }
+
+    companion object {
+        fun create() = JsoupConverterFactory()
+    }
 }
