@@ -13,6 +13,8 @@ class Movie(
     val rating: Double? = null,
     val poster: String? = null,
     val banner: String? = null,
+
+    val servers: List<Server> = listOf(),
 ) {
 
     val released = released?.toCalendar()
