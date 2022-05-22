@@ -1,15 +1,18 @@
 package com.tanasi.sflix.models
 
+import com.tanasi.sflix.utils.toCalendar
+
 class Movie(
     val id: String,
     val title: String,
-    val year: Int,
+    released: String,
     quality: String,
     val rating: Double,
     val poster: String,
     val banner: String? = null,
 ) {
 
+    val released = released.toCalendar()
     val quality = Quality.getByValue(quality)
 
 
