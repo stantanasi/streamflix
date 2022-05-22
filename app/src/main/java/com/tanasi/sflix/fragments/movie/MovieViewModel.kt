@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.Server
 import com.tanasi.sflix.services.SflixService
 import kotlinx.coroutines.launch
 
@@ -62,6 +63,15 @@ class MovieViewModel : ViewModel() {
                     ?.attr("style")
                     ?.substringAfter("background-image: url(")
                     ?.substringBefore(");"),
+
+                servers = sflixService.fetchMovieServers(id)
+                    .select("a")
+                    .map {
+                        Server(
+                            id = it.attr("data-id"),
+                            name = it.selectFirst("span")?.text()?.trim() ?: "",
+                        )
+                    },
             )
         )
     }
