@@ -57,6 +57,18 @@
         app:layout_constraintTop_toBottomOf="@id/tv_movie_title"
         tools:text="HD" />
 
+    <LinearLayout
+        android:id="@+id/ll_movie_servers"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="100dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
+        app:layout_constraintTop_toBottomOf="@id/tv_movie_quality" />
+
     <TextView
         android:id="@+id/tv_movie_overview_label"
         android:layout_width="0dp"
@@ -69,7 +81,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
-        app:layout_constraintTop_toBottomOf="@id/tv_movie_quality" />
+        app:layout_constraintTop_toBottomOf="@id/ll_movie_servers" />
 
     <TextView
         android:id="@+id/tv_movie_overview"
