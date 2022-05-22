@@ -25,6 +25,8 @@ class HomeViewModel : ViewModel() {
     }
 
     fun fetchHome() = viewModelScope.launch {
+        _state.value = State.Loading
+
         val document = sflixService.fetchHome()
 
         val trendingMovies = document
