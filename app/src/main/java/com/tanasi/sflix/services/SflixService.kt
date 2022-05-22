@@ -22,6 +22,10 @@ interface SflixService {
     @GET("home")
     suspend fun fetchHome(): Document
 
+
     @GET("movie/free-{id}")
     suspend fun fetchMovie(@Path("id") id: String): Document
+
+    @GET("ajax/movie/episodes/{id}")
+    suspend fun fetchMovieServers(@Path("id") movieId: String): Document
 }
