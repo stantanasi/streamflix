@@ -25,6 +25,8 @@ class HomeViewModel : ViewModel() {
     }
 
     fun fetchHome() = viewModelScope.launch {
+        _state.value = State.Loading
+
         val document = sflixService.fetchHome()
 
         val trendingMovies = document
@@ -40,7 +42,7 @@ class HomeViewModel : ViewModel() {
                 Movie(
                     id = it.selectFirst("a")?.attr("href")?.substringAfterLast("-") ?: "",
                     title = it.select("h3.film-name").text(),
-                    year = info?.get(2)?.toIntOrNull() ?: 0,
+                    released = info?.get(2) ?: "",
                     quality = info?.get(1) ?: "",
                     rating = info?.get(0)?.toDouble() ?: Double.NaN,
                     poster = it.selectFirst("div.film-poster > img.film-poster-img").let { img ->

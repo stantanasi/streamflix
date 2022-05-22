@@ -7,10 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.leanback.app.RowsSupportFragment
-import androidx.leanback.widget.ArrayObjectAdapter
-import androidx.leanback.widget.HeaderItem
-import androidx.leanback.widget.ListRow
-import androidx.leanback.widget.ListRowPresenter
+import androidx.leanback.widget.*
+import androidx.navigation.fragment.findNavController
 import com.tanasi.sflix.databinding.FragmentHomeBinding
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.TvShow
@@ -67,6 +65,18 @@ class HomeFragment : Fragment() {
             .beginTransaction()
             .replace(binding.flHomeRows.id, rowsFragment)
             .commit()
+
+        rowsFragment.onItemViewClickedListener =
+            OnItemViewClickedListener { _, item, _, _ ->
+                when (item) {
+                    is Movie -> findNavController().navigate(
+                        HomeFragmentDirections.actionHomeToMovie(
+                            id = item.id
+                        )
+                    )
+                    is TvShow -> {}
+                }
+            }
 
         rowsFragment.adapter = ArrayObjectAdapter(ListRowPresenter()).apply {
             add(ListRow(
