@@ -15,3 +15,11 @@ fun String.toCalendar(): Calendar? {
     }
     return null
 }
+
+fun Calendar.format(pattern: String): String? {
+    return try {
+        SimpleDateFormat(pattern, Locale.ENGLISH).format(this.time)
+    } catch (e: Exception) {
+        null
+    }
+}
