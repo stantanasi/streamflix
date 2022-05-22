@@ -25,4 +25,16 @@ class MovieFragment : Fragment() {
         _binding = FragmentMovieBinding.inflate(inflater, container, false)
         return binding.root
     }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                MovieViewModel.State.Loading -> {}
+                is MovieViewModel.State.SuccessLoading -> {
+                }
+            }
+        }
+    }
 }
