@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.leanback.app.BrowseSupportFragment
+import androidx.leanback.app.RowsSupportFragment
 import androidx.leanback.widget.ArrayObjectAdapter
 import androidx.leanback.widget.HeaderItem
 import androidx.leanback.widget.ListRow
@@ -61,14 +61,14 @@ class HomeFragment : Fragment() {
 
 
     private fun displayHome() {
-        val browseSupportFragment = BrowseSupportFragment()
+        val rowsFragment = RowsSupportFragment()
 
         parentFragmentManager
             .beginTransaction()
-            .replace(binding.flHomeRows.id, browseSupportFragment)
+            .replace(binding.flHomeRows.id, rowsFragment)
             .commit()
 
-        browseSupportFragment.adapter = ArrayObjectAdapter(ListRowPresenter()).apply {
+        rowsFragment.adapter = ArrayObjectAdapter(ListRowPresenter()).apply {
             add(ListRow(
                 HeaderItem("Trending Movies"),
                 ArrayObjectAdapter(MoviePresenter()).apply {
