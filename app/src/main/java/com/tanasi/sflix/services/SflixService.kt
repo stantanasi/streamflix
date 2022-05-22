@@ -4,6 +4,7 @@ import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface SflixService {
 
@@ -20,4 +21,7 @@ interface SflixService {
 
     @GET("home")
     suspend fun fetchHome(): Document
+
+    @GET("movie/free-{id}")
+    suspend fun fetchMovie(@Path("id") id: String): Document
 }
