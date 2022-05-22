@@ -5,14 +5,17 @@ import com.tanasi.sflix.utils.toCalendar
 class Movie(
     val id: String,
     val title: String,
-    released: String,
-    quality: String,
-    val rating: Double,
-    val poster: String,
+    val overview: String = "",
+    released: String? = null,
+    val runtime: Int? = null,
+    val youtubeTrailerId: String? = null,
+    quality: String = "",
+    val rating: Double? = null,
+    val poster: String? = null,
     val banner: String? = null,
 ) {
 
-    val released = released.toCalendar()
+    val released = released?.toCalendar()
     val quality = Quality.getByValue(quality)
 
 
