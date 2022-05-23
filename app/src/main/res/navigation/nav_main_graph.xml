@@ -21,5 +21,19 @@
         <argument
             android:name="id"
             app:argType="string" />
+        <action
+            android:id="@+id/action_movie_to_player"
+            app:destination="@id/player" />
+    </fragment>
+    <fragment
+        android:id="@+id/player"
+        android:name="com.tanasi.sflix.fragments.player.PlayerFragment"
+        android:label="PlayerFragment" >
+        <argument
+            android:name="linkId"
+            app:argType="string" />
+        <argument
+            android:name="title"
+            app:argType="string" />
     </fragment>
 </navigation>
