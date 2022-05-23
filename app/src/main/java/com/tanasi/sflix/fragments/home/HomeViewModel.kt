@@ -44,7 +44,7 @@ class HomeViewModel : ViewModel() {
                     title = it.select("h3.film-name").text(),
                     released = info?.get(2) ?: "",
                     quality = info?.get(1) ?: "",
-                    rating = info?.get(0)?.toDouble() ?: Double.NaN,
+                    rating = info?.get(0)?.toDoubleOrNull(),
                     poster = it.selectFirst("div.film-poster > img.film-poster-img").let { img ->
                         img?.attr("data-src") ?: img?.attr("src")
                     } ?: "",
@@ -66,7 +66,7 @@ class HomeViewModel : ViewModel() {
                     title = it.select("h3.film-name").text(),
                     lastEpisode = info?.get(2) ?: "",
                     quality = info?.get(1) ?: "",
-                    rating = info?.get(0)?.toDouble() ?: Double.NaN,
+                    rating = info?.get(0)?.toDoubleOrNull(),
                     poster = it.selectFirst("div.film-poster > img.film-poster-img").let { img ->
                         img?.attr("data-src") ?: img?.attr("src")
                     } ?: "",

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.databinding.FragmentMovieBinding
@@ -66,6 +67,14 @@ class MovieFragment : Fragment() {
             movie.servers.forEach {
                 val button = Button(requireContext())
                 button.text = it.name
+                button.setOnClickListener { _ ->
+                    findNavController().navigate(
+                        MovieFragmentDirections.actionMovieToPlayer(
+                            linkId = it.id,
+                            title = movie.title
+                        )
+                    )
+                }
                 addView(button)
             }
         }

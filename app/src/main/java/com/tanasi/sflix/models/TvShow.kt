@@ -5,7 +5,7 @@ class TvShow(
     val title: String,
     val lastEpisode: String,
     val quality: String,
-    val rating: Double,
+    val rating: Double?,
     val poster: String,
     val banner: String? = null,
 ) {
