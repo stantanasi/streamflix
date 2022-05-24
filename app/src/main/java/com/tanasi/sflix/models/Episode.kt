@@ -5,5 +5,7 @@ class Episode(
     val number: Int,
     val title: String = "",
     val poster: String = "",
+
+    val servers: List<Server> = listOf(),
 ) {
 }
