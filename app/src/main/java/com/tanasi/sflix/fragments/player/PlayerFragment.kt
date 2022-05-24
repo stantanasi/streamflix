@@ -71,6 +71,7 @@ class PlayerFragment : Fragment() {
         )
         playerGlue.host = VideoSupportFragmentGlueHost(videoFragment)
         playerGlue.title = args.title
+        playerGlue.subtitle = args.description
         playerGlue.playerAdapter.setDataSource(Uri.parse(video.source))
         playerGlue.playWhenPrepared()
     }
