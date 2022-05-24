@@ -24,6 +24,8 @@ class HomeFragment : Fragment() {
 
     private val trendingMovies = mutableListOf<Movie>()
     private val trendingTvShows = mutableListOf<TvShow>()
+    private val latestMovies = mutableListOf<Movie>()
+    private val latestTvShows = mutableListOf<TvShow>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +51,14 @@ class HomeFragment : Fragment() {
                         clear()
                         addAll(state.trendingTvShows)
                     }
+                    latestMovies.apply {
+                        clear()
+                        addAll(state.latestMovies)
+                    }
+                    latestTvShows.apply {
+                        clear()
+                        addAll(state.latestTvShows)
+                    }
                     displayHome()
                 }
             }
@@ -66,21 +76,20 @@ class HomeFragment : Fragment() {
             .replace(binding.flHomeRows.id, rowsFragment)
             .commit()
 
-        rowsFragment.onItemViewClickedListener =
-            OnItemViewClickedListener { _, item, _, _ ->
-                when (item) {
-                    is Movie -> findNavController().navigate(
-                        HomeFragmentDirections.actionHomeToMovie(
-                            id = item.id
-                        )
+        rowsFragment.onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
+            when (item) {
+                is Movie -> findNavController().navigate(
+                    HomeFragmentDirections.actionHomeToMovie(
+                        id = item.id
                     )
-                    is TvShow -> findNavController().navigate(
-                        HomeFragmentDirections.actionHomeToTvShow(
-                            id = item.id
-                        )
+                )
+                is TvShow -> findNavController().navigate(
+                    HomeFragmentDirections.actionHomeToTvShow(
+                        id = item.id
                     )
-                }
+                )
             }
+        }
 
         rowsFragment.adapter = ArrayObjectAdapter(ListRowPresenter()).apply {
             add(ListRow(
@@ -96,6 +105,22 @@ class HomeFragment : Fragment() {
                 ArrayObjectAdapter(TvShowPresenter()).apply {
                     clear()
                     addAll(0, trendingTvShows)
+                }
+            ))
+
+            add(ListRow(
+                HeaderItem("Latest Movies"),
+                ArrayObjectAdapter(MoviePresenter()).apply {
+                    clear()
+                    addAll(0, latestMovies)
+                }
+            ))
+
+            add(ListRow(
+                HeaderItem("Latest TV Shows"),
+                ArrayObjectAdapter(TvShowPresenter()).apply {
+                    clear()
+                    addAll(0, latestTvShows)
                 }
             ))
         }
