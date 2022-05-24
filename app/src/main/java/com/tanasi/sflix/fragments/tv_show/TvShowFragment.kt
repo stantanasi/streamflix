@@ -7,13 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.leanback.app.RowsSupportFragment
-import androidx.leanback.widget.ArrayObjectAdapter
-import androidx.leanback.widget.HeaderItem
-import androidx.leanback.widget.ListRow
-import androidx.leanback.widget.ListRowPresenter
+import androidx.leanback.widget.*
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.databinding.FragmentTvShowBinding
+import com.tanasi.sflix.models.Episode
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.presenters.EpisodePresenter
 import com.tanasi.sflix.utils.format
@@ -79,6 +78,20 @@ class TvShowFragment : Fragment() {
             .beginTransaction()
             .replace(binding.flTvShow.id, rowsFragment)
             .commit()
+
+        rowsFragment.onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
+            when (item) {
+                is Episode -> findNavController().navigate(
+                    TvShowFragmentDirections.actionTvShowToPlayer(
+                        linkId = item.servers.first().id,
+                        title = tvShow.title,
+                        description = tvShow.seasons.find { it.episodes.contains(item) }!!.let {
+                            "S${it.number} E${item.number}: ${item.title}"
+                        },
+                    )
+                )
+            }
+        }
 
         rowsFragment.adapter = ArrayObjectAdapter(ListRowPresenter()).apply {
             tvShow.seasons.forEach { season ->
