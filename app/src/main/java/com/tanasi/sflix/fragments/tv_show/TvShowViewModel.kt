@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Episode
 import com.tanasi.sflix.models.Season
+import com.tanasi.sflix.models.Server
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.services.SflixService
 import kotlinx.coroutines.launch
@@ -77,8 +78,9 @@ class TvShowViewModel : ViewModel() {
                             episodes = sflixService.fetchSeasonEpisode(seasonId)
                                 .select("div.flw-item.film_single-item.episode-item.eps-item")
                                 .mapIndexed { episodeNumber, episodeElement ->
+                                    val episodeId = episodeElement.attr("data-id")
                                     Episode(
-                                        id = episodeElement.attr("data-id"),
+                                        id = episodeId,
                                         number = episodeElement
                                             .selectFirst("div.episode-number")
                                             ?.text()
@@ -91,7 +93,16 @@ class TvShowViewModel : ViewModel() {
                                             ?.text()
                                             ?: "",
                                         poster = episodeElement.selectFirst("img")
-                                            ?.attr("src") ?: ""
+                                            ?.attr("src") ?: "",
+
+                                        servers = sflixService.fetchEpisodeServers(episodeId)
+                                            .select("a")
+                                            .map {
+                                                Server(
+                                                    id = it.attr("data-id"),
+                                                    name = it.selectFirst("span")?.text()?.trim() ?: "",
+                                                )
+                                            },
                                     )
                                 }
                         )
