@@ -36,5 +36,7 @@ class TvShowFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.fetchTvShow(args.id)
     }
 }
