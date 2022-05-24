@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tanasi.sflix.models.Episode
 import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.Season
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.services.SflixService
 import kotlinx.coroutines.launch
@@ -64,12 +66,33 @@ class HomeViewModel : ViewModel() {
                 TvShow(
                     id = it.selectFirst("a")?.attr("href")?.substringAfterLast("-") ?: "",
                     title = it.select("h3.film-name").text(),
-                    lastEpisode = info?.get(2) ?: "",
                     quality = info?.get(1) ?: "",
                     rating = info?.get(0)?.toDoubleOrNull(),
                     poster = it.selectFirst("div.film-poster > img.film-poster-img").let { img ->
                         img?.attr("data-src") ?: img?.attr("src")
                     } ?: "",
+
+                    seasons = info?.get(2)?.let { lastEpisode ->
+                        listOf(
+                            Season(
+                                id = "",
+                                number = lastEpisode
+                                    .substringAfter("S")
+                                    .substringBefore(":")
+                                    .toInt(),
+
+                                episodes = listOf(
+                                    Episode(
+                                        id = "",
+                                        number = lastEpisode
+                                            .substringAfter(":")
+                                            .substringAfter("E")
+                                            .toInt()
+                                    )
+                                )
+                            )
+                        )
+                    } ?: listOf()
                 )
             }
 
