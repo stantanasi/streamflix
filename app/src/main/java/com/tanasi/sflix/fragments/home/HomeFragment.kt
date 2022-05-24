@@ -74,7 +74,11 @@ class HomeFragment : Fragment() {
                             id = item.id
                         )
                     )
-                    is TvShow -> {}
+                    is TvShow -> findNavController().navigate(
+                        HomeFragmentDirections.actionHomeToTvShow(
+                            id = item.id
+                        )
+                    )
                 }
             }
 

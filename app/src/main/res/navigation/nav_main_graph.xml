@@ -12,6 +12,9 @@
         <action
             android:id="@+id/action_home_to_movie"
             app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_home_to_tv_show"
+            app:destination="@id/tv_show" />
     </fragment>
     <fragment
         android:id="@+id/movie"
@@ -34,6 +37,22 @@
             app:argType="string" />
         <argument
             android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="description"
+            app:argType="string"
+            android:defaultValue="" />
+    </fragment>
+    <fragment
+        android:id="@+id/tv_show"
+        android:name="com.tanasi.sflix.fragments.tv_show.TvShowFragment"
+        android:label="fragment_tv_show"
+        tools:layout="@layout/fragment_tv_show" >
+        <action
+            android:id="@+id/action_tv_show_to_player"
+            app:destination="@id/player" />
+        <argument
+            android:name="id"
             app:argType="string" />
     </fragment>
 </navigation>
