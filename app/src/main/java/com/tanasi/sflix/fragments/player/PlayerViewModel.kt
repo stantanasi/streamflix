@@ -42,6 +42,7 @@ class PlayerViewModel : ViewModel() {
                         Video.Subtitle(
                             name = it.label,
                             file = it.file,
+                            default = it.default,
                         )
                     }
             )
