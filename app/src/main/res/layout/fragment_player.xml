@@ -7,13 +7,17 @@
     android:background="#000000"
     tools:context=".fragments.player.PlayerFragment">
 
-    <FrameLayout
-        android:id="@+id/fl_player"
+    <com.google.android.exoplayer2.ui.StyledPlayerView
+        android:id="@+id/pv_player"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:resize_mode="fit"
+        app:show_timeout="5000" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

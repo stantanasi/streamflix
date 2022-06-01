@@ -35,13 +35,14 @@ class PlayerViewModel : ViewModel() {
 
         _state.value = State.SuccessLoading(
             Video(
-                source = sources.sources.firstOrNull()!!.file,
+                source = sources.sources.firstOrNull()?.file ?: "",
                 subtitles = sources.tracks
                     .filter { it.kind == "captions" }
                     .map {
                         Video.Subtitle(
                             name = it.label,
                             file = it.file,
+                            default = it.default,
                         )
                     }
             )
