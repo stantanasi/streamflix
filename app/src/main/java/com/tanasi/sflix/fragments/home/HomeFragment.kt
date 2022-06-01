@@ -6,14 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.leanback.app.RowsSupportFragment
-import androidx.leanback.widget.*
-import androidx.navigation.fragment.findNavController
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.TvShow
-import com.tanasi.sflix.presenters.MoviePresenter
-import com.tanasi.sflix.presenters.TvShowPresenter
 
 class HomeFragment : Fragment() {
 
@@ -69,60 +65,32 @@ class HomeFragment : Fragment() {
 
 
     private fun displayHome() {
-        val rowsFragment = RowsSupportFragment()
-
-        parentFragmentManager
-            .beginTransaction()
-            .replace(binding.flHomeRows.id, rowsFragment)
-            .commit()
-
-        rowsFragment.onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
-            when (item) {
-                is Movie -> findNavController().navigate(
-                    HomeFragmentDirections.actionHomeToMovie(
-                        id = item.id
-                    )
-                )
-                is TvShow -> findNavController().navigate(
-                    HomeFragmentDirections.actionHomeToTvShow(
-                        id = item.id
-                    )
-                )
-            }
+        binding.hgvTrendingMovies.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(trendingMovies.map {
+                it.apply { itemType = SflixAdapter.Type.MOVIE }
+            })
         }
 
-        rowsFragment.adapter = ArrayObjectAdapter(ListRowPresenter()).apply {
-            add(ListRow(
-                HeaderItem("Trending Movies"),
-                ArrayObjectAdapter(MoviePresenter()).apply {
-                    clear()
-                    addAll(0, trendingMovies)
-                }
-            ))
+        binding.hgvTrendingTvShows.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(trendingTvShows.map {
+                it.apply { itemType = SflixAdapter.Type.TV_SHOW }
+            })
+        }
 
-            add(ListRow(
-                HeaderItem("Trending TV Shows"),
-                ArrayObjectAdapter(TvShowPresenter()).apply {
-                    clear()
-                    addAll(0, trendingTvShows)
-                }
-            ))
+        binding.hgvLatestMovies.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(latestMovies.map {
+                it.apply { itemType = SflixAdapter.Type.MOVIE }
+            })
+        }
 
-            add(ListRow(
-                HeaderItem("Latest Movies"),
-                ArrayObjectAdapter(MoviePresenter()).apply {
-                    clear()
-                    addAll(0, latestMovies)
-                }
-            ))
-
-            add(ListRow(
-                HeaderItem("Latest TV Shows"),
-                ArrayObjectAdapter(TvShowPresenter()).apply {
-                    clear()
-                    addAll(0, latestTvShows)
-                }
-            ))
+        binding.hgvLatestTvShows.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(latestTvShows.map {
+                it.apply { itemType = SflixAdapter.Type.TV_SHOW }
+            })
         }
     }
 }
