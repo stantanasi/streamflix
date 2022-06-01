@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentMovieBinding
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.utils.format
@@ -55,34 +56,10 @@ class MovieFragment : Fragment() {
             .load(movie.banner)
             .into(binding.ivMovieBanner)
 
-        Glide.with(requireContext())
-            .load(movie.poster)
-            .into(binding.ivMoviePoster)
-
-        binding.tvMovieTitle.text = movie.title
-
-        binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
-
-        binding.llMovieServers.apply {
-            movie.servers.forEach {
-                val button = Button(requireContext())
-                button.text = it.name
-                button.setOnClickListener { _ ->
-                    findNavController().navigate(
-                        MovieFragmentDirections.actionMovieToPlayer(
-                            linkId = it.id,
-                            title = movie.title
-                        )
-                    )
-                }
-                addView(button)
-            }
+        binding.vgvMovie.apply {
+            adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
+                it.add(movie.apply { itemType = SflixAdapter.Type.MOVIE_HEADER })
+            })
         }
-
-        binding.tvMovieOverview.text = movie.overview
-
-        binding.tvMovieReleased.text = movie.released?.format("yyyy-MM-dd")
-
-        binding.tvMovieRuntime.text = "${movie.runtime} min"
     }
 }
