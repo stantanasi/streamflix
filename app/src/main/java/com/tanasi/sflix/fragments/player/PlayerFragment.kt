@@ -74,6 +74,15 @@ class PlayerFragment : Fragment() {
                 .build()
         )
 
+        video.subtitles
+            .find { it.default }
+            ?.let { subtitle ->
+                player.trackSelectionParameters = player.trackSelectionParameters
+                    .buildUpon()
+                    .setPreferredTextLanguage(subtitle.name)
+                    .build()
+            }
+
         player.prepare()
         player.play()
     }
