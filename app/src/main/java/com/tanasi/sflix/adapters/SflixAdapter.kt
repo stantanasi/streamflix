@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.sflix.adapters.view_holders.VhMovie
 import com.tanasi.sflix.adapters.view_holders.VhTvShow
 import com.tanasi.sflix.databinding.ItemMovieBinding
+import com.tanasi.sflix.databinding.ItemMovieHeaderBinding
 import com.tanasi.sflix.databinding.ItemTvShowBinding
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.TvShow
@@ -20,6 +21,7 @@ class SflixAdapter(
 
     enum class Type {
         MOVIE,
+        MOVIE_HEADER,
 
         TV_SHOW,
     }
@@ -28,6 +30,13 @@ class SflixAdapter(
         when (Type.values()[viewType]) {
             Type.MOVIE -> VhMovie(
                 ItemMovieBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+            Type.MOVIE_HEADER -> VhMovie(
+                ItemMovieHeaderBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
