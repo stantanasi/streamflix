@@ -59,7 +59,6 @@ class VhMovie(
         binding.tvMovieTitle.text = movie.title
     }
 
-
     private fun displayHeader(binding: ItemMovieHeaderBinding) {
         Glide.with(context)
             .load(movie.poster)
