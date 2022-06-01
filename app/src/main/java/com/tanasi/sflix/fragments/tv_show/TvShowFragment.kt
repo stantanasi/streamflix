@@ -56,6 +56,9 @@ class TvShowFragment : Fragment() {
         binding.vgvTvShow.apply {
             adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
                 it.add(tvShow.apply { itemType = SflixAdapter.Type.TV_SHOW_HEADER })
+                it.addAll(tvShow.seasons.map {
+                    it.apply { itemType = SflixAdapter.Type.SEASON }
+                })
             })
         }
     }
