@@ -1,7 +1,14 @@
 package com.tanasi.sflix.adapters
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.tanasi.sflix.adapters.view_holders.VhMovie
+import com.tanasi.sflix.adapters.view_holders.VhTvShow
+import com.tanasi.sflix.databinding.ItemMovieBinding
+import com.tanasi.sflix.databinding.ItemTvShowBinding
+import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.TvShow
 
 class SflixAdapter(
     private val items: List<Item>
@@ -12,14 +19,35 @@ class SflixAdapter(
     }
 
     enum class Type {
+        MOVIE,
+
+        TV_SHOW,
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        TODO("Not yet implemented")
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        when (Type.values()[viewType]) {
+            Type.MOVIE -> VhMovie(
+                ItemMovieBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.TV_SHOW -> VhTvShow(
+                ItemTvShowBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+        }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        TODO("Not yet implemented")
+        when (holder) {
+            is VhMovie -> holder.bind(items[position] as Movie)
+            is VhTvShow -> holder.bind(items[position] as TvShow)
+        }
     }
 
     override fun getItemCount(): Int = items.size
