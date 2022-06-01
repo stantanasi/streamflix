@@ -1,5 +1,6 @@
 package com.tanasi.sflix.fragments.player
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
+import com.google.android.exoplayer2.util.MimeTypes
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
 
@@ -59,7 +62,17 @@ class PlayerFragment : Fragment() {
 
 
     private fun displayVideo() {
-        player.setMediaItem(MediaItem.fromUri(video.source))
+        player.setMediaItem(
+            MediaItem.Builder()
+                .setUri(Uri.parse(video.source))
+                .setSubtitleConfigurations(video.subtitles.map {
+                    SubtitleConfiguration.Builder(Uri.parse(it.file))
+                        .setMimeType(MimeTypes.TEXT_VTT)
+                        .setLanguage(it.name)
+                        .build()
+                })
+                .build()
+        )
 
         player.prepare()
         player.play()
