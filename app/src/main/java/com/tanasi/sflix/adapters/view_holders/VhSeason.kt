@@ -1,7 +1,14 @@
 package com.tanasi.sflix.adapters.view_holders
 
+import android.R.attr
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.databinding.ItemSeasonBinding
 import com.tanasi.sflix.models.Season
 
 
@@ -16,5 +23,21 @@ class VhSeason(
 
     fun bind(season: Season) {
         this.season = season
+
+        when (_binding) {
+            is ItemSeasonBinding -> displaySeason(_binding)
+        }
+    }
+
+
+    private fun displaySeason(binding: ItemSeasonBinding) {
+        binding.tvSeasonNumber.text = season.title
+
+        binding.hgvSeasonEpisodes.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(season.episodes.map {
+                it.apply { itemType = SflixAdapter.Type.EPISODE }
+            })
+        }
     }
 }
