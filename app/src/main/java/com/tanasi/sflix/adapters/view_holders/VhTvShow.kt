@@ -7,8 +7,10 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemTvShowBinding
+import com.tanasi.sflix.databinding.ItemTvShowHeaderBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.models.TvShow
+import com.tanasi.sflix.utils.format
 
 class VhTvShow(
     private val _binding: ViewBinding
@@ -24,6 +26,8 @@ class VhTvShow(
 
         when (_binding) {
             is ItemTvShowBinding -> displayCard(_binding)
+
+            is ItemTvShowHeaderBinding -> displayHeader(_binding)
         }
     }
 
@@ -51,5 +55,21 @@ class VhTvShow(
             .into(binding.ivTvShowPoster)
 
         binding.tvTvShowTitle.text = tvShow.title
+    }
+
+    private fun displayHeader(binding: ItemTvShowHeaderBinding) {
+        Glide.with(context)
+            .load(tvShow.poster)
+            .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowTitle.text = tvShow.title
+
+        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.tvTvShowOverview.text = tvShow.overview
+
+        binding.tvTvShowReleased.text = tvShow.released?.format("yyyy-MM-dd")
+
+        binding.tvTvShowRuntime.text = "${tvShow.runtime} min"
     }
 }
