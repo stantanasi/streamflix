@@ -3,15 +3,9 @@ package com.tanasi.sflix.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.tanasi.sflix.adapters.view_holders.VhEpisode
-import com.tanasi.sflix.adapters.view_holders.VhMovie
-import com.tanasi.sflix.adapters.view_holders.VhSeason
-import com.tanasi.sflix.adapters.view_holders.VhTvShow
+import com.tanasi.sflix.adapters.view_holders.*
 import com.tanasi.sflix.databinding.*
-import com.tanasi.sflix.models.Episode
-import com.tanasi.sflix.models.Movie
-import com.tanasi.sflix.models.Season
-import com.tanasi.sflix.models.TvShow
+import com.tanasi.sflix.models.*
 
 class SflixAdapter(
     private val items: List<Item>
@@ -26,6 +20,8 @@ class SflixAdapter(
 
         MOVIE,
         MOVIE_HEADER,
+
+        ROW,
 
         SEASON,
 
@@ -52,6 +48,14 @@ class SflixAdapter(
             )
             Type.MOVIE_HEADER -> VhMovie(
                 ItemMovieHeaderBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.ROW -> VhRow(
+                ItemRowBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -86,6 +90,7 @@ class SflixAdapter(
         when (holder) {
             is VhEpisode -> holder.bind(items[position] as Episode)
             is VhMovie -> holder.bind(items[position] as Movie)
+            is VhRow -> holder.bind(items[position] as Row)
             is VhSeason -> holder.bind(items[position] as Season)
             is VhTvShow -> holder.bind(items[position] as TvShow)
         }
