@@ -1,5 +1,6 @@
 package com.tanasi.sflix.models
 
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.utils.toCalendar
 
 class Movie(
@@ -15,7 +16,7 @@ class Movie(
     val banner: String? = null,
 
     val servers: List<Server> = listOf(),
-) {
+) : SflixAdapter.Item {
 
     val released = released?.toCalendar()
     val quality = Quality.getByValue(quality)
@@ -33,4 +34,7 @@ class Movie(
             }
         }
     }
+
+
+    override lateinit var itemType: SflixAdapter.Type
 }

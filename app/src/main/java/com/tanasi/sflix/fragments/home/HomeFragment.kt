@@ -6,14 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.leanback.app.RowsSupportFragment
-import androidx.leanback.widget.*
-import androidx.navigation.fragment.findNavController
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
 import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.Row
 import com.tanasi.sflix.models.TvShow
-import com.tanasi.sflix.presenters.MoviePresenter
-import com.tanasi.sflix.presenters.TvShowPresenter
 
 class HomeFragment : Fragment() {
 
@@ -69,60 +66,30 @@ class HomeFragment : Fragment() {
 
 
     private fun displayHome() {
-        val rowsFragment = RowsSupportFragment()
+        binding.vgvHome.apply {
+            val list = mutableListOf<SflixAdapter.Item>()
 
-        parentFragmentManager
-            .beginTransaction()
-            .replace(binding.flHomeRows.id, rowsFragment)
-            .commit()
-
-        rowsFragment.onItemViewClickedListener = OnItemViewClickedListener { _, item, _, _ ->
-            when (item) {
-                is Movie -> findNavController().navigate(
-                    HomeFragmentDirections.actionHomeToMovie(
-                        id = item.id
-                    )
-                )
-                is TvShow -> findNavController().navigate(
-                    HomeFragmentDirections.actionHomeToTvShow(
-                        id = item.id
-                    )
-                )
-            }
-        }
-
-        rowsFragment.adapter = ArrayObjectAdapter(ListRowPresenter()).apply {
-            add(ListRow(
-                HeaderItem("Trending Movies"),
-                ArrayObjectAdapter(MoviePresenter()).apply {
-                    clear()
-                    addAll(0, trendingMovies)
-                }
+            list.add(Row(
+                "Trending Movies",
+                trendingMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE } }
             ))
 
-            add(ListRow(
-                HeaderItem("Trending TV Shows"),
-                ArrayObjectAdapter(TvShowPresenter()).apply {
-                    clear()
-                    addAll(0, trendingTvShows)
-                }
+            list.add(Row(
+                "Trending TV Shows",
+                trendingTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW } }
             ))
 
-            add(ListRow(
-                HeaderItem("Latest Movies"),
-                ArrayObjectAdapter(MoviePresenter()).apply {
-                    clear()
-                    addAll(0, latestMovies)
-                }
+            list.add(Row(
+                "Latest Movies",
+                latestMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE } }
             ))
 
-            add(ListRow(
-                HeaderItem("Latest TV Shows"),
-                ArrayObjectAdapter(TvShowPresenter()).apply {
-                    clear()
-                    addAll(0, latestTvShows)
-                }
+            list.add(Row(
+                "Latest TV Shows",
+                latestTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW } }
             ))
+
+            adapter = SflixAdapter(list)
         }
     }
 }
