@@ -34,9 +34,6 @@ class VhEpisode(
                 findNavController().navigate(
                     TvShowFragmentDirections.actionTvShowToPlayer(
                         linkId = episode.servers.first().id,
-                        title = "",
-//                        description = tvShow.seasons.find { it.episodes.contains(item) }!!.let {
-//                            "S${it.number} E${item.number}: ${item.title}"
                     )
                 )
             }

@@ -76,7 +76,6 @@ class VhMovie(
                     findNavController().navigate(
                         MovieFragmentDirections.actionMovieToPlayer(
                             linkId = it.id,
-                            title = movie.title
                         )
                     )
                 }
