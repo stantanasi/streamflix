@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
 import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.Row
 import com.tanasi.sflix.models.TvShow
 
 class HomeFragment : Fragment() {
@@ -65,32 +66,30 @@ class HomeFragment : Fragment() {
 
 
     private fun displayHome() {
-        binding.hgvTrendingMovies.apply {
-            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(trendingMovies.map {
-                it.apply { itemType = SflixAdapter.Type.MOVIE }
-            })
-        }
+        binding.vgvHome.apply {
+            val list = mutableListOf<SflixAdapter.Item>()
 
-        binding.hgvTrendingTvShows.apply {
-            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(trendingTvShows.map {
-                it.apply { itemType = SflixAdapter.Type.TV_SHOW }
-            })
-        }
+            list.add(Row(
+                "Trending Movies",
+                trendingMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE } }
+            ))
 
-        binding.hgvLatestMovies.apply {
-            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(latestMovies.map {
-                it.apply { itemType = SflixAdapter.Type.MOVIE }
-            })
-        }
+            list.add(Row(
+                "Trending TV Shows",
+                trendingTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW } }
+            ))
 
-        binding.hgvLatestTvShows.apply {
-            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(latestTvShows.map {
-                it.apply { itemType = SflixAdapter.Type.TV_SHOW }
-            })
+            list.add(Row(
+                "Latest Movies",
+                latestMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE } }
+            ))
+
+            list.add(Row(
+                "Latest TV Shows",
+                latestTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW } }
+            ))
+
+            adapter = SflixAdapter(list)
         }
     }
 }
