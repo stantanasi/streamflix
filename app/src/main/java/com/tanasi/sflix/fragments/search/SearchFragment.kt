@@ -42,7 +42,7 @@ class SearchFragment : Fragment() {
                 is SearchViewModel.State.SuccessSearching -> {
                     list.apply {
                         clear()
-                        addAll(state.search)
+                        addAll(state.results)
                     }
                     displaySearch()
                 }

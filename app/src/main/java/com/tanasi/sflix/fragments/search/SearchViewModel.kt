@@ -22,7 +22,7 @@ class SearchViewModel : ViewModel() {
     sealed class State {
         object Searching : State()
 
-        data class SuccessSearching(val search: List<SflixAdapter.Item>) : State()
+        data class SuccessSearching(val results: List<SflixAdapter.Item>) : State()
     }
 
 
