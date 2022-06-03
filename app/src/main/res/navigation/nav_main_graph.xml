@@ -52,5 +52,12 @@
         android:id="@+id/search"
         android:name="com.tanasi.sflix.fragments.search.SearchFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_search_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_search_to_tv_show"
+            app:destination="@id/tv_show" />
+    </fragment>
 </navigation>
