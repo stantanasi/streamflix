@@ -8,6 +8,18 @@
     tools:deviceIds="tv"
     tools:ignore="MergeRootFrame">
 
+    <com.google.android.material.navigationrail.NavigationRailView
+        android:id="@+id/nav_main"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:menuGravity="center"
+        android:theme="@style/Theme.MaterialComponents"
+        app:labelVisibilityMode="unlabeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/menu_main_activity" />
+
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_main_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -16,7 +28,7 @@
         app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/nav_main"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_main_graph" />
 
