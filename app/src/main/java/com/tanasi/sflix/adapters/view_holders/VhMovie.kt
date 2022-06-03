@@ -11,6 +11,7 @@ import com.tanasi.sflix.databinding.ItemMovieBinding
 import com.tanasi.sflix.databinding.ItemMovieHeaderBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
+import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.utils.format
 
@@ -37,9 +38,18 @@ class VhMovie(
     private fun displayCard(binding: ItemMovieBinding) {
         binding.root.apply {
             setOnClickListener {
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeToMovie(movie.id)
-                )
+                when (findNavController().currentDestination?.id) {
+                    R.id.home -> findNavController().navigate(
+                        HomeFragmentDirections.actionHomeToMovie(
+                            movie.id
+                        )
+                    )
+                    R.id.search -> findNavController().navigate(
+                        SearchFragmentDirections.actionSearchToMovie(
+                            movie.id
+                        )
+                    )
+                }
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {
