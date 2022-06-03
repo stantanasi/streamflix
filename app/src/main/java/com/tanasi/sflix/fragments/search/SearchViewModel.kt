@@ -9,10 +9,10 @@ class SearchViewModel : ViewModel() {
 
     private val sflixService = SflixService.build()
 
-    private val _state: MutableLiveData<State> = MutableLiveData(State.Loading)
+    private val _state: MutableLiveData<State> = MutableLiveData(State.Searching)
     val state: LiveData<State> = _state
 
     sealed class State {
-        object Loading : State()
+        object Searching : State()
     }
 }
