@@ -31,4 +31,16 @@ class MainActivity : FragmentActivity() {
             }
         }
     }
+
+    override fun onBackPressed() {
+        val navController = (supportFragmentManager
+            .findFragmentById(binding.navMainFragment.id) as NavHostFragment)
+            .navController
+
+        when (navController.currentDestination?.id) {
+            R.id.search,
+            R.id.home -> finish()
+            else -> super.onBackPressed()
+        }
+    }
 }
