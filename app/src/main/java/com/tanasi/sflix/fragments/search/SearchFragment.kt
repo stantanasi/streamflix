@@ -8,7 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentSearchBinding
+import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.TvShow
 import java.util.*
 
 class SearchFragment : Fragment() {
@@ -17,6 +20,8 @@ class SearchFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel by viewModels<SearchViewModel>()
+
+    private val list = mutableListOf<SflixAdapter.Item>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,6 +34,20 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                SearchViewModel.State.Searching -> {}
+
+                is SearchViewModel.State.SuccessSearching -> {
+                    list.apply {
+                        clear()
+                        addAll(state.search)
+                    }
+                    displaySearch()
+                }
+            }
+        }
 
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             private var timer = Timer()
@@ -46,6 +65,17 @@ class SearchFragment : Fragment() {
                     }
                 }, 1000)
             }
+        })
+    }
+
+
+    private fun displaySearch() {
+        binding.rvSearch.adapter = SflixAdapter(list.map {
+            when (it) {
+                is Movie -> it.itemType = SflixAdapter.Type.MOVIE
+                is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW
+            }
+            it
         })
     }
 }
