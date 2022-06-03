@@ -18,6 +18,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:resize_mode="fit"
+        app:show_subtitle_button="true"
         app:show_timeout="5000" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
