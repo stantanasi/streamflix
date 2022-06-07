@@ -9,6 +9,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemTvShowBinding
 import com.tanasi.sflix.databinding.ItemTvShowHeaderBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
+import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.format
 
@@ -35,9 +36,18 @@ class VhTvShow(
     private fun displayCard(binding: ItemTvShowBinding) {
         binding.root.apply {
             setOnClickListener {
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeToTvShow(tvShow.id)
-                )
+                when (findNavController().currentDestination?.id) {
+                    R.id.home -> findNavController().navigate(
+                        HomeFragmentDirections.actionHomeToTvShow(
+                            tvShow.id
+                        )
+                    )
+                    R.id.search -> findNavController().navigate(
+                        SearchFragmentDirections.actionSearchToTvShow(
+                            tvShow.id
+                        )
+                    )
+                }
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {
