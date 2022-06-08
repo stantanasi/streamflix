@@ -4,16 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentMovieBinding
 import com.tanasi.sflix.models.Movie
-import com.tanasi.sflix.utils.format
 
 class MovieFragment : Fragment() {
 
@@ -40,9 +38,17 @@ class MovieFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 MovieViewModel.State.Loading -> {}
+
                 is MovieViewModel.State.SuccessLoading -> {
                     movie = state.movie
                     displayMovie()
+                }
+                is MovieViewModel.State.FailedLoading -> {
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

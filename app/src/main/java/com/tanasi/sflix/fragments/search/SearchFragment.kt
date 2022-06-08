@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.tanasi.sflix.adapters.SflixAdapter
@@ -45,6 +46,13 @@ class SearchFragment : Fragment() {
                         addAll(state.results)
                     }
                     displaySearch()
+                }
+                is SearchViewModel.State.FailedSearching -> {
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
