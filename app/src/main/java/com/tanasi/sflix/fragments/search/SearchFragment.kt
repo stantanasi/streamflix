@@ -1,11 +1,10 @@
 package com.tanasi.sflix.fragments.search
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -13,7 +12,8 @@ import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentSearchBinding
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.TvShow
-import java.util.*
+import com.tanasi.sflix.utils.hideKeyboard
+
 
 class SearchFragment : Fragment() {
 
@@ -57,23 +57,18 @@ class SearchFragment : Fragment() {
             }
         }
 
-        binding.etSearch.addTextChangedListener(object : TextWatcher {
-            private var timer = Timer()
+        binding.etSearch.setOnEditorActionListener { _, actionId, _ ->
+            val query = binding.etSearch.text.toString().trim()
 
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(s: Editable) {
-                val query = s.toString().trim()
-                timer.cancel()
-                timer = Timer()
-                timer.schedule(object : TimerTask() {
-                    override fun run() {
-                        viewModel.search(query)
-                    }
-                }, 1000)
+            when (actionId) {
+                EditorInfo.IME_ACTION_SEARCH -> {
+                    viewModel.search(query)
+                    hideKeyboard()
+                    true
+                }
+                else -> false
             }
-        })
+        }
     }
 
 
