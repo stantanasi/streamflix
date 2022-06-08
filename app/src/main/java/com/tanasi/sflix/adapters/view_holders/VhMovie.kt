@@ -1,7 +1,6 @@
 package com.tanasi.sflix.adapters.view_holders
 
 import android.view.animation.AnimationUtils
-import android.widget.Button
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -78,18 +77,13 @@ class VhMovie(
 
         binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
 
-        binding.llMovieServers.apply {
-            movie.servers.forEach {
-                val button = Button(context)
-                button.text = it.name
-                button.setOnClickListener { _ ->
-                    findNavController().navigate(
-                        MovieFragmentDirections.actionMovieToPlayer(
-                            linkId = it.id,
-                        )
+        binding.btnMovieWatchNow.apply {
+            setOnClickListener { _ ->
+                findNavController().navigate(
+                    MovieFragmentDirections.actionMovieToPlayer(
+                        linkId = movie.servers.first().id,
                     )
-                }
-                addView(button)
+                )
             }
         }
 
