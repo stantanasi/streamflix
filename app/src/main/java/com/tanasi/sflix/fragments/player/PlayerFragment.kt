@@ -16,7 +16,6 @@ import com.google.android.exoplayer2.util.MimeTypes
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
 
-
 class PlayerFragment : Fragment() {
 
     private var _binding: FragmentPlayerBinding? = null

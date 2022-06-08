@@ -14,7 +14,6 @@ import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.hideKeyboard
 
-
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
