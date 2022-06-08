@@ -76,7 +76,7 @@ class PlayerFragment : Fragment() {
                 .setSubtitleConfigurations(video.subtitles.map {
                     SubtitleConfiguration.Builder(Uri.parse(it.file))
                         .setMimeType(MimeTypes.TEXT_VTT)
-                        .setLanguage(it.name)
+                        .setLabel(it.label)
                         .build()
                 })
                 .build()

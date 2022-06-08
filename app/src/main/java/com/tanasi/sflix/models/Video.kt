@@ -7,7 +7,7 @@ class Video(
 ) {
 
     class Subtitle(
-        val name: String,
+        val label: String,
         val file: String,
         val default: Boolean = false,
     ) {

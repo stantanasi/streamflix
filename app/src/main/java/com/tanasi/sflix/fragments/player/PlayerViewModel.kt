@@ -43,7 +43,7 @@ class PlayerViewModel : ViewModel() {
                         .filter { it.kind == "captions" }
                         .map {
                             Video.Subtitle(
-                                name = it.label,
+                                label = it.label,
                                 file = it.file,
                                 default = it.default,
                             )
