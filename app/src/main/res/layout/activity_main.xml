@@ -8,17 +8,19 @@
     tools:deviceIds="tv"
     tools:ignore="MergeRootFrame">
 
-    <com.google.android.material.navigationrail.NavigationRailView
+    <com.tanasi.navigation.widget.NavigationSlideView
         android:id="@+id/nav_main"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:theme="@style/Theme.MaterialComponents"
-        app:labelVisibilityMode="unlabeled"
+        android:background="#00000000"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:menu="@menu/menu_main_activity"
-        app:menuGravity="center" />
+        app:menuGravity="center"
+        app:menuSpacing="8dp" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_main_fragment"

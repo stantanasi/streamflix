@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
+import com.tanasi.navigation.widget.setupWithNavController
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ActivityMainBinding
 
