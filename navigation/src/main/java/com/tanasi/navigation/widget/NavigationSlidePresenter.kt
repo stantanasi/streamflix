@@ -9,45 +9,39 @@ import androidx.appcompat.view.menu.*
 @SuppressLint("RestrictedApi")
 class NavigationSlidePresenter : MenuPresenter {
 
-    override fun initForMenu(context: Context?, menu: MenuBuilder?) {
-        TODO("Not yet implemented")
+    private lateinit var menu: MenuBuilder
+    lateinit var menuView: NavigationSlideMenuView
+    var updateSuspended = false
+
+    override fun initForMenu(context: Context, menu: MenuBuilder) {
+        this.menu = menu
+        menuView.initialize(this.menu)
     }
 
-    override fun getMenuView(root: ViewGroup?): MenuView {
-        TODO("Not yet implemented")
-    }
+    override fun getMenuView(root: ViewGroup?): MenuView = menuView
 
     override fun updateMenuView(cleared: Boolean) {
-        TODO("Not yet implemented")
+        if (updateSuspended) return
+
+        when {
+            cleared -> menuView.buildMenuView()
+            else -> menuView.updateMenuView()
+        }
     }
 
-    override fun setCallback(cb: MenuPresenter.Callback?) {
-        TODO("Not yet implemented")
-    }
+    override fun setCallback(cb: MenuPresenter.Callback?) {}
 
-    override fun onSubMenuSelected(subMenu: SubMenuBuilder?): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun onSubMenuSelected(subMenu: SubMenuBuilder?): Boolean = false
 
-    override fun onCloseMenu(menu: MenuBuilder?, allMenusAreClosing: Boolean) {
-        TODO("Not yet implemented")
-    }
+    override fun onCloseMenu(menu: MenuBuilder?, allMenusAreClosing: Boolean) {}
 
-    override fun flagActionItems(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun flagActionItems(): Boolean = false
 
-    override fun expandItemActionView(menu: MenuBuilder?, item: MenuItemImpl?): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun expandItemActionView(menu: MenuBuilder?, item: MenuItemImpl?): Boolean = false
 
-    override fun collapseItemActionView(menu: MenuBuilder?, item: MenuItemImpl?): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun collapseItemActionView(menu: MenuBuilder?, item: MenuItemImpl?): Boolean = false
 
-    override fun getId(): Int {
-        TODO("Not yet implemented")
-    }
+    override fun getId(): Int = MENU_PRESENTER_ID
 
     override fun onSaveInstanceState(): Parcelable {
         TODO("Not yet implemented")
@@ -55,5 +49,10 @@ class NavigationSlidePresenter : MenuPresenter {
 
     override fun onRestoreInstanceState(state: Parcelable?) {
         TODO("Not yet implemented")
+    }
+
+
+    companion object {
+        const val MENU_PRESENTER_ID = 1
     }
 }
