@@ -2,6 +2,7 @@ package com.tanasi.navigation.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.ShapeDrawable
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -35,6 +36,16 @@ class NavigationSlideMenuView(
                 layoutParams.gravity = value
                 setLayoutParams(layoutParams)
             }
+        }
+
+    var menuSpacing: Int
+        get() = dividerDrawable.intrinsicHeight
+        set(value) {
+            dividerDrawable = ShapeDrawable().apply {
+                alpha = 0
+                intrinsicHeight = value
+            }
+            showDividers = SHOW_DIVIDER_MIDDLE
         }
 
 

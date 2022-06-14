@@ -50,6 +50,15 @@ class NavigationSlideView @JvmOverloads constructor(
             menuView.menuGravity = value
         }
 
+    /**
+     * Current spacing setting for how destinations in the menu view will be spaced out.
+     */
+    private var menuSpacing: Int
+        get() = menuView.menuSpacing
+        set(value) {
+            menuView.menuSpacing = value
+        }
+
 
     init {
         val attributes = context.theme.obtainStyledAttributes(
@@ -67,6 +76,11 @@ class NavigationSlideView @JvmOverloads constructor(
         menuGravity = attributes.getInt(
             R.styleable.NavigationSlideView_menuGravity,
             DEFAULT_MENU_GRAVITY
+        )
+
+        menuSpacing = attributes.getDimensionPixelSize(
+            R.styleable.NavigationSlideView_menuSpacing,
+            DEFAULT_MENU_SPACING
         )
 
         inflateMenu(attributes.getResourceIdOrThrow(R.styleable.NavigationSlideView_menu))
@@ -116,5 +130,6 @@ class NavigationSlideView @JvmOverloads constructor(
 
     companion object {
         const val DEFAULT_MENU_GRAVITY = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+        const val DEFAULT_MENU_SPACING = 0
     }
 }
