@@ -20,7 +20,9 @@ class NavigationSlideView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     val menu = NavigationSlideMenu(context)
-    private val menuView = NavigationSlideMenuView(context)
+    private val menuView = NavigationSlideMenuView(context).also {
+        it.navigationSlideView = this
+    }
     private val presenter = NavigationSlidePresenter()
     private val menuInflater: MenuInflater = SupportMenuInflater(context)
 

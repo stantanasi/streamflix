@@ -17,6 +17,8 @@ class NavigationSlideMenuView(
     context: Context,
 ) : LinearLayout(context), MenuView {
 
+    lateinit var navigationSlideView: NavigationSlideView
+
     private var childs = mutableListOf<NavigationSlideItemView>()
     var selectedItemId = 0
     var selectedItemPosition = 0
@@ -81,6 +83,13 @@ class NavigationSlideMenuView(
             child.initialize(item as MenuItemImpl, 0)
             child.itemPosition = i
 
+            child.setOnFocusChangeListener { _, _ ->
+                when (childs.any { it.hasFocus() }) {
+                    true -> navigationSlideView.open()
+                    false -> navigationSlideView.close()
+                }
+            }
+
             child.setOnClickListener {
                 if (!menu.performItemAction(item, presenter, 0)) {
                     item.isChecked = true
@@ -111,6 +120,11 @@ class NavigationSlideMenuView(
             presenter.updateSuspended = true
             child.initialize((menu.getItem(i) as MenuItemImpl), 0)
             presenter.updateSuspended = false
+        }
+
+        when (navigationSlideView.isOpen) {
+            true -> navigationSlideView.open()
+            false -> navigationSlideView.close()
         }
     }
 
