@@ -24,6 +24,8 @@ class NavigationSlideView @JvmOverloads constructor(
     private val presenter = NavigationSlidePresenter()
     private val menuInflater: MenuInflater = SupportMenuInflater(context)
 
+    var isOpen = false
+
     private var selectedListener: ((item: MenuItem) -> Boolean)? = null
     private var reselectedListener: ((item: MenuItem) -> Boolean)? = null
 
@@ -125,6 +127,18 @@ class NavigationSlideView @JvmOverloads constructor(
         menuInflater.inflate(resId, menu)
         presenter.updateSuspended = false
         presenter.updateMenuView(true)
+    }
+
+    fun open() {
+        isOpen = true
+
+        menuView.open()
+    }
+
+    fun close() {
+        isOpen = false
+
+        menuView.close()
     }
 
 

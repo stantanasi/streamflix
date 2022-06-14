@@ -7,6 +7,7 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.text.TextUtils
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
@@ -120,6 +121,15 @@ class NavigationSlideItemView(
      * this menu item view.
      */
     fun getItemLayoutResId(): Int = R.layout.item_navigation
+
+
+    fun open() {
+        label.visibility = View.VISIBLE
+    }
+
+    fun close() {
+        label.visibility = View.GONE
+    }
 
 
     companion object {

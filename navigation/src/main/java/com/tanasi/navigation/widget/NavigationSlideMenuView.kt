@@ -113,4 +113,22 @@ class NavigationSlideMenuView(
             presenter.updateSuspended = false
         }
     }
+
+    fun open() {
+        childs.forEach {
+            it.isFocusable = true
+            it.isFocusableInTouchMode = true
+
+            it.open()
+        }
+    }
+
+    fun close() {
+        childs.forEach {
+            it.isFocusable = it.isSelected
+            it.isFocusableInTouchMode = it.isSelected
+
+            it.close()
+        }
+    }
 }
