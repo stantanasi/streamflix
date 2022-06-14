@@ -28,6 +28,15 @@ class NavigationSlideMenuView(
         ViewGroup.LayoutParams.WRAP_CONTENT
     )
 
+    var menuGravity: Int
+        get() = layoutParams.gravity
+        set(value) {
+            if (layoutParams.gravity != value) {
+                layoutParams.gravity = value
+                setLayoutParams(layoutParams)
+            }
+        }
+
 
     init {
         orientation = VERTICAL

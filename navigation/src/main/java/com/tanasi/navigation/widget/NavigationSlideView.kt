@@ -3,6 +3,7 @@ package com.tanasi.navigation.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.FrameLayout
@@ -40,6 +41,15 @@ class NavigationSlideView @JvmOverloads constructor(
             }
         }
 
+    /**
+     * Current gravity setting for how destinations in the menu view will be grouped.
+     */
+    private var menuGravity: Int
+        get() = menuView.menuGravity
+        set(value) {
+            menuView.menuGravity = value
+        }
+
 
     init {
         val attributes = context.theme.obtainStyledAttributes(
@@ -53,6 +63,11 @@ class NavigationSlideView @JvmOverloads constructor(
         menuView.presenter = presenter
         menu.addMenuPresenter(presenter)
         presenter.initForMenu(getContext(), menu)
+
+        menuGravity = attributes.getInt(
+            R.styleable.NavigationSlideView_menuGravity,
+            DEFAULT_MENU_GRAVITY
+        )
 
         inflateMenu(attributes.getResourceIdOrThrow(R.styleable.NavigationSlideView_menu))
 
@@ -96,5 +111,10 @@ class NavigationSlideView @JvmOverloads constructor(
         menuInflater.inflate(resId, menu)
         presenter.updateSuspended = false
         presenter.updateMenuView(true)
+    }
+
+
+    companion object {
+        const val DEFAULT_MENU_GRAVITY = Gravity.TOP or Gravity.CENTER_HORIZONTAL
     }
 }
