@@ -35,6 +35,8 @@
         android:layout_marginTop="32dp"
         android:clipChildren="false"
         android:clipToPadding="false"
+        app:focusOutEnd="true"
+        app:focusOutFront="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
