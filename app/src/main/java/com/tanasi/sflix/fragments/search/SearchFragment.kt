@@ -72,12 +72,15 @@ class SearchFragment : Fragment() {
 
 
     private fun displaySearch() {
-        binding.rvSearch.adapter = SflixAdapter(list.map {
-            when (it) {
-                is Movie -> it.itemType = SflixAdapter.Type.MOVIE
-                is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW
-            }
-            it
-        })
+        binding.vgvSearch.apply {
+            setNumColumns(6)
+            adapter = SflixAdapter(list.map {
+                when (it) {
+                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE
+                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW
+                }
+                it
+            })
+        }
     }
 }
