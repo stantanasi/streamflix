@@ -1,10 +1,6 @@
 package com.tanasi.sflix.adapters.view_holders
 
-import android.R.attr
-import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.tanasi.sflix.adapters.SflixAdapter

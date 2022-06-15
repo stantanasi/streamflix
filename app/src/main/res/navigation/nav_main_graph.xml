@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/home"
         android:name="com.tanasi.sflix.fragments.home.HomeFragment"
-        android:label="HomeFragment" >
+        android:label="HomeFragment">
         <action
             android:id="@+id/action_home_to_movie"
             app:destination="@id/movie" />
@@ -20,7 +20,7 @@
         android:id="@+id/movie"
         android:name="com.tanasi.sflix.fragments.movie.MovieFragment"
         android:label="fragment_movie"
-        tools:layout="@layout/fragment_movie" >
+        tools:layout="@layout/fragment_movie">
         <argument
             android:name="id"
             app:argType="string" />
@@ -31,7 +31,7 @@
     <fragment
         android:id="@+id/player"
         android:name="com.tanasi.sflix.fragments.player.PlayerFragment"
-        android:label="PlayerFragment" >
+        android:label="PlayerFragment">
         <argument
             android:name="linkId"
             app:argType="string" />
@@ -40,7 +40,7 @@
         android:id="@+id/tv_show"
         android:name="com.tanasi.sflix.fragments.tv_show.TvShowFragment"
         android:label="fragment_tv_show"
-        tools:layout="@layout/fragment_tv_show" >
+        tools:layout="@layout/fragment_tv_show">
         <action
             android:id="@+id/action_tv_show_to_player"
             app:destination="@id/player" />
@@ -52,7 +52,7 @@
         android:id="@+id/search"
         android:name="com.tanasi.sflix.fragments.search.SearchFragment"
         android:label="fragment_search"
-        tools:layout="@layout/fragment_search" >
+        tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_search_to_movie"
             app:destination="@id/movie" />

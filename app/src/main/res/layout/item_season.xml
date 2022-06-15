@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:clipChildren="false"
-    android:clipToPadding="false"
-    android:layout_height="wrap_content">
+    android:clipToPadding="false">
 
     <TextView
         android:id="@+id/tv_season_number"
@@ -19,9 +19,9 @@
     <androidx.leanback.widget.HorizontalGridView
         android:id="@+id/hgv_season_episodes"
         android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_season_number"

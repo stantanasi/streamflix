@@ -1,3 +1,4 @@
 <resources>
+
     <style name="Theme.SFlix" parent="@style/Theme.Leanback" />
 </resources>
