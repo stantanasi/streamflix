@@ -28,7 +28,10 @@ class MovieFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentMovieBinding.inflate(inflater, container, false)
+        if (_binding == null) {
+            _binding = FragmentMovieBinding.inflate(inflater, container, false)
+            viewModel.fetchMovie(args.id)
+        }
         return binding.root
     }
 
@@ -52,8 +55,6 @@ class MovieFragment : Fragment() {
                 }
             }
         }
-
-        viewModel.fetchMovie(args.id)
     }
 
 

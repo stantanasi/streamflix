@@ -28,7 +28,10 @@ class TvShowFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTvShowBinding.inflate(inflater, container, false)
+        if (_binding == null) {
+            _binding = FragmentTvShowBinding.inflate(inflater, container, false)
+            viewModel.fetchTvShow(args.id)
+        }
         return binding.root
     }
 
@@ -52,8 +55,6 @@ class TvShowFragment : Fragment() {
                 }
             }
         }
-
-        viewModel.fetchTvShow(args.id)
     }
 
 

@@ -30,7 +30,10 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        if (_binding == null) {
+            _binding = FragmentHomeBinding.inflate(inflater, container, false)
+            viewModel.fetchHome()
+        }
         return binding.root
     }
 
@@ -69,8 +72,6 @@ class HomeFragment : Fragment() {
                 }
             }
         }
-
-        viewModel.fetchHome()
     }
 
 
