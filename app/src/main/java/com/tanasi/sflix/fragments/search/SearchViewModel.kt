@@ -81,7 +81,7 @@ class SearchViewModel : ViewModel() {
                                             number = lastEpisode
                                                 .substringAfter("S")
                                                 .substringBefore(":")
-                                                .toInt(),
+                                                .toIntOrNull() ?: 0,
 
                                             episodes = listOf(
                                                 Episode(
@@ -89,7 +89,7 @@ class SearchViewModel : ViewModel() {
                                                     number = lastEpisode
                                                         .substringAfter(":")
                                                         .substringAfter("E")
-                                                        .toInt()
+                                                        .toIntOrNull() ?: 0,
                                                 )
                                             )
                                         )

@@ -86,7 +86,7 @@ class HomeViewModel : ViewModel() {
                                     number = lastEpisode
                                         .substringAfter("S")
                                         .substringBefore(":")
-                                        .toInt(),
+                                        .toIntOrNull() ?: 0,
 
                                     episodes = listOf(
                                         Episode(
@@ -94,7 +94,7 @@ class HomeViewModel : ViewModel() {
                                             number = lastEpisode
                                                 .substringAfter(":")
                                                 .substringAfter("E")
-                                                .toInt()
+                                                .toIntOrNull() ?: 0,
                                         )
                                     )
                                 )
@@ -153,7 +153,7 @@ class HomeViewModel : ViewModel() {
                                     number = lastEpisode
                                         .substringAfter("S")
                                         .substringBefore(":")
-                                        .toInt(),
+                                        .toIntOrNull() ?: 0,
 
                                     episodes = listOf(
                                         Episode(
@@ -161,7 +161,7 @@ class HomeViewModel : ViewModel() {
                                             number = lastEpisode
                                                 .substringAfter(":")
                                                 .substringAfter("E")
-                                                .toInt()
+                                                .toIntOrNull() ?: 0,
                                         )
                                     )
                                 )
