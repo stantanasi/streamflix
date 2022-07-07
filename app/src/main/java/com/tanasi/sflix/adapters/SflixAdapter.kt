@@ -19,8 +19,8 @@ class SflixAdapter(
         EPISODE,
 
         MOVIE_HOME,
+        MOVIE_SEARCH,
 
-        MOVIE,
         MOVIE_HEADER,
 
         ROW,
@@ -28,8 +28,8 @@ class SflixAdapter(
         SEASON,
 
         TV_SHOW_HOME,
+        TV_SHOW_SEARCH,
 
-        TV_SHOW,
         TV_SHOW_HEADER,
     }
 
@@ -50,14 +50,14 @@ class SflixAdapter(
                     false,
                 )
             )
-
-            Type.MOVIE -> VhMovie(
-                ItemMovieBinding.inflate(
+            Type.MOVIE_SEARCH -> VhMovie(
+                ItemMovieSearchBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
+
             Type.MOVIE_HEADER -> VhMovie(
                 ItemMovieHeaderBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -89,14 +89,14 @@ class SflixAdapter(
                     false
                 )
             )
-
-            Type.TV_SHOW -> VhTvShow(
-                ItemTvShowBinding.inflate(
+            Type.TV_SHOW_SEARCH -> VhTvShow(
+                ItemTvShowSearchBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
             )
+
             Type.TV_SHOW_HEADER -> VhTvShow(
                 ItemTvShowHeaderBinding.inflate(
                     LayoutInflater.from(parent.context),

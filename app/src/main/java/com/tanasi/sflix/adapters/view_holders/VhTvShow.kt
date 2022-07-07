@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
-import com.tanasi.sflix.databinding.ItemTvShowBinding
 import com.tanasi.sflix.databinding.ItemTvShowHeaderBinding
 import com.tanasi.sflix.databinding.ItemTvShowHomeBinding
+import com.tanasi.sflix.databinding.ItemTvShowSearchBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.models.TvShow
@@ -28,7 +28,7 @@ class VhTvShow(
 
         when (_binding) {
             is ItemTvShowHomeBinding -> displayHome(_binding)
-            is ItemTvShowBinding -> displayCard(_binding)
+            is ItemTvShowSearchBinding -> displaySearch(_binding)
 
             is ItemTvShowHeaderBinding -> displayHeader(_binding)
         }
@@ -66,21 +66,14 @@ class VhTvShow(
         binding.tvTvShowTitle.text = tvShow.title
     }
 
-    private fun displayCard(binding: ItemTvShowBinding) {
+    private fun displaySearch(binding: ItemTvShowSearchBinding) {
         binding.root.apply {
             setOnClickListener {
-                when (findNavController().currentDestination?.id) {
-                    R.id.home -> findNavController().navigate(
-                        HomeFragmentDirections.actionHomeToTvShow(
-                            tvShow.id
-                        )
+                findNavController().navigate(
+                    SearchFragmentDirections.actionSearchToTvShow(
+                        id = tvShow.id
                     )
-                    R.id.search -> findNavController().navigate(
-                        SearchFragmentDirections.actionSearchToTvShow(
-                            tvShow.id
-                        )
-                    )
-                }
+                )
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {

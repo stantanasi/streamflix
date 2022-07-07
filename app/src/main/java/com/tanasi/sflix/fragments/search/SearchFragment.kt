@@ -76,8 +76,8 @@ class SearchFragment : Fragment() {
             setNumColumns(6)
             adapter = SflixAdapter(list.map {
                 when (it) {
-                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE
-                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW
+                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_SEARCH
+                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_SEARCH
                 }
                 it
             })

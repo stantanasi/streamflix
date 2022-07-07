@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
-import com.tanasi.sflix.databinding.ItemMovieBinding
 import com.tanasi.sflix.databinding.ItemMovieHeaderBinding
 import com.tanasi.sflix.databinding.ItemMovieHomeBinding
+import com.tanasi.sflix.databinding.ItemMovieSearchBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
@@ -29,7 +29,7 @@ class VhMovie(
 
         when (_binding) {
             is ItemMovieHomeBinding -> displayHome(_binding)
-            is ItemMovieBinding -> displayCard(_binding)
+            is ItemMovieSearchBinding -> displaySearch(_binding)
 
             is ItemMovieHeaderBinding -> displayHeader(_binding)
         }
@@ -67,21 +67,14 @@ class VhMovie(
         binding.tvMovieTitle.text = movie.title
     }
 
-    private fun displayCard(binding: ItemMovieBinding) {
+    private fun displaySearch(binding: ItemMovieSearchBinding) {
         binding.root.apply {
             setOnClickListener {
-                when (findNavController().currentDestination?.id) {
-                    R.id.home -> findNavController().navigate(
-                        HomeFragmentDirections.actionHomeToMovie(
-                            movie.id
-                        )
+                findNavController().navigate(
+                    SearchFragmentDirections.actionSearchToMovie(
+                        id = movie.id
                     )
-                    R.id.search -> findNavController().navigate(
-                        SearchFragmentDirections.actionSearchToMovie(
-                            movie.id
-                        )
-                    )
-                }
+                )
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {

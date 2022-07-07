@@ -41,6 +41,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/et_search"
-        tools:listitem="@layout/item_movie" />
+        tools:listitem="@layout/item_movie_search" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
