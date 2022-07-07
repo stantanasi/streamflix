@@ -44,14 +44,32 @@ class HomeViewModel : ViewModel() {
                         .select("div.film-detail > div.fd-infor > span")
                         .toList()
                         .map { element -> element.text() }
-                        .takeIf { info -> info.size == 3 }
+                        .let { info ->
+                            object {
+                                val released = when (info.size) {
+                                    1 -> info[0] ?: ""
+                                    2 -> info[1] ?: ""
+                                    3 -> info[2] ?: ""
+                                    else -> null
+                                }
+                                val quality = when (info.size) {
+                                    3 -> info[1] ?: ""
+                                    else -> null
+                                }
+                                val rating = when (info.size) {
+                                    2 -> info[0].toDoubleOrNull()
+                                    3 -> info[0].toDoubleOrNull()
+                                    else -> null
+                                }
+                            }
+                        }
 
                     Movie(
                         id = it.selectFirst("a")?.attr("href")?.substringAfterLast("-") ?: "",
                         title = it.select("h3.film-name").text(),
-                        released = info?.get(2) ?: "",
-                        quality = info?.get(1) ?: "",
-                        rating = info?.get(0)?.toDoubleOrNull(),
+                        released = info.released ?: "",
+                        quality = info.quality ?: "",
+                        rating = info.rating,
                         poster = it.selectFirst("div.film-poster > img.film-poster-img")
                             .let { img ->
                                 img?.attr("data-src") ?: img?.attr("src")
@@ -67,19 +85,37 @@ class HomeViewModel : ViewModel() {
                         .select("div.film-detail > div.fd-infor > span")
                         .toList()
                         .map { element -> element.text() }
-                        .takeIf { info -> info.size == 3 }
+                        .let { info ->
+                            object {
+                                val quality = when (info.size) {
+                                    3 -> info[1] ?: ""
+                                    else -> null
+                                }
+                                val rating = when (info.size) {
+                                    2 -> info[0].toDoubleOrNull()
+                                    3 -> info[0].toDoubleOrNull()
+                                    else -> null
+                                }
+                                val lastEpisode = when (info.size) {
+                                    1 -> info[0] ?: ""
+                                    2 -> info[1] ?: ""
+                                    3 -> info[2] ?: ""
+                                    else -> null
+                                }
+                            }
+                        }
 
                     TvShow(
                         id = it.selectFirst("a")?.attr("href")?.substringAfterLast("-") ?: "",
                         title = it.select("h3.film-name").text(),
-                        quality = info?.get(1) ?: "",
-                        rating = info?.get(0)?.toDoubleOrNull(),
+                        quality = info.quality ?: "",
+                        rating = info.rating,
                         poster = it.selectFirst("div.film-poster > img.film-poster-img")
                             .let { img ->
                                 img?.attr("data-src") ?: img?.attr("src")
                             } ?: "",
 
-                        seasons = info?.get(2)?.let { lastEpisode ->
+                        seasons = info.lastEpisode?.let { lastEpisode ->
                             listOf(
                                 Season(
                                     id = "",
@@ -111,14 +147,32 @@ class HomeViewModel : ViewModel() {
                         .select("div.film-detail > div.fd-infor > span")
                         .toList()
                         .map { element -> element.text() }
-                        .takeIf { info -> info.size == 3 }
+                        .let { info ->
+                            object {
+                                val released = when (info.size) {
+                                    1 -> info[0] ?: ""
+                                    2 -> info[1] ?: ""
+                                    3 -> info[2] ?: ""
+                                    else -> null
+                                }
+                                val quality = when (info.size) {
+                                    3 -> info[1] ?: ""
+                                    else -> null
+                                }
+                                val rating = when (info.size) {
+                                    2 -> info[0].toDoubleOrNull()
+                                    3 -> info[0].toDoubleOrNull()
+                                    else -> null
+                                }
+                            }
+                        }
 
                     Movie(
                         id = it.selectFirst("a")?.attr("href")?.substringAfterLast("-") ?: "",
                         title = it.select("h3.film-name").text(),
-                        released = info?.get(2) ?: "",
-                        quality = info?.get(1) ?: "",
-                        rating = info?.get(0)?.toDoubleOrNull(),
+                        released = info.released ?: "",
+                        quality = info.quality ?: "",
+                        rating = info.rating,
                         poster = it.selectFirst("div.film-poster > img.film-poster-img")
                             .let { img ->
                                 img?.attr("data-src") ?: img?.attr("src")
@@ -134,19 +188,37 @@ class HomeViewModel : ViewModel() {
                         .select("div.film-detail > div.fd-infor > span")
                         .toList()
                         .map { element -> element.text() }
-                        .takeIf { info -> info.size == 3 }
+                        .let { info ->
+                            object {
+                                val quality = when (info.size) {
+                                    3 -> info[1] ?: ""
+                                    else -> null
+                                }
+                                val rating = when (info.size) {
+                                    2 -> info[0].toDoubleOrNull()
+                                    3 -> info[0].toDoubleOrNull()
+                                    else -> null
+                                }
+                                val lastEpisode = when (info.size) {
+                                    1 -> info[0] ?: ""
+                                    2 -> info[1] ?: ""
+                                    3 -> info[2] ?: ""
+                                    else -> null
+                                }
+                            }
+                        }
 
                     TvShow(
                         id = it.selectFirst("a")?.attr("href")?.substringAfterLast("-") ?: "",
                         title = it.select("h3.film-name").text(),
-                        quality = info?.get(1) ?: "",
-                        rating = info?.get(0)?.toDoubleOrNull(),
+                        quality = info.quality ?: "",
+                        rating = info.rating,
                         poster = it.selectFirst("div.film-poster > img.film-poster-img")
                             .let { img ->
                                 img?.attr("data-src") ?: img?.attr("src")
                             } ?: "",
 
-                        seasons = info?.get(2)?.let { lastEpisode ->
+                        seasons = info.lastEpisode?.let { lastEpisode ->
                             listOf(
                                 Season(
                                     id = "",
