@@ -60,8 +60,9 @@ class VhTvShow(
             .into(binding.ivTvShowPoster)
 
         binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
-        
-        binding.tvTvShowLastEpisode.text = "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+
+        binding.tvTvShowLastEpisode.text =
+            "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
 
         binding.tvTvShowTitle.text = tvShow.title
     }
@@ -89,6 +90,11 @@ class VhTvShow(
             .load(tvShow.poster)
             .centerCrop()
             .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.tvTvShowLastEpisode.text =
+            "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
 
         binding.tvTvShowTitle.text = tvShow.title
     }

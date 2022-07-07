@@ -91,6 +91,10 @@ class VhMovie(
             .centerCrop()
             .into(binding.ivMoviePoster)
 
+        binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
+
+        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
+
         binding.tvMovieTitle.text = movie.title
     }
 
