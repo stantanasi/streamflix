@@ -28,7 +28,7 @@ class VhMovie(
         this.movie = movie
 
         when (_binding) {
-            is ItemMovieHomeBinding -> displayHomeMovie(_binding)
+            is ItemMovieHomeBinding -> displayHome(_binding)
             is ItemMovieBinding -> displayCard(_binding)
 
             is ItemMovieHeaderBinding -> displayHeader(_binding)
@@ -36,7 +36,7 @@ class VhMovie(
     }
 
 
-    private fun displayHomeMovie(binding: ItemMovieHomeBinding) {
+    private fun displayHome(binding: ItemMovieHomeBinding) {
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(

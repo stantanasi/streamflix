@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemTvShowBinding
 import com.tanasi.sflix.databinding.ItemTvShowHeaderBinding
+import com.tanasi.sflix.databinding.ItemTvShowHomeBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.models.TvShow
@@ -26,12 +27,44 @@ class VhTvShow(
         this.tvShow = tvShow
 
         when (_binding) {
+            is ItemTvShowHomeBinding -> displayHome(_binding)
             is ItemTvShowBinding -> displayCard(_binding)
 
             is ItemTvShowHeaderBinding -> displayHeader(_binding)
         }
     }
 
+
+    private fun displayHome(binding: ItemTvShowHomeBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeToTvShow(
+                        id = tvShow.id
+                    )
+                )
+            }
+            setOnFocusChangeListener { _, hasFocus ->
+                val animation = when {
+                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
+                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
+                }
+                binding.root.startAnimation(animation)
+                animation.fillAfter = true
+            }
+        }
+
+        Glide.with(context)
+            .load(tvShow.poster)
+            .centerCrop()
+            .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+        
+        binding.tvTvShowLastEpisode.text = "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+
+        binding.tvTvShowTitle.text = tvShow.title
+    }
 
     private fun displayCard(binding: ItemTvShowBinding) {
         binding.root.apply {
