@@ -8,6 +8,7 @@ import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemMovieBinding
 import com.tanasi.sflix.databinding.ItemMovieHeaderBinding
+import com.tanasi.sflix.databinding.ItemMovieHomeBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
@@ -27,12 +28,44 @@ class VhMovie(
         this.movie = movie
 
         when (_binding) {
+            is ItemMovieHomeBinding -> displayHomeMovie(_binding)
             is ItemMovieBinding -> displayCard(_binding)
 
             is ItemMovieHeaderBinding -> displayHeader(_binding)
         }
     }
 
+
+    private fun displayHomeMovie(binding: ItemMovieHomeBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeToMovie(
+                        id = movie.id
+                    )
+                )
+            }
+            setOnFocusChangeListener { _, hasFocus ->
+                val animation = when {
+                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
+                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
+                }
+                binding.root.startAnimation(animation)
+                animation.fillAfter = true
+            }
+        }
+
+        Glide.with(context)
+            .load(movie.poster)
+            .centerCrop()
+            .into(binding.ivMoviePoster)
+
+        binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
+
+        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
+
+        binding.tvMovieTitle.text = movie.title
+    }
 
     private fun displayCard(binding: ItemMovieBinding) {
         binding.root.apply {
