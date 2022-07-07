@@ -81,7 +81,7 @@ class HomeFragment : Fragment() {
 
             list.add(Row(
                 "Trending Movies",
-                trendingMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE } }
+                trendingMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE_HOME } }
             ))
 
             list.add(Row(
@@ -91,7 +91,7 @@ class HomeFragment : Fragment() {
 
             list.add(Row(
                 "Latest Movies",
-                latestMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE } }
+                latestMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE_HOME } }
             ))
 
             list.add(Row(
