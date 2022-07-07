@@ -73,7 +73,6 @@ class SearchFragment : Fragment() {
 
     private fun displaySearch() {
         binding.vgvSearch.apply {
-            setNumColumns(6)
             adapter = SflixAdapter(list.map {
                 when (it) {
                     is Movie -> it.itemType = SflixAdapter.Type.MOVIE_SEARCH
