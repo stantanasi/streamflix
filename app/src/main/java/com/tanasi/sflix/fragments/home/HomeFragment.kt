@@ -86,7 +86,7 @@ class HomeFragment : Fragment() {
 
             list.add(Row(
                 "Trending TV Shows",
-                trendingTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW } }
+                trendingTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW_HOME } }
             ))
 
             list.add(Row(
@@ -96,7 +96,7 @@ class HomeFragment : Fragment() {
 
             list.add(Row(
                 "Latest TV Shows",
-                latestTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW } }
+                latestTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW_HOME } }
             ))
 
             adapter = SflixAdapter(list)
