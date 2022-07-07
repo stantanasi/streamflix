@@ -18,6 +18,8 @@ class SflixAdapter(
     enum class Type {
         EPISODE,
 
+        MOVIE_HOME,
+
         MOVIE,
         MOVIE_HEADER,
 
@@ -33,6 +35,14 @@ class SflixAdapter(
         when (Type.values()[viewType]) {
             Type.EPISODE -> VhEpisode(
                 ItemEpisodeBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.MOVIE_HOME -> VhMovie(
+                ItemMovieHomeBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
