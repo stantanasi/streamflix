@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
 import com.tanasi.sflix.models.Movie
@@ -80,26 +81,43 @@ class HomeFragment : Fragment() {
             val list = mutableListOf<SflixAdapter.Item>()
 
             list.add(Row(
-                "Trending Movies",
-                trendingMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE_HOME } }
-            ))
+                title = "Trending Movies",
+                list = trendingMovies.map {
+                    it.apply { itemType = SflixAdapter.Type.MOVIE_HOME }
+                }
+            ).apply {
+                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+            })
 
             list.add(Row(
-                "Trending TV Shows",
-                trendingTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW_HOME } }
-            ))
+                title = "Trending TV Shows",
+                list = trendingTvShows.map {
+                    it.apply { itemType = SflixAdapter.Type.TV_SHOW_HOME }
+                }
+            ).apply {
+                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+            })
 
             list.add(Row(
-                "Latest Movies",
-                latestMovies.map { it.apply { itemType = SflixAdapter.Type.MOVIE_HOME } }
-            ))
+                title = "Latest Movies",
+                list = latestMovies.map {
+                    it.apply { itemType = SflixAdapter.Type.MOVIE_HOME }
+                }
+            ).apply {
+                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+            })
 
             list.add(Row(
-                "Latest TV Shows",
-                latestTvShows.map { it.apply { itemType = SflixAdapter.Type.TV_SHOW_HOME } }
-            ))
+                title = "Latest TV Shows",
+                list = latestTvShows.map {
+                    it.apply { itemType = SflixAdapter.Type.TV_SHOW_HOME }
+                }
+            ).apply {
+                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+            })
 
             adapter = SflixAdapter(list)
+            setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
         }
     }
 }
