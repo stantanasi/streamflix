@@ -30,6 +30,7 @@ class VhRow(
         binding.hgvRow.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = SflixAdapter(row.list)
+            setItemSpacing(row.itemSpacing)
         }
     }
 }
