@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <scale xmlns:android="http://schemas.android.com/apk/res/android"
     android:duration="100"
-    android:fromXScale="110%"
-    android:fromYScale="110%"
+    android:fromXScale="105%"
+    android:fromYScale="105%"
     android:pivotX="50%"
     android:pivotY="50%"
     android:toXScale="100%"
