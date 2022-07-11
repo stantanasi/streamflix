@@ -3,6 +3,7 @@ package com.tanasi.sflix.adapters.view_holders
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.ItemSeasonBinding
 import com.tanasi.sflix.models.Season
@@ -34,6 +35,7 @@ class VhSeason(
             adapter = SflixAdapter(season.episodes.map {
                 it.apply { itemType = SflixAdapter.Type.EPISODE }
             })
+            setItemSpacing(context.resources.getDimension(R.dimen.season_episodes_spacing).toInt())
         }
     }
 }
