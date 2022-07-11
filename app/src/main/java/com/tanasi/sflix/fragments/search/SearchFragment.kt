@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentSearchBinding
 import com.tanasi.sflix.models.Movie
@@ -80,6 +81,7 @@ class SearchFragment : Fragment() {
                 }
                 it
             })
+            setItemSpacing(requireContext().resources.getDimension(R.dimen.search_spacing).toInt())
         }
     }
 }
