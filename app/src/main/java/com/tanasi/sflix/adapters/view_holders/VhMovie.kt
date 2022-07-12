@@ -1,5 +1,7 @@
 package com.tanasi.sflix.adapters.view_holders
 
+import android.content.Intent
+import android.net.Uri
 import android.view.animation.AnimationUtils
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -98,6 +100,7 @@ class VhMovie(
         binding.tvMovieTitle.text = movie.title
     }
 
+
     private fun displayHeader(binding: ItemMovieHeaderBinding) {
         Glide.with(context)
             .load(movie.poster)
@@ -115,6 +118,15 @@ class VhMovie(
                     )
                 )
             }
+        }
+
+        binding.btnMovieTrailer.setOnClickListener {
+            context.startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://www.youtube.com/watch?v=${movie.youtubeTrailerId}")
+                )
+            )
         }
 
         binding.tvMovieOverview.text = movie.overview
