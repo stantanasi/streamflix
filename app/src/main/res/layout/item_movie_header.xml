@@ -45,27 +45,27 @@
         app:layout_constraintTop_toBottomOf="@id/tv_movie_title"
         tools:text="HD" />
 
-    <Button
+    <TextView
         android:id="@+id/btn_movie_watch_now"
+        style="@style/AppTheme.Widget.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="100dp"
         android:text="Watch Now"
-        android:textAllCaps="true"
         app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
         app:layout_constraintTop_toBottomOf="@id/tv_movie_quality" />
 
-    <Button
+    <TextView
         android:id="@+id/btn_movie_trailer"
+        style="@style/AppTheme.Widget.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="100dp"
         android:text="Trailer"
-        android:textAllCaps="true"
         app:layout_constraintStart_toEndOf="@id/btn_movie_watch_now"
         app:layout_constraintTop_toBottomOf="@id/tv_movie_quality" />
 
