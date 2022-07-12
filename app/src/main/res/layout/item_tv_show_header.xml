@@ -47,6 +47,18 @@
         app:layout_constraintTop_toBottomOf="@id/tv_tv_show_title"
         tools:text="HD" />
 
+    <Button
+        android:id="@+id/btn_tv_show_watch_now"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="100dp"
+        android:text="Trailer"
+        android:textAllCaps="true"
+        app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
+        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_quality" />
+
     <TextView
         android:id="@+id/tv_tv_show_overview_label"
         android:layout_width="0dp"
@@ -59,7 +71,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
-        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_quality" />
+        app:layout_constraintTop_toBottomOf="@id/btn_tv_show_watch_now" />
 
     <TextView
         android:id="@+id/tv_tv_show_overview"

@@ -1,5 +1,7 @@
 package com.tanasi.sflix.adapters.view_holders
 
+import android.content.Intent
+import android.net.Uri
 import android.view.animation.AnimationUtils
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -99,6 +101,7 @@ class VhTvShow(
         binding.tvTvShowTitle.text = tvShow.title
     }
 
+
     private fun displayHeader(binding: ItemTvShowHeaderBinding) {
         Glide.with(context)
             .load(tvShow.poster)
@@ -107,6 +110,15 @@ class VhTvShow(
         binding.tvTvShowTitle.text = tvShow.title
 
         binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.btnTvShowWatchNow.setOnClickListener {
+            context.startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://www.youtube.com/watch?v=${tvShow.youtubeTrailerId}")
+                )
+            )
+        }
 
         binding.tvTvShowOverview.text = tvShow.overview
 
