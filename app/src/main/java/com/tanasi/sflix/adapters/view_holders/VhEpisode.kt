@@ -33,7 +33,7 @@ class VhEpisode(
             setOnClickListener {
                 findNavController().navigate(
                     TvShowFragmentDirections.actionTvShowToPlayer(
-                        linkId = episode.servers.first().id,
+                        linkId = episode.servers.firstOrNull()?.id ?: "",
                     )
                 )
             }

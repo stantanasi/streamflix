@@ -111,10 +111,10 @@ class VhMovie(
         binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
 
         binding.btnMovieWatchNow.apply {
-            setOnClickListener { _ ->
+            setOnClickListener {
                 findNavController().navigate(
                     MovieFragmentDirections.actionMovieToPlayer(
-                        linkId = movie.servers.first().id,
+                        linkId = movie.servers.firstOrNull()?.id ?: "",
                     )
                 )
             }
