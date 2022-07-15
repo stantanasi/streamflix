@@ -82,8 +82,8 @@ class HomeFragment : Fragment() {
 
             list.add(Row(
                 title = "Trending Movies",
-                list = trendingMovies.map {
-                    it.apply { itemType = SflixAdapter.Type.MOVIE_HOME }
+                list = trendingMovies.onEach {
+                    it.itemType = SflixAdapter.Type.MOVIE_HOME
                 }
             ).apply {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
@@ -91,8 +91,8 @@ class HomeFragment : Fragment() {
 
             list.add(Row(
                 title = "Trending TV Shows",
-                list = trendingTvShows.map {
-                    it.apply { itemType = SflixAdapter.Type.TV_SHOW_HOME }
+                list = trendingTvShows.onEach {
+                    it.itemType = SflixAdapter.Type.TV_SHOW_HOME
                 }
             ).apply {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
@@ -100,8 +100,8 @@ class HomeFragment : Fragment() {
 
             list.add(Row(
                 title = "Latest Movies",
-                list = latestMovies.map {
-                    it.apply { itemType = SflixAdapter.Type.MOVIE_HOME }
+                list = latestMovies.onEach {
+                    it.itemType = SflixAdapter.Type.MOVIE_HOME
                 }
             ).apply {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
@@ -109,8 +109,8 @@ class HomeFragment : Fragment() {
 
             list.add(Row(
                 title = "Latest TV Shows",
-                list = latestTvShows.map {
-                    it.apply { itemType = SflixAdapter.Type.TV_SHOW_HOME }
+                list = latestTvShows.onEach {
+                    it.itemType = SflixAdapter.Type.TV_SHOW_HOME
                 }
             ).apply {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()

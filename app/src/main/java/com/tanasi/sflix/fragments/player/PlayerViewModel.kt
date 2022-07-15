@@ -22,6 +22,7 @@ class PlayerViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
+
     fun getVideo(id: String) = viewModelScope.launch {
         _state.value = State.Loading
 

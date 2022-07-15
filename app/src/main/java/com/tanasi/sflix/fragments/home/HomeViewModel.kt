@@ -30,6 +30,7 @@ class HomeViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
+
     fun fetchHome() = viewModelScope.launch {
         _state.value = State.Loading
 

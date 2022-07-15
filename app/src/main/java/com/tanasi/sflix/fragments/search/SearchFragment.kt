@@ -74,12 +74,11 @@ class SearchFragment : Fragment() {
 
     private fun displaySearch() {
         binding.vgvSearch.apply {
-            adapter = SflixAdapter(list.map {
+            adapter = SflixAdapter(list.onEach {
                 when (it) {
                     is Movie -> it.itemType = SflixAdapter.Type.MOVIE_SEARCH
                     is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_SEARCH
                 }
-                it
             })
             setItemSpacing(requireContext().resources.getDimension(R.dimen.search_spacing).toInt())
         }

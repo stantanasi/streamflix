@@ -26,6 +26,9 @@ class MainActivity : FragmentActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
+                R.id.movie,
+                R.id.tv_show,
+                R.id.seasons,
                 R.id.player -> binding.navMain.visibility = View.GONE
                 else -> binding.navMain.visibility = View.VISIBLE
             }
