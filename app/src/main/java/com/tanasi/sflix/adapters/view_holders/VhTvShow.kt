@@ -116,7 +116,9 @@ class VhTvShow(
             setOnClickListener {
                 findNavController().navigate(
                     TvShowFragmentDirections.actionTvShowToSeasons(
-                        tvShowId = tvShow.id
+                        tvShowId = tvShow.id,
+                        tvShowTitle = tvShow.title,
+                        tvShowBanner = tvShow.banner,
                     )
                 )
             }

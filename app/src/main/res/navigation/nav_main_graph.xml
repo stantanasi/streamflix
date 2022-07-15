@@ -43,9 +43,6 @@
         android:name="com.tanasi.sflix.fragments.tv_show.TvShowFragment"
         android:label="fragment_tv_show"
         tools:layout="@layout/fragment_tv_show">
-        <action
-            android:id="@+id/action_tv_show_to_player"
-            app:destination="@id/player" />
         <argument
             android:name="id"
             app:argType="string" />
@@ -76,5 +73,12 @@
         <action
             android:id="@+id/action_seasons_to_player"
             app:destination="@id/player" />
+        <argument
+            android:name="tvShowTitle"
+            app:argType="string" />
+        <argument
+            android:name="tvShowBanner"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
 </navigation>
