@@ -18,14 +18,18 @@ class SflixAdapter(
     enum class Type {
         EPISODE,
 
-        MOVIE,
+        MOVIE_HOME,
+        MOVIE_SEARCH,
+
         MOVIE_HEADER,
 
         ROW,
 
         SEASON,
 
-        TV_SHOW,
+        TV_SHOW_HOME,
+        TV_SHOW_SEARCH,
+
         TV_SHOW_HEADER,
     }
 
@@ -39,13 +43,21 @@ class SflixAdapter(
                 )
             )
 
-            Type.MOVIE -> VhMovie(
-                ItemMovieBinding.inflate(
+            Type.MOVIE_HOME -> VhMovie(
+                ItemMovieHomeBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
+            Type.MOVIE_SEARCH -> VhMovie(
+                ItemMovieSearchBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
             Type.MOVIE_HEADER -> VhMovie(
                 ItemMovieHeaderBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -70,13 +82,21 @@ class SflixAdapter(
                 )
             )
 
-            Type.TV_SHOW -> VhTvShow(
-                ItemTvShowBinding.inflate(
+            Type.TV_SHOW_HOME -> VhTvShow(
+                ItemTvShowHomeBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
             )
+            Type.TV_SHOW_SEARCH -> VhTvShow(
+                ItemTvShowSearchBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+
             Type.TV_SHOW_HEADER -> VhTvShow(
                 ItemTvShowHeaderBinding.inflate(
                     LayoutInflater.from(parent.context),

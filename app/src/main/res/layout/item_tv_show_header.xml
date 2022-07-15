@@ -3,9 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/iv_tv_show_poster"
@@ -48,6 +46,30 @@
         tools:text="HD" />
 
     <TextView
+        android:id="@+id/btn_tv_show_seasons"
+        style="@style/AppTheme.Widget.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="100dp"
+        android:text="Seasons"
+        app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
+        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_quality" />
+
+    <TextView
+        android:id="@+id/btn_tv_show_trailer"
+        style="@style/AppTheme.Widget.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="100dp"
+        android:text="Trailer"
+        app:layout_constraintStart_toEndOf="@id/btn_tv_show_seasons"
+        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_quality" />
+
+    <TextView
         android:id="@+id/tv_tv_show_overview_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -59,7 +81,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
-        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_quality" />
+        app:layout_constraintTop_toBottomOf="@id/btn_tv_show_seasons" />
 
     <TextView
         android:id="@+id/tv_tv_show_overview"

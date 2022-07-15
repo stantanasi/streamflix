@@ -24,6 +24,7 @@ class Movie(
 
     enum class Quality {
         HD,
+        SD,
         CAM;
 
         companion object {

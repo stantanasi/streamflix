@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentSearchBinding
 import com.tanasi.sflix.models.Movie
@@ -73,14 +74,13 @@ class SearchFragment : Fragment() {
 
     private fun displaySearch() {
         binding.vgvSearch.apply {
-            setNumColumns(6)
-            adapter = SflixAdapter(list.map {
+            adapter = SflixAdapter(list.onEach {
                 when (it) {
-                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE
-                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW
+                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_SEARCH
+                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_SEARCH
                 }
-                it
             })
+            setItemSpacing(requireContext().resources.getDimension(R.dimen.search_spacing).toInt())
         }
     }
 }

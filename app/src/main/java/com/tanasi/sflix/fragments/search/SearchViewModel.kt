@@ -38,64 +38,108 @@ class SearchViewModel : ViewModel() {
 
                 State.SuccessSearching(
                     document.select("div.flw-item").map {
-
-                        val isMovie =
-                            it.selectFirst("a")?.attr("href")?.contains("/movie/") ?: false
-
-                        val info = it
-                            .select("div.film-detail > div.fd-infor > span")
-                            .toList()
-                            .map { element -> element.text() }
-                            .takeIf { info -> info.size == 3 }
+                        val isMovie = it.selectFirst("a")
+                            ?.attr("href")
+                            ?.contains("/movie/")
+                            ?: false
 
                         val id = it.selectFirst("a")?.attr("href")?.substringAfterLast("-") ?: ""
                         val title = it.select("h2.film-name").text()
-                        val released = info?.get(2) ?: ""
-                        val quality = info?.get(1) ?: ""
-                        val rating = info?.get(0)?.toDoubleOrNull()
                         val poster =
                             it.selectFirst("div.film-poster > img.film-poster-img").let { img ->
                                 img?.attr("data-src") ?: img?.attr("src")
                             } ?: ""
 
                         when (isMovie) {
-                            true -> Movie(
-                                id = id,
-                                title = title,
-                                released = released,
-                                quality = quality,
-                                rating = rating,
-                                poster = poster,
-                            )
-                            false -> TvShow(
-                                id = id,
-                                title = title,
-                                quality = quality,
-                                rating = rating,
-                                poster = poster,
+                            true -> {
+                                val info = it
+                                    .select("div.film-detail > div.fd-infor > span")
+                                    .toList()
+                                    .map { element -> element.text() }
+                                    .let { info ->
+                                        object {
+                                            val released = when (info.size) {
+                                                1 -> info[0] ?: ""
+                                                2 -> info[1] ?: ""
+                                                3 -> info[2] ?: ""
+                                                else -> null
+                                            }
+                                            val quality = when (info.size) {
+                                                3 -> info[1] ?: ""
+                                                else -> null
+                                            }
+                                            val rating = when (info.size) {
+                                                2 -> info[0].toDoubleOrNull()
+                                                3 -> info[0].toDoubleOrNull()
+                                                else -> null
+                                            }
+                                        }
+                                    }
 
-                                seasons = info?.get(2)?.let { lastEpisode ->
-                                    listOf(
-                                        Season(
-                                            id = "",
-                                            number = lastEpisode
-                                                .substringAfter("S")
-                                                .substringBefore(":")
-                                                .toIntOrNull() ?: 0,
+                                Movie(
+                                    id = id,
+                                    title = title,
+                                    released = info.released,
+                                    quality = info.quality ?: "",
+                                    rating = info.rating,
+                                    poster = poster,
+                                )
+                            }
+                            false -> {
+                                val info = it
+                                    .select("div.film-detail > div.fd-infor > span")
+                                    .toList()
+                                    .map { element -> element.text() }
+                                    .let { info ->
+                                        object {
+                                            val quality = when (info.size) {
+                                                3 -> info[1] ?: ""
+                                                else -> null
+                                            }
+                                            val rating = when (info.size) {
+                                                2 -> info[0].toDoubleOrNull()
+                                                3 -> info[0].toDoubleOrNull()
+                                                else -> null
+                                            }
+                                            val lastEpisode = when (info.size) {
+                                                1 -> info[0] ?: ""
+                                                2 -> info[1] ?: ""
+                                                3 -> info[2] ?: ""
+                                                else -> null
+                                            }
+                                        }
+                                    }
 
-                                            episodes = listOf(
-                                                Episode(
-                                                    id = "",
-                                                    number = lastEpisode
-                                                        .substringAfter(":")
-                                                        .substringAfter("E")
-                                                        .toIntOrNull() ?: 0,
+                                TvShow(
+                                    id = id,
+                                    title = title,
+                                    quality = info.quality ?: "",
+                                    rating = info.rating,
+                                    poster = poster,
+
+                                    seasons = info.lastEpisode?.let { lastEpisode ->
+                                        listOf(
+                                            Season(
+                                                id = "",
+                                                number = lastEpisode
+                                                    .substringAfter("S")
+                                                    .substringBefore(":")
+                                                    .toIntOrNull() ?: 0,
+
+                                                episodes = listOf(
+                                                    Episode(
+                                                        id = "",
+                                                        number = lastEpisode
+                                                            .substringAfter(":")
+                                                            .substringAfter("E")
+                                                            .toIntOrNull() ?: 0,
+                                                    )
                                                 )
                                             )
                                         )
-                                    )
-                                } ?: listOf(),
-                            )
+                                    } ?: listOf(),
+                                )
+                            }
                         }
                     }
                 )

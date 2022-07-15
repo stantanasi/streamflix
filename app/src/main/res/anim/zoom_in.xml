@@ -5,5 +5,5 @@
     android:fromYScale="100%"
     android:pivotX="50%"
     android:pivotY="50%"
-    android:toXScale="110%"
-    android:toYScale="110%"></scale>
+    android:toXScale="105%"
+    android:toYScale="105%" />

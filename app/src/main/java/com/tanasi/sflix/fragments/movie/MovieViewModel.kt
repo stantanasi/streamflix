@@ -23,6 +23,7 @@ class MovieViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
+
     fun fetchMovie(id: String) = viewModelScope.launch {
         _state.value = State.Loading
 

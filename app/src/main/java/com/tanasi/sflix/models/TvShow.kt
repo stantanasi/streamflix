@@ -24,6 +24,7 @@ class TvShow(
 
     enum class Quality {
         HD,
+        SD,
         CAM;
 
         companion object {

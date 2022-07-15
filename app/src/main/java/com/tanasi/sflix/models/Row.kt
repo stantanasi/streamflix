@@ -7,5 +7,8 @@ class Row(
     val list: List<SflixAdapter.Item>,
 ) : SflixAdapter.Item {
 
+    var itemSpacing: Int = 0
+
+
     override var itemType = SflixAdapter.Type.ROW
 }

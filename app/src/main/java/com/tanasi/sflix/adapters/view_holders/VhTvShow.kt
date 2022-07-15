@@ -1,15 +1,19 @@
 package com.tanasi.sflix.adapters.view_holders
 
+import android.content.Intent
+import android.net.Uri
 import android.view.animation.AnimationUtils
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
-import com.tanasi.sflix.databinding.ItemTvShowBinding
 import com.tanasi.sflix.databinding.ItemTvShowHeaderBinding
+import com.tanasi.sflix.databinding.ItemTvShowHomeBinding
+import com.tanasi.sflix.databinding.ItemTvShowSearchBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
+import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.format
 
@@ -26,28 +30,22 @@ class VhTvShow(
         this.tvShow = tvShow
 
         when (_binding) {
-            is ItemTvShowBinding -> displayCard(_binding)
+            is ItemTvShowHomeBinding -> displayHome(_binding)
+            is ItemTvShowSearchBinding -> displaySearch(_binding)
 
             is ItemTvShowHeaderBinding -> displayHeader(_binding)
         }
     }
 
 
-    private fun displayCard(binding: ItemTvShowBinding) {
+    private fun displayHome(binding: ItemTvShowHomeBinding) {
         binding.root.apply {
             setOnClickListener {
-                when (findNavController().currentDestination?.id) {
-                    R.id.home -> findNavController().navigate(
-                        HomeFragmentDirections.actionHomeToTvShow(
-                            tvShow.id
-                        )
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeToTvShow(
+                        id = tvShow.id
                     )
-                    R.id.search -> findNavController().navigate(
-                        SearchFragmentDirections.actionSearchToTvShow(
-                            tvShow.id
-                        )
-                    )
-                }
+                )
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {
@@ -64,8 +62,46 @@ class VhTvShow(
             .centerCrop()
             .into(binding.ivTvShowPoster)
 
+        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.tvTvShowLastEpisode.text =
+            "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+
         binding.tvTvShowTitle.text = tvShow.title
     }
+
+    private fun displaySearch(binding: ItemTvShowSearchBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    SearchFragmentDirections.actionSearchToTvShow(
+                        id = tvShow.id
+                    )
+                )
+            }
+            setOnFocusChangeListener { _, hasFocus ->
+                val animation = when {
+                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
+                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
+                }
+                binding.root.startAnimation(animation)
+                animation.fillAfter = true
+            }
+        }
+
+        Glide.with(context)
+            .load(tvShow.poster)
+            .centerCrop()
+            .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.tvTvShowLastEpisode.text =
+            "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+
+        binding.tvTvShowTitle.text = tvShow.title
+    }
+
 
     private fun displayHeader(binding: ItemTvShowHeaderBinding) {
         Glide.with(context)
@@ -75,6 +111,27 @@ class VhTvShow(
         binding.tvTvShowTitle.text = tvShow.title
 
         binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.btnTvShowSeasons.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    TvShowFragmentDirections.actionTvShowToSeasons(
+                        tvShowId = tvShow.id,
+                        tvShowTitle = tvShow.title,
+                        tvShowBanner = tvShow.banner,
+                    )
+                )
+            }
+        }
+
+        binding.btnTvShowTrailer.setOnClickListener {
+            context.startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://www.youtube.com/watch?v=${tvShow.youtubeTrailerId}")
+                )
+            )
+        }
 
         binding.tvTvShowOverview.text = tvShow.overview
 

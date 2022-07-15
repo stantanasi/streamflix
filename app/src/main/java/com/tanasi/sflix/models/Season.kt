@@ -7,7 +7,8 @@ class Season(
     val number: Int,
     val title: String = "",
 
-    val episodes: List<Episode> = listOf(),
+    var episodes: List<Episode> = listOf(),
+    var tvShow: TvShow? = null,
 ) : SflixAdapter.Item {
 
 

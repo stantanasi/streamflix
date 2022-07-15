@@ -32,15 +32,17 @@
         android:id="@+id/vgv_search"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:padding="16dp"
         app:focusOutEnd="true"
         app:focusOutFront="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/et_search"
-        tools:listitem="@layout/item_movie" />
+        app:numberOfColumns="6"
+        tools:listitem="@layout/item_movie_search" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
