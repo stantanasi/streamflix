@@ -111,7 +111,7 @@ class VhTvShow(
 
         binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
 
-        binding.btnTvShowWatchNow.setOnClickListener {
+        binding.btnTvShowTrailer.setOnClickListener {
             context.startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
