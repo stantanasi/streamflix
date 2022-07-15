@@ -13,6 +13,7 @@ import com.tanasi.sflix.databinding.ItemTvShowHomeBinding
 import com.tanasi.sflix.databinding.ItemTvShowSearchBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
+import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.format
 
@@ -111,7 +112,19 @@ class VhTvShow(
 
         binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
 
-        binding.btnTvShowWatchNow.setOnClickListener {
+        binding.btnTvShowSeasons.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    TvShowFragmentDirections.actionTvShowToSeasons(
+                        tvShowId = tvShow.id,
+                        tvShowTitle = tvShow.title,
+                        tvShowBanner = tvShow.banner,
+                    )
+                )
+            }
+        }
+
+        binding.btnTvShowTrailer.setOnClickListener {
             context.startActivity(
                 Intent(
                     Intent.ACTION_VIEW,

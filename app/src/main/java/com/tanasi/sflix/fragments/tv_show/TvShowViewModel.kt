@@ -25,6 +25,7 @@ class TvShowViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
+
     fun fetchTvShow(id: String) = viewModelScope.launch {
         _state.value = State.Loading
 
@@ -68,49 +69,6 @@ class TvShowViewModel : ViewModel() {
                         ?.attr("style")
                         ?.substringAfter("background-image: url(")
                         ?.substringBefore(");"),
-
-                    seasons = sflixService.fetchTvShowSeasons(id)
-                        .select("div.dropdown-menu.dropdown-menu-model > a")
-                        .mapIndexed { seasonNumber, seasonElement ->
-                            val seasonId = seasonElement.attr("data-id")
-                            Season(
-                                id = seasonId,
-                                number = seasonNumber + 1,
-                                title = seasonElement.text(),
-
-                                episodes = sflixService.fetchSeasonEpisode(seasonId)
-                                    .select("div.flw-item.film_single-item.episode-item.eps-item")
-                                    .mapIndexed { episodeNumber, episodeElement ->
-                                        val episodeId = episodeElement.attr("data-id")
-                                        Episode(
-                                            id = episodeId,
-                                            number = episodeElement
-                                                .selectFirst("div.episode-number")
-                                                ?.text()
-                                                ?.substringAfter("Episode ")
-                                                ?.substringBefore(":")
-                                                ?.toIntOrNull()
-                                                ?: episodeNumber,
-                                            title = episodeElement
-                                                .selectFirst("h3.film-name")
-                                                ?.text()
-                                                ?: "",
-                                            poster = episodeElement.selectFirst("img")
-                                                ?.attr("src") ?: "",
-
-                                            servers = sflixService.fetchEpisodeServers(episodeId)
-                                                .select("a")
-                                                .map {
-                                                    Server(
-                                                        id = it.attr("data-id"),
-                                                        name = it.selectFirst("span")?.text()
-                                                            ?.trim() ?: "",
-                                                    )
-                                                },
-                                        )
-                                    }
-                            )
-                        },
                 )
             )
         } catch (e: Exception) {

@@ -1,12 +1,12 @@
 package com.tanasi.sflix.adapters.view_holders
 
-import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.ItemSeasonBinding
+import com.tanasi.sflix.fragments.seasons.SeasonsFragment
 import com.tanasi.sflix.models.Season
+import com.tanasi.sflix.utils.getCurrentFragment
+import com.tanasi.sflix.utils.toActivity
 
 
 class VhSeason(
@@ -28,14 +28,13 @@ class VhSeason(
 
 
     private fun displaySeason(binding: ItemSeasonBinding) {
-        binding.tvSeasonNumber.text = season.title
-
-        binding.hgvSeasonEpisodes.apply {
-            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(season.episodes.map {
-                it.apply { itemType = SflixAdapter.Type.EPISODE }
-            })
-            setItemSpacing(context.resources.getDimension(R.dimen.season_episodes_spacing).toInt())
+        binding.tvSeasonNumber.apply {
+            text = season.title
+            setOnClickListener {
+                when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                    is SeasonsFragment -> fragment.viewModel.getSeasonEpisodes(season.id)
+                }
+            }
         }
     }
 }
