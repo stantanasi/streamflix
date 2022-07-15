@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <attr name="menuGravity" format="enum">
-        <enum name="top" value="49" />
-        <enum name="center" value="17" />
-        <enum name="bottom" value="81" />
-    </attr>
-
     <declare-styleable name="NavigationSlideView">
         <attr name="menu" format="reference" />
         <attr name="menuGravity" />
