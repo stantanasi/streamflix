@@ -65,6 +65,11 @@ class PlayerFragment : Fragment() {
         viewModel.getVideo(args.linkId)
     }
 
+    override fun onPause() {
+        super.onPause()
+        player.pause()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         player.release()
