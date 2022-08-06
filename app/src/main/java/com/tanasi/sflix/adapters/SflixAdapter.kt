@@ -28,6 +28,7 @@ class SflixAdapter(
         SEASON,
 
         TV_SHOW_HOME,
+        TV_SHOW_TV_SHOWS,
         TV_SHOW_SEARCH,
 
         TV_SHOW_HEADER,
@@ -84,6 +85,13 @@ class SflixAdapter(
 
             Type.TV_SHOW_HOME -> VhTvShow(
                 ItemTvShowHomeBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+            Type.TV_SHOW_TV_SHOWS -> VhTvShow(
+                ItemTvShowTvShowsBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
