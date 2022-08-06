@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.util.MimeTypes
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
@@ -96,6 +97,12 @@ class PlayerFragment : Fragment() {
                 })
                 .build()
         )
+
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                binding.pvPlayer.keepScreenOn = isPlaying
+            }
+        })
 
         player.prepare()
         player.play()
