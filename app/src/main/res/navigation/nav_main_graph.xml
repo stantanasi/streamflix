@@ -81,4 +81,13 @@
             app:argType="string"
             app:nullable="true" />
     </fragment>
+    <fragment
+        android:id="@+id/movies"
+        android:name="com.tanasi.sflix.fragments.movies.MoviesFragment"
+        android:label="MoviesFragment"
+        tools:layout="@layout/fragment_movies">
+        <action
+            android:id="@+id/action_movies_to_movie"
+            app:destination="@id/movie" />
+    </fragment>
 </navigation>
