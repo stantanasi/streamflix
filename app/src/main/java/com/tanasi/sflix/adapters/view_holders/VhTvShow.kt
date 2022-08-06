@@ -11,9 +11,11 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemTvShowHeaderBinding
 import com.tanasi.sflix.databinding.ItemTvShowHomeBinding
 import com.tanasi.sflix.databinding.ItemTvShowSearchBinding
+import com.tanasi.sflix.databinding.ItemTvShowTvShowsBinding
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
+import com.tanasi.sflix.fragments.tv_shows.TvShowsFragmentDirections
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.format
 
@@ -31,6 +33,7 @@ class VhTvShow(
 
         when (_binding) {
             is ItemTvShowHomeBinding -> displayHome(_binding)
+            is ItemTvShowTvShowsBinding -> displayTvShows(_binding)
             is ItemTvShowSearchBinding -> displaySearch(_binding)
 
             is ItemTvShowHeaderBinding -> displayHeader(_binding)
@@ -43,6 +46,38 @@ class VhTvShow(
             setOnClickListener {
                 findNavController().navigate(
                     HomeFragmentDirections.actionHomeToTvShow(
+                        id = tvShow.id
+                    )
+                )
+            }
+            setOnFocusChangeListener { _, hasFocus ->
+                val animation = when {
+                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
+                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
+                }
+                binding.root.startAnimation(animation)
+                animation.fillAfter = true
+            }
+        }
+
+        Glide.with(context)
+            .load(tvShow.poster)
+            .centerCrop()
+            .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.tvTvShowLastEpisode.text =
+            "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+
+        binding.tvTvShowTitle.text = tvShow.title
+    }
+
+    private fun displayTvShows(binding: ItemTvShowTvShowsBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    TvShowsFragmentDirections.actionTvShowsToTvShow(
                         id = tvShow.id
                     )
                 )

@@ -18,4 +18,9 @@
         android:icon="@drawable/ic_outline_movie_24"
         android:title="Movies" />
 
+    <item
+        android:id="@id/tv_shows"
+        android:icon="@drawable/ic_outline_tv_24"
+        android:title="TV Shows" />
+
 </menu>
