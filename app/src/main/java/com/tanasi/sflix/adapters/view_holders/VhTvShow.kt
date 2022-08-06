@@ -145,7 +145,22 @@ class VhTvShow(
 
         binding.tvTvShowTitle.text = tvShow.title
 
+        binding.tvTvShowRating.text = tvShow.rating?.let { String.format("%.1f", it) } ?: "N/A"
+
         binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.tvTvShowReleased.text = tvShow.released?.format("yyyy")
+
+        binding.tvTvShowRuntime.text = tvShow.runtime?.let {
+            val hours = it / 60
+            val minutes = it % 60
+            when {
+                hours > 0 -> "$hours h $minutes min"
+                else -> "$minutes min"
+            }
+        } ?: "0 min"
+
+        binding.tvTvShowOverview.text = tvShow.overview
 
         binding.btnTvShowSeasons.apply {
             setOnClickListener {
@@ -167,11 +182,5 @@ class VhTvShow(
                 )
             )
         }
-
-        binding.tvTvShowOverview.text = tvShow.overview
-
-        binding.tvTvShowReleased.text = tvShow.released?.format("yyyy-MM-dd")
-
-        binding.tvTvShowRuntime.text = "${tvShow.runtime} min"
     }
 }
