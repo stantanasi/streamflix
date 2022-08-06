@@ -28,6 +28,10 @@ interface SflixService {
     suspend fun search(@Path("query") query: String): Document
 
 
+    @GET("tv-show")
+    suspend fun fetchTvShows(): Document
+
+
     @GET("movie/free-{id}")
     suspend fun fetchMovie(@Path("id") id: String): Document
 
