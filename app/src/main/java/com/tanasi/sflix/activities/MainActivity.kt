@@ -42,7 +42,8 @@ class MainActivity : FragmentActivity() {
 
         when (navController.currentDestination?.id) {
             R.id.search,
-            R.id.home -> when {
+            R.id.home,
+            R.id.movies -> when {
                 binding.navMain.hasFocus() -> finish()
                 else -> binding.navMain.requestFocus()
             }
