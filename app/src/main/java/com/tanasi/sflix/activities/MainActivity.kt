@@ -41,11 +41,17 @@ class MainActivity : FragmentActivity() {
             .navController
 
         when (navController.currentDestination?.id) {
+            R.id.home -> when {
+                binding.navMain.hasFocus() -> finish()
+                else -> binding.navMain.requestFocus()
+            }
             R.id.search,
-            R.id.home,
             R.id.movies,
             R.id.tv_shows -> when {
-                binding.navMain.hasFocus() -> finish()
+                binding.navMain.hasFocus() -> binding.navMain.findViewById<View>(R.id.home).let {
+                    it.requestFocus()
+                    it.performClick()
+                }
                 else -> binding.navMain.requestFocus()
             }
             else -> super.onBackPressed()
