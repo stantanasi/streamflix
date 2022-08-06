@@ -142,7 +142,22 @@ class VhMovie(
 
         binding.tvMovieTitle.text = movie.title
 
+        binding.tvMovieRating.text = movie.rating?.let { String.format("%.1f", it) } ?: "N/A"
+
         binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
+
+        binding.tvMovieReleased.text = movie.released?.format("yyyy")
+
+        binding.tvMovieRuntime.text = movie.runtime?.let {
+            val hours = it / 60
+            val minutes = it % 60
+            when {
+                hours > 0 -> "$hours h $minutes min"
+                else -> "$minutes min"
+            }
+        } ?: "0 min"
+
+        binding.tvMovieOverview.text = movie.overview
 
         binding.btnMovieWatchNow.apply {
             setOnClickListener {
@@ -162,11 +177,5 @@ class VhMovie(
                 )
             )
         }
-
-        binding.tvMovieOverview.text = movie.overview
-
-        binding.tvMovieReleased.text = movie.released?.format("yyyy-MM-dd")
-
-        binding.tvMovieRuntime.text = "${movie.runtime} min"
     }
 }
