@@ -10,11 +10,11 @@ class MoviesViewModel : ViewModel() {
 
     private val sflixService = SflixService.build()
 
-    private val _state = MutableLiveData<State>(State.Searching)
+    private val _state = MutableLiveData<State>(State.Loading)
     val state: LiveData<State> = _state
 
     sealed class State {
-        object Searching : State()
+        object Loading : State()
 
         data class SuccessLoading(val movies: List<Movie>) : State()
         data class FailedLoading(val error: Exception) : State()
