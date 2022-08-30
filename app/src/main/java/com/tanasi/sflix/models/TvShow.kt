@@ -16,6 +16,7 @@ class TvShow(
     val banner: String? = null,
 
     val seasons: List<Season> = listOf(),
+    val casts: List<People> = listOf(),
 ) : SflixAdapter.Item {
 
     val released = released?.toCalendar()
