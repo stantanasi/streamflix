@@ -8,5 +8,5 @@ class People(
     val image: String = "",
 ) : SflixAdapter.Item {
 
-    override lateinit var itemType: SflixAdapter.Type
+    override var itemType = SflixAdapter.Type.PEOPLE
 }
