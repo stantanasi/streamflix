@@ -2,16 +2,15 @@ package com.tanasi.sflix.adapters.view_holders
 
 import android.content.Intent
 import android.net.Uri
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
-import com.tanasi.sflix.databinding.ItemMovieHeaderBinding
-import com.tanasi.sflix.databinding.ItemMovieHomeBinding
-import com.tanasi.sflix.databinding.ItemMovieMoviesBinding
-import com.tanasi.sflix.databinding.ItemMovieSearchBinding
+import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.databinding.*
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
 import com.tanasi.sflix.fragments.movies.MoviesFragmentDirections
@@ -37,6 +36,7 @@ class VhMovie(
             is ItemMovieSearchBinding -> displaySearch(_binding)
 
             is ItemMovieHeaderBinding -> displayHeader(_binding)
+            is ItemMovieCastsBinding -> displayCasts(_binding)
         }
     }
 
@@ -176,6 +176,14 @@ class VhMovie(
                     Uri.parse("https://www.youtube.com/watch?v=${movie.youtubeTrailerId}")
                 )
             )
+        }
+    }
+
+    private fun displayCasts(binding: ItemMovieCastsBinding) {
+        binding.hgvMoviePeoples.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(movie.casts)
+            setItemSpacing(80)
         }
     }
 }
