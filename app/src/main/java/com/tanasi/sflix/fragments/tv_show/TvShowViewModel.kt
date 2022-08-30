@@ -4,9 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tanasi.sflix.models.Episode
-import com.tanasi.sflix.models.Season
-import com.tanasi.sflix.models.Server
+import com.tanasi.sflix.models.People
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.services.SflixService
 import kotlinx.coroutines.launch
@@ -34,16 +32,24 @@ class TvShowViewModel : ViewModel() {
 
             var released = ""
             var runtime: Int? = null
+            val casts = mutableListOf<People>()
 
             document.select("div.elements > .row > div > .row-line").forEach { element ->
                 val type = element?.select(".type")?.text() ?: return@forEach
                 when {
                     type.contains("Released") -> released = element.ownText().trim()
-                    type.contains("Duration") ->
-                        runtime = element.ownText()
-                            .removeSuffix("min")
-                            .trim()
-                            .toIntOrNull()
+                    type.contains("Duration") -> runtime = element.ownText()
+                        .removeSuffix("min")
+                        .trim()
+                        .toIntOrNull()
+                    type.contains("Casts") -> casts.addAll(
+                        element.select("a").map {
+                            People(
+                                slug = it.attr("href").substringAfter("/cast/"),
+                                name = it.text(),
+                            )
+                        }
+                    )
                 }
             }
 
@@ -69,6 +75,8 @@ class TvShowViewModel : ViewModel() {
                         ?.attr("style")
                         ?.substringAfter("background-image: url(")
                         ?.substringBefore(");"),
+
+                    casts = casts,
                 )
             )
         } catch (e: Exception) {
