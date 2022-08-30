@@ -24,6 +24,8 @@ class SflixAdapter(
 
         MOVIE_HEADER,
 
+        PEOPLE,
+
         ROW,
 
         SEASON,
@@ -69,6 +71,14 @@ class SflixAdapter(
 
             Type.MOVIE_HEADER -> VhMovie(
                 ItemMovieHeaderBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.PEOPLE -> VhPeople(
+                ItemPeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -126,6 +136,7 @@ class SflixAdapter(
         when (holder) {
             is VhEpisode -> holder.bind(items[position] as Episode)
             is VhMovie -> holder.bind(items[position] as Movie)
+            is VhPeople -> holder.bind(items[position] as People)
             is VhRow -> holder.bind(items[position] as Row)
             is VhSeason -> holder.bind(items[position] as Season)
             is VhTvShow -> holder.bind(items[position] as TvShow)
