@@ -23,6 +23,9 @@ class SflixAdapter(
         MOVIE_SEARCH,
 
         MOVIE_HEADER,
+        MOVIE_CASTS,
+
+        PEOPLE,
 
         ROW,
 
@@ -33,6 +36,7 @@ class SflixAdapter(
         TV_SHOW_SEARCH,
 
         TV_SHOW_HEADER,
+        TV_SHOW_CASTS,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
@@ -69,6 +73,21 @@ class SflixAdapter(
 
             Type.MOVIE_HEADER -> VhMovie(
                 ItemMovieHeaderBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+            Type.MOVIE_CASTS -> VhMovie(
+                ItemMovieCastsBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.PEOPLE -> VhPeople(
+                ItemPeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -120,12 +139,20 @@ class SflixAdapter(
                     false,
                 )
             )
+            Type.TV_SHOW_CASTS -> VhTvShow(
+                ItemTvShowCastsBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
         }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is VhEpisode -> holder.bind(items[position] as Episode)
             is VhMovie -> holder.bind(items[position] as Movie)
+            is VhPeople -> holder.bind(items[position] as People)
             is VhRow -> holder.bind(items[position] as Row)
             is VhSeason -> holder.bind(items[position] as Season)
             is VhTvShow -> holder.bind(items[position] as TvShow)
