@@ -17,7 +17,7 @@ class Movie(
 
     val casts: List<People> = listOf(),
     val servers: List<Server> = listOf(),
-) : SflixAdapter.Item {
+) : SflixAdapter.Item, Cloneable {
 
     val released = released?.toCalendar()
     val quality = Quality.getByValue(quality)
@@ -39,4 +39,8 @@ class Movie(
 
 
     override lateinit var itemType: SflixAdapter.Type
+
+    public override fun clone(): Movie {
+        return super.clone() as Movie
+    }
 }

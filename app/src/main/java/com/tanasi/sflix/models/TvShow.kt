@@ -17,7 +17,7 @@ class TvShow(
 
     val seasons: List<Season> = listOf(),
     val casts: List<People> = listOf(),
-) : SflixAdapter.Item {
+) : SflixAdapter.Item, Cloneable {
 
     val released = released?.toCalendar()
     val quality = Quality.getByValue(quality)
@@ -39,4 +39,8 @@ class TvShow(
 
 
     override lateinit var itemType: SflixAdapter.Type
+
+    public override fun clone(): TvShow {
+        return super.clone() as TvShow
+    }
 }
