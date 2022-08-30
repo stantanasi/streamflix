@@ -15,6 +15,7 @@ class Movie(
     val poster: String? = null,
     val banner: String? = null,
 
+    val casts: List<People> = listOf(),
     val servers: List<Server> = listOf(),
 ) : SflixAdapter.Item {
 
