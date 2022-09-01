@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tanasi.sflix.models.*
+import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.People
+import com.tanasi.sflix.models.Server
 import com.tanasi.sflix.services.SflixService
 import kotlinx.coroutines.launch
 
