@@ -35,6 +35,7 @@ class VhTvShow(
             is ItemTvShowSearchBinding -> displaySearch(_binding)
 
             is ItemTvShowHeaderBinding -> displayHeader(_binding)
+            is ItemTvShowSeasonsBinding -> displaySeasons(_binding)
             is ItemTvShowCastsBinding -> displayCasts(_binding)
         }
     }
@@ -168,6 +169,14 @@ class VhTvShow(
                     Uri.parse("https://www.youtube.com/watch?v=${tvShow.youtubeTrailerId}")
                 )
             )
+        }
+    }
+
+    private fun displaySeasons(binding: ItemTvShowSeasonsBinding) {
+        binding.hgvTvShowSeasons.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(tvShow.seasons.reversed())
+            setItemSpacing(80)
         }
     }
 
