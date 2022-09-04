@@ -47,8 +47,8 @@
             android:name="id"
             app:argType="string" />
         <action
-            android:id="@+id/action_tv_show_to_seasons"
-            app:destination="@id/seasons" />
+            android:id="@+id/action_tv_show_to_season"
+            app:destination="@id/season" />
     </fragment>
     <fragment
         android:id="@+id/search"
@@ -63,15 +63,15 @@
             app:destination="@id/tv_show" />
     </fragment>
     <fragment
-        android:id="@+id/seasons"
-        android:name="com.tanasi.sflix.fragments.seasons.SeasonsFragment"
-        android:label="fragment_seasons"
-        tools:layout="@layout/fragment_seasons">
+        android:id="@+id/season"
+        android:name="com.tanasi.sflix.fragments.season.SeasonFragment"
+        android:label="fragment_season"
+        tools:layout="@layout/fragment_season">
         <argument
             android:name="tvShowId"
             app:argType="string" />
         <action
-            android:id="@+id/action_seasons_to_player"
+            android:id="@+id/action_season_to_player"
             app:destination="@id/player" />
         <argument
             android:name="tvShowTitle"

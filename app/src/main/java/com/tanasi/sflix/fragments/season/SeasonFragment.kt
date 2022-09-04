@@ -1,4 +1,4 @@
-package com.tanasi.sflix.fragments.seasons
+package com.tanasi.sflix.fragments.season
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,22 +10,22 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.adapters.SflixAdapter
-import com.tanasi.sflix.databinding.FragmentSeasonsBinding
+import com.tanasi.sflix.databinding.FragmentSeasonBinding
 
-class SeasonsFragment : Fragment() {
+class SeasonFragment : Fragment() {
 
-    private var _binding: FragmentSeasonsBinding? = null
+    private var _binding: FragmentSeasonBinding? = null
     private val binding get() = _binding!!
 
-    val viewModel by viewModels<SeasonsViewModel>()
-    private val args by navArgs<SeasonsFragmentArgs>()
+    val viewModel by viewModels<SeasonViewModel>()
+    private val args by navArgs<SeasonFragmentArgs>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSeasonsBinding.inflate(inflater, container, false)
+        _binding = FragmentSeasonBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -41,8 +41,8 @@ class SeasonsFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                SeasonsViewModel.State.LoadingSeasons -> {}
-                is SeasonsViewModel.State.SuccessLoadingSeasons -> {
+                SeasonViewModel.State.LoadingSeasons -> {}
+                is SeasonViewModel.State.SuccessLoadingSeasons -> {
                     binding.vgvSeasons.apply {
                         adapter = SflixAdapter(state.seasons.onEach {
                             it.itemType = SflixAdapter.Type.SEASON
@@ -51,7 +51,7 @@ class SeasonsFragment : Fragment() {
                     }
                     viewModel.getSeasonEpisodes(state.seasons.firstOrNull()?.id ?: "")
                 }
-                is SeasonsViewModel.State.FailedLoadingSeasons -> {
+                is SeasonViewModel.State.FailedLoadingSeasons -> {
                     Toast.makeText(
                         requireContext(),
                         state.error.message,
@@ -59,8 +59,8 @@ class SeasonsFragment : Fragment() {
                     ).show()
                 }
 
-                SeasonsViewModel.State.LoadingEpisodes -> {}
-                is SeasonsViewModel.State.SuccessLoadingEpisodes -> {
+                SeasonViewModel.State.LoadingEpisodes -> {}
+                is SeasonViewModel.State.SuccessLoadingEpisodes -> {
                     binding.vgvEpisodes.apply {
                         adapter = SflixAdapter(state.episodes.onEach {
                             it.itemType = SflixAdapter.Type.EPISODE
@@ -68,7 +68,7 @@ class SeasonsFragment : Fragment() {
                         setItemSpacing(20)
                     }
                 }
-                is SeasonsViewModel.State.FailedLoadingEpisodes -> {
+                is SeasonViewModel.State.FailedLoadingEpisodes -> {
                     Toast.makeText(
                         requireContext(),
                         state.error.message,

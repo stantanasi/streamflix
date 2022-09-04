@@ -1,4 +1,4 @@
-package com.tanasi.sflix.fragments.seasons
+package com.tanasi.sflix.fragments.season
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,7 +10,7 @@ import com.tanasi.sflix.models.Server
 import com.tanasi.sflix.services.SflixService
 import kotlinx.coroutines.launch
 
-class SeasonsViewModel : ViewModel() {
+class SeasonViewModel : ViewModel() {
 
     private val sflixService = SflixService.build()
 
