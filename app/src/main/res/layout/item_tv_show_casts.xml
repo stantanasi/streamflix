@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.leanback.widget.HorizontalGridView
-        android:id="@+id/hgv_tv_show_peoples"
+        android:id="@+id/hgv_tv_show_casts"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:clipChildren="false"
@@ -34,6 +34,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_tv_show_casts_label"
         tools:listitem="@layout/item_people" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

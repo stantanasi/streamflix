@@ -185,7 +185,7 @@ class VhTvShow(
     }
 
     private fun displayCasts(binding: ItemTvShowCastsBinding) {
-        binding.hgvTvShowPeoples.apply {
+        binding.hgvTvShowCasts.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = SflixAdapter(tvShow.casts)
             setItemSpacing(80)
