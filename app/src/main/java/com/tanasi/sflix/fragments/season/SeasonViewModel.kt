@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Episode
-import com.tanasi.sflix.models.Season
 import com.tanasi.sflix.models.Server
 import com.tanasi.sflix.services.SflixService
 import kotlinx.coroutines.launch

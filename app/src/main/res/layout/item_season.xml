@@ -23,10 +23,10 @@
         android:id="@+id/tv_season_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_season_poster"
-        android:textColor="#FFFFFF"
         tools:text="Season #" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
