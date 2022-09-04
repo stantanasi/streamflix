@@ -6,51 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".fragments.season.SeasonFragment">
 
-    <ImageView
-        android:id="@+id/iv_tv_show_banner"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginEnd="100dp"
-        app:layout_constraintDimensionRatio="2:1"
-        app:layout_constraintEnd_toStartOf="@id/vgv_episodes"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
-
-    <TextView
-        android:id="@+id/tv_tv_show_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="30dp"
-        android:gravity="center"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp"
-        app:layout_constraintEnd_toStartOf="@id/vgv_episodes"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_tv_show_banner"
-        tools:text="Title" />
-
-    <androidx.leanback.widget.VerticalGridView
-        android:id="@+id/vgv_seasons"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:paddingStart="30dp"
-        android:paddingTop="30dp"
-        android:paddingEnd="30dp"
-        android:paddingBottom="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/vgv_episodes"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_title"
-        app:layout_constraintWidth_percent="0.3"
-        tools:listitem="@layout/item_season" />
-
     <androidx.leanback.widget.VerticalGridView
         android:id="@+id/vgv_episodes"
         android:layout_width="0dp"
@@ -60,7 +15,7 @@
         android:padding="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/vgv_seasons"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:listitem="@layout/item_episode" />
 
