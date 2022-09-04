@@ -13,7 +13,6 @@ import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.*
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
-import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.sflix.fragments.tv_shows.TvShowsFragmentDirections
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.format
@@ -161,18 +160,6 @@ class VhTvShow(
         } ?: "0 min"
 
         binding.tvTvShowOverview.text = tvShow.overview
-
-        binding.btnTvShowSeasons.apply {
-            setOnClickListener {
-                findNavController().navigate(
-                    TvShowFragmentDirections.actionTvShowToSeasons(
-                        tvShowId = tvShow.id,
-                        tvShowTitle = tvShow.title,
-                        tvShowBanner = tvShow.banner,
-                    )
-                )
-            }
-        }
 
         binding.btnTvShowTrailer.setOnClickListener {
             context.startActivity(

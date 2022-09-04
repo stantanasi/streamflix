@@ -94,25 +94,14 @@
         tools:text="Overview" />
 
     <TextView
-        android:id="@+id/btn_tv_show_seasons"
+        android:id="@+id/btn_tv_show_trailer"
         style="@style/AppTheme.Widget.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginTop="30dp"
-        android:text="Seasons"
-        app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
-        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview" />
-
-    <TextView
-        android:id="@+id/btn_tv_show_trailer"
-        style="@style/AppTheme.Widget.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="30dp"
         android:text="Trailer"
-        app:layout_constraintStart_toEndOf="@id/btn_tv_show_seasons"
+        app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
         app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
