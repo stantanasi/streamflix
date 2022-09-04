@@ -14,14 +14,10 @@ class SeasonViewModel : ViewModel() {
 
     private val sflixService = SflixService.build()
 
-    private val _state = MutableLiveData<State>(State.LoadingSeasons)
+    private val _state = MutableLiveData<State>(State.LoadingEpisodes)
     val state: LiveData<State> = _state
 
     sealed class State {
-        object LoadingSeasons : State()
-        data class SuccessLoadingSeasons(val seasons: List<Season>) : State()
-        data class FailedLoadingSeasons(val error: Exception) : State()
-
         object LoadingEpisodes : State()
         data class SuccessLoadingEpisodes(
             val seasonId: String,
@@ -30,27 +26,6 @@ class SeasonViewModel : ViewModel() {
         data class FailedLoadingEpisodes(val error: Exception) : State()
     }
 
-
-    fun getSeasons(tvShowId: String) = viewModelScope.launch {
-        _state.value = State.LoadingSeasons
-
-        _state.value = try {
-            State.SuccessLoadingSeasons(
-                seasons = sflixService.fetchTvShowSeasons(tvShowId)
-                    .select("div.dropdown-menu.dropdown-menu-model > a")
-                    .mapIndexed { seasonNumber, seasonElement ->
-                        val seasonId = seasonElement.attr("data-id")
-                        Season(
-                            id = seasonId,
-                            number = seasonNumber + 1,
-                            title = seasonElement.text(),
-                        )
-                    }
-            )
-        } catch (e: Exception) {
-            State.FailedLoadingSeasons(e)
-        }
-    }
 
     fun getSeasonEpisodes(seasonId: String) = viewModelScope.launch {
         _state.value = State.LoadingEpisodes

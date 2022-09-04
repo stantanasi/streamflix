@@ -36,9 +36,7 @@ class SeasonFragment : Fragment() {
                 SeasonViewModel.State.LoadingEpisodes -> {}
                 is SeasonViewModel.State.SuccessLoadingEpisodes -> {
                     binding.vgvEpisodes.apply {
-                        adapter = SflixAdapter(state.episodes.onEach {
-                            it.itemType = SflixAdapter.Type.EPISODE
-                        })
+                        adapter = SflixAdapter(state.episodes)
                         setItemSpacing(20)
                     }
                 }
@@ -51,5 +49,7 @@ class SeasonFragment : Fragment() {
                 }
             }
         }
+
+        viewModel.getSeasonEpisodes(args.seasonId)
     }
 }
