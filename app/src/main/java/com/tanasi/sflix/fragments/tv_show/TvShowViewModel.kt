@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.People
+import com.tanasi.sflix.models.Season
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.services.SflixService
 import kotlinx.coroutines.launch
@@ -76,6 +77,15 @@ class TvShowViewModel : ViewModel() {
                         ?.substringAfter("background-image: url(")
                         ?.substringBefore(");"),
 
+                    seasons = sflixService.fetchTvShowSeasons(id)
+                        .select("div.dropdown-menu.dropdown-menu-model > a")
+                        .mapIndexed { seasonNumber, seasonElement ->
+                            Season(
+                                id = seasonElement.attr("data-id"),
+                                number = seasonNumber + 1,
+                                title = seasonElement.text(),
+                            )
+                        },
                     casts = casts,
                 )
             )
