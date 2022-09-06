@@ -27,6 +27,8 @@ class SflixAdapter(
 
         PEOPLE,
 
+        PEOPLE_HEADER,
+
         ROW,
 
         SEASON,
@@ -88,6 +90,14 @@ class SflixAdapter(
 
             Type.PEOPLE -> VhPeople(
                 ItemPeopleBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.PEOPLE_HEADER -> VhPeople(
+                ItemPeopleHeaderBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
