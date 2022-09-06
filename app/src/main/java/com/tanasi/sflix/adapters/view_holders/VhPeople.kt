@@ -7,6 +7,7 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemPeopleBinding
+import com.tanasi.sflix.databinding.ItemPeopleHeaderBinding
 import com.tanasi.sflix.fragments.movie.MovieFragment
 import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
 import com.tanasi.sflix.fragments.tv_show.TvShowFragment
@@ -29,6 +30,8 @@ class VhPeople(
 
         when (_binding) {
             is ItemPeopleBinding -> displayPeople(_binding)
+
+            is ItemPeopleHeaderBinding -> displayHeader(_binding)
         }
     }
 
@@ -65,5 +68,19 @@ class VhPeople(
         }
 
         binding.tvPeopleName.text = people.name
+    }
+
+
+    private fun displayHeader(binding: ItemPeopleHeaderBinding) {
+        binding.tvPeopleName.text = people.name
+
+        binding.ivPeopleImage.apply {
+            clipToOutline = true
+            Glide.with(context)
+                .load(people.image)
+                .placeholder(R.drawable.ic_person_placeholder)
+                .centerCrop()
+                .into(this)
+        }
     }
 }
