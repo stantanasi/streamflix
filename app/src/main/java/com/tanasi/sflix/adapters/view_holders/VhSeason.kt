@@ -34,6 +34,7 @@ class VhSeason(
                 findNavController().navigate(
                     TvShowFragmentDirections.actionTvShowToSeason(
                         seasonId = season.id,
+                        seasonTitle = season.title,
                     )
                 )
             }

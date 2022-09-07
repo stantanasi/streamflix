@@ -73,6 +73,9 @@
         <argument
             android:name="seasonId"
             app:argType="string" />
+        <argument
+            android:name="seasonTitle"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/movies"
