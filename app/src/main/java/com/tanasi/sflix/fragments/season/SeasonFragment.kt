@@ -24,7 +24,10 @@ class SeasonFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSeasonBinding.inflate(inflater, container, false)
+        if (_binding == null) {
+            _binding = FragmentSeasonBinding.inflate(inflater, container, false)
+            viewModel.getSeasonEpisodes(args.seasonId)
+        }
         return binding.root
     }
 
@@ -49,7 +52,5 @@ class SeasonFragment : Fragment() {
                 }
             }
         }
-
-        viewModel.getSeasonEpisodes(args.seasonId)
     }
 }
