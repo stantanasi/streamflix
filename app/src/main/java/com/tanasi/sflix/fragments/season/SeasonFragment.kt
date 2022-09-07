@@ -34,13 +34,15 @@ class SeasonFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.tvSeasonTitle.text = args.seasonTitle
+
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 SeasonViewModel.State.LoadingEpisodes -> {}
                 is SeasonViewModel.State.SuccessLoadingEpisodes -> {
                     binding.vgvEpisodes.apply {
                         adapter = SflixAdapter(state.episodes)
-                        setItemSpacing(20)
+                        setItemSpacing(60)
                     }
                 }
                 is SeasonViewModel.State.FailedLoadingEpisodes -> {
