@@ -4,6 +4,7 @@ import android.view.animation.AnimationUtils
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemSeasonBinding
 import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
@@ -46,6 +47,14 @@ class VhSeason(
                 binding.root.startAnimation(animation)
                 animation.fillAfter = true
             }
+        }
+
+        binding.ivSeasonPoster.apply {
+            clipToOutline = true
+            Glide.with(context)
+                .load(season.poster)
+                .centerCrop()
+                .into(this)
         }
 
         binding.tvSeasonTitle.text = season.title
