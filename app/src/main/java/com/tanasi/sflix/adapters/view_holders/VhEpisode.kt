@@ -47,10 +47,13 @@ class VhEpisode(
             }
         }
 
-        Glide.with(context)
-            .load(episode.poster)
-            .centerCrop()
-            .into(binding.ivEpisodePoster)
+        binding.ivEpisodePoster.apply {
+            clipToOutline = true
+            Glide.with(context)
+                .load(episode.poster)
+                .centerCrop()
+                .into(this)
+        }
 
         binding.tvEpisodeInfo.text = "Episode ${episode.number}"
 
