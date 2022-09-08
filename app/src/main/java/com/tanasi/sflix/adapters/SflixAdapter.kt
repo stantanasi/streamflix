@@ -36,8 +36,8 @@ class SflixAdapter(
 
         TV_SHOW_HOME,
         TV_SHOW_PEOPLE,
-        TV_SHOW_TV_SHOWS,
         TV_SHOW_SEARCH,
+        TV_SHOW_TV_SHOWS,
 
         TV_SHOW_HEADER,
         TV_SHOW_CASTS,
@@ -143,15 +143,15 @@ class SflixAdapter(
                     false
                 )
             )
-            Type.TV_SHOW_TV_SHOWS -> VhTvShow(
-                ItemTvShowTvShowsBinding.inflate(
+            Type.TV_SHOW_SEARCH -> VhTvShow(
+                ItemTvShowSearchBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
             )
-            Type.TV_SHOW_SEARCH -> VhTvShow(
-                ItemTvShowSearchBinding.inflate(
+            Type.TV_SHOW_TV_SHOWS -> VhTvShow(
+                ItemTvShowTvShowsBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false

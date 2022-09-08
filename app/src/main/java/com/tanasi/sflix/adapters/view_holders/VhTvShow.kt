@@ -34,8 +34,8 @@ class VhTvShow(
         when (_binding) {
             is ItemTvShowHomeBinding -> displayHome(_binding)
             is ItemTvShowPeopleBinding -> displayPeople(_binding)
-            is ItemTvShowTvShowsBinding -> displayTvShows(_binding)
             is ItemTvShowSearchBinding -> displaySearch(_binding)
+            is ItemTvShowTvShowsBinding -> displayTvShows(_binding)
 
             is ItemTvShowHeaderBinding -> displayHeader(_binding)
             is ItemTvShowCastsBinding -> displayCasts(_binding)
@@ -107,11 +107,11 @@ class VhTvShow(
         binding.tvTvShowTitle.text = tvShow.title
     }
 
-    private fun displayTvShows(binding: ItemTvShowTvShowsBinding) {
+    private fun displaySearch(binding: ItemTvShowSearchBinding) {
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    TvShowsFragmentDirections.actionTvShowsToTvShow(
+                    SearchFragmentDirections.actionSearchToTvShow(
                         id = tvShow.id
                     )
                 )
@@ -139,11 +139,11 @@ class VhTvShow(
         binding.tvTvShowTitle.text = tvShow.title
     }
 
-    private fun displaySearch(binding: ItemTvShowSearchBinding) {
+    private fun displayTvShows(binding: ItemTvShowTvShowsBinding) {
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    SearchFragmentDirections.actionSearchToTvShow(
+                    TvShowsFragmentDirections.actionTvShowsToTvShow(
                         id = tvShow.id
                     )
                 )
