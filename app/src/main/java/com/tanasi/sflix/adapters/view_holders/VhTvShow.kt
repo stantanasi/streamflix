@@ -12,6 +12,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.*
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
+import com.tanasi.sflix.fragments.people.PeopleFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.sflix.fragments.tv_shows.TvShowsFragmentDirections
@@ -32,6 +33,7 @@ class VhTvShow(
 
         when (_binding) {
             is ItemTvShowHomeBinding -> displayHome(_binding)
+            is ItemTvShowPeopleBinding -> displayPeople(_binding)
             is ItemTvShowTvShowsBinding -> displayTvShows(_binding)
             is ItemTvShowSearchBinding -> displaySearch(_binding)
 
@@ -46,6 +48,38 @@ class VhTvShow(
             setOnClickListener {
                 findNavController().navigate(
                     HomeFragmentDirections.actionHomeToTvShow(
+                        id = tvShow.id
+                    )
+                )
+            }
+            setOnFocusChangeListener { _, hasFocus ->
+                val animation = when {
+                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
+                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
+                }
+                binding.root.startAnimation(animation)
+                animation.fillAfter = true
+            }
+        }
+
+        Glide.with(context)
+            .load(tvShow.poster)
+            .centerCrop()
+            .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.tvTvShowLastEpisode.text =
+            "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+
+        binding.tvTvShowTitle.text = tvShow.title
+    }
+
+    private fun displayPeople(binding: ItemTvShowPeopleBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    PeopleFragmentDirections.actionPeopleToTvShow(
                         id = tvShow.id
                     )
                 )
