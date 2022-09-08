@@ -7,8 +7,7 @@ class People(
     val name: String,
     val image: String = "",
 
-    val movies: List<Movie> = listOf(),
-    val tvShows: List<TvShow> = listOf(),
+    val filmography: List<SflixAdapter.Item> = listOf(),
 ) : SflixAdapter.Item {
 
     override var itemType = SflixAdapter.Type.PEOPLE
