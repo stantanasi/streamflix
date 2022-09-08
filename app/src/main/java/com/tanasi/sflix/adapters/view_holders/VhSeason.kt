@@ -1,12 +1,14 @@
 package com.tanasi.sflix.adapters.view_holders
 
+import android.view.animation.AnimationUtils
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import com.bumptech.glide.Glide
+import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemSeasonBinding
-import com.tanasi.sflix.fragments.seasons.SeasonsFragment
+import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.sflix.models.Season
-import com.tanasi.sflix.utils.getCurrentFragment
-import com.tanasi.sflix.utils.toActivity
 
 
 class VhSeason(
@@ -28,13 +30,33 @@ class VhSeason(
 
 
     private fun displaySeason(binding: ItemSeasonBinding) {
-        binding.tvSeasonNumber.apply {
-            text = season.title
+        binding.root.apply {
             setOnClickListener {
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is SeasonsFragment -> fragment.viewModel.getSeasonEpisodes(season.id)
+                findNavController().navigate(
+                    TvShowFragmentDirections.actionTvShowToSeason(
+                        seasonId = season.id,
+                        seasonTitle = season.title,
+                    )
+                )
+            }
+            setOnFocusChangeListener { _, hasFocus ->
+                val animation = when {
+                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
+                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
                 }
+                binding.root.startAnimation(animation)
+                animation.fillAfter = true
             }
         }
+
+        binding.ivSeasonPoster.apply {
+            clipToOutline = true
+            Glide.with(context)
+                .load(season.poster)
+                .centerCrop()
+                .into(this)
+        }
+
+        binding.tvSeasonTitle.text = season.title
     }
 }
