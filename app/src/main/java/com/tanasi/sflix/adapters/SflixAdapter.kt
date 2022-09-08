@@ -20,6 +20,7 @@ class SflixAdapter(
 
         MOVIE_HOME,
         MOVIE_MOVIES,
+        MOVIE_PEOPLE,
         MOVIE_SEARCH,
 
         MOVIE_HEADER,
@@ -60,6 +61,13 @@ class SflixAdapter(
             )
             Type.MOVIE_MOVIES -> VhMovie(
                 ItemMovieMoviesBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+            Type.MOVIE_PEOPLE -> VhMovie(
+                ItemMoviePeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
