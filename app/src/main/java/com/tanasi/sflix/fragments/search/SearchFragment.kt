@@ -76,8 +76,8 @@ class SearchFragment : Fragment() {
         binding.vgvSearch.apply {
             adapter = SflixAdapter(list.onEach {
                 when (it) {
-                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_SEARCH
-                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_SEARCH
+                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_GRID_ITEM
+                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_GRID_ITEM
                 }
             })
             setItemSpacing(requireContext().resources.getDimension(R.dimen.search_spacing).toInt())

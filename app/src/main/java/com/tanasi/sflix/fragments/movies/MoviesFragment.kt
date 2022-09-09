@@ -62,7 +62,7 @@ class MoviesFragment : Fragment() {
     private fun displayMovies() {
         binding.vgvMovies.apply {
             adapter = SflixAdapter(movies.onEach {
-                it.itemType = SflixAdapter.Type.MOVIE_MOVIES
+                it.itemType = SflixAdapter.Type.MOVIE_GRID_ITEM
             })
             setItemSpacing(requireContext().resources.getDimension(R.dimen.movies_spacing).toInt())
         }

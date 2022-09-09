@@ -8,8 +8,8 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.databinding.ContentPeopleBinding
 import com.tanasi.sflix.databinding.ItemPeopleBinding
-import com.tanasi.sflix.databinding.ItemPeopleHeaderBinding
 import com.tanasi.sflix.fragments.movie.MovieFragment
 import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
 import com.tanasi.sflix.fragments.tv_show.TvShowFragment
@@ -33,14 +33,14 @@ class VhPeople(
         this.people = people
 
         when (_binding) {
-            is ItemPeopleBinding -> displayPeople(_binding)
+            is ItemPeopleBinding -> displayItem(_binding)
 
-            is ItemPeopleHeaderBinding -> displayHeader(_binding)
+            is ContentPeopleBinding -> displayPeople(_binding)
         }
     }
 
 
-    private fun displayPeople(binding: ItemPeopleBinding) {
+    private fun displayItem(binding: ItemPeopleBinding) {
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -75,7 +75,7 @@ class VhPeople(
     }
 
 
-    private fun displayHeader(binding: ItemPeopleHeaderBinding) {
+    private fun displayPeople(binding: ContentPeopleBinding) {
         binding.tvPeopleName.text = people.name
 
         binding.ivPeopleImage.apply {
@@ -91,8 +91,8 @@ class VhPeople(
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = SflixAdapter(people.filmography.onEach {
                 when (it) {
-                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_PEOPLE
-                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_PEOPLE
+                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
+                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
                 }
             })
             setItemSpacing(20)

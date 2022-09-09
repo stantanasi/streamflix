@@ -16,37 +16,33 @@ class SflixAdapter(
     }
 
     enum class Type {
-        EPISODE,
+        EPISODE_ITEM,
 
-        MOVIE_HOME,
-        MOVIE_MOVIES,
-        MOVIE_PEOPLE,
-        MOVIE_SEARCH,
+        MOVIE_ITEM,
+        MOVIE_GRID_ITEM,
 
-        MOVIE_HEADER,
+        MOVIE,
         MOVIE_CASTS,
+
+        PEOPLE_ITEM,
 
         PEOPLE,
 
-        PEOPLE_HEADER,
+        ROW_ITEM,
 
-        ROW,
+        SEASON_ITEM,
 
-        SEASON,
+        TV_SHOW_ITEM,
+        TV_SHOW_GRID_ITEM,
 
-        TV_SHOW_HOME,
-        TV_SHOW_PEOPLE,
-        TV_SHOW_SEARCH,
-        TV_SHOW_TV_SHOWS,
-
-        TV_SHOW_HEADER,
+        TV_SHOW,
         TV_SHOW_SEASONS,
         TV_SHOW_CASTS,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (Type.values()[viewType]) {
-            Type.EPISODE -> VhEpisode(
+            Type.EPISODE_ITEM -> VhEpisode(
                 ItemEpisodeBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -54,51 +50,37 @@ class SflixAdapter(
                 )
             )
 
-            Type.MOVIE_HOME -> VhMovie(
-                ItemMovieHomeBinding.inflate(
+            Type.MOVIE_ITEM -> VhMovie(
+                ItemMovieBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
-            Type.MOVIE_MOVIES -> VhMovie(
-                ItemMovieMoviesBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false,
-                )
-            )
-            Type.MOVIE_PEOPLE -> VhMovie(
-                ItemMoviePeopleBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false,
-                )
-            )
-            Type.MOVIE_SEARCH -> VhMovie(
-                ItemMovieSearchBinding.inflate(
+            Type.MOVIE_GRID_ITEM -> VhMovie(
+                ItemMovieGridBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
 
-            Type.MOVIE_HEADER -> VhMovie(
-                ItemMovieHeaderBinding.inflate(
+            Type.MOVIE -> VhMovie(
+                ContentMovieBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
             Type.MOVIE_CASTS -> VhMovie(
-                ItemMovieCastsBinding.inflate(
+                ContentMovieCastsBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
 
-            Type.PEOPLE -> VhPeople(
+            Type.PEOPLE_ITEM -> VhPeople(
                 ItemPeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -106,15 +88,15 @@ class SflixAdapter(
                 )
             )
 
-            Type.PEOPLE_HEADER -> VhPeople(
-                ItemPeopleHeaderBinding.inflate(
+            Type.PEOPLE -> VhPeople(
+                ContentPeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
 
-            Type.ROW -> VhRow(
+            Type.ROW_ITEM -> VhRow(
                 ItemRowBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -122,7 +104,7 @@ class SflixAdapter(
                 )
             )
 
-            Type.SEASON -> VhSeason(
+            Type.SEASON_ITEM -> VhSeason(
                 ItemSeasonBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -130,51 +112,37 @@ class SflixAdapter(
                 )
             )
 
-            Type.TV_SHOW_HOME -> VhTvShow(
-                ItemTvShowHomeBinding.inflate(
+            Type.TV_SHOW_ITEM -> VhTvShow(
+                ItemTvShowBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
             )
-            Type.TV_SHOW_PEOPLE -> VhTvShow(
-                ItemTvShowPeopleBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-            )
-            Type.TV_SHOW_SEARCH -> VhTvShow(
-                ItemTvShowSearchBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-            )
-            Type.TV_SHOW_TV_SHOWS -> VhTvShow(
-                ItemTvShowTvShowsBinding.inflate(
+            Type.TV_SHOW_GRID_ITEM -> VhTvShow(
+                ItemTvShowGridBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 )
             )
 
-            Type.TV_SHOW_HEADER -> VhTvShow(
-                ItemTvShowHeaderBinding.inflate(
+            Type.TV_SHOW -> VhTvShow(
+                ContentTvShowBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
             Type.TV_SHOW_SEASONS -> VhTvShow(
-                ItemTvShowSeasonsBinding.inflate(
+                ContentTvShowSeasonsBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
             Type.TV_SHOW_CASTS -> VhTvShow(
-                ItemTvShowCastsBinding.inflate(
+                ContentTvShowCastsBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,

@@ -83,7 +83,7 @@ class HomeFragment : Fragment() {
             list.add(Row(
                 title = "Trending Movies",
                 list = trendingMovies.onEach {
-                    it.itemType = SflixAdapter.Type.MOVIE_HOME
+                    it.itemType = SflixAdapter.Type.MOVIE_ITEM
                 }
             ).apply {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
@@ -92,7 +92,7 @@ class HomeFragment : Fragment() {
             list.add(Row(
                 title = "Trending TV Shows",
                 list = trendingTvShows.onEach {
-                    it.itemType = SflixAdapter.Type.TV_SHOW_HOME
+                    it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
                 }
             ).apply {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
@@ -101,7 +101,7 @@ class HomeFragment : Fragment() {
             list.add(Row(
                 title = "Latest Movies",
                 list = latestMovies.onEach {
-                    it.itemType = SflixAdapter.Type.MOVIE_HOME
+                    it.itemType = SflixAdapter.Type.MOVIE_ITEM
                 }
             ).apply {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
@@ -110,7 +110,7 @@ class HomeFragment : Fragment() {
             list.add(Row(
                 title = "Latest TV Shows",
                 list = latestTvShows.onEach {
-                    it.itemType = SflixAdapter.Type.TV_SHOW_HOME
+                    it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
                 }
             ).apply {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()

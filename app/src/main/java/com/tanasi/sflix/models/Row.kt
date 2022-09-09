@@ -10,5 +10,5 @@ class Row(
     var itemSpacing: Int = 0
 
 
-    override var itemType = SflixAdapter.Type.ROW
+    override var itemType = SflixAdapter.Type.ROW_ITEM
 }

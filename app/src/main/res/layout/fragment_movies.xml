@@ -20,6 +20,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:numberOfColumns="6"
-        tools:listitem="@layout/item_movie_movies" />
+        tools:listitem="@layout/item_movie_grid" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

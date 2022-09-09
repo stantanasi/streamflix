@@ -13,5 +13,5 @@ class Season(
 ) : SflixAdapter.Item {
 
 
-    override var itemType = SflixAdapter.Type.SEASON
+    override var itemType = SflixAdapter.Type.SEASON_ITEM
 }

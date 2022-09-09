@@ -10,14 +10,23 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
-import com.tanasi.sflix.databinding.*
+import com.tanasi.sflix.databinding.ContentMovieBinding
+import com.tanasi.sflix.databinding.ContentMovieCastsBinding
+import com.tanasi.sflix.databinding.ItemMovieBinding
+import com.tanasi.sflix.databinding.ItemMovieGridBinding
+import com.tanasi.sflix.fragments.home.HomeFragment
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
+import com.tanasi.sflix.fragments.movies.MoviesFragment
 import com.tanasi.sflix.fragments.movies.MoviesFragmentDirections
+import com.tanasi.sflix.fragments.people.PeopleFragment
 import com.tanasi.sflix.fragments.people.PeopleFragmentDirections
+import com.tanasi.sflix.fragments.search.SearchFragment
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.utils.format
+import com.tanasi.sflix.utils.getCurrentFragment
+import com.tanasi.sflix.utils.toActivity
 
 class VhMovie(
     private val _binding: ViewBinding
@@ -32,25 +41,30 @@ class VhMovie(
         this.movie = movie
 
         when (_binding) {
-            is ItemMovieHomeBinding -> displayHome(_binding)
-            is ItemMovieMoviesBinding -> displayMovies(_binding)
-            is ItemMoviePeopleBinding -> displayPeople(_binding)
-            is ItemMovieSearchBinding -> displaySearch(_binding)
+            is ItemMovieBinding -> displayItem(_binding)
+            is ItemMovieGridBinding -> displayGridItem(_binding)
 
-            is ItemMovieHeaderBinding -> displayHeader(_binding)
-            is ItemMovieCastsBinding -> displayCasts(_binding)
+            is ContentMovieBinding -> displayMovie(_binding)
+            is ContentMovieCastsBinding -> displayCasts(_binding)
         }
     }
 
 
-    private fun displayHome(binding: ItemMovieHomeBinding) {
+    private fun displayItem(binding: ItemMovieBinding) {
         binding.root.apply {
             setOnClickListener {
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeToMovie(
-                        id = movie.id
+                when (context.toActivity()?.getCurrentFragment()) {
+                    is HomeFragment -> findNavController().navigate(
+                        HomeFragmentDirections.actionHomeToMovie(
+                            id = movie.id
+                        )
                     )
-                )
+                    is PeopleFragment -> findNavController().navigate(
+                        PeopleFragmentDirections.actionPeopleToMovie(
+                            id = movie.id
+                        )
+                    )
+                }
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {
@@ -74,76 +88,22 @@ class VhMovie(
         binding.tvMovieTitle.text = movie.title
     }
 
-    private fun displayMovies(binding: ItemMovieMoviesBinding) {
+    private fun displayGridItem(binding: ItemMovieGridBinding) {
         binding.root.apply {
             setOnClickListener {
-                findNavController().navigate(
-                    MoviesFragmentDirections.actionMoviesToMovie(
-                        id = movie.id
+                when (context.toActivity()?.getCurrentFragment()) {
+                    is MoviesFragment -> findNavController().navigate(
+                        MoviesFragmentDirections.actionMoviesToMovie(
+                            id = movie.id
+                        )
                     )
-                )
-            }
-            setOnFocusChangeListener { _, hasFocus ->
-                val animation = when {
-                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
-                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
+                    is SearchFragment -> findNavController().navigate(
+                        SearchFragmentDirections.actionSearchToMovie(
+                            id = movie.id
+                        )
+                    )
                 }
-                binding.root.startAnimation(animation)
-                animation.fillAfter = true
-            }
-        }
 
-        Glide.with(context)
-            .load(movie.poster)
-            .centerCrop()
-            .into(binding.ivMoviePoster)
-
-        binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
-
-        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
-
-        binding.tvMovieTitle.text = movie.title
-    }
-
-    private fun displayPeople(binding: ItemMoviePeopleBinding) {
-        binding.root.apply {
-            setOnClickListener {
-                findNavController().navigate(
-                    PeopleFragmentDirections.actionPeopleToMovie(
-                        id = movie.id
-                    )
-                )
-            }
-            setOnFocusChangeListener { _, hasFocus ->
-                val animation = when {
-                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
-                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
-                }
-                binding.root.startAnimation(animation)
-                animation.fillAfter = true
-            }
-        }
-
-        Glide.with(context)
-            .load(movie.poster)
-            .centerCrop()
-            .into(binding.ivMoviePoster)
-
-        binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
-
-        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
-
-        binding.tvMovieTitle.text = movie.title
-    }
-
-    private fun displaySearch(binding: ItemMovieSearchBinding) {
-        binding.root.apply {
-            setOnClickListener {
-                findNavController().navigate(
-                    SearchFragmentDirections.actionSearchToMovie(
-                        id = movie.id
-                    )
-                )
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {
@@ -168,7 +128,7 @@ class VhMovie(
     }
 
 
-    private fun displayHeader(binding: ItemMovieHeaderBinding) {
+    private fun displayMovie(binding: ContentMovieBinding) {
         Glide.with(context)
             .load(movie.poster)
             .into(binding.ivMoviePoster)
@@ -212,7 +172,7 @@ class VhMovie(
         }
     }
 
-    private fun displayCasts(binding: ItemMovieCastsBinding) {
+    private fun displayCasts(binding: ContentMovieCastsBinding) {
         binding.hgvMovieCasts.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = SflixAdapter(movie.casts)

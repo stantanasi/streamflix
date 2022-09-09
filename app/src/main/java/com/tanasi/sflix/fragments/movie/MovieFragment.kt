@@ -65,7 +65,7 @@ class MovieFragment : Fragment() {
 
         binding.vgvMovie.apply {
             adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
-                it.add(movie.apply { itemType = SflixAdapter.Type.MOVIE_HEADER })
+                it.add(movie.apply { itemType = SflixAdapter.Type.MOVIE })
                 it.add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_CASTS })
             })
             setItemSpacing(80)

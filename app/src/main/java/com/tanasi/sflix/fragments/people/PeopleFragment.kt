@@ -60,7 +60,7 @@ class PeopleFragment : Fragment() {
     private fun displayPeople() {
         binding.vgvPeople.apply {
             adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
-                it.add(people.apply { itemType = SflixAdapter.Type.PEOPLE_HEADER })
+                it.add(people.apply { itemType = SflixAdapter.Type.PEOPLE })
             })
             setItemSpacing(80)
         }

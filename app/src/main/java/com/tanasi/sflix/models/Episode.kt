@@ -12,5 +12,5 @@ class Episode(
 ) : SflixAdapter.Item {
 
 
-    override var itemType = SflixAdapter.Type.EPISODE
+    override var itemType = SflixAdapter.Type.EPISODE_ITEM
 }

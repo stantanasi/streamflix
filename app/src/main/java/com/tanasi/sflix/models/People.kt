@@ -10,5 +10,5 @@ class People(
     val filmography: List<SflixAdapter.Item> = listOf(),
 ) : SflixAdapter.Item {
 
-    override var itemType = SflixAdapter.Type.PEOPLE
+    override var itemType = SflixAdapter.Type.PEOPLE_ITEM
 }
