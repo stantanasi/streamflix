@@ -19,6 +19,7 @@ import com.tanasi.sflix.fragments.search.SearchFragment
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.fragments.tv_shows.TvShowsFragment
 import com.tanasi.sflix.fragments.tv_shows.TvShowsFragmentDirections
+import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.format
 import com.tanasi.sflix.utils.getCurrentFragment
@@ -43,6 +44,7 @@ class VhTvShow(
             is ContentTvShowBinding -> displayTvShow(_binding)
             is ContentTvShowSeasonsBinding -> displaySeasons(_binding)
             is ContentTvShowCastsBinding -> displayCasts(_binding)
+            is ContentTvShowRecommendationsBinding -> displayRecommendations(_binding)
         }
     }
 
@@ -173,6 +175,19 @@ class VhTvShow(
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = SflixAdapter(tvShow.casts)
             setItemSpacing(80)
+        }
+    }
+
+    private fun displayRecommendations(binding: ContentTvShowRecommendationsBinding) {
+        binding.hgvTvShowRecommendations.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(tvShow.recommendations.onEach {
+                when (it) {
+                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
+                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
+                }
+            })
+            setItemSpacing(20)
         }
     }
 }
