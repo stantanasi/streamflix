@@ -68,6 +68,8 @@ class MovieFragment : Fragment() {
                 it.add(movie.apply { itemType = SflixAdapter.Type.MOVIE })
                 if (movie.casts.isNotEmpty())
                     it.add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_CASTS })
+                if (movie.recommendations.isNotEmpty())
+                    it.add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_RECOMMENDATIONS })
             })
             setItemSpacing(80)
         }
