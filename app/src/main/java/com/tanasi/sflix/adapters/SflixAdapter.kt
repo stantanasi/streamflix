@@ -23,6 +23,7 @@ class SflixAdapter(
 
         MOVIE,
         MOVIE_CASTS,
+        MOVIE_RECOMMENDATIONS,
 
         PEOPLE_ITEM,
 
@@ -38,6 +39,7 @@ class SflixAdapter(
         TV_SHOW,
         TV_SHOW_SEASONS,
         TV_SHOW_CASTS,
+        TV_SHOW_RECOMMENDATIONS,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
@@ -74,6 +76,13 @@ class SflixAdapter(
             )
             Type.MOVIE_CASTS -> VhMovie(
                 ContentMovieCastsBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+            Type.MOVIE_RECOMMENDATIONS -> VhMovie(
+                ContentMovieRecommendationsBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -143,6 +152,13 @@ class SflixAdapter(
             )
             Type.TV_SHOW_CASTS -> VhTvShow(
                 ContentTvShowCastsBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+            Type.TV_SHOW_RECOMMENDATIONS -> VhTvShow(
+                ContentTvShowRecommendationsBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
