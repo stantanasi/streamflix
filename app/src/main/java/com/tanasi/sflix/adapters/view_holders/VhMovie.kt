@@ -13,6 +13,7 @@ import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.*
 import com.tanasi.sflix.fragments.home.HomeFragment
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
+import com.tanasi.sflix.fragments.movie.MovieFragment
 import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
 import com.tanasi.sflix.fragments.movies.MoviesFragment
 import com.tanasi.sflix.fragments.movies.MoviesFragmentDirections
@@ -20,6 +21,8 @@ import com.tanasi.sflix.fragments.people.PeopleFragment
 import com.tanasi.sflix.fragments.people.PeopleFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragment
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
+import com.tanasi.sflix.fragments.tv_show.TvShowFragment
+import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.format
@@ -58,8 +61,18 @@ class VhMovie(
                             id = movie.id
                         )
                     )
+                    is MovieFragment -> findNavController().navigate(
+                        MovieFragmentDirections.actionMovieToMovie(
+                            id = movie.id
+                        )
+                    )
                     is PeopleFragment -> findNavController().navigate(
                         PeopleFragmentDirections.actionPeopleToMovie(
+                            id = movie.id
+                        )
+                    )
+                    is TvShowFragment -> findNavController().navigate(
+                        TvShowFragmentDirections.actionTvShowToMovie(
                             id = movie.id
                         )
                     )
