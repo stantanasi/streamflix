@@ -16,6 +16,7 @@ class Movie(
     val banner: String? = null,
 
     val casts: List<People> = listOf(),
+    val recommendations: List<SflixAdapter.Item> = listOf(),
     val servers: List<Server> = listOf(),
 ) : SflixAdapter.Item, Cloneable {
 

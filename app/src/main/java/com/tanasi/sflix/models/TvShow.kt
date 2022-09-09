@@ -17,6 +17,7 @@ class TvShow(
 
     val seasons: List<Season> = listOf(),
     val casts: List<People> = listOf(),
+    val recommendations: List<SflixAdapter.Item> = listOf(),
 ) : SflixAdapter.Item, Cloneable {
 
     val released = released?.toCalendar()
