@@ -1,12 +1,24 @@
 package com.tanasi.sflix.adapters.view_holders
 
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.ItemPeopleBinding
+import com.tanasi.sflix.databinding.ItemPeopleHeaderBinding
+import com.tanasi.sflix.fragments.movie.MovieFragment
+import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
+import com.tanasi.sflix.fragments.tv_show.TvShowFragment
+import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
+import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.People
+import com.tanasi.sflix.models.TvShow
+import com.tanasi.sflix.utils.getCurrentFragment
+import com.tanasi.sflix.utils.toActivity
 
 class VhPeople(
     private val _binding: ViewBinding
@@ -22,6 +34,8 @@ class VhPeople(
 
         when (_binding) {
             is ItemPeopleBinding -> displayPeople(_binding)
+
+            is ItemPeopleHeaderBinding -> displayHeader(_binding)
         }
     }
 
@@ -29,6 +43,14 @@ class VhPeople(
     private fun displayPeople(binding: ItemPeopleBinding) {
         binding.root.apply {
             setOnClickListener {
+                when (context.toActivity()?.getCurrentFragment()) {
+                    is MovieFragment -> findNavController().navigate(
+                        MovieFragmentDirections.actionMovieToPeople(people.slug)
+                    )
+                    is TvShowFragment -> findNavController().navigate(
+                        TvShowFragmentDirections.actionTvShowToPeople(people.slug)
+                    )
+                }
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {
@@ -50,5 +72,30 @@ class VhPeople(
         }
 
         binding.tvPeopleName.text = people.name
+    }
+
+
+    private fun displayHeader(binding: ItemPeopleHeaderBinding) {
+        binding.tvPeopleName.text = people.name
+
+        binding.ivPeopleImage.apply {
+            clipToOutline = true
+            Glide.with(context)
+                .load(people.image)
+                .placeholder(R.drawable.ic_person_placeholder)
+                .centerCrop()
+                .into(this)
+        }
+
+        binding.hgvPeopleFilmography.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(people.filmography.onEach {
+                when (it) {
+                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_PEOPLE
+                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_PEOPLE
+                }
+            })
+            setItemSpacing(20)
+        }
     }
 }

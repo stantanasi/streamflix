@@ -20,6 +20,7 @@ class SflixAdapter(
 
         MOVIE_HOME,
         MOVIE_MOVIES,
+        MOVIE_PEOPLE,
         MOVIE_SEARCH,
 
         MOVIE_HEADER,
@@ -27,13 +28,16 @@ class SflixAdapter(
 
         PEOPLE,
 
+        PEOPLE_HEADER,
+
         ROW,
 
         SEASON,
 
         TV_SHOW_HOME,
-        TV_SHOW_TV_SHOWS,
+        TV_SHOW_PEOPLE,
         TV_SHOW_SEARCH,
+        TV_SHOW_TV_SHOWS,
 
         TV_SHOW_HEADER,
         TV_SHOW_SEASONS,
@@ -59,6 +63,13 @@ class SflixAdapter(
             )
             Type.MOVIE_MOVIES -> VhMovie(
                 ItemMovieMoviesBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+            Type.MOVIE_PEOPLE -> VhMovie(
+                ItemMoviePeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -95,6 +106,14 @@ class SflixAdapter(
                 )
             )
 
+            Type.PEOPLE_HEADER -> VhPeople(
+                ItemPeopleHeaderBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
             Type.ROW -> VhRow(
                 ItemRowBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -118,8 +137,8 @@ class SflixAdapter(
                     false
                 )
             )
-            Type.TV_SHOW_TV_SHOWS -> VhTvShow(
-                ItemTvShowTvShowsBinding.inflate(
+            Type.TV_SHOW_PEOPLE -> VhTvShow(
+                ItemTvShowPeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
@@ -127,6 +146,13 @@ class SflixAdapter(
             )
             Type.TV_SHOW_SEARCH -> VhTvShow(
                 ItemTvShowSearchBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+            Type.TV_SHOW_TV_SHOWS -> VhTvShow(
+                ItemTvShowTvShowsBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false

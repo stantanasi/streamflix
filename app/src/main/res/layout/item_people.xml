@@ -16,7 +16,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ContentDescription" />
+        tools:clipToOutline="true"
+        tools:ignore="ContentDescription"
+        tools:src="@drawable/ic_person_placeholder" />
 
     <TextView
         android:id="@+id/tv_people_name"

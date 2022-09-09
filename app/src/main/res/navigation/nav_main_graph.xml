@@ -28,6 +28,9 @@
         <action
             android:id="@+id/action_movie_to_player"
             app:destination="@id/player" />
+        <action
+            android:id="@+id/action_movie_to_people"
+            app:destination="@id/people" />
     </fragment>
     <fragment
         android:id="@+id/player"
@@ -49,6 +52,9 @@
         <action
             android:id="@+id/action_tv_show_to_season"
             app:destination="@id/season" />
+        <action
+            android:id="@+id/action_tv_show_to_people"
+            app:destination="@id/people" />
     </fragment>
     <fragment
         android:id="@+id/search"
@@ -93,6 +99,21 @@
         tools:layout="@layout/fragment_tv_shows">
         <action
             android:id="@+id/action_tv_shows_to_tv_show"
+            app:destination="@id/tv_show" />
+    </fragment>
+    <fragment
+        android:id="@+id/people"
+        android:name="com.tanasi.sflix.fragments.people.PeopleFragment"
+        android:label="fragment_people"
+        tools:layout="@layout/fragment_people" >
+        <argument
+            android:name="slug"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_people_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_people_to_tv_show"
             app:destination="@id/tv_show" />
     </fragment>
 </navigation>

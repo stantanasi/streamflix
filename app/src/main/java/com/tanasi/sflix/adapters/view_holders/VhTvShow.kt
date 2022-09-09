@@ -12,6 +12,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.*
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
+import com.tanasi.sflix.fragments.people.PeopleFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.fragments.tv_shows.TvShowsFragmentDirections
 import com.tanasi.sflix.models.TvShow
@@ -31,8 +32,9 @@ class VhTvShow(
 
         when (_binding) {
             is ItemTvShowHomeBinding -> displayHome(_binding)
-            is ItemTvShowTvShowsBinding -> displayTvShows(_binding)
+            is ItemTvShowPeopleBinding -> displayPeople(_binding)
             is ItemTvShowSearchBinding -> displaySearch(_binding)
+            is ItemTvShowTvShowsBinding -> displayTvShows(_binding)
 
             is ItemTvShowHeaderBinding -> displayHeader(_binding)
             is ItemTvShowSeasonsBinding -> displaySeasons(_binding)
@@ -73,11 +75,11 @@ class VhTvShow(
         binding.tvTvShowTitle.text = tvShow.title
     }
 
-    private fun displayTvShows(binding: ItemTvShowTvShowsBinding) {
+    private fun displayPeople(binding: ItemTvShowPeopleBinding) {
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    TvShowsFragmentDirections.actionTvShowsToTvShow(
+                    PeopleFragmentDirections.actionPeopleToTvShow(
                         id = tvShow.id
                     )
                 )
@@ -110,6 +112,38 @@ class VhTvShow(
             setOnClickListener {
                 findNavController().navigate(
                     SearchFragmentDirections.actionSearchToTvShow(
+                        id = tvShow.id
+                    )
+                )
+            }
+            setOnFocusChangeListener { _, hasFocus ->
+                val animation = when {
+                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
+                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
+                }
+                binding.root.startAnimation(animation)
+                animation.fillAfter = true
+            }
+        }
+
+        Glide.with(context)
+            .load(tvShow.poster)
+            .centerCrop()
+            .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+
+        binding.tvTvShowLastEpisode.text =
+            "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+
+        binding.tvTvShowTitle.text = tvShow.title
+    }
+
+    private fun displayTvShows(binding: ItemTvShowTvShowsBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    TvShowsFragmentDirections.actionTvShowsToTvShow(
                         id = tvShow.id
                     )
                 )

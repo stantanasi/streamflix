@@ -55,6 +55,10 @@ interface SflixService {
     suspend fun fetchEpisodeServers(@Path("id") episodeId: String): Document
 
 
+    @GET("cast/{slug}")
+    suspend fun fetchCast(@Path("slug") slug: String): Document
+
+
     @GET("ajax/get_link/{id}")
     suspend fun getLink(@Path("id") id: String): Link
 
