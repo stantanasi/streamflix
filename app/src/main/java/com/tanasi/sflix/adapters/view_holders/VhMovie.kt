@@ -10,12 +10,10 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
-import com.tanasi.sflix.databinding.ContentMovieBinding
-import com.tanasi.sflix.databinding.ContentMovieCastsBinding
-import com.tanasi.sflix.databinding.ItemMovieBinding
-import com.tanasi.sflix.databinding.ItemMovieGridBinding
+import com.tanasi.sflix.databinding.*
 import com.tanasi.sflix.fragments.home.HomeFragment
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
+import com.tanasi.sflix.fragments.movie.MovieFragment
 import com.tanasi.sflix.fragments.movie.MovieFragmentDirections
 import com.tanasi.sflix.fragments.movies.MoviesFragment
 import com.tanasi.sflix.fragments.movies.MoviesFragmentDirections
@@ -23,7 +21,10 @@ import com.tanasi.sflix.fragments.people.PeopleFragment
 import com.tanasi.sflix.fragments.people.PeopleFragmentDirections
 import com.tanasi.sflix.fragments.search.SearchFragment
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
+import com.tanasi.sflix.fragments.tv_show.TvShowFragment
+import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.format
 import com.tanasi.sflix.utils.getCurrentFragment
 import com.tanasi.sflix.utils.toActivity
@@ -46,6 +47,7 @@ class VhMovie(
 
             is ContentMovieBinding -> displayMovie(_binding)
             is ContentMovieCastsBinding -> displayCasts(_binding)
+            is ContentMovieRecommendationsBinding -> displayRecommendations(_binding)
         }
     }
 
@@ -59,8 +61,18 @@ class VhMovie(
                             id = movie.id
                         )
                     )
+                    is MovieFragment -> findNavController().navigate(
+                        MovieFragmentDirections.actionMovieToMovie(
+                            id = movie.id
+                        )
+                    )
                     is PeopleFragment -> findNavController().navigate(
                         PeopleFragmentDirections.actionPeopleToMovie(
+                            id = movie.id
+                        )
+                    )
+                    is TvShowFragment -> findNavController().navigate(
+                        TvShowFragmentDirections.actionTvShowToMovie(
                             id = movie.id
                         )
                     )
@@ -177,6 +189,19 @@ class VhMovie(
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = SflixAdapter(movie.casts)
             setItemSpacing(80)
+        }
+    }
+
+    private fun displayRecommendations(binding: ContentMovieRecommendationsBinding) {
+        binding.hgvMovieRecommendations.apply {
+            setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+            adapter = SflixAdapter(movie.recommendations.onEach {
+                when (it) {
+                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
+                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
+                }
+            })
+            setItemSpacing(20)
         }
     }
 }
