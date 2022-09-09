@@ -70,6 +70,8 @@ class TvShowFragment : Fragment() {
                     it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_SEASONS })
                 if (tvShow.casts.isNotEmpty())
                     it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_CASTS })
+                if (tvShow.recommendations.isNotEmpty())
+                    it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_RECOMMENDATIONS })
             })
             setItemSpacing(80)
         }
