@@ -66,8 +66,10 @@ class TvShowFragment : Fragment() {
         binding.vgvTvShow.apply {
             adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
                 it.add(tvShow.apply { itemType = SflixAdapter.Type.TV_SHOW })
-                it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_SEASONS })
-                it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_CASTS })
+                if (tvShow.seasons.isNotEmpty())
+                    it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_SEASONS })
+                if (tvShow.casts.isNotEmpty())
+                    it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_CASTS })
             })
             setItemSpacing(80)
         }
