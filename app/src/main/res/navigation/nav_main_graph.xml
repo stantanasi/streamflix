@@ -31,6 +31,12 @@
         <action
             android:id="@+id/action_movie_to_people"
             app:destination="@id/people" />
+        <action
+            android:id="@+id/action_movie_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_movie_to_tv_show"
+            app:destination="@id/tv_show" />
     </fragment>
     <fragment
         android:id="@+id/player"
@@ -55,6 +61,12 @@
         <action
             android:id="@+id/action_tv_show_to_people"
             app:destination="@id/people" />
+        <action
+            android:id="@+id/action_tv_show_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_tv_show_to_tv_show"
+            app:destination="@id/tv_show" />
     </fragment>
     <fragment
         android:id="@+id/search"
