@@ -31,36 +31,22 @@ class MovieViewModel : ViewModel() {
         _state.value = try {
             val document = sflixService.fetchMovie(id)
 
-            var released = ""
-            var runtime: Int? = null
-            val casts = mutableListOf<People>()
-
-            document.select("div.elements > .row > div > .row-line").forEach { element ->
-                val type = element?.select(".type")?.text() ?: return@forEach
-                when {
-                    type.contains("Released") -> released = element.ownText().trim()
-                    type.contains("Duration") -> runtime = element.ownText()
-                        .removeSuffix("min")
-                        .trim()
-                        .toIntOrNull()
-                    type.contains("Casts") -> casts.addAll(
-                        element.select("a").map {
-                            People(
-                                slug = it.attr("href").substringAfter("/cast/"),
-                                name = it.text(),
-                            )
-                        }
-                    )
-                }
-            }
-
             State.SuccessLoading(
                 Movie(
                     id = id,
                     title = document.selectFirst("h2.heading-name")?.text() ?: "",
                     overview = document.selectFirst("div.description")?.ownText() ?: "",
-                    released = released,
-                    runtime = runtime,
+                    released = document.select("div.elements > .row > div > .row-line")
+                        .find { it?.select(".type")?.text()?.contains("Released") ?: false }
+                        ?.ownText()
+                        ?.trim()
+                        ?: "",
+                    runtime = document.select("div.elements > .row > div > .row-line")
+                        .find { it?.select(".type")?.text()?.contains("Duration") ?: false }
+                        ?.ownText()
+                        ?.removeSuffix("min")
+                        ?.trim()
+                        ?.toIntOrNull(),
                     youtubeTrailerId = document.selectFirst("iframe#iframe-trailer")
                         ?.attr("data-src")
                         ?.substringAfterLast("/"),
@@ -77,7 +63,15 @@ class MovieViewModel : ViewModel() {
                         ?.substringAfter("background-image: url(")
                         ?.substringBefore(");"),
 
-                    casts = casts,
+                    casts = document.select("div.elements > .row > div > .row-line")
+                        .find { it?.select(".type")?.text()?.contains("Casts") ?: false }
+                        ?.select("a")
+                        ?.map {
+                            People(
+                                slug = it.attr("href").substringAfter("/cast/"),
+                                name = it.text(),
+                            )
+                        } ?: listOf(),
                     servers = sflixService.fetchMovieServers(id)
                         .select("a")
                         .map {
