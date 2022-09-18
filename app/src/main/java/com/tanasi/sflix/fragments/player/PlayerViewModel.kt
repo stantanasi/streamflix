@@ -29,13 +29,20 @@ class PlayerViewModel : ViewModel() {
         _state.value = try {
             val link = sflixService.getLink(id)
 
-            val sources = sflixService.getSources(
+            val response = sflixService.getSources(
                 url = link.link
                     .substringBeforeLast("/")
                     .replace("/embed", "/ajax/embed")
                     .plus("/getSources"),
                 id = link.link.substringAfterLast("/").substringBefore("?"),
             )
+
+            val sources = when (response) {
+                is SflixService.Sources -> response
+                is SflixService.Sources.Encrypted -> response.decrypt(
+                    secret = sflixService.getSourceEncryptedKey().key
+                )
+            }
 
             State.SuccessLoading(
                 Video(
