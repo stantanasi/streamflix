@@ -12,6 +12,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentSearchBinding
 import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.Show
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.hideKeyboard
 
@@ -22,7 +23,7 @@ class SearchFragment : Fragment() {
 
     private val viewModel by viewModels<SearchViewModel>()
 
-    private val list = mutableListOf<SflixAdapter.Item>()
+    private val list = mutableListOf<Show>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
