@@ -23,11 +23,21 @@ class PlayerViewModel : ViewModel() {
     }
 
 
-    fun getVideo(id: String) = viewModelScope.launch {
+    fun getVideo(videoType: PlayerFragment.VideoType, id: String) = viewModelScope.launch {
         _state.value = State.Loading
 
         _state.value = try {
-            val link = sflixService.getLink(id)
+            val servers = when (videoType) {
+                PlayerFragment.VideoType.Movie -> sflixService.getMovieServersById(id)
+                PlayerFragment.VideoType.Episode -> sflixService.getEpisodeServersById(id)
+            }.select("a").map {
+                object {
+                    val id = it.attr("data-id")
+                    val name = it.selectFirst("span")?.text()?.trim() ?: ""
+                }
+            }
+
+            val link = sflixService.getLink(servers.firstOrNull()?.id ?: "")
 
             val response = sflixService.getSources(
                 url = link.link

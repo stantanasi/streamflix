@@ -19,6 +19,7 @@ import com.tanasi.sflix.fragments.movies.MoviesFragment
 import com.tanasi.sflix.fragments.movies.MoviesFragmentDirections
 import com.tanasi.sflix.fragments.people.PeopleFragment
 import com.tanasi.sflix.fragments.people.PeopleFragmentDirections
+import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.fragments.search.SearchFragment
 import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.fragments.tv_show.TvShowFragment
@@ -168,7 +169,8 @@ class VhMovie(
             setOnClickListener {
                 findNavController().navigate(
                     MovieFragmentDirections.actionMovieToPlayer(
-                        linkId = movie.servers.firstOrNull()?.id ?: "",
+                        videoType = PlayerFragment.VideoType.Movie,
+                        id = movie.id,
                     )
                 )
             }

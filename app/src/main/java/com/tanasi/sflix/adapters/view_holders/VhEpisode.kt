@@ -7,6 +7,7 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemEpisodeBinding
+import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.fragments.season.SeasonFragmentDirections
 import com.tanasi.sflix.models.Episode
 
@@ -33,7 +34,8 @@ class VhEpisode(
             setOnClickListener {
                 findNavController().navigate(
                     SeasonFragmentDirections.actionSeasonToPlayer(
-                        linkId = episode.servers.firstOrNull()?.id ?: "",
+                        videoType = PlayerFragment.VideoType.Episode,
+                        id = episode.id,
                     )
                 )
             }

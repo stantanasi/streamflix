@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Episode
-import com.tanasi.sflix.models.Server
 import com.tanasi.sflix.services.SflixService
 import kotlinx.coroutines.launch
 
@@ -51,16 +50,6 @@ class SeasonViewModel : ViewModel() {
                                 ?: "",
                             poster = episodeElement.selectFirst("img")
                                 ?.attr("src") ?: "",
-
-                            servers = sflixService.getEpisodeServersById(episodeId)
-                                .select("a")
-                                .map {
-                                    Server(
-                                        id = it.attr("data-id"),
-                                        name = it.selectFirst("span")?.text()
-                                            ?.trim() ?: "",
-                                    )
-                                },
                         )
                     }
             )

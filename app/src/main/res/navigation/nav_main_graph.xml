@@ -44,7 +44,10 @@
         android:label="PlayerFragment"
         tools:layout="@layout/fragment_player">
         <argument
-            android:name="linkId"
+            android:name="videoType"
+            app:argType="com.tanasi.sflix.fragments.player.PlayerFragment$VideoType" />
+        <argument
+            android:name="id"
             app:argType="string" />
     </fragment>
     <fragment

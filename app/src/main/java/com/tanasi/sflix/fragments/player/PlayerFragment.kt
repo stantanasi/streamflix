@@ -21,6 +21,11 @@ import com.tanasi.sflix.models.Video
 
 class PlayerFragment : Fragment() {
 
+    enum class VideoType {
+        Movie,
+        Episode;
+    }
+
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
 
@@ -36,6 +41,7 @@ class PlayerFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPlayerBinding.inflate(inflater, container, false)
+        viewModel.getVideo(args.videoType, args.id)
         return binding.root
     }
 
@@ -62,8 +68,6 @@ class PlayerFragment : Fragment() {
                 }
             }
         }
-
-        viewModel.getVideo(args.linkId)
     }
 
     override fun onPause() {

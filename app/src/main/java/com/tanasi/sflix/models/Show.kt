@@ -38,7 +38,6 @@ class Movie(
 
     val cast: List<People> = listOf(),
     val recommendations: List<Show> = listOf(),
-    val servers: List<Server> = listOf(),
 ) : Show(), SflixAdapter.Item, Cloneable {
 
     val released = released?.toCalendar()

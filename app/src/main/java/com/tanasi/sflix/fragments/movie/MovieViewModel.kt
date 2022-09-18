@@ -189,14 +189,6 @@ class MovieViewModel : ViewModel() {
                                 }
                             }
                         },
-                    servers = sflixService.getMovieServersById(id)
-                        .select("a")
-                        .map {
-                            Server(
-                                id = it.attr("data-id"),
-                                name = it.selectFirst("span")?.text()?.trim() ?: "",
-                            )
-                        },
                 )
             )
         } catch (e: Exception) {
