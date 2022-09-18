@@ -31,11 +31,11 @@ class HomeViewModel : ViewModel() {
     }
 
 
-    fun fetchHome() = viewModelScope.launch {
+    fun getHome() = viewModelScope.launch {
         _state.value = State.Loading
 
         _state.value = try {
-            val document = sflixService.fetchHome()
+            val document = sflixService.getHome()
 
             val trendingMovies = document
                 .select("div#trending-movies")

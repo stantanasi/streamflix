@@ -26,7 +26,7 @@ class MoviesViewModel : ViewModel() {
         _state.value = State.Loading
 
         _state.value = try {
-            val document = sflixService.fetchMovies()
+            val document = sflixService.getMovies()
 
             val movies = document
                 .select("div.flw-item")

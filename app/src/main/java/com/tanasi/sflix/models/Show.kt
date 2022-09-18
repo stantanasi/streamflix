@@ -36,7 +36,7 @@ class Movie(
     val poster: String? = null,
     val banner: String? = null,
 
-    val casts: List<People> = listOf(),
+    val cast: List<People> = listOf(),
     val recommendations: List<Show> = listOf(),
     val servers: List<Server> = listOf(),
 ) : Show(), SflixAdapter.Item, Cloneable {
@@ -65,7 +65,7 @@ class TvShow(
     val banner: String? = null,
 
     val seasons: List<Season> = listOf(),
-    val casts: List<People> = listOf(),
+    val cast: List<People> = listOf(),
     val recommendations: List<Show> = listOf(),
 ) : Show(), SflixAdapter.Item, Cloneable {
 

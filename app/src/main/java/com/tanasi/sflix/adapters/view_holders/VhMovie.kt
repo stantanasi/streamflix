@@ -187,7 +187,7 @@ class VhMovie(
     private fun displayCasts(binding: ContentMovieCastsBinding) {
         binding.hgvMovieCasts.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(movie.casts)
+            adapter = SflixAdapter(movie.cast)
             setItemSpacing(80)
         }
     }

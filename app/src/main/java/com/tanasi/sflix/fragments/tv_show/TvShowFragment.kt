@@ -30,7 +30,7 @@ class TvShowFragment : Fragment() {
     ): View {
         if (_binding == null) {
             _binding = FragmentTvShowBinding.inflate(inflater, container, false)
-            viewModel.fetchTvShow(args.id)
+            viewModel.getTvShowById(args.id)
         }
         return binding.root
     }
@@ -68,7 +68,7 @@ class TvShowFragment : Fragment() {
                 it.add(tvShow.apply { itemType = SflixAdapter.Type.TV_SHOW })
                 if (tvShow.seasons.isNotEmpty())
                     it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_SEASONS })
-                if (tvShow.casts.isNotEmpty())
+                if (tvShow.cast.isNotEmpty())
                     it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_CASTS })
                 if (tvShow.recommendations.isNotEmpty())
                     it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_RECOMMENDATIONS })

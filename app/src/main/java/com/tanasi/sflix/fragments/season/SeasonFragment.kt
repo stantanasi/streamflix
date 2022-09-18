@@ -26,7 +26,7 @@ class SeasonFragment : Fragment() {
     ): View {
         if (_binding == null) {
             _binding = FragmentSeasonBinding.inflate(inflater, container, false)
-            viewModel.getSeasonEpisodes(args.seasonId)
+            viewModel.getSeasonEpisodesById(args.seasonId)
         }
         return binding.root
     }

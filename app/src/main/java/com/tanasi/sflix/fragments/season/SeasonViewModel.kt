@@ -26,13 +26,13 @@ class SeasonViewModel : ViewModel() {
     }
 
 
-    fun getSeasonEpisodes(seasonId: String) = viewModelScope.launch {
+    fun getSeasonEpisodesById(seasonId: String) = viewModelScope.launch {
         _state.value = State.LoadingEpisodes
 
         _state.value = try {
             State.SuccessLoadingEpisodes(
                 seasonId = seasonId,
-                episodes = sflixService.fetchSeasonEpisode(seasonId)
+                episodes = sflixService.getSeasonEpisodesById(seasonId)
                     .select("div.flw-item.film_single-item.episode-item.eps-item")
                     .mapIndexed { episodeNumber, episodeElement ->
                         val episodeId = episodeElement.attr("data-id")
@@ -52,7 +52,7 @@ class SeasonViewModel : ViewModel() {
                             poster = episodeElement.selectFirst("img")
                                 ?.attr("src") ?: "",
 
-                            servers = sflixService.fetchEpisodeServers(episodeId)
+                            servers = sflixService.getEpisodeServersById(episodeId)
                                 .select("a")
                                 .map {
                                     Server(

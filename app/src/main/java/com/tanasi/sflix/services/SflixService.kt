@@ -39,40 +39,40 @@ interface SflixService {
 
 
     @GET("home")
-    suspend fun fetchHome(): Document
+    suspend fun getHome(): Document
 
     @GET("search/{query}")
     suspend fun search(@Path("query") query: String): Document
 
     @GET("movie")
-    suspend fun fetchMovies(): Document
+    suspend fun getMovies(): Document
 
     @GET("tv-show")
-    suspend fun fetchTvShows(): Document
+    suspend fun getTvShows(): Document
 
 
     @GET("movie/free-{id}")
-    suspend fun fetchMovie(@Path("id") id: String): Document
+    suspend fun getMovieById(@Path("id") id: String): Document
 
     @GET("ajax/movie/episodes/{id}")
-    suspend fun fetchMovieServers(@Path("id") movieId: String): Document
+    suspend fun getMovieServersById(@Path("id") movieId: String): Document
 
 
     @GET("tv/free-{id}")
-    suspend fun fetchTvShow(@Path("id") id: String): Document
+    suspend fun getTvShowById(@Path("id") id: String): Document
 
     @GET("ajax/v2/tv/seasons/{id}")
-    suspend fun fetchTvShowSeasons(@Path("id") tvShowId: String): Document
+    suspend fun getTvShowSeasonsById(@Path("id") tvShowId: String): Document
 
     @GET("ajax/v2/season/episodes/{id}")
-    suspend fun fetchSeasonEpisode(@Path("id") seasonId: String): Document
+    suspend fun getSeasonEpisodesById(@Path("id") seasonId: String): Document
 
     @GET("ajax/v2/episode/servers/{id}")
-    suspend fun fetchEpisodeServers(@Path("id") episodeId: String): Document
+    suspend fun getEpisodeServersById(@Path("id") episodeId: String): Document
 
 
     @GET("cast/{slug}")
-    suspend fun fetchCast(@Path("slug") slug: String): Document
+    suspend fun getPeopleBySlug(@Path("slug") slug: String): Document
 
 
     @GET("ajax/get_link/{id}")

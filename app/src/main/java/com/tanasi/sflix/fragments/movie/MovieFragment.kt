@@ -30,7 +30,7 @@ class MovieFragment : Fragment() {
     ): View {
         if (_binding == null) {
             _binding = FragmentMovieBinding.inflate(inflater, container, false)
-            viewModel.fetchMovie(args.id)
+            viewModel.getMovieById(args.id)
         }
         return binding.root
     }
@@ -66,7 +66,7 @@ class MovieFragment : Fragment() {
         binding.vgvMovie.apply {
             adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
                 it.add(movie.apply { itemType = SflixAdapter.Type.MOVIE })
-                if (movie.casts.isNotEmpty())
+                if (movie.cast.isNotEmpty())
                     it.add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_CASTS })
                 if (movie.recommendations.isNotEmpty())
                     it.add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_RECOMMENDATIONS })

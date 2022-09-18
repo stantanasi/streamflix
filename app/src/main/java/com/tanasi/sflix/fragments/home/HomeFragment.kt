@@ -33,7 +33,7 @@ class HomeFragment : Fragment() {
     ): View {
         if (_binding == null) {
             _binding = FragmentHomeBinding.inflate(inflater, container, false)
-            viewModel.fetchHome()
+            viewModel.getHome()
         }
         return binding.root
     }

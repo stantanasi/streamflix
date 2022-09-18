@@ -23,11 +23,11 @@ class MovieViewModel : ViewModel() {
     }
 
 
-    fun fetchMovie(id: String) = viewModelScope.launch {
+    fun getMovieById(id: String) = viewModelScope.launch {
         _state.value = State.Loading
 
         _state.value = try {
-            val document = sflixService.fetchMovie(id)
+            val document = sflixService.getMovieById(id)
 
             State.SuccessLoading(
                 Movie(
@@ -61,12 +61,12 @@ class MovieViewModel : ViewModel() {
                         ?.substringAfter("background-image: url(")
                         ?.substringBefore(");"),
 
-                    casts = document.select("div.elements > .row > div > .row-line")
+                    cast = document.select("div.elements > .row > div > .row-line")
                         .find { it?.select(".type")?.text()?.contains("Casts") ?: false }
                         ?.select("a")
                         ?.map {
                             People(
-                                slug = it.attr("href").substringAfter("/cast/"),
+                                id = it.attr("href").substringAfter("/cast/"),
                                 name = it.text(),
                             )
                         } ?: listOf(),
@@ -189,7 +189,7 @@ class MovieViewModel : ViewModel() {
                                 }
                             }
                         },
-                    servers = sflixService.fetchMovieServers(id)
+                    servers = sflixService.getMovieServersById(id)
                         .select("a")
                         .map {
                             Server(

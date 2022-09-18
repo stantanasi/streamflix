@@ -23,15 +23,15 @@ class PeopleViewModel : ViewModel() {
     }
 
 
-    fun fetchCast(slug: String) = viewModelScope.launch {
+    fun getPeopleById(peopleId: String) = viewModelScope.launch {
         _state.value = State.Loading
 
         _state.value = try {
-            val document = sflixService.fetchCast(slug)
+            val document = sflixService.getPeopleBySlug(peopleId)
 
             State.SuccessLoading(
                 People(
-                    slug = slug,
+                    id = peopleId,
                     name = document.selectFirst("h2.cat-heading")?.text() ?: "",
 
                     filmography = document.select("div.flw-item").map {

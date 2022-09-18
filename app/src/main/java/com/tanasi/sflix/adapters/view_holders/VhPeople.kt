@@ -45,10 +45,10 @@ class VhPeople(
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
                     is MovieFragment -> findNavController().navigate(
-                        MovieFragmentDirections.actionMovieToPeople(people.slug)
+                        MovieFragmentDirections.actionMovieToPeople(people.id)
                     )
                     is TvShowFragment -> findNavController().navigate(
-                        TvShowFragmentDirections.actionTvShowToPeople(people.slug)
+                        TvShowFragmentDirections.actionTvShowToPeople(people.id)
                     )
                 }
             }

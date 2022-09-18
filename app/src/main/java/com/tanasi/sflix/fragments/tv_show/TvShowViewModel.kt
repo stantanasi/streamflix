@@ -23,11 +23,11 @@ class TvShowViewModel : ViewModel() {
     }
 
 
-    fun fetchTvShow(id: String) = viewModelScope.launch {
+    fun getTvShowById(id: String) = viewModelScope.launch {
         _state.value = State.Loading
 
         _state.value = try {
-            val document = sflixService.fetchTvShow(id)
+            val document = sflixService.getTvShowById(id)
 
             State.SuccessLoading(
                 TvShow(
@@ -61,7 +61,7 @@ class TvShowViewModel : ViewModel() {
                         ?.substringAfter("background-image: url(")
                         ?.substringBefore(");"),
 
-                    seasons = sflixService.fetchTvShowSeasons(id)
+                    seasons = sflixService.getTvShowSeasonsById(id)
                         .select("div.dropdown-menu.dropdown-menu-model > a")
                         .mapIndexed { seasonNumber, seasonElement ->
                             Season(
@@ -70,12 +70,12 @@ class TvShowViewModel : ViewModel() {
                                 title = seasonElement.text(),
                             )
                         },
-                    casts = document.select("div.elements > .row > div > .row-line")
+                    cast = document.select("div.elements > .row > div > .row-line")
                         .find { it?.select(".type")?.text()?.contains("Casts") ?: false }
                         ?.select("a")
                         ?.map {
                             People(
-                                slug = it.attr("href").substringAfter("/cast/"),
+                                id = it.attr("href").substringAfter("/cast/"),
                                 name = it.text(),
                             )
                         } ?: listOf(),

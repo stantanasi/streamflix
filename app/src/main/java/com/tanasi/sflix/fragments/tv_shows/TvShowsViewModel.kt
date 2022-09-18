@@ -28,7 +28,7 @@ class TvShowsViewModel : ViewModel() {
         _state.value = State.Loading
 
         _state.value = try {
-            val document = sflixService.fetchTvShows()
+            val document = sflixService.getTvShows()
 
             val tvShows = document
                 .select("div.flw-item")
