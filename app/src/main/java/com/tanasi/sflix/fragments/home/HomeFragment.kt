@@ -10,8 +10,8 @@ import androidx.fragment.app.viewModels
 import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
-import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.Category
+import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.TvShow
 
 class HomeFragment : Fragment() {
@@ -21,10 +21,7 @@ class HomeFragment : Fragment() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
-    private val trendingMovies = mutableListOf<Movie>()
-    private val trendingTvShows = mutableListOf<TvShow>()
-    private val latestMovies = mutableListOf<Movie>()
-    private val latestTvShows = mutableListOf<TvShow>()
+    private val categories = mutableListOf<Category>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,21 +43,9 @@ class HomeFragment : Fragment() {
                 HomeViewModel.State.Loading -> {}
 
                 is HomeViewModel.State.SuccessLoading -> {
-                    trendingMovies.apply {
+                    categories.apply {
                         clear()
-                        addAll(state.trendingMovies)
-                    }
-                    trendingTvShows.apply {
-                        clear()
-                        addAll(state.trendingTvShows)
-                    }
-                    latestMovies.apply {
-                        clear()
-                        addAll(state.latestMovies)
-                    }
-                    latestTvShows.apply {
-                        clear()
-                        addAll(state.latestTvShows)
+                        addAll(state.categories)
                     }
                     displayHome()
                 }
@@ -78,45 +63,15 @@ class HomeFragment : Fragment() {
 
     private fun displayHome() {
         binding.vgvHome.apply {
-            val list = mutableListOf<SflixAdapter.Item>()
-
-            list.add(Category(
-                name = "Trending Movies",
-                list = trendingMovies.onEach {
-                    it.itemType = SflixAdapter.Type.MOVIE_ITEM
+            adapter = SflixAdapter(categories.onEach {
+                it.list.onEach { show ->
+                    show.itemType = when (show) {
+                        is Movie -> SflixAdapter.Type.MOVIE_ITEM
+                        is TvShow -> SflixAdapter.Type.TV_SHOW_ITEM
+                    }
                 }
-            ).apply {
-                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+                it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
             })
-
-            list.add(Category(
-                name = "Trending TV Shows",
-                list = trendingTvShows.onEach {
-                    it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
-                }
-            ).apply {
-                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-            })
-
-            list.add(Category(
-                name = "Latest Movies",
-                list = latestMovies.onEach {
-                    it.itemType = SflixAdapter.Type.MOVIE_ITEM
-                }
-            ).apply {
-                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-            })
-
-            list.add(Category(
-                name = "Latest TV Shows",
-                list = latestTvShows.onEach {
-                    it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
-                }
-            ).apply {
-                itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-            })
-
-            adapter = SflixAdapter(list)
             setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
         }
     }
