@@ -11,7 +11,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
 import com.tanasi.sflix.models.Movie
-import com.tanasi.sflix.models.Row
+import com.tanasi.sflix.models.Category
 import com.tanasi.sflix.models.TvShow
 
 class HomeFragment : Fragment() {
@@ -80,8 +80,8 @@ class HomeFragment : Fragment() {
         binding.vgvHome.apply {
             val list = mutableListOf<SflixAdapter.Item>()
 
-            list.add(Row(
-                title = "Trending Movies",
+            list.add(Category(
+                name = "Trending Movies",
                 list = trendingMovies.onEach {
                     it.itemType = SflixAdapter.Type.MOVIE_ITEM
                 }
@@ -89,8 +89,8 @@ class HomeFragment : Fragment() {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
             })
 
-            list.add(Row(
-                title = "Trending TV Shows",
+            list.add(Category(
+                name = "Trending TV Shows",
                 list = trendingTvShows.onEach {
                     it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
                 }
@@ -98,8 +98,8 @@ class HomeFragment : Fragment() {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
             })
 
-            list.add(Row(
-                title = "Latest Movies",
+            list.add(Category(
+                name = "Latest Movies",
                 list = latestMovies.onEach {
                     it.itemType = SflixAdapter.Type.MOVIE_ITEM
                 }
@@ -107,8 +107,8 @@ class HomeFragment : Fragment() {
                 itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
             })
 
-            list.add(Row(
-                title = "Latest TV Shows",
+            list.add(Category(
+                name = "Latest TV Shows",
                 list = latestTvShows.onEach {
                     it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
                 }

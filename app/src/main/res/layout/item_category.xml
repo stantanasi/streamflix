@@ -8,7 +8,7 @@
     android:clipToPadding="false">
 
     <TextView
-        android:id="@+id/tv_row_title"
+        android:id="@+id/tv_category_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
@@ -19,7 +19,7 @@
         tools:text="Title" />
 
     <androidx.leanback.widget.HorizontalGridView
-        android:id="@+id/hgv_row"
+        android:id="@+id/hgv_category"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -29,6 +29,6 @@
         app:focusOutFront="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_row_title" />
+        app:layout_constraintTop_toBottomOf="@id/tv_category_title" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
