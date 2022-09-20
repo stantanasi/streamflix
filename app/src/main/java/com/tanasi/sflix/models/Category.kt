@@ -4,7 +4,7 @@ import com.tanasi.sflix.adapters.SflixAdapter
 
 class Category(
     val name: String,
-    val list: List<SflixAdapter.Item>,
+    val list: List<Show>,
 ) : SflixAdapter.Item {
 
     var itemSpacing: Int = 0
