@@ -24,12 +24,12 @@ class VhSeason(
         this.season = season
 
         when (_binding) {
-            is ItemSeasonBinding -> displaySeason(_binding)
+            is ItemSeasonBinding -> displayItem(_binding)
         }
     }
 
 
-    private fun displaySeason(binding: ItemSeasonBinding) {
+    private fun displayItem(binding: ItemSeasonBinding) {
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
