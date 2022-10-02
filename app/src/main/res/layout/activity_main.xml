@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#181818"
     tools:context=".activities.MainActivity"
     tools:deviceIds="tv"
     tools:ignore="MergeRootFrame">
@@ -12,7 +13,6 @@
         android:id="@+id/nav_main"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:background="#00000000"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
