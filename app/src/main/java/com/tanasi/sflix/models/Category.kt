@@ -7,6 +7,7 @@ class Category(
     val list: List<Show>,
 ) : SflixAdapter.Item {
 
+    var selectedIndex = 0
     var itemSpacing: Int = 0
 
 
