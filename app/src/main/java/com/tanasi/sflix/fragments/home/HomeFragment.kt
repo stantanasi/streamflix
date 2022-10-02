@@ -64,6 +64,10 @@ class HomeFragment : Fragment() {
     private fun displayHome() {
         binding.vgvHome.apply {
             adapter = SflixAdapter(categories.onEach {
+                it.itemType = when (it.name) {
+                    "Featured" -> SflixAdapter.Type.CATEGORY_SWIPER
+                    else -> SflixAdapter.Type.CATEGORY_ITEM
+                }
                 it.list.onEach { show ->
                     show.itemType = when (show) {
                         is Movie -> SflixAdapter.Type.MOVIE_ITEM
