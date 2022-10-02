@@ -33,6 +33,126 @@ class HomeViewModel : ViewModel() {
 
             categories.add(
                 Category(
+                    name = "Featured",
+                    list = document
+                        .select("div.swiper-wrapper > div.swiper-slide")
+                        .map {
+                            val isMovie = it.selectFirst("a")
+                                ?.attr("href")
+                                ?.contains("/movie/")
+                                ?: false
+
+                            val id = it.selectFirst("a")
+                                ?.attr("href")
+                                ?.substringAfterLast("-") ?: ""
+                            val title = it.select("h2.film-title").text()
+                            val overview = it.selectFirst("p.sc-desc")?.text() ?: ""
+                            val poster = it.selectFirst("img.film-poster-img")
+                                ?.attr("src") ?: ""
+                            val banner = it.selectFirst("div.slide-photo img")
+                                ?.attr("src") ?: ""
+
+                            when (isMovie) {
+                                true -> {
+                                    val info = it
+                                        .select("div.sc-detail > div.scd-item")
+                                        .toList()
+                                        .map { element -> element.text() }
+                                        .let { info ->
+                                            object {
+                                                val rating = when (info.size) {
+                                                    1 -> info[0].toDoubleOrNull()
+                                                    2 -> info[0].toDoubleOrNull()
+                                                    3 -> info[0].toDoubleOrNull()
+                                                    else -> null
+                                                }
+                                                val quality = when (info.size) {
+                                                    2 -> info[1] ?: ""
+                                                    3 -> info[1] ?: ""
+                                                    else -> null
+                                                }
+                                                val released = when (info.size) {
+                                                    3 -> info[2] ?: ""
+                                                    else -> null
+                                                }
+                                            }
+                                        }
+
+                                    Movie(
+                                        id = id,
+                                        title = title,
+                                        overview = overview,
+                                        released = info.released,
+                                        quality = info.quality ?: "",
+                                        rating = info.rating,
+                                        poster = poster,
+                                        banner = banner,
+                                    )
+                                }
+                                false -> {
+                                    val info = it
+                                        .select("div.sc-detail > div.scd-item")
+                                        .toList()
+                                        .map { element -> element.text() }
+                                        .let { info ->
+                                            object {
+                                                val rating = when (info.size) {
+                                                    1 -> info[0].toDoubleOrNull()
+                                                    2 -> info[0].toDoubleOrNull()
+                                                    3 -> info[0].toDoubleOrNull()
+                                                    else -> null
+                                                }
+                                                val quality = when (info.size) {
+                                                    3 -> info[1] ?: ""
+                                                    else -> null
+                                                }
+                                                val lastEpisode = when (info.size) {
+                                                    2 -> info[1] ?: ""
+                                                    3 -> info[2] ?: ""
+                                                    else -> null
+                                                }
+                                            }
+                                        }
+
+                                    TvShow(
+                                        id = id,
+                                        title = title,
+                                        overview = overview,
+                                        quality = info.quality ?: "",
+                                        rating = info.rating,
+                                        poster = poster,
+                                        banner = banner,
+
+                                        seasons = info.lastEpisode?.let { lastEpisode ->
+                                            listOf(
+                                                Season(
+                                                    id = "",
+                                                    number = lastEpisode
+                                                        .substringAfter("S")
+                                                        .substringBefore(" :")
+                                                        .toIntOrNull() ?: 0,
+
+                                                    episodes = listOf(
+                                                        Episode(
+                                                            id = "",
+                                                            number = lastEpisode
+                                                                .substringAfter(":")
+                                                                .substringAfter("E")
+                                                                .toIntOrNull() ?: 0,
+                                                        )
+                                                    )
+                                                )
+                                            )
+                                        } ?: listOf(),
+                                    )
+                                }
+                            }
+                        },
+                )
+            )
+
+            categories.add(
+                Category(
                     name = "Trending Movies",
                     list = document
                         .select("div#trending-movies")
