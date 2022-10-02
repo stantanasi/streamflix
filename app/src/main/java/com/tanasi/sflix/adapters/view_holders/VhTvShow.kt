@@ -86,6 +86,12 @@ class VhTvShow(
                 }
                 binding.root.startAnimation(animation)
                 animation.fillAfter = true
+
+                if (hasFocus) {
+                    when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                        is HomeFragment -> fragment.binding.ivHomeBackground.setImageDrawable(null)
+                    }
+                }
             }
         }
 

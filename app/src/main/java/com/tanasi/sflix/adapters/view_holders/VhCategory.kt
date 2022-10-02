@@ -98,6 +98,22 @@ class VhCategory(
         }
 
         binding.btnSwiperWatchNow.apply {
+            setOnFocusChangeListener { _, hasFocus ->
+                if (hasFocus) {
+                    when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                        is HomeFragment -> {
+                            Glide.with(context)
+                                .load(
+                                    when (selected) {
+                                        is Movie -> selected.banner
+                                        is TvShow -> selected.banner
+                                    }
+                                )
+                                .into(fragment.binding.ivHomeBackground)
+                        }
+                    }
+                }
+            }
             setOnKeyListener { _, _, event ->
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     when (event.keyCode) {
