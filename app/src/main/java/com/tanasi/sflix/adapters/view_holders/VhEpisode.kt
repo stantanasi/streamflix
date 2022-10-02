@@ -24,12 +24,12 @@ class VhEpisode(
         this.episode = episode
 
         when (_binding) {
-            is ItemEpisodeBinding -> displayEpisode(_binding)
+            is ItemEpisodeBinding -> displayItem(_binding)
         }
     }
 
 
-    private fun displayEpisode(binding: ItemEpisodeBinding) {
+    private fun displayItem(binding: ItemEpisodeBinding) {
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
