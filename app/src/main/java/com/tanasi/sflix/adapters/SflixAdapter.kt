@@ -31,6 +31,8 @@ class SflixAdapter(
 
         CATEGORY_ITEM,
 
+        CATEGORY_SWIPER,
+
         SEASON_ITEM,
 
         TV_SHOW_ITEM,
@@ -107,6 +109,14 @@ class SflixAdapter(
 
             Type.CATEGORY_ITEM -> VhCategory(
                 ItemCategoryBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.CATEGORY_SWIPER -> VhCategory(
+                ContentCategorySwiperBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
