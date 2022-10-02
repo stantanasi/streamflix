@@ -6,6 +6,18 @@
     android:layout_height="match_parent"
     tools:context=".fragments.home.HomeFragment">
 
+    <ImageView
+        android:id="@+id/iv_home_background"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:foreground="@drawable/bg_home_fragment"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription" />
+
     <androidx.leanback.widget.VerticalGridView
         android:id="@+id/vgv_home"
         android:layout_width="0dp"
