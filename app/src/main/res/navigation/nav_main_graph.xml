@@ -49,6 +49,12 @@
         <argument
             android:name="id"
             app:argType="string" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="subtitle"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/tv_show"
