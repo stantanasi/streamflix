@@ -34,7 +34,10 @@ class VhSeason(
             setOnClickListener {
                 findNavController().navigate(
                     TvShowFragmentDirections.actionTvShowToSeason(
+                        tvShowId = season.tvShow?.id ?: "",
+                        tvShowTitle = season.tvShow?.title ?: "",
                         seasonId = season.id,
+                        seasonNumber = season.number,
                         seasonTitle = season.title,
                     )
                 )
