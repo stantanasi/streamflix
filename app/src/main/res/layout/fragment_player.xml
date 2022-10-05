@@ -20,6 +20,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:resize_mode="fit"
         app:show_buffering="always"
+        app:show_next_button="false"
+        app:show_previous_button="false"
         app:show_subtitle_button="true"
         app:show_timeout="5000" />
 
