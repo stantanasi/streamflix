@@ -10,6 +10,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentSeasonBinding
+import com.tanasi.sflix.models.Season
+import com.tanasi.sflix.models.TvShow
 
 class SeasonFragment : Fragment() {
 
@@ -39,9 +41,20 @@ class SeasonFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 SeasonViewModel.State.LoadingEpisodes -> {}
+
                 is SeasonViewModel.State.SuccessLoadingEpisodes -> {
                     binding.vgvEpisodes.apply {
-                        adapter = SflixAdapter(state.episodes)
+                        adapter = SflixAdapter(state.episodes.onEach {
+                            it.tvShow = TvShow(
+                                id = args.tvShowId,
+                                title = args.tvShowTitle,
+                            )
+                            it.season = Season(
+                                id = args.seasonId,
+                                number = args.seasonNumber,
+                                title = args.seasonTitle,
+                            )
+                        })
                         setItemSpacing(60)
                     }
                 }
