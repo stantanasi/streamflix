@@ -7,6 +7,9 @@ class Episode(
     val number: Int,
     val title: String = "",
     val poster: String = "",
+
+    var tvShow: TvShow? = null,
+    var season: Season? = null,
 ) : SflixAdapter.Item {
 
 

@@ -8,8 +8,8 @@ class Season(
     val title: String = "",
     val poster: String = "",
 
-    var episodes: List<Episode> = listOf(),
     var tvShow: TvShow? = null,
+    var episodes: List<Episode> = listOf(),
 ) : SflixAdapter.Item {
 
 
