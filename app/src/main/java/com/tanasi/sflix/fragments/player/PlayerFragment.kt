@@ -58,6 +58,8 @@ class PlayerFragment : Fragment() {
 
         binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
 
+        binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10 * 1000)
+
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 PlayerViewModel.State.Loading -> {}
