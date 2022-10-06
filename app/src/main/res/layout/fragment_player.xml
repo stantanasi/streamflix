@@ -14,12 +14,15 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:keepScreenOn="true"
+        app:controller_layout_id="@layout/content_exo_controller"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:resize_mode="fit"
         app:show_buffering="always"
+        app:show_next_button="false"
+        app:show_previous_button="false"
         app:show_subtitle_button="true"
         app:show_timeout="5000" />
 

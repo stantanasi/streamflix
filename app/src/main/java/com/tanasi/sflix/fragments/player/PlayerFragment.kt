@@ -15,7 +15,10 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.MimeTypes
+import com.tanasi.sflix.R
+import com.tanasi.sflix.databinding.ContentExoControllerBinding
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
 
@@ -50,6 +53,12 @@ class PlayerFragment : Fragment() {
 
         player = ExoPlayer.Builder(requireContext()).build()
         binding.pvPlayer.player = player
+
+        binding.pvPlayer.controller.tvExoTitle.text = args.title
+
+        binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
+
+        binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10 * 1000)
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -111,4 +120,8 @@ class PlayerFragment : Fragment() {
         player.prepare()
         player.play()
     }
+
+
+    private val StyledPlayerView.controller: ContentExoControllerBinding
+        get() = ContentExoControllerBinding.bind(this.findViewById(R.id.cl_exo_controller))
 }

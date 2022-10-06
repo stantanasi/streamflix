@@ -49,6 +49,12 @@
         <argument
             android:name="id"
             app:argType="string" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="subtitle"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/tv_show"
@@ -92,8 +98,17 @@
             android:id="@+id/action_season_to_player"
             app:destination="@id/player" />
         <argument
+            android:name="tvShowId"
+            app:argType="string" />
+        <argument
+            android:name="tvShowTitle"
+            app:argType="string" />
+        <argument
             android:name="seasonId"
             app:argType="string" />
+        <argument
+            android:name="seasonNumber"
+            app:argType="integer" />
         <argument
             android:name="seasonTitle"
             app:argType="string" />
@@ -120,7 +135,7 @@
         android:id="@+id/people"
         android:name="com.tanasi.sflix.fragments.people.PeopleFragment"
         android:label="fragment_people"
-        tools:layout="@layout/fragment_people" >
+        tools:layout="@layout/fragment_people">
         <argument
             android:name="slug"
             app:argType="string" />

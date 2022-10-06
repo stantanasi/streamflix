@@ -43,7 +43,9 @@ class TvShowFragment : Fragment() {
                 TvShowViewModel.State.Loading -> {}
 
                 is TvShowViewModel.State.SuccessLoading -> {
-                    tvShow = state.tvShow
+                    tvShow = state.tvShow.apply {
+                        seasons.onEach { it.tvShow = this }
+                    }
                     displayTvShow()
                 }
                 is TvShowViewModel.State.FailedLoading -> {
