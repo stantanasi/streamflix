@@ -92,8 +92,8 @@ interface SflixService {
         @Query("id") id: String,
     ): SourcesResponse
 
-    @GET("https://raw.githubusercontent.com/BlipBlob/blabflow/main/keys.json")
-    suspend fun getSourceEncryptedKey(): Sources.Encrypted.SecretKey
+    @GET("https://raw.githubusercontent.com/consumet/rapidclown/dokicloud/key.txt")
+    suspend fun getSourceEncryptedKey(): Document
 
 
     data class Link(
