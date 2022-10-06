@@ -113,9 +113,9 @@ interface SflixService {
             ): SourcesResponse {
                 val jsonObject = json?.asJsonObject ?: JsonObject()
 
-                return when (jsonObject.get("encrypted")?.asBoolean ?: false) {
-                    true -> Gson().fromJson(json, Sources.Encrypted::class.java)
-                    false -> Gson().fromJson(json, Sources::class.java)
+                return when (jsonObject.get("sources")?.isJsonArray ?: false) {
+                    true -> Gson().fromJson(json, Sources::class.java)
+                    false -> Gson().fromJson(json, Sources.Encrypted::class.java)
                 }
             }
         }
