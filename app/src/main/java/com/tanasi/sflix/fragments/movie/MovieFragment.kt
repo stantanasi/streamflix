@@ -21,8 +21,6 @@ class MovieFragment : Fragment() {
     private val args by navArgs<MovieFragmentArgs>()
     private val viewModel by viewModels<MovieViewModel>()
 
-    private lateinit var movie: Movie
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,8 +41,7 @@ class MovieFragment : Fragment() {
                 MovieViewModel.State.Loading -> {}
 
                 is MovieViewModel.State.SuccessLoading -> {
-                    movie = state.movie
-                    displayMovie()
+                    displayMovie(state.movie)
                 }
                 is MovieViewModel.State.FailedLoading -> {
                     Toast.makeText(
@@ -58,7 +55,7 @@ class MovieFragment : Fragment() {
     }
 
 
-    private fun displayMovie() {
+    private fun displayMovie(movie: Movie) {
         Glide.with(requireContext())
             .load(movie.banner)
             .into(binding.ivMovieBanner)

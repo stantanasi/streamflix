@@ -19,8 +19,6 @@ class MoviesFragment : Fragment() {
 
     private val viewModel by viewModels<MoviesViewModel>()
 
-    private val movies = mutableListOf<Movie>()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,11 +39,7 @@ class MoviesFragment : Fragment() {
                 MoviesViewModel.State.Loading -> {}
 
                 is MoviesViewModel.State.SuccessLoading -> {
-                    movies.let {
-                        it.clear()
-                        it.addAll(state.movies)
-                    }
-                    displayMovies()
+                    displayMovies(state.movies)
                 }
                 is MoviesViewModel.State.FailedLoading -> {
                     Toast.makeText(
@@ -59,7 +53,7 @@ class MoviesFragment : Fragment() {
     }
 
 
-    private fun displayMovies() {
+    private fun displayMovies(movies: List<Movie>) {
         binding.vgvMovies.apply {
             adapter = SflixAdapter(movies.onEach {
                 it.itemType = SflixAdapter.Type.MOVIE_GRID_ITEM

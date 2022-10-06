@@ -36,7 +36,6 @@ class PlayerFragment : Fragment() {
     private val viewModel by viewModels<PlayerViewModel>()
 
     private lateinit var player: ExoPlayer
-    private lateinit var video: Video
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,8 +64,7 @@ class PlayerFragment : Fragment() {
                 PlayerViewModel.State.Loading -> {}
 
                 is PlayerViewModel.State.SuccessLoading -> {
-                    video = state.video
-                    displayVideo()
+                    displayVideo(state.video)
                 }
                 is PlayerViewModel.State.FailedLoading -> {
                     Toast.makeText(
@@ -90,7 +88,7 @@ class PlayerFragment : Fragment() {
     }
 
 
-    private fun displayVideo() {
+    private fun displayVideo(video: Video) {
         player.setAudioAttributes(
             AudioAttributes.Builder()
                 .setUsage(C.USAGE_MEDIA)

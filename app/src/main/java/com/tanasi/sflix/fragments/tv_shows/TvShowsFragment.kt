@@ -19,8 +19,6 @@ class TvShowsFragment : Fragment() {
 
     private val viewModel by viewModels<TvShowsViewModel>()
 
-    private val tvShows = mutableListOf<TvShow>()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,11 +39,7 @@ class TvShowsFragment : Fragment() {
                 TvShowsViewModel.State.Loading -> {}
 
                 is TvShowsViewModel.State.SuccessLoading -> {
-                    tvShows.let {
-                        it.clear()
-                        it.addAll(state.tvShows)
-                    }
-                    displayTvShows()
+                    displayTvShows(state.tvShows)
                 }
                 is TvShowsViewModel.State.FailedLoading -> {
                     Toast.makeText(
@@ -59,7 +53,7 @@ class TvShowsFragment : Fragment() {
     }
 
 
-    private fun displayTvShows() {
+    private fun displayTvShows(tvShows: List<TvShow>) {
         binding.vgvTvShows.apply {
             adapter = SflixAdapter(tvShows.onEach {
                 it.itemType = SflixAdapter.Type.TV_SHOW_GRID_ITEM

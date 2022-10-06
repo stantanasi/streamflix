@@ -21,8 +21,6 @@ class HomeFragment : Fragment() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
-    private val categories = mutableListOf<Category>()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,11 +41,7 @@ class HomeFragment : Fragment() {
                 HomeViewModel.State.Loading -> {}
 
                 is HomeViewModel.State.SuccessLoading -> {
-                    categories.apply {
-                        clear()
-                        addAll(state.categories)
-                    }
-                    displayHome()
+                    displayHome(state.categories)
                 }
                 is HomeViewModel.State.FailedLoading -> {
                     Toast.makeText(
@@ -61,7 +55,7 @@ class HomeFragment : Fragment() {
     }
 
 
-    private fun displayHome() {
+    private fun displayHome(categories: List<Category>) {
         binding.vgvHome.apply {
             adapter = SflixAdapter(categories.onEach {
                 it.itemType = when (it.name) {

@@ -23,8 +23,6 @@ class SearchFragment : Fragment() {
 
     private val viewModel by viewModels<SearchViewModel>()
 
-    private val list = mutableListOf<Show>()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,11 +40,7 @@ class SearchFragment : Fragment() {
                 SearchViewModel.State.Searching -> {}
 
                 is SearchViewModel.State.SuccessSearching -> {
-                    list.apply {
-                        clear()
-                        addAll(state.results)
-                    }
-                    displaySearch()
+                    displaySearch(state.results)
                 }
                 is SearchViewModel.State.FailedSearching -> {
                     Toast.makeText(
@@ -73,7 +67,7 @@ class SearchFragment : Fragment() {
     }
 
 
-    private fun displaySearch() {
+    private fun displaySearch(list: List<Show>) {
         binding.vgvSearch.apply {
             adapter = SflixAdapter(list.onEach {
                 when (it) {

@@ -21,8 +21,6 @@ class TvShowFragment : Fragment() {
     private val viewModel by viewModels<TvShowViewModel>()
     private val args by navArgs<TvShowFragmentArgs>()
 
-    private lateinit var tvShow: TvShow
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -43,10 +41,9 @@ class TvShowFragment : Fragment() {
                 TvShowViewModel.State.Loading -> {}
 
                 is TvShowViewModel.State.SuccessLoading -> {
-                    tvShow = state.tvShow.apply {
+                    displayTvShow(state.tvShow.apply {
                         seasons.onEach { it.tvShow = this }
-                    }
-                    displayTvShow()
+                    })
                 }
                 is TvShowViewModel.State.FailedLoading -> {
                     Toast.makeText(
@@ -60,7 +57,7 @@ class TvShowFragment : Fragment() {
     }
 
 
-    private fun displayTvShow() {
+    private fun displayTvShow(tvShow: TvShow) {
         Glide.with(requireContext())
             .load(tvShow.banner)
             .into(binding.ivTvShowBanner)

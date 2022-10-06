@@ -20,8 +20,6 @@ class PeopleFragment : Fragment() {
     private val args by navArgs<PeopleFragmentArgs>()
     private val viewModel by viewModels<PeopleViewModel>()
 
-    private lateinit var people: People
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -42,8 +40,7 @@ class PeopleFragment : Fragment() {
                 PeopleViewModel.State.Loading -> {}
 
                 is PeopleViewModel.State.SuccessLoading -> {
-                    people = state.people
-                    displayPeople()
+                    displayPeople(state.people)
                 }
                 is PeopleViewModel.State.FailedLoading -> {
                     Toast.makeText(
@@ -57,7 +54,7 @@ class PeopleFragment : Fragment() {
     }
 
 
-    private fun displayPeople() {
+    private fun displayPeople(people: People) {
         binding.vgvPeople.apply {
             adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
                 it.add(people.apply { itemType = SflixAdapter.Type.PEOPLE })
