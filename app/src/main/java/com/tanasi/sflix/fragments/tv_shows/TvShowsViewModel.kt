@@ -8,6 +8,7 @@ import com.tanasi.sflix.models.Episode
 import com.tanasi.sflix.models.Season
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.services.SflixService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class TvShowsViewModel : ViewModel() {
@@ -24,10 +25,10 @@ class TvShowsViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
-    fun getTvShows() = viewModelScope.launch {
-        _state.value = State.Loading
+    fun getTvShows() = viewModelScope.launch(Dispatchers.IO) {
+        _state.postValue(State.Loading)
 
-        _state.value = try {
+        try {
             val document = sflixService.getTvShows()
 
             val tvShows = document
@@ -91,9 +92,9 @@ class TvShowsViewModel : ViewModel() {
                     )
                 }
 
-            State.SuccessLoading(tvShows)
+            _state.postValue(State.SuccessLoading(tvShows))
         } catch (e: Exception) {
-            State.FailedLoading(e)
+            _state.postValue(State.FailedLoading(e))
         }
     }
 }

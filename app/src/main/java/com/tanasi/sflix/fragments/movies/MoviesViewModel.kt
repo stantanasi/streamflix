@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.services.SflixService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MoviesViewModel : ViewModel() {
@@ -22,10 +23,10 @@ class MoviesViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
-    fun getMovies() = viewModelScope.launch {
-        _state.value = State.Loading
+    fun getMovies() = viewModelScope.launch(Dispatchers.IO) {
+        _state.postValue(State.Loading)
 
-        _state.value = try {
+        try {
             val document = sflixService.getMovies()
 
             val movies = document
@@ -68,9 +69,9 @@ class MoviesViewModel : ViewModel() {
                     )
                 }
 
-            State.SuccessLoading(movies)
+            _state.postValue(State.SuccessLoading(movies))
         } catch (e: Exception) {
-            State.FailedLoading(e)
+            _state.postValue(State.FailedLoading(e))
         }
     }
 }

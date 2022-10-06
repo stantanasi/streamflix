@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.tanasi.sflix.models.Video
 import com.tanasi.sflix.services.SflixService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.*
 import org.json.JSONArray
@@ -27,8 +28,11 @@ class PlayerViewModel : ViewModel() {
     }
 
 
-    fun getVideo(videoType: PlayerFragment.VideoType, id: String) = viewModelScope.launch {
-        _state.value = State.Loading
+    fun getVideo(
+        videoType: PlayerFragment.VideoType,
+        id: String
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        _state.postValue(State.Loading)
 
         try {
             val servers = when (videoType) {
@@ -76,20 +80,20 @@ class PlayerViewModel : ViewModel() {
                                     secret = key
                                 )
 
-                                _state.postValue(State.SuccessLoading(
-                                    Video(
-                                        source = sources.sources.firstOrNull()?.file ?: "",
-                                        subtitles = sources.tracks
-                                            .filter { it.kind == "captions" }
-                                            .map {
-                                                Video.Subtitle(
-                                                    label = it.label,
-                                                    file = it.file,
-                                                    default = it.default,
-                                                )
-                                            }
-                                    )
-                                ))
+                                val video = Video(
+                                    source = sources.sources.firstOrNull()?.file ?: "",
+                                    subtitles = sources.tracks
+                                        .filter { it.kind == "captions" }
+                                        .map {
+                                            Video.Subtitle(
+                                                label = it.label,
+                                                file = it.file,
+                                                default = it.default,
+                                            )
+                                        }
+                                )
+
+                                _state.postValue(State.SuccessLoading(video))
 
                                 webSocket.send("41")
                             }
@@ -106,7 +110,7 @@ class PlayerViewModel : ViewModel() {
                 }
             )
         } catch (e: Exception) {
-            _state.value = State.FailedLoading(e)
+            _state.postValue(State.FailedLoading(e))
         }
     }
 }

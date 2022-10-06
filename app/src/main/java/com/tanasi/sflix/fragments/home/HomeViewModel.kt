@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.*
 import com.tanasi.sflix.services.SflixService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
@@ -23,10 +24,10 @@ class HomeViewModel : ViewModel() {
     }
 
 
-    fun getHome() = viewModelScope.launch {
-        _state.value = State.Loading
+    fun getHome() = viewModelScope.launch(Dispatchers.IO) {
+        _state.postValue(State.Loading)
 
-        _state.value = try {
+        try {
             val document = sflixService.getHome()
 
             val categories = mutableListOf<Category>()
@@ -385,9 +386,9 @@ class HomeViewModel : ViewModel() {
                 )
             )
 
-            State.SuccessLoading(categories)
+            _state.postValue(State.SuccessLoading(categories))
         } catch (e: Exception) {
-            State.FailedLoading(e)
+            _state.postValue(State.FailedLoading(e))
         }
     }
 }
