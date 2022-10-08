@@ -2,6 +2,8 @@ package com.tanasi.sflix.fragments.player
 
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.media.MediaDescriptionCompat
+import android.support.v4.media.session.MediaSessionCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +17,8 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.MimeTypes
 import com.tanasi.sflix.R
@@ -32,10 +36,14 @@ class PlayerFragment : Fragment() {
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
 
+    private val StyledPlayerView.controller
+        get() = ContentExoControllerBinding.bind(this.findViewById(R.id.cl_exo_controller))
+
     private val args by navArgs<PlayerFragmentArgs>()
     private val viewModel by viewModels<PlayerViewModel>()
 
     private lateinit var player: ExoPlayer
+    private lateinit var mediaSession: MediaSessionCompat
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,6 +60,21 @@ class PlayerFragment : Fragment() {
 
         player = ExoPlayer.Builder(requireContext()).build()
         binding.pvPlayer.player = player
+
+        mediaSession = MediaSessionCompat(requireContext(), "Player").apply {
+            isActive = true
+
+            MediaSessionConnector(this).also {
+                it.setPlayer(player)
+                it.setQueueNavigator(object : TimelineQueueNavigator(this) {
+                    override fun getMediaDescription(player: Player, windowIndex: Int) =
+                        MediaDescriptionCompat.Builder()
+                            .setTitle(args.title)
+                            .setSubtitle(args.subtitle)
+                            .build()
+                })
+            }
+        }
 
         binding.pvPlayer.controller.tvExoTitle.text = args.title
 
@@ -85,6 +108,7 @@ class PlayerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         player.release()
+        mediaSession.release()
     }
 
 
@@ -118,8 +142,4 @@ class PlayerFragment : Fragment() {
         player.prepare()
         player.play()
     }
-
-
-    private val StyledPlayerView.controller: ContentExoControllerBinding
-        get() = ContentExoControllerBinding.bind(this.findViewById(R.id.cl_exo_controller))
 }
