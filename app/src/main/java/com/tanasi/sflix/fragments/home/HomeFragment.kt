@@ -38,10 +38,11 @@ class HomeFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                HomeViewModel.State.Loading -> {}
+                HomeViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
 
                 is HomeViewModel.State.SuccessLoading -> {
                     displayHome(state.categories)
+                    binding.isLoading.root.visibility = View.GONE
                 }
                 is HomeViewModel.State.FailedLoading -> {
                     Toast.makeText(
