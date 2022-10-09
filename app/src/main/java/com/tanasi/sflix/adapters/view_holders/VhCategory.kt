@@ -7,7 +7,6 @@ import android.widget.LinearLayout
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.ContentCategorySwiperBinding
@@ -54,16 +53,12 @@ class VhCategory(
         val selected = category.list[category.selectedIndex]
 
         when (val fragment = context.toActivity()?.getCurrentFragment()) {
-            is HomeFragment -> {
-                Glide.with(context)
-                    .load(
-                        when (selected) {
-                            is Movie -> selected.banner
-                            is TvShow -> selected.banner
-                        }
-                    )
-                    .into(fragment.binding.ivHomeBackground)
-            }
+            is HomeFragment -> fragment.updateBackground(
+                when (selected) {
+                    is Movie -> selected.banner
+                    is TvShow -> selected.banner
+                }
+            )
         }
 
         binding.tvSwiperTitle.text = when (selected) {
@@ -101,16 +96,12 @@ class VhCategory(
             setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> {
-                            Glide.with(context)
-                                .load(
-                                    when (selected) {
-                                        is Movie -> selected.banner
-                                        is TvShow -> selected.banner
-                                    }
-                                )
-                                .into(fragment.binding.ivHomeBackground)
-                        }
+                        is HomeFragment -> fragment.updateBackground(
+                            when (selected) {
+                                is Movie -> selected.banner
+                                is TvShow -> selected.banner
+                            }
+                        )
                     }
                 }
             }
@@ -118,8 +109,7 @@ class VhCategory(
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     when (event.keyCode) {
                         KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                            category.selectedIndex =
-                                (category.selectedIndex + 1) % category.list.size
+                            category.selectedIndex = (category.selectedIndex + 1) % category.list.size
                             bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
                             return@setOnKeyListener true
                         }

@@ -89,7 +89,7 @@ class VhMovie(
 
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> fragment.binding.ivHomeBackground.setImageDrawable(null)
+                        is HomeFragment -> fragment.updateBackground(movie.banner)
                     }
                 }
             }

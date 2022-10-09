@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
@@ -55,6 +56,12 @@ class HomeFragment : Fragment() {
         }
     }
 
+
+    fun updateBackground(uri: String?) {
+        Glide.with(requireContext())
+            .load(uri)
+            .into(binding.ivHomeBackground)
+    }
 
     private fun displayHome(categories: List<Category>) {
         binding.vgvHome.apply {

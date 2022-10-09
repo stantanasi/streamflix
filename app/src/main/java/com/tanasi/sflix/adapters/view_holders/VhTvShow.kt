@@ -89,7 +89,7 @@ class VhTvShow(
 
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> fragment.binding.ivHomeBackground.setImageDrawable(null)
+                        is HomeFragment -> fragment.updateBackground(tvShow.banner)
                     }
                 }
             }
