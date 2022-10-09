@@ -89,12 +89,14 @@ class VhPeople(
 
         binding.hgvPeopleFilmography.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(people.filmography.onEach {
-                when (it) {
-                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
-                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
-                }
-            })
+            adapter = SflixAdapter().apply {
+                items.addAll(people.filmography.onEach {
+                    when (it) {
+                        is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
+                        is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
+                    }
+                })
+            }
             setItemSpacing(20)
         }
     }
