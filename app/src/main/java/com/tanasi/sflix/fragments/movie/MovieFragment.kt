@@ -21,6 +21,8 @@ class MovieFragment : Fragment() {
     private val args by navArgs<MovieFragmentArgs>()
     private val viewModel by viewModels<MovieViewModel>()
 
+    private val sflixAdapter = SflixAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,6 +37,8 @@ class MovieFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initializeMovie()
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -56,20 +60,26 @@ class MovieFragment : Fragment() {
     }
 
 
+    private fun initializeMovie() {
+        binding.vgvMovie.apply {
+            adapter = sflixAdapter
+            setItemSpacing(80)
+        }
+    }
+
     private fun displayMovie(movie: Movie) {
         Glide.with(requireContext())
             .load(movie.banner)
             .into(binding.ivMovieBanner)
 
-        binding.vgvMovie.apply {
-            adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
-                it.add(movie.apply { itemType = SflixAdapter.Type.MOVIE })
-                if (movie.cast.isNotEmpty())
-                    it.add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_CASTS })
-                if (movie.recommendations.isNotEmpty())
-                    it.add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_RECOMMENDATIONS })
-            })
-            setItemSpacing(80)
+        sflixAdapter.items.apply {
+            clear()
+            add(movie.apply { itemType = SflixAdapter.Type.MOVIE })
+            if (movie.cast.isNotEmpty())
+                add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_CASTS })
+            if (movie.recommendations.isNotEmpty())
+                add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_RECOMMENDATIONS })
         }
+        sflixAdapter.notifyDataSetChanged()
     }
 }
