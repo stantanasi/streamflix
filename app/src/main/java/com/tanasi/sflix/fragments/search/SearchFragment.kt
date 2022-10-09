@@ -28,7 +28,10 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        if (_binding == null) {
+            _binding = FragmentSearchBinding.inflate(inflater, container, false)
+            viewModel.search("")
+        }
         return binding.root
     }
 
@@ -37,10 +40,11 @@ class SearchFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                SearchViewModel.State.Searching -> {}
+                SearchViewModel.State.Searching -> binding.isLoading.root.visibility = View.VISIBLE
 
                 is SearchViewModel.State.SuccessSearching -> {
                     displaySearch(state.results)
+                    binding.isLoading.root.visibility = View.GONE
                 }
                 is SearchViewModel.State.FailedSearching -> {
                     Toast.makeText(

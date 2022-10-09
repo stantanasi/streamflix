@@ -37,10 +37,11 @@ class PeopleFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                PeopleViewModel.State.Loading -> {}
+                PeopleViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
 
                 is PeopleViewModel.State.SuccessLoading -> {
                     displayPeople(state.people)
+                    binding.isLoading.root.visibility = View.GONE
                 }
                 is PeopleViewModel.State.FailedLoading -> {
                     Toast.makeText(

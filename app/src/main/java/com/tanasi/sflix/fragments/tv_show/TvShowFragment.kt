@@ -38,12 +38,11 @@ class TvShowFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                TvShowViewModel.State.Loading -> {}
+                TvShowViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
 
                 is TvShowViewModel.State.SuccessLoading -> {
-                    displayTvShow(state.tvShow.apply {
-                        seasons.onEach { it.tvShow = this }
-                    })
+                    displayTvShow(state.tvShow)
+                    binding.isLoading.root.visibility = View.GONE
                 }
                 is TvShowViewModel.State.FailedLoading -> {
                     Toast.makeText(
@@ -63,6 +62,8 @@ class TvShowFragment : Fragment() {
             .into(binding.ivTvShowBanner)
 
         binding.vgvTvShow.apply {
+            tvShow.seasons.onEach { it.tvShow = tvShow }
+
             adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
                 it.add(tvShow.apply { itemType = SflixAdapter.Type.TV_SHOW })
                 if (tvShow.seasons.isNotEmpty())
@@ -70,7 +71,9 @@ class TvShowFragment : Fragment() {
                 if (tvShow.cast.isNotEmpty())
                     it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_CASTS })
                 if (tvShow.recommendations.isNotEmpty())
-                    it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_RECOMMENDATIONS })
+                    it.add(
+                        tvShow.clone()
+                            .apply { itemType = SflixAdapter.Type.TV_SHOW_RECOMMENDATIONS })
             })
             setItemSpacing(80)
         }
