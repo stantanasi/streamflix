@@ -41,7 +41,7 @@ class SeasonFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                SeasonViewModel.State.LoadingEpisodes -> {}
+                SeasonViewModel.State.LoadingEpisodes -> binding.isLoading.root.visibility = View.VISIBLE
 
                 is SeasonViewModel.State.SuccessLoadingEpisodes -> {
                     displaySeason(state.episodes.onEach {
@@ -55,6 +55,7 @@ class SeasonFragment : Fragment() {
                             title = args.seasonTitle,
                         )
                     })
+                    binding.isLoading.root.visibility = View.GONE
                 }
                 is SeasonViewModel.State.FailedLoadingEpisodes -> {
                     Toast.makeText(
