@@ -20,6 +20,8 @@ class PeopleFragment : Fragment() {
     private val args by navArgs<PeopleFragmentArgs>()
     private val viewModel by viewModels<PeopleViewModel>()
 
+    private val sflixAdapter = SflixAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,6 +36,8 @@ class PeopleFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initializePeople()
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -55,12 +59,18 @@ class PeopleFragment : Fragment() {
     }
 
 
-    private fun displayPeople(people: People) {
+    private fun initializePeople() {
         binding.vgvPeople.apply {
-            adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
-                it.add(people.apply { itemType = SflixAdapter.Type.PEOPLE })
-            })
+            adapter = sflixAdapter
             setItemSpacing(80)
         }
+    }
+
+    private fun displayPeople(people: People) {
+        sflixAdapter.items.apply {
+            clear()
+            add(people.apply { itemType = SflixAdapter.Type.PEOPLE })
+        }
+        sflixAdapter.notifyDataSetChanged()
     }
 }
