@@ -8,7 +8,7 @@ import com.tanasi.sflix.databinding.*
 import com.tanasi.sflix.models.*
 
 class SflixAdapter(
-    private val items: List<Item>
+    val items: MutableList<Item> = mutableListOf()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     interface Item {
