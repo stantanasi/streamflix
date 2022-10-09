@@ -185,7 +185,9 @@ class VhTvShow(
     private fun displaySeasons(binding: ContentTvShowSeasonsBinding) {
         binding.hgvTvShowSeasons.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(tvShow.seasons.reversed())
+            adapter = SflixAdapter().apply {
+                items.addAll(tvShow.seasons.reversed())
+            }
             setItemSpacing(80)
         }
     }
@@ -193,7 +195,9 @@ class VhTvShow(
     private fun displayCasts(binding: ContentTvShowCastsBinding) {
         binding.hgvTvShowCasts.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(tvShow.cast)
+            adapter = SflixAdapter().apply {
+                items.addAll(tvShow.cast)
+            }
             setItemSpacing(80)
         }
     }
@@ -201,12 +205,14 @@ class VhTvShow(
     private fun displayRecommendations(binding: ContentTvShowRecommendationsBinding) {
         binding.hgvTvShowRecommendations.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(tvShow.recommendations.onEach {
-                when (it) {
-                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
-                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
-                }
-            })
+            adapter = SflixAdapter().apply {
+                items.addAll(tvShow.recommendations.onEach {
+                    when (it) {
+                        is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
+                        is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
+                    }
+                })
+            }
             setItemSpacing(20)
         }
     }
