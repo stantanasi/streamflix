@@ -44,17 +44,7 @@ class SeasonFragment : Fragment() {
                 SeasonViewModel.State.LoadingEpisodes -> binding.isLoading.root.visibility = View.VISIBLE
 
                 is SeasonViewModel.State.SuccessLoadingEpisodes -> {
-                    displaySeason(state.episodes.onEach {
-                        it.tvShow = TvShow(
-                            id = args.tvShowId,
-                            title = args.tvShowTitle,
-                        )
-                        it.season = Season(
-                            id = args.seasonId,
-                            number = args.seasonNumber,
-                            title = args.seasonTitle,
-                        )
-                    })
+                    displaySeason(state.episodes)
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is SeasonViewModel.State.FailedLoadingEpisodes -> {
@@ -70,7 +60,17 @@ class SeasonFragment : Fragment() {
 
     private fun displaySeason(episodes: List<Episode>) {
         binding.vgvEpisodes.apply {
-            adapter = SflixAdapter(episodes)
+            adapter = SflixAdapter(episodes.onEach {
+                it.tvShow = TvShow(
+                    id = args.tvShowId,
+                    title = args.tvShowTitle,
+                )
+                it.season = Season(
+                    id = args.seasonId,
+                    number = args.seasonNumber,
+                    title = args.seasonTitle,
+                )
+            })
             setItemSpacing(60)
         }
     }
