@@ -22,6 +22,8 @@ class SeasonFragment : Fragment() {
     val viewModel by viewModels<SeasonViewModel>()
     private val args by navArgs<SeasonFragmentArgs>()
 
+    private val sflixAdapter = SflixAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,7 +39,7 @@ class SeasonFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.tvSeasonTitle.text = args.seasonTitle
+        initializeSeason()
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -58,9 +60,20 @@ class SeasonFragment : Fragment() {
         }
     }
 
-    private fun displaySeason(episodes: List<Episode>) {
+
+    private fun initializeSeason() {
+        binding.tvSeasonTitle.text = args.seasonTitle
+
         binding.vgvEpisodes.apply {
-            adapter = SflixAdapter(episodes.onEach {
+            adapter = sflixAdapter
+            setItemSpacing(60)
+        }
+    }
+
+    private fun displaySeason(episodes: List<Episode>) {
+        sflixAdapter.items.apply {
+            clear()
+            addAll(episodes.onEach {
                 it.tvShow = TvShow(
                     id = args.tvShowId,
                     title = args.tvShowTitle,
@@ -71,7 +84,7 @@ class SeasonFragment : Fragment() {
                     title = args.seasonTitle,
                 )
             })
-            setItemSpacing(60)
         }
+        sflixAdapter.notifyDataSetChanged()
     }
 }
