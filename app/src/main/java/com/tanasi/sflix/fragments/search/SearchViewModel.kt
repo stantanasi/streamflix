@@ -29,7 +29,7 @@ class SearchViewModel : ViewModel() {
 
         try {
             if (query.isEmpty()) {
-                State.SuccessSearching(listOf())
+                _state.postValue(State.SuccessSearching(listOf()))
             } else {
                 val document = sflixService.search(query.replace(" ", "-"))
 
