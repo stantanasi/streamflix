@@ -38,12 +38,13 @@ class TvShowFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                TvShowViewModel.State.Loading -> {}
+                TvShowViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
 
                 is TvShowViewModel.State.SuccessLoading -> {
                     displayTvShow(state.tvShow.apply {
                         seasons.onEach { it.tvShow = this }
                     })
+                    binding.isLoading.root.visibility = View.GONE
                 }
                 is TvShowViewModel.State.FailedLoading -> {
                     Toast.makeText(
