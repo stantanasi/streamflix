@@ -34,7 +34,7 @@
 ## About the project
 
 <p align="center">
-  <img src="./app/src/main/res/drawable/screenshot.png" alt="SFlix Preview">
+  <img src="./.github/docs/screenshot.png" alt="SFlix Preview">
 </p>
 
 SFlix is an Android TV app that allows users to watch movies and TV shows online in HD quality for free.
