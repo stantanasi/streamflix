@@ -23,6 +23,8 @@ class SearchFragment : Fragment() {
 
     private val viewModel by viewModels<SearchViewModel>()
 
+    private val sflixAdapter = SflixAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,6 +39,8 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initializeSearch()
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -55,7 +59,10 @@ class SearchFragment : Fragment() {
                 }
             }
         }
+    }
 
+
+    private fun initializeSearch() {
         binding.etSearch.setOnEditorActionListener { _, actionId, _ ->
             val query = binding.etSearch.text.toString().trim()
 
@@ -68,18 +75,23 @@ class SearchFragment : Fragment() {
                 else -> false
             }
         }
+
+        binding.vgvSearch.apply {
+            adapter = sflixAdapter
+            setItemSpacing(requireContext().resources.getDimension(R.dimen.search_spacing).toInt())
+        }
     }
 
-
     private fun displaySearch(list: List<Show>) {
-        binding.vgvSearch.apply {
-            adapter = SflixAdapter(list.onEach {
+        sflixAdapter.items.apply {
+            clear()
+            addAll(list.onEach {
                 when (it) {
                     is Movie -> it.itemType = SflixAdapter.Type.MOVIE_GRID_ITEM
                     is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_GRID_ITEM
                 }
             })
-            setItemSpacing(requireContext().resources.getDimension(R.dimen.search_spacing).toInt())
         }
+        sflixAdapter.notifyDataSetChanged()
     }
 }

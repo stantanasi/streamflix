@@ -44,7 +44,9 @@ class VhCategory(
 
         binding.hgvCategory.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(category.list)
+            adapter = SflixAdapter().apply {
+                items.addAll(category.list)
+            }
             setItemSpacing(category.itemSpacing)
         }
     }

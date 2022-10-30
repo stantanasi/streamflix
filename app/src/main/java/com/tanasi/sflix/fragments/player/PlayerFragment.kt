@@ -58,29 +58,7 @@ class PlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        player = ExoPlayer.Builder(requireContext()).build()
-        binding.pvPlayer.player = player
-
-        mediaSession = MediaSessionCompat(requireContext(), "Player").apply {
-            isActive = true
-
-            MediaSessionConnector(this).also {
-                it.setPlayer(player)
-                it.setQueueNavigator(object : TimelineQueueNavigator(this) {
-                    override fun getMediaDescription(player: Player, windowIndex: Int) =
-                        MediaDescriptionCompat.Builder()
-                            .setTitle(args.title)
-                            .setSubtitle(args.subtitle)
-                            .build()
-                })
-            }
-        }
-
-        binding.pvPlayer.controller.tvExoTitle.text = args.title
-
-        binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
-
-        binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10 * 1000)
+        initializeVideo()
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -111,6 +89,34 @@ class PlayerFragment : Fragment() {
         mediaSession.release()
     }
 
+
+    private fun initializeVideo() {
+        player = ExoPlayer.Builder(requireContext()).build()
+
+        mediaSession = MediaSessionCompat(requireContext(), "Player").apply {
+            isActive = true
+
+            MediaSessionConnector(this).also {
+                it.setPlayer(player)
+                it.setQueueNavigator(object : TimelineQueueNavigator(this) {
+                    override fun getMediaDescription(player: Player, windowIndex: Int) =
+                        MediaDescriptionCompat.Builder()
+                            .setTitle(args.title)
+                            .setSubtitle(args.subtitle)
+                            .build()
+                })
+            }
+        }
+
+
+        binding.pvPlayer.player = player
+
+        binding.pvPlayer.controller.tvExoTitle.text = args.title
+
+        binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
+
+        binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10 * 1000)
+    }
 
     private fun displayVideo(video: Video) {
         player.setAudioAttributes(

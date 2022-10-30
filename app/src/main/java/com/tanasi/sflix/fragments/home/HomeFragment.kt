@@ -22,6 +22,8 @@ class HomeFragment : Fragment() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
+    private val sflixAdapter = SflixAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,6 +38,8 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initializeHome()
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -63,22 +67,30 @@ class HomeFragment : Fragment() {
             .into(binding.ivHomeBackground)
     }
 
-    private fun displayHome(categories: List<Category>) {
+    private fun initializeHome() {
         binding.vgvHome.apply {
-            adapter = SflixAdapter(categories.onEach {
-                it.itemType = when (it.name) {
-                    "Featured" -> SflixAdapter.Type.CATEGORY_SWIPER
-                    else -> SflixAdapter.Type.CATEGORY_ITEM
-                }
-                it.list.onEach { show ->
+            adapter = sflixAdapter
+            setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
+        }
+    }
+
+    private fun displayHome(categories: List<Category>) {
+        sflixAdapter.items.apply {
+            clear()
+            addAll(categories.onEach { category ->
+                category.list.onEach { show ->
                     show.itemType = when (show) {
                         is Movie -> SflixAdapter.Type.MOVIE_ITEM
                         is TvShow -> SflixAdapter.Type.TV_SHOW_ITEM
                     }
                 }
-                it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+                category.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+                category.itemType = when (category.name) {
+                    "Featured" -> SflixAdapter.Type.CATEGORY_SWIPER
+                    else -> SflixAdapter.Type.CATEGORY_ITEM
+                }
             })
-            setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
         }
+        sflixAdapter.notifyDataSetChanged()
     }
 }

@@ -19,6 +19,8 @@ class TvShowsFragment : Fragment() {
 
     private val viewModel by viewModels<TvShowsViewModel>()
 
+    private val sflixAdapter = SflixAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,6 +35,8 @@ class TvShowsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initializeTvShows()
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -54,14 +58,20 @@ class TvShowsFragment : Fragment() {
     }
 
 
-    private fun displayTvShows(tvShows: List<TvShow>) {
+    private fun initializeTvShows() {
         binding.vgvTvShows.apply {
-            adapter = SflixAdapter(tvShows.onEach {
+            adapter = sflixAdapter
+            setItemSpacing(requireContext().resources.getDimension(R.dimen.tv_shows_spacing).toInt())
+        }
+    }
+
+    private fun displayTvShows(tvShows: List<TvShow>) {
+        sflixAdapter.items.apply {
+            clear()
+            addAll(tvShows.onEach {
                 it.itemType = SflixAdapter.Type.TV_SHOW_GRID_ITEM
             })
-            setItemSpacing(
-                requireContext().resources.getDimension(R.dimen.tv_shows_spacing).toInt()
-            )
         }
+        sflixAdapter.notifyDataSetChanged()
     }
 }

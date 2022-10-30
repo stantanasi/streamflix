@@ -197,7 +197,9 @@ class VhMovie(
     private fun displayCasts(binding: ContentMovieCastsBinding) {
         binding.hgvMovieCasts.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(movie.cast)
+            adapter = SflixAdapter().apply {
+                items.addAll(movie.cast)
+            }
             setItemSpacing(80)
         }
     }
@@ -205,12 +207,14 @@ class VhMovie(
     private fun displayRecommendations(binding: ContentMovieRecommendationsBinding) {
         binding.hgvMovieRecommendations.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter(movie.recommendations.onEach {
-                when (it) {
-                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
-                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
-                }
-            })
+            adapter = SflixAdapter().apply {
+                items.addAll(movie.recommendations.onEach {
+                    when (it) {
+                        is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
+                        is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
+                    }
+                })
+            }
             setItemSpacing(20)
         }
     }

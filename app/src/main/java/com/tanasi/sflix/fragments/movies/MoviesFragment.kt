@@ -19,6 +19,8 @@ class MoviesFragment : Fragment() {
 
     private val viewModel by viewModels<MoviesViewModel>()
 
+    private val sflixAdapter = SflixAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,6 +35,8 @@ class MoviesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initializeMovies()
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -54,12 +58,20 @@ class MoviesFragment : Fragment() {
     }
 
 
-    private fun displayMovies(movies: List<Movie>) {
+    private fun initializeMovies() {
         binding.vgvMovies.apply {
-            adapter = SflixAdapter(movies.onEach {
-                it.itemType = SflixAdapter.Type.MOVIE_GRID_ITEM
-            })
+            adapter = sflixAdapter
             setItemSpacing(requireContext().resources.getDimension(R.dimen.movies_spacing).toInt())
         }
+    }
+
+    private fun displayMovies(movies: List<Movie>) {
+        sflixAdapter.items.apply {
+            clear()
+            addAll(movies.onEach {
+                it.itemType = SflixAdapter.Type.MOVIE_GRID_ITEM
+            })
+        }
+        sflixAdapter.notifyDataSetChanged()
     }
 }
