@@ -21,6 +21,8 @@ class TvShowFragment : Fragment() {
     private val viewModel by viewModels<TvShowViewModel>()
     private val args by navArgs<TvShowFragmentArgs>()
 
+    private val sflixAdapter = SflixAdapter()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,6 +37,8 @@ class TvShowFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        initializeTvShow()
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -56,26 +60,32 @@ class TvShowFragment : Fragment() {
     }
 
 
+    private fun initializeTvShow() {
+        binding.vgvTvShow.apply {
+            adapter = sflixAdapter
+            setItemSpacing(80)
+        }
+    }
+
     private fun displayTvShow(tvShow: TvShow) {
         Glide.with(requireContext())
             .load(tvShow.banner)
             .into(binding.ivTvShowBanner)
 
-        binding.vgvTvShow.apply {
-            tvShow.seasons.onEach { it.tvShow = tvShow }
-
-            adapter = SflixAdapter(mutableListOf<SflixAdapter.Item>().also {
-                it.add(tvShow.apply { itemType = SflixAdapter.Type.TV_SHOW })
-                if (tvShow.seasons.isNotEmpty())
-                    it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_SEASONS })
-                if (tvShow.cast.isNotEmpty())
-                    it.add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_CASTS })
-                if (tvShow.recommendations.isNotEmpty())
-                    it.add(
-                        tvShow.clone()
-                            .apply { itemType = SflixAdapter.Type.TV_SHOW_RECOMMENDATIONS })
-            })
-            setItemSpacing(80)
+        tvShow.seasons.onEach {
+            it.tvShow = tvShow
         }
+
+        sflixAdapter.items.apply {
+            clear()
+            add(tvShow.apply { itemType = SflixAdapter.Type.TV_SHOW })
+            if (tvShow.seasons.isNotEmpty())
+                add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_SEASONS })
+            if (tvShow.cast.isNotEmpty())
+                add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_CASTS })
+            if (tvShow.recommendations.isNotEmpty())
+                add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_RECOMMENDATIONS })
+        }
+        sflixAdapter.notifyDataSetChanged()
     }
 }
