@@ -2,6 +2,7 @@ package com.tanasi.sflix.utils
 
 import android.app.Activity
 import android.content.Context
+import android.database.Cursor
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
@@ -70,4 +71,13 @@ suspend fun <T> CoroutineScope.retry(retries: Int, predicate: suspend (attempt: 
         }
     }
     throw throwable!!
+}
+
+fun <T> Cursor.map(transform: (Cursor) -> T): List<T> {
+    val items = mutableListOf<T>()
+    while (!this.isClosed && this.moveToNext()) {
+        items.add(transform(this))
+    }
+    this.close()
+    return items.toList()
 }
