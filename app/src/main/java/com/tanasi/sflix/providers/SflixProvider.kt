@@ -1001,6 +1001,125 @@ object SflixProvider {
     }
 
 
+    suspend fun getPeople(id: String): People {
+        val document = sflixService.getPeopleBySlug(id)
+
+        val people = People(
+            id = id,
+            name = document.selectFirst("h2.cat-heading")?.text() ?: "",
+
+            filmography = document.select("div.flw-item").map {
+                val isMovie = it.selectFirst("a")
+                    ?.attr("href")
+                    ?.contains("/movie/")
+                    ?: false
+
+                val showId = it.selectFirst("a")?.attr("href")
+                    ?.substringAfterLast("-")
+                    ?: ""
+                val showTitle = it.select("h2.film-name").text()
+                val showPoster = it.selectFirst("div.film-poster > img.film-poster-img")
+                    ?.attr("data-src")
+                    ?: ""
+
+                when (isMovie) {
+                    true -> {
+                        val info = it
+                            .select("div.film-detail > div.fd-infor > span")
+                            .toList()
+                            .map { element -> element.text() }
+                            .let { info ->
+                                object {
+                                    val released = when (info.size) {
+                                        1 -> info[0] ?: ""
+                                        2 -> info[1] ?: ""
+                                        3 -> info[2] ?: ""
+                                        else -> null
+                                    }
+                                    val quality = when (info.size) {
+                                        3 -> info[1] ?: ""
+                                        else -> null
+                                    }
+                                    val rating = when (info.size) {
+                                        2 -> info[0].toDoubleOrNull()
+                                        3 -> info[0].toDoubleOrNull()
+                                        else -> null
+                                    }
+                                }
+                            }
+
+                        Movie(
+                            id = showId,
+                            title = showTitle,
+                            released = info.released,
+                            quality = info.quality ?: "",
+                            rating = info.rating,
+                            poster = showPoster,
+                        )
+                    }
+                    false -> {
+                        val info = it
+                            .select("div.film-detail > div.fd-infor > span")
+                            .toList()
+                            .map { element -> element.text() }
+                            .let { info ->
+                                object {
+                                    val quality = when (info.size) {
+                                        3 -> info[1] ?: ""
+                                        else -> null
+                                    }
+                                    val rating = when (info.size) {
+                                        2 -> info[0].toDoubleOrNull()
+                                        3 -> info[0].toDoubleOrNull()
+                                        else -> null
+                                    }
+                                    val lastEpisode = when (info.size) {
+                                        1 -> info[0] ?: ""
+                                        2 -> info[1] ?: ""
+                                        3 -> info[2] ?: ""
+                                        else -> null
+                                    }
+                                }
+                            }
+
+                        TvShow(
+                            id = showId,
+                            title = showTitle,
+                            quality = info.quality ?: "",
+                            rating = info.rating,
+                            poster = showPoster,
+
+                            seasons = info.lastEpisode?.let { lastEpisode ->
+                                listOf(
+                                    Season(
+                                        id = "",
+                                        number = lastEpisode
+                                            .substringAfter("S")
+                                            .substringBefore(":")
+                                            .toIntOrNull() ?: 0,
+
+                                        episodes = listOf(
+                                            Episode(
+                                                id = "",
+                                                number = lastEpisode
+                                                    .substringAfter(":")
+                                                    .substringAfter("E")
+                                                    .toIntOrNull() ?: 0,
+                                            )
+                                        )
+                                    )
+                                )
+                            } ?: listOf(),
+                        )
+                    }
+                }
+            },
+        )
+
+        return people
+    }
+
+
     interface SflixService {
 
         companion object {
