@@ -3,6 +3,7 @@ package com.tanasi.sflix.providers
 import android.util.Base64
 import com.google.gson.*
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
+import com.tanasi.sflix.models.*
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -17,6 +18,369 @@ import javax.crypto.spec.SecretKeySpec
 object SflixProvider {
 
     private val sflixService = SflixService.build()
+
+
+    suspend fun getHome(): List<Category> {
+        val document = sflixService.getHome()
+
+        val categories = mutableListOf<Category>()
+
+        categories.add(
+            Category(
+                name = "Featured",
+                list = document
+                    .select("div.swiper-wrapper > div.swiper-slide")
+                    .map {
+                        val isMovie = it.selectFirst("a")
+                            ?.attr("href")
+                            ?.contains("/movie/")
+                            ?: false
+
+                        val id = it.selectFirst("a")
+                            ?.attr("href")
+                            ?.substringAfterLast("-") ?: ""
+                        val title = it.select("h2.film-title").text()
+                        val overview = it.selectFirst("p.sc-desc")?.text() ?: ""
+                        val poster = it.selectFirst("img.film-poster-img")
+                            ?.attr("src") ?: ""
+                        val banner = it.selectFirst("div.slide-photo img")
+                            ?.attr("src") ?: ""
+
+                        when (isMovie) {
+                            true -> {
+                                val info = it
+                                    .select("div.sc-detail > div.scd-item")
+                                    .toList()
+                                    .map { element -> element.text() }
+                                    .let { info ->
+                                        object {
+                                            val rating = when (info.size) {
+                                                1 -> info[0].toDoubleOrNull()
+                                                2 -> info[0].toDoubleOrNull()
+                                                3 -> info[0].toDoubleOrNull()
+                                                else -> null
+                                            }
+                                            val quality = when (info.size) {
+                                                2 -> info[1] ?: ""
+                                                3 -> info[1] ?: ""
+                                                else -> null
+                                            }
+                                            val released = when (info.size) {
+                                                3 -> info[2] ?: ""
+                                                else -> null
+                                            }
+                                        }
+                                    }
+
+                                Movie(
+                                    id = id,
+                                    title = title,
+                                    overview = overview,
+                                    released = info.released,
+                                    quality = info.quality ?: "",
+                                    rating = info.rating,
+                                    poster = poster,
+                                    banner = banner,
+                                )
+                            }
+                            false -> {
+                                val info = it
+                                    .select("div.sc-detail > div.scd-item")
+                                    .toList()
+                                    .map { element -> element.text() }
+                                    .let { info ->
+                                        object {
+                                            val rating = when (info.size) {
+                                                1 -> info[0].toDoubleOrNull()
+                                                2 -> info[0].toDoubleOrNull()
+                                                3 -> info[0].toDoubleOrNull()
+                                                else -> null
+                                            }
+                                            val quality = when (info.size) {
+                                                3 -> info[1] ?: ""
+                                                else -> null
+                                            }
+                                            val lastEpisode = when (info.size) {
+                                                2 -> info[1] ?: ""
+                                                3 -> info[2] ?: ""
+                                                else -> null
+                                            }
+                                        }
+                                    }
+
+                                TvShow(
+                                    id = id,
+                                    title = title,
+                                    overview = overview,
+                                    quality = info.quality ?: "",
+                                    rating = info.rating,
+                                    poster = poster,
+                                    banner = banner,
+
+                                    seasons = info.lastEpisode?.let { lastEpisode ->
+                                        listOf(
+                                            Season(
+                                                id = "",
+                                                number = lastEpisode
+                                                    .substringAfter("S")
+                                                    .substringBefore(" :")
+                                                    .toIntOrNull() ?: 0,
+
+                                                episodes = listOf(
+                                                    Episode(
+                                                        id = "",
+                                                        number = lastEpisode
+                                                            .substringAfter(":")
+                                                            .substringAfter("E")
+                                                            .toIntOrNull() ?: 0,
+                                                    )
+                                                )
+                                            )
+                                        )
+                                    } ?: listOf(),
+                                )
+                            }
+                        }
+                    },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Trending Movies",
+                list = document
+                    .select("div#trending-movies")
+                    .select("div.flw-item")
+                    .map {
+                        val info = it
+                            .select("div.film-detail > div.fd-infor > span")
+                            .toList()
+                            .map { element -> element.text() }
+                            .let { info ->
+                                object {
+                                    val released = when (info.size) {
+                                        1 -> info[0] ?: ""
+                                        2 -> info[1] ?: ""
+                                        3 -> info[2] ?: ""
+                                        else -> null
+                                    }
+                                    val quality = when (info.size) {
+                                        3 -> info[1] ?: ""
+                                        else -> null
+                                    }
+                                    val rating = when (info.size) {
+                                        2 -> info[0].toDoubleOrNull()
+                                        3 -> info[0].toDoubleOrNull()
+                                        else -> null
+                                    }
+                                }
+                            }
+
+                        Movie(
+                            id = it.selectFirst("a")
+                                ?.attr("href")
+                                ?.substringAfterLast("-")
+                                ?: "",
+                            title = it.select("h3.film-name").text(),
+                            released = info.released ?: "",
+                            quality = info.quality ?: "",
+                            rating = info.rating,
+                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                                ?.attr("data-src")
+                                ?: "",
+                        )
+                    },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Trending TV Shows",
+                list = document
+                    .select("div#trending-tv")
+                    .select("div.flw-item")
+                    .map {
+                        val info = it
+                            .select("div.film-detail > div.fd-infor > span")
+                            .toList()
+                            .map { element -> element.text() }
+                            .let { info ->
+                                object {
+                                    val quality = when (info.size) {
+                                        3 -> info[1] ?: ""
+                                        else -> null
+                                    }
+                                    val rating = when (info.size) {
+                                        2 -> info[0].toDoubleOrNull()
+                                        3 -> info[0].toDoubleOrNull()
+                                        else -> null
+                                    }
+                                    val lastEpisode = when (info.size) {
+                                        1 -> info[0] ?: ""
+                                        2 -> info[1] ?: ""
+                                        3 -> info[2] ?: ""
+                                        else -> null
+                                    }
+                                }
+                            }
+
+                        TvShow(
+                            id = it.selectFirst("a")
+                                ?.attr("href")
+                                ?.substringAfterLast("-")
+                                ?: "",
+                            title = it.select("h3.film-name").text(),
+                            quality = info.quality ?: "",
+                            rating = info.rating,
+                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                                ?.attr("data-src")
+                                ?: "",
+
+                            seasons = info.lastEpisode?.let { lastEpisode ->
+                                listOf(
+                                    Season(
+                                        id = "",
+                                        number = lastEpisode
+                                            .substringAfter("S")
+                                            .substringBefore(":")
+                                            .toIntOrNull() ?: 0,
+
+                                        episodes = listOf(
+                                            Episode(
+                                                id = "",
+                                                number = lastEpisode
+                                                    .substringAfter(":")
+                                                    .substringAfter("E")
+                                                    .toIntOrNull() ?: 0,
+                                            )
+                                        )
+                                    )
+                                )
+                            } ?: listOf()
+                        )
+                    },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Latest Movies",
+                list = document
+                    .select(".section-id-02:has(h2:matchesOwn(Latest Movies))")
+                    .select("div.flw-item")
+                    .map {
+                        val info = it
+                            .select("div.film-detail > div.fd-infor > span")
+                            .toList()
+                            .map { element -> element.text() }
+                            .let { info ->
+                                object {
+                                    val released = when (info.size) {
+                                        1 -> info[0] ?: ""
+                                        2 -> info[1] ?: ""
+                                        3 -> info[2] ?: ""
+                                        else -> null
+                                    }
+                                    val quality = when (info.size) {
+                                        3 -> info[1] ?: ""
+                                        else -> null
+                                    }
+                                    val rating = when (info.size) {
+                                        2 -> info[0].toDoubleOrNull()
+                                        3 -> info[0].toDoubleOrNull()
+                                        else -> null
+                                    }
+                                }
+                            }
+
+                        Movie(
+                            id = it.selectFirst("a")
+                                ?.attr("href")
+                                ?.substringAfterLast("-")
+                                ?: "",
+                            title = it.select("h3.film-name").text(),
+                            released = info.released ?: "",
+                            quality = info.quality ?: "",
+                            rating = info.rating,
+                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                                ?.attr("data-src")
+                                ?: "",
+                        )
+                    },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Latest TV Shows",
+                list = document
+                    .select(".section-id-02:has(h2:matchesOwn(Latest TV Shows))")
+                    .select("div.flw-item")
+                    .map {
+                        val info = it
+                            .select("div.film-detail > div.fd-infor > span")
+                            .toList()
+                            .map { element -> element.text() }
+                            .let { info ->
+                                object {
+                                    val quality = when (info.size) {
+                                        3 -> info[1] ?: ""
+                                        else -> null
+                                    }
+                                    val rating = when (info.size) {
+                                        2 -> info[0].toDoubleOrNull()
+                                        3 -> info[0].toDoubleOrNull()
+                                        else -> null
+                                    }
+                                    val lastEpisode = when (info.size) {
+                                        1 -> info[0] ?: ""
+                                        2 -> info[1] ?: ""
+                                        3 -> info[2] ?: ""
+                                        else -> null
+                                    }
+                                }
+                            }
+
+                        TvShow(
+                            id = it.selectFirst("a")
+                                ?.attr("href")
+                                ?.substringAfterLast("-")
+                                ?: "",
+                            title = it.select("h3.film-name").text(),
+                            quality = info.quality ?: "",
+                            rating = info.rating,
+                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                                ?.attr("data-src")
+                                ?: "",
+
+                            seasons = info.lastEpisode?.let { lastEpisode ->
+                                listOf(
+                                    Season(
+                                        id = "",
+                                        number = lastEpisode
+                                            .substringAfter("S")
+                                            .substringBefore(":")
+                                            .toIntOrNull() ?: 0,
+
+                                        episodes = listOf(
+                                            Episode(
+                                                id = "",
+                                                number = lastEpisode
+                                                    .substringAfter(":")
+                                                    .substringAfter("E")
+                                                    .toIntOrNull() ?: 0,
+                                            )
+                                        )
+                                    )
+                                )
+                            } ?: listOf()
+                        )
+                    },
+            )
+        )
+
+        return categories
+    }
 
 
     interface SflixService {
