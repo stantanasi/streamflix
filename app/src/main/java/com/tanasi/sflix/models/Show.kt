@@ -47,9 +47,7 @@ class Movie(
 
     override lateinit var itemType: SflixAdapter.Type
 
-    public override fun clone(): Movie {
-        return super.clone() as Movie
-    }
+    public override fun clone() = super.clone() as Movie
 }
 
 class TvShow(
@@ -76,7 +74,5 @@ class TvShow(
 
     override lateinit var itemType: SflixAdapter.Type
 
-    public override fun clone(): TvShow {
-        return super.clone() as TvShow
-    }
+    public override fun clone() = super.clone() as TvShow
 }
