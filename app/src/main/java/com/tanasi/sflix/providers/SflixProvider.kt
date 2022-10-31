@@ -972,6 +972,34 @@ object SflixProvider {
         return tvShow
     }
 
+    suspend fun getSeasonEpisodes(seasonId: String): List<Episode> {
+        val document = sflixService.getSeasonEpisodesById(seasonId)
+
+        val episodes = document
+            .select("div.flw-item.film_single-item.episode-item.eps-item")
+            .mapIndexed { episodeNumber, episodeElement ->
+                val episodeId = episodeElement.attr("data-id")
+                Episode(
+                    id = episodeId,
+                    number = episodeElement
+                        .selectFirst("div.episode-number")
+                        ?.text()
+                        ?.substringAfter("Episode ")
+                        ?.substringBefore(":")
+                        ?.toIntOrNull()
+                        ?: episodeNumber,
+                    title = episodeElement
+                        .selectFirst("h3.film-name")
+                        ?.text()
+                        ?: "",
+                    poster = episodeElement.selectFirst("img")
+                        ?.attr("src") ?: "",
+                )
+            }
+
+        return episodes
+    }
+
 
     interface SflixService {
 
