@@ -43,7 +43,7 @@ class PlayerViewModel : ViewModel() {
                 }
             }
 
-            retry(min(servers.size, 2)) { attempt ->
+            val video = retry(min(servers.size, 2)) { attempt ->
                 val link = sflixService.getLink(servers.getOrNull(attempt - 1)?.id ?: "")
 
                 val response = sflixService.getSources(
@@ -61,7 +61,7 @@ class PlayerViewModel : ViewModel() {
                     )
                 }
 
-                val video = Video(
+                Video(
                     source = sources.sources.firstOrNull()?.file ?: "",
                     subtitles = sources.tracks
                         .filter { it.kind == "captions" }
@@ -73,9 +73,9 @@ class PlayerViewModel : ViewModel() {
                             )
                         }
                 )
-
-                _state.postValue(State.SuccessLoading(video))
             }
+
+            _state.postValue(State.SuccessLoading(video))
         } catch (e: Exception) {
             _state.postValue(State.FailedLoading(e))
         }
