@@ -65,6 +65,7 @@ class TvShow(
     val banner: String? = null,
 
     val seasons: List<Season> = listOf(),
+    val genres: List<Genre> = listOf(),
     val cast: List<People> = listOf(),
     val recommendations: List<Show> = listOf(),
 ) : Show(), SflixAdapter.Item, Cloneable {
