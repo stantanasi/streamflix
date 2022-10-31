@@ -496,6 +496,52 @@ object SflixProvider {
         return results
     }
 
+    suspend fun getMovies(): List<Movie> {
+        val document = sflixService.getMovies()
+
+        val movies = document
+            .select("div.flw-item")
+            .map {
+                val info = it
+                    .select("div.film-detail > div.fd-infor > span")
+                    .toList()
+                    .map { element -> element.text() }
+                    .let { info ->
+                        object {
+                            val released = when (info.size) {
+                                1 -> info[0] ?: ""
+                                2 -> info[1] ?: ""
+                                3 -> info[2] ?: ""
+                                else -> null
+                            }
+                            val quality = when (info.size) {
+                                3 -> info[1] ?: ""
+                                else -> null
+                            }
+                            val rating = when (info.size) {
+                                2 -> info[0].toDoubleOrNull()
+                                3 -> info[0].toDoubleOrNull()
+                                else -> null
+                            }
+                        }
+                    }
+
+                Movie(
+                    id = it.selectFirst("a")?.attr("href")?.substringAfterLast("-") ?: "",
+                    title = it.select("h2.film-name").text(),
+                    released = info.released ?: "",
+                    quality = info.quality ?: "",
+                    rating = info.rating,
+                    poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                        .let { img ->
+                            img?.attr("data-src") ?: img?.attr("src")
+                        } ?: "",
+                )
+            }
+
+        return movies
+    }
+
 
     interface SflixService {
 
