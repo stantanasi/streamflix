@@ -70,6 +70,15 @@ class TvShowViewModel : ViewModel() {
                             title = seasonElement.text(),
                         )
                     },
+                genres = document.select("div.elements > .row > div > .row-line")
+                    .find { it?.select(".type")?.text()?.contains("Genre") ?: false }
+                    ?.select("a")
+                    ?.map {
+                        Genre(
+                            id = it.attr("href").substringAfter("/genre/"),
+                            name = it.text(),
+                        )
+                    } ?: listOf(),
                 cast = document.select("div.elements > .row > div > .row-line")
                     .find { it?.select(".type")?.text()?.contains("Casts") ?: false }
                     ?.select("a")
