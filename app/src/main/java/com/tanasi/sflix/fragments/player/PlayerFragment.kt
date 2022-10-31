@@ -29,6 +29,7 @@ import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
 import com.tanasi.sflix.utils.map
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class PlayerFragment : Fragment() {
 
@@ -208,6 +209,18 @@ class PlayerFragment : Fragment() {
                 }
             }
         })
+
+        val lastPlaybackPositionMillis = requireContext().contentResolver.query(
+            TvContractCompat.WatchNextPrograms.CONTENT_URI,
+            WatchNextProgram.PROJECTION,
+            null,
+            null,
+            null
+        )?.map { WatchNextProgram.fromCursor(it) }
+            ?.find { it.contentId == args.id }
+            ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
+
+        player.seekTo(lastPlaybackPositionMillis ?: 0)
 
         player.prepare()
         player.play()
