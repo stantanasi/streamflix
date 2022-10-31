@@ -18,17 +18,17 @@
 <details>
   <summary>Table of Contents</summary>
 
-  * [About the project](#about-the-project)
-    * [Features](#features)
-    * [Built with](#built-with)
-  * [Getting started](#getting-started)
-    * [Prerequisites](#prerequisites)
-    * [Setup](#setup)
-  * [Development](#development)
-  * [Contributing](#contributing)
-  * [Disclaimer](#disclaimer)
-  * [Author](#author)
-  * [License](#license)
+  - [About the project](#about-the-project)
+    - [Features](#features)
+    - [Built with](#built-with)
+  - [Getting started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Setup](#setup)
+  - [Development](#development)
+  - [Contributing](#contributing)
+  - [Disclaimer](#disclaimer)
+  - [Author](#author)
+  - [License](#license)
 </details>
 
 ## About the project
@@ -68,7 +68,6 @@ Install [Android Studio](https://developer.android.com/studio)
 
 ```bash
 git clone https://github.com/stantanasi/sflix.git
-cd sflix
 ```
 
 2. Open the project in Android Studio
