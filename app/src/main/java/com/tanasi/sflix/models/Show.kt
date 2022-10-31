@@ -36,6 +36,7 @@ class Movie(
     val poster: String? = null,
     val banner: String? = null,
 
+    val genres: List<Genre> = listOf(),
     val cast: List<People> = listOf(),
     val recommendations: List<Show> = listOf(),
 ) : Show(), SflixAdapter.Item, Cloneable {
