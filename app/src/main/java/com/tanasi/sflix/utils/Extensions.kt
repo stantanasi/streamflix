@@ -10,7 +10,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
 import com.tanasi.sflix.R
 import com.tanasi.sflix.activities.MainActivity
-import kotlinx.coroutines.CoroutineScope
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -61,7 +60,7 @@ fun FragmentActivity.getCurrentFragment(): Fragment? = when (this) {
     else -> null
 }
 
-suspend fun <T> CoroutineScope.retry(retries: Int, predicate: suspend (attempt: Int) -> T): T {
+suspend fun <T> retry(retries: Int, predicate: suspend (attempt: Int) -> T): T {
     var throwable: Throwable? = null
     (1..retries).forEach { attempt ->
         try {
