@@ -11,6 +11,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import androidx.tvprovider.media.tv.TvContractCompat
+import androidx.tvprovider.media.tv.WatchNextProgram
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -25,6 +27,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ContentExoControllerBinding
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
+import com.tanasi.sflix.utils.map
 import kotlin.time.Duration.Companion.minutes
 
 class PlayerFragment : Fragment() {
@@ -143,6 +146,66 @@ class PlayerFragment : Fragment() {
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 binding.pvPlayer.keepScreenOn = isPlaying
+            }
+        })
+
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (!isPlaying) {
+                    val program = requireContext().contentResolver.query(
+                        TvContractCompat.WatchNextPrograms.CONTENT_URI,
+                        WatchNextProgram.PROJECTION,
+                        null,
+                        null,
+                        null
+                    )?.map { WatchNextProgram.fromCursor(it) }
+                        ?.find { it.contentId == args.id }
+
+                    when {
+                        player.hasStarted() -> {
+                            if (program == null) {
+                                val builder = WatchNextProgram.Builder()
+                                    .setTitle(args.title)
+                                    .setDescription(args.subtitle)
+                                    .setType(
+                                        when (args.videoType as VideoType) {
+                                            VideoType.Movie -> TvContractCompat.PreviewPrograms.TYPE_MOVIE
+                                            VideoType.Episode -> TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE
+                                        }
+                                    )
+                                    .setWatchNextType(TvContractCompat.WatchNextPrograms.WATCH_NEXT_TYPE_CONTINUE)
+                                    .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
+                                    .setLastPlaybackPositionMillis(player.currentPosition.toInt())
+                                    .setDurationMillis(player.duration.toInt())
+                                    .setContentId(args.id)
+
+                                requireContext().contentResolver.insert(
+                                    TvContractCompat.WatchNextPrograms.CONTENT_URI,
+                                    builder.build().toContentValues(),
+                                )
+                            } else {
+                                val builder = WatchNextProgram.Builder(program)
+                                    .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
+                                    .setLastPlaybackPositionMillis(player.currentPosition.toInt())
+                                    .setDurationMillis(player.duration.toInt())
+
+                                requireContext().contentResolver.update(
+                                    TvContractCompat.buildWatchNextProgramUri(program.id),
+                                    builder.build().toContentValues(),
+                                    null,
+                                    null,
+                                )
+                            }
+                        }
+                        player.hasFinished() && program != null -> {
+                            requireContext().contentResolver.delete(
+                                TvContractCompat.buildWatchNextProgramUri(program.id),
+                                null,
+                                null,
+                            )
+                        }
+                    }
+                }
             }
         })
 
