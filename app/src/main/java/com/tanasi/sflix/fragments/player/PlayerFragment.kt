@@ -25,6 +25,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ContentExoControllerBinding
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
+import kotlin.time.Duration.Companion.minutes
 
 class PlayerFragment : Fragment() {
 
@@ -147,5 +148,15 @@ class PlayerFragment : Fragment() {
 
         player.prepare()
         player.play()
+    }
+
+
+    private fun ExoPlayer.hasStarted(): Boolean {
+        return (this.currentPosition > (this.duration * 0.03) || this.currentPosition > 2.minutes.inWholeMilliseconds)
+                && !this.hasFinished()
+    }
+
+    private fun ExoPlayer.hasFinished(): Boolean {
+        return (this.currentPosition > (this.duration * 0.90))
     }
 }
