@@ -542,6 +542,73 @@ object SflixProvider {
         return movies
     }
 
+    suspend fun getTvShows(): List<TvShow> {
+        val document = sflixService.getTvShows()
+
+        val tvShows = document
+            .select("div.flw-item")
+            .map {
+                val info = it
+                    .select("div.film-detail > div.fd-infor > span")
+                    .toList()
+                    .map { element -> element.text() }
+                    .let { info ->
+                        object {
+                            val quality = when (info.size) {
+                                3 -> info[1] ?: ""
+                                else -> null
+                            }
+                            val rating = when (info.size) {
+                                2 -> info[0].toDoubleOrNull()
+                                3 -> info[0].toDoubleOrNull()
+                                else -> null
+                            }
+                            val lastEpisode = when (info.size) {
+                                1 -> info[0] ?: ""
+                                2 -> info[1] ?: ""
+                                3 -> info[2] ?: ""
+                                else -> null
+                            }
+                        }
+                    }
+
+                TvShow(
+                    id = it.selectFirst("a")?.attr("href")?.substringAfterLast("-") ?: "",
+                    title = it.select("h2.film-name").text(),
+                    quality = info.quality ?: "",
+                    rating = info.rating,
+                    poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                        .let { img ->
+                            img?.attr("data-src") ?: img?.attr("src")
+                        } ?: "",
+
+                    seasons = info.lastEpisode?.let { lastEpisode ->
+                        listOf(
+                            Season(
+                                id = "",
+                                number = lastEpisode
+                                    .substringAfter("S")
+                                    .substringBefore(":")
+                                    .toIntOrNull() ?: 0,
+
+                                episodes = listOf(
+                                    Episode(
+                                        id = "",
+                                        number = lastEpisode
+                                            .substringAfter(":")
+                                            .substringAfter("E")
+                                            .toIntOrNull() ?: 0,
+                                    )
+                                )
+                            )
+                        )
+                    } ?: listOf()
+                )
+            }
+
+        return tvShows
+    }
+
 
     interface SflixService {
 
