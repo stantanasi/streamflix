@@ -5,15 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Video
-import com.tanasi.sflix.services.SflixService
-import com.tanasi.sflix.utils.retry
+import com.tanasi.sflix.providers.SflixProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Integer.min
 
 class PlayerViewModel : ViewModel() {
-
-    private val sflixService = SflixService.build()
 
     private val _state = MutableLiveData<State>(State.Loading)
     val state: LiveData<State> = _state
@@ -33,47 +29,7 @@ class PlayerViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val servers = when (videoType) {
-                PlayerFragment.VideoType.Movie -> sflixService.getMovieServersById(id)
-                PlayerFragment.VideoType.Episode -> sflixService.getEpisodeServersById(id)
-            }.select("a").map {
-                object {
-                    val id = it.attr("data-id")
-                    val name = it.selectFirst("span")?.text()?.trim() ?: ""
-                }
-            }
-
-            val video = retry(min(servers.size, 2)) { attempt ->
-                val link = sflixService.getLink(servers.getOrNull(attempt - 1)?.id ?: "")
-
-                val response = sflixService.getSources(
-                    url = link.link
-                        .substringBeforeLast("/")
-                        .replace("/embed", "/ajax/embed")
-                        .plus("/getSources"),
-                    id = link.link.substringAfterLast("/").substringBefore("?"),
-                )
-
-                val sources = when (response) {
-                    is SflixService.Sources -> response
-                    is SflixService.Sources.Encrypted -> response.decrypt(
-                        secret = sflixService.getSourceEncryptedKey().text()
-                    )
-                }
-
-                Video(
-                    source = sources.sources.firstOrNull()?.file ?: "",
-                    subtitles = sources.tracks
-                        .filter { it.kind == "captions" }
-                        .map {
-                            Video.Subtitle(
-                                label = it.label,
-                                file = it.file,
-                                default = it.default,
-                            )
-                        }
-                )
-            }
+            val video = SflixProvider.getVideo(id, videoType)
 
             _state.postValue(State.SuccessLoading(video))
         } catch (e: Exception) {
