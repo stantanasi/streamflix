@@ -1,8 +1,11 @@
 package com.tanasi.sflix.adapters.view_holders
 
+import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import androidx.tvprovider.media.tv.TvContractCompat
+import androidx.tvprovider.media.tv.WatchNextProgram
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
@@ -10,6 +13,7 @@ import com.tanasi.sflix.databinding.ItemEpisodeBinding
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.fragments.season.SeasonFragmentDirections
 import com.tanasi.sflix.models.Episode
+import com.tanasi.sflix.utils.map
 
 class VhEpisode(
     private val _binding: ViewBinding
@@ -57,6 +61,26 @@ class VhEpisode(
                 .load(episode.poster)
                 .centerCrop()
                 .into(this)
+        }
+
+        binding.pbEpisodeProgress.apply {
+            val program = context.contentResolver.query(
+                TvContractCompat.WatchNextPrograms.CONTENT_URI,
+                WatchNextProgram.PROJECTION,
+                null,
+                null,
+                null,
+            )?.map { WatchNextProgram.fromCursor(it) }
+                ?.find { it.contentId == episode.id }
+
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                else -> View.GONE
+            }
         }
 
         binding.tvEpisodeInfo.text = "Episode ${episode.number}"
