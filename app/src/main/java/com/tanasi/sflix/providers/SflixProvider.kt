@@ -3,11 +3,14 @@ package com.tanasi.sflix.providers
 import android.util.Base64
 import com.google.gson.*
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
+import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.models.*
+import com.tanasi.sflix.utils.retry
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
+import java.lang.Integer.min
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -1117,6 +1120,53 @@ object SflixProvider {
         )
 
         return people
+    }
+
+
+    suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
+        val servers = when (videoType) {
+            PlayerFragment.VideoType.Movie -> sflixService.getMovieServersById(id)
+            PlayerFragment.VideoType.Episode -> sflixService.getEpisodeServersById(id)
+        }.select("a").map {
+            object {
+                val id = it.attr("data-id")
+                val name = it.selectFirst("span")?.text()?.trim() ?: ""
+            }
+        }
+
+        val video = retry(min(servers.size, 2)) { attempt ->
+            val link = sflixService.getLink(servers.getOrNull(attempt - 1)?.id ?: "")
+
+            val response = sflixService.getSources(
+                url = link.link
+                    .substringBeforeLast("/")
+                    .replace("/embed", "/ajax/embed")
+                    .plus("/getSources"),
+                id = link.link.substringAfterLast("/").substringBefore("?"),
+            )
+
+            val sources = when (response) {
+                is SflixService.Sources -> response
+                is SflixService.Sources.Encrypted -> response.decrypt(
+                    secret = sflixService.getSourceEncryptedKey().text()
+                )
+            }
+
+            Video(
+                source = sources.sources.firstOrNull()?.file ?: "",
+                subtitles = sources.tracks
+                    .filter { it.kind == "captions" }
+                    .map {
+                        Video.Subtitle(
+                            label = it.label,
+                            file = it.file,
+                            default = it.default,
+                        )
+                    }
+            )
+        }
+
+        return video
     }
 
 
