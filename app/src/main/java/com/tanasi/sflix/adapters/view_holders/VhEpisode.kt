@@ -41,7 +41,7 @@ class VhEpisode(
                         videoType = PlayerFragment.VideoType.Episode,
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
-                        subtitle = "${episode.title} • Season ${episode.season?.number ?: 0} Episode ${episode.number}",
+                        subtitle = "S${episode.season?.number ?: 0} E${episode.number} • ${episode.title}",
                     )
                 )
             }
