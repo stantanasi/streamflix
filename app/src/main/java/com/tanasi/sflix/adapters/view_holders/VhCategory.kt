@@ -54,15 +54,6 @@ class VhCategory(
     private fun displaySwiper(binding: ContentCategorySwiperBinding) {
         val selected = category.list[category.selectedIndex]
 
-        when (val fragment = context.toActivity()?.getCurrentFragment()) {
-            is HomeFragment -> fragment.updateBackground(
-                when (selected) {
-                    is Movie -> selected.banner
-                    is TvShow -> selected.banner
-                }
-            )
-        }
-
         binding.tvSwiperTitle.text = when (selected) {
             is Movie -> selected.title
             is TvShow -> selected.title
@@ -112,6 +103,15 @@ class VhCategory(
                     when (event.keyCode) {
                         KeyEvent.KEYCODE_DPAD_RIGHT -> {
                             category.selectedIndex = (category.selectedIndex + 1) % category.list.size
+
+                            when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                                is HomeFragment -> fragment.updateBackground(
+                                    when (val it = category.list[category.selectedIndex]) {
+                                        is Movie -> it.banner
+                                        is TvShow -> it.banner
+                                    }
+                                )
+                            }
                             bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
                             return@setOnKeyListener true
                         }
