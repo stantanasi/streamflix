@@ -104,6 +104,14 @@ class PlayerFragment : Fragment() {
         mediaSession.release()
     }
 
+    fun onBackPressed() = when {
+        binding.pvPlayer.isControllerVisible -> {
+            binding.pvPlayer.hideController()
+            true
+        }
+        else -> false
+    }
+
 
     private fun initializeVideo() {
         player = ExoPlayer.Builder(requireContext()).build()
