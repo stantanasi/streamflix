@@ -7,6 +7,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.tanasi.navigation.widget.setupWithNavController
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ActivityMainBinding
+import com.tanasi.sflix.fragments.player.PlayerFragment
 
 class MainActivity : FragmentActivity() {
 
@@ -37,9 +38,9 @@ class MainActivity : FragmentActivity() {
     }
 
     override fun onBackPressed() {
-        val navController = (supportFragmentManager
-            .findFragmentById(binding.navMainFragment.id) as NavHostFragment)
-            .navController
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(binding.navMainFragment.id) as NavHostFragment
+        val navController = navHostFragment.navController
 
         when (navController.currentDestination?.id) {
             R.id.home -> when {
@@ -55,7 +56,15 @@ class MainActivity : FragmentActivity() {
                 }
                 else -> binding.navMain.requestFocus()
             }
-            else -> super.onBackPressed()
+            else -> {
+                val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
+                when (currentFragment) {
+                    is PlayerFragment -> currentFragment.onBackPressed()
+                    else -> false
+                }.takeIf { !it }?.let {
+                    super.onBackPressed()
+                }
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
+import com.google.android.exoplayer2.ui.StyledPlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.MimeTypes
 import com.tanasi.sflix.R
@@ -44,6 +45,13 @@ class PlayerFragment : Fragment() {
 
     private val StyledPlayerView.controller
         get() = ContentExoControllerBinding.bind(this.findViewById(R.id.cl_exo_controller))
+
+    private val StyledPlayerView.isControllerVisible
+        get() = this.javaClass.getDeclaredField("controller").let {
+            it.isAccessible = true
+            val controller = it.get(this) as StyledPlayerControlView
+            controller.isVisible
+        }
 
     private val args by navArgs<PlayerFragmentArgs>()
     private val viewModel by viewModels<PlayerViewModel>()
@@ -94,6 +102,14 @@ class PlayerFragment : Fragment() {
         super.onDestroyView()
         player.release()
         mediaSession.release()
+    }
+
+    fun onBackPressed() = when {
+        binding.pvPlayer.isControllerVisible -> {
+            binding.pvPlayer.hideController()
+            true
+        }
+        else -> false
     }
 
 
