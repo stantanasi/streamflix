@@ -145,7 +145,7 @@ class PlayerFragment : Fragment() {
         player.setAudioAttributes(
             AudioAttributes.Builder()
                 .setUsage(C.USAGE_MEDIA)
-                .setContentType(C.CONTENT_TYPE_MOVIE)
+                .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
                 .build(),
             true,
         )
