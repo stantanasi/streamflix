@@ -1,5 +1,6 @@
 package com.tanasi.sflix.adapters.view_holders
 
+import android.annotation.SuppressLint
 import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.navigation.findNavController
@@ -15,6 +16,7 @@ import com.tanasi.sflix.fragments.season.SeasonFragmentDirections
 import com.tanasi.sflix.models.Episode
 import com.tanasi.sflix.utils.map
 
+@SuppressLint("RestrictedApi")
 class VhEpisode(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
