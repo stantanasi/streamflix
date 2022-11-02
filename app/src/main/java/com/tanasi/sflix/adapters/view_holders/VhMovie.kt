@@ -1,5 +1,6 @@
 package com.tanasi.sflix.adapters.view_holders
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.view.View
@@ -34,6 +35,7 @@ import com.tanasi.sflix.utils.getCurrentFragment
 import com.tanasi.sflix.utils.map
 import com.tanasi.sflix.utils.toActivity
 
+@SuppressLint("RestrictedApi")
 class VhMovie(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(

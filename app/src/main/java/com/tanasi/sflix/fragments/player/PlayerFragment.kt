@@ -1,5 +1,6 @@
 package com.tanasi.sflix.fragments.player
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.media.MediaDescriptionCompat
@@ -33,6 +34,7 @@ import com.tanasi.sflix.utils.map
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@SuppressLint("RestrictedApi")
 class PlayerFragment : Fragment() {
 
     enum class VideoType {
