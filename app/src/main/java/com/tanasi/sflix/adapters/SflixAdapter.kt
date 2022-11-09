@@ -16,6 +16,10 @@ class SflixAdapter(
     }
 
     enum class Type {
+        CATEGORY_ITEM,
+
+        CATEGORY_SWIPER,
+
         EPISODE_ITEM,
 
         MOVIE_ITEM,
@@ -28,10 +32,6 @@ class SflixAdapter(
         PEOPLE_ITEM,
 
         PEOPLE,
-
-        CATEGORY_ITEM,
-
-        CATEGORY_SWIPER,
 
         SEASON_ITEM,
 
@@ -46,6 +46,22 @@ class SflixAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (Type.values()[viewType]) {
+            Type.CATEGORY_ITEM -> VhCategory(
+                ItemCategoryBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.CATEGORY_SWIPER -> VhCategory(
+                ContentCategorySwiperBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
             Type.EPISODE_ITEM -> VhEpisode(
                 ItemEpisodeBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -107,22 +123,6 @@ class SflixAdapter(
                 )
             )
 
-            Type.CATEGORY_ITEM -> VhCategory(
-                ItemCategoryBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false,
-                )
-            )
-
-            Type.CATEGORY_SWIPER -> VhCategory(
-                ContentCategorySwiperBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false,
-                )
-            )
-
             Type.SEASON_ITEM -> VhSeason(
                 ItemSeasonBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -178,10 +178,10 @@ class SflixAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
+            is VhCategory -> holder.bind(items[position] as Category)
             is VhEpisode -> holder.bind(items[position] as Episode)
             is VhMovie -> holder.bind(items[position] as Movie)
             is VhPeople -> holder.bind(items[position] as People)
-            is VhCategory -> holder.bind(items[position] as Category)
             is VhSeason -> holder.bind(items[position] as Season)
             is VhTvShow -> holder.bind(items[position] as TvShow)
         }
