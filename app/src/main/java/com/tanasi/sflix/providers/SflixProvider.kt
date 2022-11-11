@@ -18,12 +18,12 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-object SflixProvider {
+object SflixProvider : Provider {
 
     private val sflixService = SflixService.build()
 
 
-    suspend fun getHome(): List<Category> {
+    override suspend fun getHome(): List<Category> {
         val document = sflixService.getHome()
 
         val categories = mutableListOf<Category>()
@@ -385,7 +385,7 @@ object SflixProvider {
         return categories
     }
 
-    suspend fun search(query: String): List<Show> {
+    override suspend fun search(query: String): List<Show> {
         if (query.isEmpty()) return listOf()
 
         val document = sflixService.search(query.replace(" ", "-"))
@@ -499,7 +499,7 @@ object SflixProvider {
         return results
     }
 
-    suspend fun getMovies(): List<Movie> {
+    override suspend fun getMovies(): List<Movie> {
         val document = sflixService.getMovies()
 
         val movies = document
@@ -545,7 +545,7 @@ object SflixProvider {
         return movies
     }
 
-    suspend fun getTvShows(): List<TvShow> {
+    override suspend fun getTvShows(): List<TvShow> {
         val document = sflixService.getTvShows()
 
         val tvShows = document
@@ -613,7 +613,7 @@ object SflixProvider {
     }
 
 
-    suspend fun getMovie(id: String): Movie {
+    override suspend fun getMovie(id: String): Movie {
         val document = sflixService.getMovieById(id)
 
         val movie = Movie(
@@ -790,7 +790,7 @@ object SflixProvider {
     }
 
 
-    suspend fun getTvShow(id: String): TvShow {
+    override suspend fun getTvShow(id: String): TvShow {
         val document = sflixService.getTvShowById(id)
 
         val tvShow = TvShow(
@@ -975,7 +975,7 @@ object SflixProvider {
         return tvShow
     }
 
-    suspend fun getSeasonEpisodes(seasonId: String): List<Episode> {
+    override suspend fun getSeasonEpisodes(seasonId: String): List<Episode> {
         val document = sflixService.getSeasonEpisodesById(seasonId)
 
         val episodes = document
@@ -1004,7 +1004,7 @@ object SflixProvider {
     }
 
 
-    suspend fun getPeople(id: String): People {
+    override suspend fun getPeople(id: String): People {
         val document = sflixService.getPeopleBySlug(id)
 
         val people = People(
@@ -1123,7 +1123,7 @@ object SflixProvider {
     }
 
 
-    suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
+    override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
         val servers = when (videoType) {
             PlayerFragment.VideoType.Movie -> sflixService.getMovieServersById(id)
             PlayerFragment.VideoType.Episode -> sflixService.getEpisodeServersById(id)
