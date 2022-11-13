@@ -77,7 +77,7 @@ class HomeFragment : Fragment() {
     private fun displayHome(categories: List<Category>) {
         sflixAdapter.items.apply {
             clear()
-            addAll(categories.onEach { category ->
+            addAll(categories.filter { it.list.isNotEmpty() }.onEach { category ->
                 category.list.onEach { show ->
                     show.itemType = when (show) {
                         is Movie -> SflixAdapter.Type.MOVIE_ITEM
