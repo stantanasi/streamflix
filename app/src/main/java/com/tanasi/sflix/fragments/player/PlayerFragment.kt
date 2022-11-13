@@ -154,7 +154,7 @@ class PlayerFragment : Fragment() {
 
         player.setMediaItem(
             MediaItem.Builder()
-                .setUri(Uri.parse(video.source))
+                .setUri(Uri.parse(video.sources.firstOrNull() ?: ""))
                 .setSubtitleConfigurations(video.subtitles.map {
                     SubtitleConfiguration.Builder(Uri.parse(it.file))
                         .setMimeType(MimeTypes.TEXT_VTT)

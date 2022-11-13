@@ -1153,7 +1153,7 @@ object SflixProvider : Provider {
             }
 
             Video(
-                source = sources.sources.firstOrNull()?.file ?: "",
+                sources = sources.sources.map { it.file },
                 subtitles = sources.tracks
                     .filter { it.kind == "captions" }
                     .map {

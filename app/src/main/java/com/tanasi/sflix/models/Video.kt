@@ -1,7 +1,7 @@
 package com.tanasi.sflix.models
 
 class Video(
-    val source: String,
+    val sources: List<String>,
 
     val subtitles: List<Subtitle> = listOf(),
 ) {
