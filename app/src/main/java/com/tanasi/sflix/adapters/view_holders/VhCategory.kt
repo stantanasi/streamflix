@@ -52,7 +52,7 @@ class VhCategory(
     }
 
     private fun displaySwiper(binding: ContentCategorySwiperBinding) {
-        val selected = category.list[category.selectedIndex]
+        val selected = category.list.getOrNull(category.selectedIndex) ?: return
 
         binding.tvSwiperTitle.text = when (selected) {
             is Movie -> selected.title
