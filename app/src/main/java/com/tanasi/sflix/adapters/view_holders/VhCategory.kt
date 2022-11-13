@@ -65,8 +65,8 @@ class VhCategory(
         }
 
         binding.tvSwiperQuality.text = when (selected) {
-            is Movie -> selected.quality?.name ?: "N/A"
-            is TvShow -> selected.quality?.name ?: "N/A"
+            is Movie -> selected.quality ?: "N/A"
+            is TvShow -> selected.quality ?: "N/A"
         }
 
         binding.tvSwiperTvShowLastEpisode.apply {

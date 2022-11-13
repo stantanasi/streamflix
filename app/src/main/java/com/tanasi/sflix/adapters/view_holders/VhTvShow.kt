@@ -100,7 +100,7 @@ class VhTvShow(
             .centerCrop()
             .into(binding.ivTvShowPoster)
 
-        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+        binding.tvTvShowQuality.text = tvShow.quality ?: "N/A"
 
         binding.tvTvShowLastEpisode.text =
             "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
@@ -139,7 +139,7 @@ class VhTvShow(
             .centerCrop()
             .into(binding.ivTvShowPoster)
 
-        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+        binding.tvTvShowQuality.text = tvShow.quality ?: "N/A"
 
         binding.tvTvShowLastEpisode.text =
             "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
@@ -157,7 +157,7 @@ class VhTvShow(
 
         binding.tvTvShowRating.text = tvShow.rating?.let { String.format("%.1f", it) } ?: "N/A"
 
-        binding.tvTvShowQuality.text = tvShow.quality?.name ?: "N/A"
+        binding.tvTvShowQuality.text = tvShow.quality ?: "N/A"
 
         binding.tvTvShowReleased.text = tvShow.released?.format("yyyy")
 

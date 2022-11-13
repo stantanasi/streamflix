@@ -106,7 +106,7 @@ class VhMovie(
             .centerCrop()
             .into(binding.ivMoviePoster)
 
-        binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
+        binding.tvMovieQuality.text = movie.quality ?: "N/A"
 
         binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
 
@@ -145,7 +145,7 @@ class VhMovie(
             .centerCrop()
             .into(binding.ivMoviePoster)
 
-        binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
+        binding.tvMovieQuality.text = movie.quality ?: "N/A"
 
         binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
 
@@ -162,7 +162,7 @@ class VhMovie(
 
         binding.tvMovieRating.text = movie.rating?.let { String.format("%.1f", it) } ?: "N/A"
 
-        binding.tvMovieQuality.text = movie.quality?.name ?: "N/A"
+        binding.tvMovieQuality.text = movie.quality ?: "N/A"
 
         binding.tvMovieReleased.text = movie.released?.format("yyyy")
 

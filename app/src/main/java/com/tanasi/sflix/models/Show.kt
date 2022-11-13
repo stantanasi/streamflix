@@ -4,19 +4,6 @@ import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.utils.toCalendar
 
 sealed class Show : SflixAdapter.Item {
-    enum class Quality {
-        HD,
-        SD,
-        CAM;
-
-        companion object {
-            fun getByValue(value: String): Quality? = try {
-                valueOf(value)
-            } catch (e: Exception) {
-                null
-            }
-        }
-    }
 
     enum class Type {
         Movie,
@@ -31,7 +18,7 @@ class Movie(
     released: String? = null,
     val runtime: Int? = null,
     val youtubeTrailerId: String? = null,
-    quality: String = "",
+    val quality: String? = null,
     val rating: Double? = null,
     val poster: String? = null,
     val banner: String? = null,
@@ -42,7 +29,6 @@ class Movie(
 ) : Show(), SflixAdapter.Item, Cloneable {
 
     val released = released?.toCalendar()
-    val quality = Quality.getByValue(quality)
 
 
     override lateinit var itemType: SflixAdapter.Type
@@ -57,7 +43,7 @@ class TvShow(
     released: String? = null,
     val runtime: Int? = null,
     val youtubeTrailerId: String? = null,
-    quality: String = "",
+    val quality: String? = null,
     val rating: Double? = null,
     val poster: String? = null,
     val banner: String? = null,
@@ -69,7 +55,6 @@ class TvShow(
 ) : Show(), SflixAdapter.Item, Cloneable {
 
     val released = released?.toCalendar()
-    val quality = Quality.getByValue(quality)
 
 
     override lateinit var itemType: SflixAdapter.Type
