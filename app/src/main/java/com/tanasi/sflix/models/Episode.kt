@@ -6,7 +6,7 @@ class Episode(
     val id: String,
     val number: Int,
     val title: String = "",
-    val poster: String = "",
+    val poster: String? = null,
 
     var tvShow: TvShow? = null,
     var season: Season? = null,
