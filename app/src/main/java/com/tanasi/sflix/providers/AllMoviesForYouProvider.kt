@@ -565,7 +565,24 @@ object AllMoviesForYouProvider : Provider {
     }
 
     override suspend fun getSeasonEpisodes(seasonId: String): List<Episode> {
-        TODO("Not yet implemented")
+        val document = service.getSeasonEpisodes(seasonId)
+
+        val episodes = document.select("section.SeasonBx tr.Viewed").map {
+            Episode(
+                id = it.selectFirst("a")?.attr("href")
+                    ?.substringBeforeLast("/")?.substringAfterLast("/") ?: "",
+                number = it.selectFirst("span.Num")
+                    ?.text()?.toIntOrNull() ?: 0,
+                title = it.selectFirst("td.MvTbTtl > a")
+                    ?.text() ?: "",
+                released = it.selectFirst("td.MvTbTtl > span")
+                    ?.text(),
+                poster = it.selectFirst("td.MvTbImg img")
+                    ?.attr("src")?.toSafeUrl()?.replace("w92", "w500"),
+            )
+        }
+
+        return episodes
     }
 
 
@@ -632,5 +649,8 @@ object AllMoviesForYouProvider : Provider {
 
         @GET("series/{slug}")
         suspend fun getTvShow(@Path("slug") slug: String): Document
+
+        @GET("season/{id}")
+        suspend fun getSeasonEpisodes(@Path("id") seasonId: String): Document
     }
 }
