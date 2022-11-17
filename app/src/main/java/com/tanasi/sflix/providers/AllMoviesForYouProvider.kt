@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import retrofit2.Retrofit
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 object AllMoviesForYouProvider : Provider {
 
@@ -230,7 +231,84 @@ object AllMoviesForYouProvider : Provider {
     }
 
     override suspend fun search(query: String): List<Show> {
-        TODO("Not yet implemented")
+        if (query.isEmpty()) return listOf()
+
+        val document = service.search(query)
+
+        val results = document.select("ul.MovieList article.TPost.B").map {
+            val id = it.selectFirst("a")?.attr("href")
+                ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
+            val title = it.selectFirst("h2.Title")
+                ?.text() ?: ""
+            val overview = it.selectFirst("div.Description > p")
+                ?.text() ?: ""
+            val released = it.selectFirst("div.Image span.Yr")
+                ?.text()
+            val runtime = it.selectFirst("span.Time")
+                ?.text()?.toMinutes()
+            val rating = it.selectFirst("div.Vote > div.post-ratings > span")
+                ?.text()?.toDoubleOrNull()
+            val poster = it.selectFirst("div.Image img")
+                ?.attr("data-src")?.toSafeUrl()
+
+            val genres = it.select("div.Description > p.Genre a").map { element ->
+                Genre(
+                    id = element.attr("href")
+                        .substringBeforeLast("/").substringAfterLast("/"),
+                    name = element.text(),
+                )
+            }
+            val directors = it.select("div.Description > p.Director a").map { element ->
+                People(
+                    id = element.attr("href")
+                        .substringBeforeLast("/").substringAfterLast("/"),
+                    name = element.text(),
+                )
+            }
+            val cast = it.select("div.Description > p.Cast a").map { element ->
+                People(
+                    id = element.attr("href")
+                        .substringBeforeLast("/").substringAfterLast("/"),
+                    name = element.text(),
+                )
+            }
+
+            when {
+                it.isMovie() -> {
+                    Movie(
+                        id = id,
+                        title = title,
+                        overview = overview,
+                        released = released,
+                        runtime = runtime,
+                        quality = it.selectFirst("div.Image span.Qlty")?.text(),
+                        rating = rating,
+                        poster = poster,
+
+                        genres = genres,
+                        directors = directors,
+                        cast = cast,
+                    )
+                }
+                else -> {
+                    TvShow(
+                        id = id,
+                        title = title,
+                        overview = overview,
+                        released = released,
+                        runtime = runtime,
+                        rating = rating,
+                        poster = poster,
+
+                        genres = genres,
+                        directors = directors,
+                        cast = cast,
+                    )
+                }
+            }
+        }
+
+        return results
     }
 
     override suspend fun getMovies(): List<Movie> {
@@ -302,5 +380,8 @@ object AllMoviesForYouProvider : Provider {
 
         @GET(".")
         suspend fun getHome(): Document
+
+        @GET(".")
+        suspend fun search(@Query("s") query: String): Document
     }
 }
