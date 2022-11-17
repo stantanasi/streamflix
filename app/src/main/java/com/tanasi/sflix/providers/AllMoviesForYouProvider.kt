@@ -484,7 +484,84 @@ object AllMoviesForYouProvider : Provider {
 
 
     override suspend fun getTvShow(id: String): TvShow {
-        TODO("Not yet implemented")
+        val document = service.getTvShow(id)
+
+        val tvShow = TvShow(
+            id = id,
+            title = document.selectFirst("h1.Title")
+                ?.text() ?: "",
+            overview = document.selectFirst("div.Description > p")
+                ?.text() ?: "",
+            released = document.selectFirst("span.Date")
+                ?.text(),
+            runtime = document.selectFirst("span.Time")
+                ?.text()?.toMinutes(),
+            youtubeTrailerId = Regex("\"trailer\":\".*?src=\\\\\"(.*?)\\\\\"").find(document.toString())
+                ?.groupValues?.get(1)?.replace("\\\\", "")?.substringAfterLast("/"),
+            rating = document.selectFirst("div.Vote > div.post-ratings > span")?.text()
+                ?.toDoubleOrNull(),
+            banner = document.selectFirst("div.Image img")
+                ?.attr("src")?.toSafeUrl(),
+
+            seasons = document.select("section.SeasonBx").map {
+                Season(
+                    id = it.selectFirst("a")?.attr("href")
+                        ?.substringBeforeLast("/")?.substringAfterLast("/") ?: "",
+                    number = it.selectFirst("div.Title > a > span")
+                        ?.text()?.toIntOrNull() ?: 0,
+                    title = it.selectFirst("div.Title")
+                        ?.text() ?: "",
+                )
+            },
+            genres = document.select("div.Description > p.Genre a").map {
+                Genre(
+                    id = it.attr("href")
+                        .substringBeforeLast("/").substringAfterLast("/"),
+                    name = it.text(),
+                )
+            },
+            directors = document.select("div.Description > p.Director a").map {
+                People(
+                    id = it.attr("href")
+                        .substringBeforeLast("/").substringAfterLast("/"),
+                    name = it.text(),
+                )
+            },
+            cast = document.select("div.Description > p.Cast a").map {
+                People(
+                    id = it.attr("href")
+                        .substringBeforeLast("/").substringAfterLast("/"),
+                    name = it.text(),
+                )
+            },
+            recommendations = document.select("div.MovieListTop div.TPost.B").map {
+                val showId = it.selectFirst("a")?.attr("href")
+                    ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
+                val showTitle = it.selectFirst("h2.Title")
+                    ?.text() ?: ""
+                val showPoster = it.selectFirst("div.Image img")
+                    ?.attr("data-src")?.toSafeUrl()
+
+                when {
+                    it.isMovie() -> {
+                        Movie(
+                            id = showId,
+                            title = showTitle,
+                            poster = showPoster,
+                        )
+                    }
+                    else -> {
+                        TvShow(
+                            id = showId,
+                            title = showTitle,
+                            poster = showPoster,
+                        )
+                    }
+                }
+            },
+        )
+
+        return tvShow
     }
 
     override suspend fun getSeasonEpisodes(seasonId: String): List<Episode> {
@@ -551,5 +628,9 @@ object AllMoviesForYouProvider : Provider {
 
         @GET("movies/{slug}")
         suspend fun getMovie(@Path("slug") slug: String): Document
+
+
+        @GET("series/{slug}")
+        suspend fun getTvShow(@Path("slug") slug: String): Document
     }
 }
