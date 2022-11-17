@@ -312,7 +312,52 @@ object AllMoviesForYouProvider : Provider {
     }
 
     override suspend fun getMovies(): List<Movie> {
-        TODO("Not yet implemented")
+        val document = service.getMovies()
+
+        val movies = document.select("ul.MovieList article.TPost.B").map {
+            Movie(
+                id = it.selectFirst("a")?.attr("href")
+                    ?.substringBeforeLast("/")?.substringAfterLast("/") ?: "",
+                title = it.selectFirst("h2.Title")
+                    ?.text() ?: "",
+                overview = it.selectFirst("div.Description > p")
+                    ?.text() ?: "",
+                released = it.selectFirst("div.Image span.Yr")
+                    ?.text(),
+                runtime = it.selectFirst("span.Time")
+                    ?.text()?.toMinutes(),
+                quality = it.selectFirst("div.Image span.Qlty")
+                    ?.text(),
+                rating = it.selectFirst("div.Vote > div.post-ratings > span")
+                    ?.text()?.toDoubleOrNull(),
+                poster = it.selectFirst("div.Image img")
+                    ?.attr("data-src")?.toSafeUrl(),
+
+                genres = it.select("div.Description > p.Genre a").map { element ->
+                    Genre(
+                        id = element.attr("href")
+                            .substringBeforeLast("/").substringAfterLast("/"),
+                        name = element.text(),
+                    )
+                },
+                directors = it.select("div.Description > p.Director a").map { element ->
+                    People(
+                        id = element.attr("href")
+                            .substringBeforeLast("/").substringAfterLast("/"),
+                        name = element.text(),
+                    )
+                },
+                cast = it.select("div.Description > p.Cast a").map { element ->
+                    People(
+                        id = element.attr("href")
+                            .substringBeforeLast("/").substringAfterLast("/"),
+                        name = element.text(),
+                    )
+                },
+            )
+        }
+
+        return movies
     }
 
     override suspend fun getTvShows(): List<TvShow> {
@@ -383,5 +428,8 @@ object AllMoviesForYouProvider : Provider {
 
         @GET(".")
         suspend fun search(@Query("s") query: String): Document
+
+        @GET("movies")
+        suspend fun getMovies(): Document
     }
 }
