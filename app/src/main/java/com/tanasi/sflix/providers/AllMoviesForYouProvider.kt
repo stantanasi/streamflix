@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import retrofit2.Retrofit
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 object AllMoviesForYouProvider : Provider {
@@ -409,7 +410,76 @@ object AllMoviesForYouProvider : Provider {
 
 
     override suspend fun getMovie(id: String): Movie {
-        TODO("Not yet implemented")
+        val document = service.getMovie(id)
+
+        val movie = Movie(
+            id = id,
+            title = document.selectFirst("h1.Title")
+                ?.text() ?: "",
+            overview = document.selectFirst("div.Description > p")
+                ?.text() ?: "",
+            released = document.selectFirst("span.Date")
+                ?.text(),
+            runtime = document.selectFirst("span.Time")
+                ?.text()?.toMinutes(),
+            youtubeTrailerId = Regex("\"trailer\":\".*?src=\\\\\"(.*?)\\\\\"").find(document.toString())
+                ?.groupValues?.get(1)?.replace("\\\\", "")?.substringAfterLast("/"),
+            quality = document.selectFirst("span.Qlty")
+                ?.text(),
+            rating = document.selectFirst("div.Vote > div.post-ratings > span")
+                ?.text()?.toDoubleOrNull(),
+            banner = document.selectFirst("div.Image img")
+                ?.attr("src")?.toSafeUrl(),
+
+            genres = document.select("div.Description > p.Genre a").map {
+                Genre(
+                    id = it.attr("href")
+                        .substringBeforeLast("/").substringAfterLast("/"),
+                    name = it.text(),
+                )
+            },
+            directors = document.select("div.Description > p.Director a").map {
+                People(
+                    id = it.attr("href")
+                        .substringBeforeLast("/").substringAfterLast("/"),
+                    name = it.text(),
+                )
+            },
+            cast = document.select("div.Description > p.Cast a").map {
+                People(
+                    id = it.attr("href")
+                        .substringBeforeLast("/").substringAfterLast("/"),
+                    name = it.text(),
+                )
+            },
+            recommendations = document.select("div.MovieListTop div.TPost.B").map {
+                val showId = it.selectFirst("a")?.attr("href")
+                    ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
+                val showTitle = it.selectFirst("h2.Title")
+                    ?.text() ?: ""
+                val showPoster = it.selectFirst("div.Image img")
+                    ?.attr("data-src")?.toSafeUrl()
+
+                when {
+                    it.isMovie() -> {
+                        Movie(
+                            id = showId,
+                            title = showTitle,
+                            poster = showPoster,
+                        )
+                    }
+                    else -> {
+                        TvShow(
+                            id = showId,
+                            title = showTitle,
+                            poster = showPoster,
+                        )
+                    }
+                }
+            },
+        )
+
+        return movie
     }
 
 
@@ -477,5 +547,9 @@ object AllMoviesForYouProvider : Provider {
 
         @GET("shows")
         suspend fun getTvShows(): Document
+
+
+        @GET("movies/{slug}")
+        suspend fun getMovie(@Path("slug") slug: String): Document
     }
 }
