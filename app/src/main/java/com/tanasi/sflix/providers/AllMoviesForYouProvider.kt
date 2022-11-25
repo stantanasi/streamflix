@@ -712,6 +712,15 @@ object AllMoviesForYouProvider : Provider {
 
             Video(
                 sources = sources,
+                subtitles = link.select("video > track")
+                    .map {
+                        Video.Subtitle(
+                            label = it.attr("label"),
+                            file = it.attr("src"),
+                        )
+                    }
+                    .filter { it.label != "Upload SRT" }
+                    .sortedBy { it.label }
             )
         }
 
