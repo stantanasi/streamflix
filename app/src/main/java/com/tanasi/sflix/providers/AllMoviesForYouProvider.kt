@@ -3,12 +3,15 @@ package com.tanasi.sflix.providers
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.models.*
+import com.tanasi.sflix.utils.JsUnpacker
+import com.tanasi.sflix.utils.retry
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 object AllMoviesForYouProvider : Provider {
 
@@ -673,7 +676,46 @@ object AllMoviesForYouProvider : Provider {
 
 
     override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
-        TODO("Not yet implemented")
+        val document = when (videoType) {
+            PlayerFragment.VideoType.Movie -> service.getMovie(id)
+            PlayerFragment.VideoType.Episode -> service.getEpisode(id)
+        }
+
+        val links = document.select("body iframe")
+            .map { it.attr("src") }
+            .mapNotNull { src ->
+                if (src.contains("trembed")) {
+                    service.getLink(src)
+                        .selectFirst("body iframe")
+                        ?.attr("src")
+                        ?.replace("streamhub.to/d/", "streamhub.to/e/")
+                } else {
+                    src
+                }
+            }
+
+        val video = retry(links.size) { attempt ->
+            val link = service.getSource(links.getOrNull(attempt - 1) ?: "")
+
+            val jsEval = Regex("eval((.|\\n)*?)</script>").find(link.toString())?.let {
+                it.groupValues[1]
+            } ?: throw Exception("No sources found")
+
+            val unPacked = JsUnpacker("eval$jsEval").unpack()
+                ?: throw Exception("No sources found")
+
+            val sources = Regex("src:\"(.*?)\"").findAll(
+                Regex("\\{sources:\\[(.*?)]").find(unPacked)?.let {
+                    it.groupValues[1]
+                } ?: throw Exception("No sources found")
+            ).map { it.groupValues[1] }.toList()
+
+            Video(
+                sources = sources,
+            )
+        }
+
+        return video
     }
 
 
@@ -734,8 +776,18 @@ object AllMoviesForYouProvider : Provider {
         @GET("season/{id}")
         suspend fun getSeasonEpisodes(@Path("id") seasonId: String): Document
 
+        @GET("episode/{id}")
+        suspend fun getEpisode(@Path("id") id: String): Document
+
 
         @GET("cast/{slug}")
         suspend fun getPeople(@Path("slug") slug: String): Document
+
+
+        @GET
+        suspend fun getLink(@Url url: String): Document
+
+        @GET
+        suspend fun getSource(@Url url: String): Document
     }
 }
