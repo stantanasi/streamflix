@@ -5,6 +5,10 @@ import com.tanasi.sflix.models.*
 
 interface Provider {
 
+    var name: String
+    var logo: String
+
+
     suspend fun getHome(): List<Category>
 
     suspend fun search(query: String): List<Show>
