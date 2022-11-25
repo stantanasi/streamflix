@@ -31,6 +31,8 @@ class PlayerViewModel : ViewModel() {
         try {
             val video = SflixProvider.getVideo(id, videoType)
 
+            if (video.sources.isEmpty()) throw Exception("No links found")
+
             _state.postValue(State.SuccessLoading(video))
         } catch (e: Exception) {
             _state.postValue(State.FailedLoading(e))
