@@ -1,6 +1,19 @@
 package com.tanasi.sflix.fragments.providers
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.tanasi.sflix.models.Provider
 
 class ProvidersViewModel : ViewModel() {
+
+    private val _state = MutableLiveData<State>(State.Loading)
+    val state: LiveData<State> = _state
+
+    sealed class State {
+        object Loading : State()
+
+        data class SuccessLoading(val providers: List<Provider>) : State()
+        data class FailedLoading(val error: Exception) : State()
+    }
 }
