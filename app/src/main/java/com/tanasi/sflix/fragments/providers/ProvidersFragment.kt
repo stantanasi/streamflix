@@ -7,9 +7,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentProvidersBinding
 import com.tanasi.sflix.models.Provider
+import com.tanasi.sflix.ui.SpacingItemDecoration
 
 class ProvidersFragment : Fragment() {
 
@@ -60,6 +62,11 @@ class ProvidersFragment : Fragment() {
     private fun initializeProviders() {
         binding.rvProviders.apply {
             adapter = sflixAdapter
+            addItemDecoration(
+                SpacingItemDecoration(
+                    requireContext().resources.getDimension(R.dimen.providers_spacing).toInt()
+                )
+            )
         }
     }
 
