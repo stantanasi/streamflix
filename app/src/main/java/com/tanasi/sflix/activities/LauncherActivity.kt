@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ActivityLauncherBinding
+import com.tanasi.sflix.utils.AppPreferences
 
 class LauncherActivity : FragmentActivity() {
 
@@ -15,5 +16,7 @@ class LauncherActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityLauncherBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        AppPreferences.setup(this)
     }
 }
