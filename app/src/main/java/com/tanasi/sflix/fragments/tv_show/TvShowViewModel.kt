@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.TvShow
-import com.tanasi.sflix.providers.SflixProvider
+import com.tanasi.sflix.utils.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -26,7 +26,7 @@ class TvShowViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val tvShow = SflixProvider.getTvShow(id)
+            val tvShow = AppPreferences.currentProvider.getTvShow(id)
 
             _state.postValue(State.SuccessLoading(tvShow))
         } catch (e: Exception) {
