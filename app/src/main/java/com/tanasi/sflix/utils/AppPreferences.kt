@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.tanasi.sflix.BuildConfig
 import com.tanasi.sflix.providers.AllMoviesForYouProvider
+import com.tanasi.sflix.providers.Provider
 import com.tanasi.sflix.providers.SflixProvider
 
 object AppPreferences {
@@ -23,9 +24,15 @@ object AppPreferences {
         AllMoviesForYouProvider,
     )
 
+    var currentProvider: Provider
+        get() = Key.CURRENT_PROVIDER.getString()?.let { name ->
+            providers.find { it.name == name }
+        } ?: SflixProvider
+        set(value) = Key.CURRENT_PROVIDER.setString(value.name)
+
 
     private enum class Key {
-        ;
+        CURRENT_PROVIDER;
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)
