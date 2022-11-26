@@ -3,6 +3,8 @@ package com.tanasi.sflix.utils
 import android.content.Context
 import android.content.SharedPreferences
 import com.tanasi.sflix.BuildConfig
+import com.tanasi.sflix.providers.AllMoviesForYouProvider
+import com.tanasi.sflix.providers.SflixProvider
 
 object AppPreferences {
 
@@ -14,6 +16,12 @@ object AppPreferences {
             Context.MODE_PRIVATE,
         )
     }
+
+
+    val providers = listOf(
+        SflixProvider,
+        AllMoviesForYouProvider,
+    )
 
 
     private enum class Key {
