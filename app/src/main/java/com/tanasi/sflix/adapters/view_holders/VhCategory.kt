@@ -71,7 +71,11 @@ class VhCategory(
 
         binding.tvSwiperTvShowLastEpisode.apply {
             text = when (selected) {
-                is TvShow -> "S${selected.seasons.lastOrNull()?.number ?: ""} E${selected.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+                is TvShow -> selected.seasons.lastOrNull()?.let { season ->
+                    season.episodes.lastOrNull()?.let { episode ->
+                        "S${season.number} E${episode.number}"
+                    }
+                } ?: "TV"
                 else -> ""
             }
             visibility = when (selected) {

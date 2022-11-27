@@ -102,8 +102,11 @@ class VhTvShow(
 
         binding.tvTvShowQuality.text = tvShow.quality ?: "N/A"
 
-        binding.tvTvShowLastEpisode.text =
-            "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+        binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
+            season.episodes.lastOrNull()?.let { episode ->
+                "S${season.number} E${episode.number}"
+            }
+        } ?: "TV"
 
         binding.tvTvShowTitle.text = tvShow.title
     }
@@ -141,8 +144,11 @@ class VhTvShow(
 
         binding.tvTvShowQuality.text = tvShow.quality ?: "N/A"
 
-        binding.tvTvShowLastEpisode.text =
-            "S${tvShow.seasons.lastOrNull()?.number ?: ""} E${tvShow.seasons.lastOrNull()?.episodes?.lastOrNull()?.number ?: ""}"
+        binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
+            season.episodes.lastOrNull()?.let { episode ->
+                "S${season.number} E${episode.number}"
+            }
+        } ?: "TV"
 
         binding.tvTvShowTitle.text = tvShow.title
     }
