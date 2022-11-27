@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Show
-import com.tanasi.sflix.providers.SflixProvider
+import com.tanasi.sflix.utils.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -26,7 +26,7 @@ class SearchViewModel : ViewModel() {
         _state.postValue(State.Searching)
 
         try {
-            val results = SflixProvider.search(query)
+            val results = AppPreferences.currentProvider.search(query)
 
             _state.postValue(State.SuccessSearching(results))
         } catch (e: Exception) {

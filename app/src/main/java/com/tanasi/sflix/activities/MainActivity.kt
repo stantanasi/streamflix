@@ -15,7 +15,6 @@ class MainActivity : FragmentActivity() {
     private val binding: ActivityMainBinding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme_SFlix)
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

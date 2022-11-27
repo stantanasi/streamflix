@@ -22,6 +22,9 @@ import javax.crypto.spec.SecretKeySpec
 
 object SflixProvider : Provider {
 
+    override var name = "SFlix"
+    override var logo = "https://img.sflix.to/xxrz/400x400/100/66/35/66356c25ce98cb12993249e21742b129/66356c25ce98cb12993249e21742b129.png"
+
     private val service = SflixService.build()
 
 

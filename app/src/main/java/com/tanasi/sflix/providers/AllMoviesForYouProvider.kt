@@ -15,6 +15,9 @@ import retrofit2.http.Url
 
 object AllMoviesForYouProvider : Provider {
 
+    override var name = "AllMoviesForYou"
+    override var logo = "https://i0.wp.com/allmoviesforyou.net/wp-content/uploads/2021/04/cropped-cropped-allmoviesforyou-logo-header-HD.png?w=800&ssl=1"
+
     private val service = AllMoviesForYouService.build()
 
 

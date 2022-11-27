@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.People
-import com.tanasi.sflix.providers.SflixProvider
+import com.tanasi.sflix.utils.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -26,7 +26,7 @@ class PeopleViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val people = SflixProvider.getPeople(id)
+            val people = AppPreferences.currentProvider.getPeople(id)
 
             _state.postValue(State.SuccessLoading(people))
         } catch (e: Exception) {

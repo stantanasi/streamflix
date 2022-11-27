@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Episode
-import com.tanasi.sflix.providers.SflixProvider
+import com.tanasi.sflix.utils.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -29,7 +29,7 @@ class SeasonViewModel : ViewModel() {
         _state.postValue(State.LoadingEpisodes)
 
         try {
-            val episodes = SflixProvider.getSeasonEpisodes(seasonId)
+            val episodes = AppPreferences.currentProvider.getSeasonEpisodes(seasonId)
 
             _state.postValue(State.SuccessLoadingEpisodes(seasonId, episodes))
         } catch (e: Exception) {

@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Movie
-import com.tanasi.sflix.providers.SflixProvider
+import com.tanasi.sflix.utils.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -26,7 +26,7 @@ class MovieViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val movie = SflixProvider.getMovie(id)
+            val movie = AppPreferences.currentProvider.getMovie(id)
 
             _state.postValue(State.SuccessLoading(movie))
         } catch (e: Exception) {

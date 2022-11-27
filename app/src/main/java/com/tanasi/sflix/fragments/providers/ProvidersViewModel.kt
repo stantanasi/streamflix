@@ -1,15 +1,15 @@
-package com.tanasi.sflix.fragments.tv_shows
+package com.tanasi.sflix.fragments.providers
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tanasi.sflix.models.TvShow
+import com.tanasi.sflix.models.Provider
 import com.tanasi.sflix.utils.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class TvShowsViewModel : ViewModel() {
+class ProvidersViewModel : ViewModel() {
 
     private val _state = MutableLiveData<State>(State.Loading)
     val state: LiveData<State> = _state
@@ -17,17 +17,25 @@ class TvShowsViewModel : ViewModel() {
     sealed class State {
         object Loading : State()
 
-        data class SuccessLoading(val tvShows: List<TvShow>) : State()
+        data class SuccessLoading(val providers: List<Provider>) : State()
         data class FailedLoading(val error: Exception) : State()
     }
 
-    fun getTvShows() = viewModelScope.launch(Dispatchers.IO) {
+
+    fun getProviders() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {
-            val tvShows = AppPreferences.currentProvider.getTvShows()
+            val providers = AppPreferences.providers.map {
+                Provider(
+                    name = it.name,
+                    logo = it.logo,
 
-            _state.postValue(State.SuccessLoading(tvShows))
+                    provider = it,
+                )
+            }.sortedBy { it.name }
+
+            _state.postValue(State.SuccessLoading(providers))
         } catch (e: Exception) {
             _state.postValue(State.FailedLoading(e))
         }
