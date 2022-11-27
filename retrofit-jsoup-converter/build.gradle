@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace 'com.tanasi.retrofit_jsoup'
     compileSdk 32
 
     defaultConfig {

@@ -5,6 +5,7 @@ plugins {
 }
 
 android {
+    namespace 'com.tanasi.sflix'
     compileSdk 33
 
     defaultConfig {

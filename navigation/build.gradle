@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace 'com.tanasi.navigation'
     compileSdk 32
 
     defaultConfig {
