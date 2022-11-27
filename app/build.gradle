@@ -5,14 +5,15 @@ plugins {
 }
 
 android {
+    namespace 'com.tanasi.sflix'
     compileSdk 33
 
     defaultConfig {
         applicationId "com.tanasi.sflix"
         minSdk 23
         targetSdk 33
-        versionCode 2
-        versionName "1.1.0"
+        versionCode 3
+        versionName "1.2.0"
 
     }
 
@@ -39,17 +40,17 @@ dependencies {
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.13.1'
 
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.18.1'
-    implementation 'com.google.android.exoplayer:exoplayer-dash:2.18.1'
-    implementation 'com.google.android.exoplayer:exoplayer-hls:2.18.1'
-    implementation 'com.google.android.exoplayer:extension-mediasession:2.18.1'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.18.1'
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.18.2'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.18.2'
+    implementation 'com.google.android.exoplayer:exoplayer-hls:2.18.2'
+    implementation 'com.google.android.exoplayer:extension-mediasession:2.18.2'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.18.2'
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.9'
     implementation project(path: ':retrofit-jsoup-converter')
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'org.jsoup:jsoup:1.15.1'
+    implementation 'org.jsoup:jsoup:1.15.3'
 
     implementation 'androidx.fragment:fragment-ktx:1.5.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
