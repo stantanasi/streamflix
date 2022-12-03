@@ -157,8 +157,10 @@ object SflixProvider : Provider {
         categories.add(
             Category(
                 name = "Latest Movies",
-                list = document.select(".section-id-02:has(h2:matchesOwn(Latest Movies)) div.flw-item")
-                    .map {
+                list = document.select("section.section-id-02")
+                    .find { it.selectFirst("h2.cat-heading")?.ownText() == "Latest Movies" }
+                    ?.select("div.flw-item")
+                    ?.map {
                         val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
 
                         Movie(
@@ -172,15 +174,17 @@ object SflixProvider : Provider {
                             poster = it.selectFirst("div.film-poster > img.film-poster-img")
                                 ?.attr("data-src"),
                         )
-                    },
+                    } ?: listOf(),
             )
         )
 
         categories.add(
             Category(
                 name = "Latest TV Shows",
-                list = document.select(".section-id-02:has(h2:matchesOwn(Latest TV Shows)) div.flw-item")
-                    .map {
+                list = document.select("section.section-id-02")
+                    .find { it.selectFirst("h2.cat-heading")?.ownText() == "Latest TV Shows" }
+                    ?.select("div.flw-item")
+                    ?.map {
                         val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
 
                         TvShow(
@@ -209,7 +213,7 @@ object SflixProvider : Provider {
                                 )
                             } ?: listOf()
                         )
-                    },
+                    } ?: listOf(),
             )
         )
 
