@@ -77,6 +77,8 @@ class SeasonFragment : Fragment() {
                 it.tvShow = TvShow(
                     id = args.tvShowId,
                     title = args.tvShowTitle,
+                    poster = args.tvShowPoster,
+                    banner = args.tvShowBanner,
                 )
                 it.season = Season(
                     id = args.seasonId,

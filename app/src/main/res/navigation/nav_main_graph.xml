@@ -104,6 +104,14 @@
             android:name="tvShowTitle"
             app:argType="string" />
         <argument
+            android:name="tvShowPoster"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="tvShowBanner"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
             android:name="seasonId"
             app:argType="string" />
         <argument

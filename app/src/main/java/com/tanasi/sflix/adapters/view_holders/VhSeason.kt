@@ -36,6 +36,8 @@ class VhSeason(
                     TvShowFragmentDirections.actionTvShowToSeason(
                         tvShowId = season.tvShow?.id ?: "",
                         tvShowTitle = season.tvShow?.title ?: "",
+                        tvShowPoster = season.tvShow?.poster,
+                        tvShowBanner = season.tvShow?.banner,
                         seasonId = season.id,
                         seasonNumber = season.number,
                         seasonTitle = season.title,
