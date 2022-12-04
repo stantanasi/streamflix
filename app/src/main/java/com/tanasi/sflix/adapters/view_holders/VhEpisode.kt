@@ -40,10 +40,12 @@ class VhEpisode(
             setOnClickListener {
                 findNavController().navigate(
                     SeasonFragmentDirections.actionSeasonToPlayer(
-                        videoType = PlayerFragment.VideoType.Episode,
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
                         subtitle = "S${episode.season?.number ?: 0} E${episode.number} • ${episode.title}",
+                        videoType = PlayerFragment.VideoType.Episode(
+                            id = episode.id,
+                        ),
                     )
                 )
             }

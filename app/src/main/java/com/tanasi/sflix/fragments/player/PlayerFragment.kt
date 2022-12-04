@@ -3,6 +3,7 @@ package com.tanasi.sflix.fragments.player
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.view.LayoutInflater
@@ -31,15 +32,23 @@ import com.tanasi.sflix.databinding.ContentExoControllerBinding
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
 import com.tanasi.sflix.utils.map
+import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("RestrictedApi")
 class PlayerFragment : Fragment() {
 
-    enum class VideoType {
-        Movie,
-        Episode;
+    sealed class VideoType : Parcelable {
+        @Parcelize
+        data class Movie(
+            val id: String,
+        ) : VideoType()
+
+        @Parcelize
+        data class Episode(
+            val id: String,
+        ) : VideoType()
     }
 
     private var _binding: FragmentPlayerBinding? = null
@@ -190,8 +199,8 @@ class PlayerFragment : Fragment() {
                                     .setDescription(args.subtitle)
                                     .setType(
                                         when (args.videoType as VideoType) {
-                                            VideoType.Movie -> TvContractCompat.PreviewPrograms.TYPE_MOVIE
-                                            VideoType.Episode -> TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE
+                                            is VideoType.Movie -> TvContractCompat.PreviewPrograms.TYPE_MOVIE
+                                            is VideoType.Episode -> TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE
                                         }
                                     )
                                     .setWatchNextType(TvContractCompat.WatchNextPrograms.WATCH_NEXT_TYPE_CONTINUE)

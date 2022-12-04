@@ -181,10 +181,12 @@ class VhMovie(
             setOnClickListener {
                 findNavController().navigate(
                     MovieFragmentDirections.actionMovieToPlayer(
-                        videoType = PlayerFragment.VideoType.Movie,
                         id = movie.id,
                         title = movie.title,
                         subtitle = movie.released?.format("yyyy") ?: "",
+                        videoType = PlayerFragment.VideoType.Movie(
+                            id = movie.id,
+                        ),
                     )
                 )
             }
