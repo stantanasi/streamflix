@@ -48,6 +48,7 @@ class VhMovie(
         when (_binding) {
             is ItemMovieBinding -> displayItem(_binding)
             is ItemMovieGridBinding -> displayGridItem(_binding)
+            is ItemMovieContinueWatchingBinding -> displayItemContinueWatching(_binding)
 
             is ContentMovieBinding -> displayMovie(_binding)
             is ContentMovieCastsBinding -> displayCasts(_binding)
@@ -143,6 +144,69 @@ class VhMovie(
             .into(binding.ivMoviePoster)
 
         binding.tvMovieQuality.text = movie.quality ?: "N/A"
+
+        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
+
+        binding.tvMovieTitle.text = movie.title
+    }
+
+    private fun displayItemContinueWatching(binding: ItemMovieContinueWatchingBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeToPlayer(
+                        id = movie.id,
+                        title = movie.title,
+                        subtitle = movie.released?.format("yyyy") ?: "",
+                        videoType = PlayerFragment.VideoType.Movie(
+                            id = movie.id,
+                            title = movie.title,
+                            releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",
+                            poster = movie.poster ?: "",
+                        ),
+                    )
+                )
+            }
+            setOnFocusChangeListener { _, hasFocus ->
+                val animation = when {
+                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
+                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
+                }
+                binding.root.startAnimation(animation)
+                animation.fillAfter = true
+
+                if (hasFocus) {
+                    when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                        is HomeFragment -> fragment.updateBackground(movie.banner)
+                    }
+                }
+            }
+        }
+
+        Glide.with(context)
+            .load(movie.poster)
+            .centerCrop()
+            .into(binding.ivMoviePoster)
+
+        binding.pbMovieProgress.apply {
+            val program = context.contentResolver.query(
+                TvContractCompat.WatchNextPrograms.CONTENT_URI,
+                WatchNextProgram.PROJECTION,
+                null,
+                null,
+                null,
+            )?.map { WatchNextProgram.fromCursor(it) }
+                ?.find { it.contentId == movie.id && it.internalProviderId == AppPreferences.currentProvider.name }
+
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
 
         binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
 
