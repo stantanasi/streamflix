@@ -46,7 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_episode_poster"
-        tools:text="Season #, Episode #" />
+        tools:text="Episode #" />
 
     <TextView
         android:id="@+id/tv_episode_title"
