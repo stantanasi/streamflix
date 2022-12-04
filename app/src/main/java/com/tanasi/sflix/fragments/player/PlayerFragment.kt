@@ -44,6 +44,9 @@ class PlayerFragment : Fragment() {
         @Parcelize
         data class Movie(
             val id: String,
+            val title: String,
+            val releaseDate: String,
+            val poster: String,
         ) : VideoType()
 
         @Parcelize

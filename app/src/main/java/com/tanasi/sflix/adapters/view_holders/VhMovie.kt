@@ -183,6 +183,9 @@ class VhMovie(
                         subtitle = movie.released?.format("yyyy") ?: "",
                         videoType = PlayerFragment.VideoType.Movie(
                             id = movie.id,
+                            title = movie.title,
+                            releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",
+                            poster = movie.poster ?: movie.banner ?: "",
                         ),
                     )
                 )
