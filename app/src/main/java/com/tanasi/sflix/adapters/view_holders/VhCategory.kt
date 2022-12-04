@@ -15,6 +15,7 @@ import com.tanasi.sflix.fragments.home.HomeFragment
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.models.Category
 import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.models.Show
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.getCurrentFragment
 import com.tanasi.sflix.utils.toActivity
@@ -52,7 +53,7 @@ class VhCategory(
     }
 
     private fun displaySwiper(binding: ContentCategorySwiperBinding) {
-        val selected = category.list.getOrNull(category.selectedIndex) ?: return
+        val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
 
         binding.tvSwiperTitle.text = when (selected) {
             is Movie -> selected.title
@@ -109,12 +110,10 @@ class VhCategory(
                             category.selectedIndex = (category.selectedIndex + 1) % category.list.size
 
                             when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                                is HomeFragment -> fragment.updateBackground(
-                                    when (val it = category.list[category.selectedIndex]) {
-                                        is Movie -> it.banner
-                                        is TvShow -> it.banner
-                                    }
-                                )
+                                is HomeFragment -> when (val it = category.list[category.selectedIndex]) {
+                                    is Movie -> fragment.updateBackground(it.banner)
+                                    is TvShow -> fragment.updateBackground(it.banner)
+                                }
                             }
                             bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
                             return@setOnKeyListener true

@@ -78,10 +78,10 @@ class HomeFragment : Fragment() {
         sflixAdapter.items.apply {
             clear()
             addAll(categories.filter { it.list.isNotEmpty() }.onEach { category ->
-                category.list.onEach { show ->
-                    show.itemType = when (show) {
-                        is Movie -> SflixAdapter.Type.MOVIE_ITEM
-                        is TvShow -> SflixAdapter.Type.TV_SHOW_ITEM
+                category.list.onEach { item ->
+                    when (item) {
+                        is Movie -> item.itemType = SflixAdapter.Type.MOVIE_ITEM
+                        is TvShow -> item.itemType = SflixAdapter.Type.TV_SHOW_ITEM
                     }
                 }
                 category.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
