@@ -1,5 +1,6 @@
 package com.tanasi.sflix.fragments.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,14 +8,17 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.tvprovider.media.tv.TvContractCompat
+import androidx.tvprovider.media.tv.WatchNextProgram
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
-import com.tanasi.sflix.models.Category
-import com.tanasi.sflix.models.Movie
-import com.tanasi.sflix.models.TvShow
+import com.tanasi.sflix.models.*
+import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.map
 
+@SuppressLint("RestrictedApi")
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -77,19 +81,74 @@ class HomeFragment : Fragment() {
     private fun displayHome(categories: List<Category>) {
         sflixAdapter.items.apply {
             clear()
-            addAll(categories.filter { it.list.isNotEmpty() }.onEach { category ->
-                category.list.onEach { item ->
-                    when (item) {
-                        is Movie -> item.itemType = SflixAdapter.Type.MOVIE_ITEM
-                        is TvShow -> item.itemType = SflixAdapter.Type.TV_SHOW_ITEM
+
+            categories.find { it.name == "Featured" }?.let { category ->
+                category.itemType = SflixAdapter.Type.CATEGORY_SWIPER
+                add(category)
+            }
+
+            Category(
+                name = "Continue Watching",
+                list = requireContext().contentResolver.query(
+                    TvContractCompat.WatchNextPrograms.CONTENT_URI,
+                    WatchNextProgram.PROJECTION,
+                    null,
+                    null,
+                    null
+                )?.map { WatchNextProgram.fromCursor(it) }
+                    ?.filter { it.internalProviderId == AppPreferences.currentProvider.name }
+                    ?.mapNotNull {
+                        when (it.type) {
+                            TvContractCompat.PreviewPrograms.TYPE_MOVIE -> Movie(
+                                id = it.contentId ?: "",
+                                title = it.title ?: "",
+                                released = it.releaseDate,
+                                poster = it.posterArtUri?.toString(),
+                            )
+                            TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE -> Episode(
+                                id = it.contentId,
+                                number = it.episodeNumber?.toIntOrNull() ?: 0,
+                                title = it.episodeTitle ?: "",
+
+                                tvShow = TvShow(
+                                    id = it.seriesId ?: "",
+                                    title = it.title ?: "",
+                                    poster = it.posterArtUri?.toString(),
+                                ),
+                                season = Season(
+                                    id = "",
+                                    number = it.seasonNumber?.toIntOrNull() ?: 0,
+                                    title = it.seasonTitle ?: "",
+                                ),
+                            )
+                            else -> null
+                        }
+                    } ?: listOf()
+            ).takeIf { it.list.isNotEmpty() }?.let {
+                it.list.onEach { show ->
+                    when (show) {
+                        is Movie -> show.itemType = SflixAdapter.Type.MOVIE_CONTINUE_WATCHING_ITEM
+                        is Episode -> show.itemType = SflixAdapter.Type.EPISODE_CONTINUE_WATCHING_ITEM
                     }
                 }
-                category.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-                category.itemType = when (category.name) {
-                    "Featured" -> SflixAdapter.Type.CATEGORY_SWIPER
-                    else -> SflixAdapter.Type.CATEGORY_ITEM
+                it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+                it.itemType = SflixAdapter.Type.CATEGORY_ITEM
+                add(it)
+            }
+
+            categories
+                .filter { it.name != "Featured" && it.list.isNotEmpty() }
+                .onEach { category ->
+                    category.list.onEach { show ->
+                        when (show) {
+                            is Movie -> show.itemType = SflixAdapter.Type.MOVIE_ITEM
+                            is TvShow -> show.itemType = SflixAdapter.Type.TV_SHOW_ITEM
+                        }
+                    }
+                    category.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+                    category.itemType = SflixAdapter.Type.CATEGORY_ITEM
+                    add(category)
                 }
-            })
         }
         sflixAdapter.notifyDataSetChanged()
     }
