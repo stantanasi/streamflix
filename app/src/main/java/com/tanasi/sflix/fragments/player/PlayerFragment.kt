@@ -208,6 +208,7 @@ class PlayerFragment : Fragment() {
                                     .setLastPlaybackPositionMillis(player.currentPosition.toInt())
                                     .setDurationMillis(player.duration.toInt())
                                     .setContentId(args.id)
+                                    .setInternalProviderId(AppPreferences.currentProvider.name)
 
                                 requireContext().contentResolver.insert(
                                     TvContractCompat.WatchNextPrograms.CONTENT_URI,
