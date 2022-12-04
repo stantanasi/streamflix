@@ -46,6 +46,19 @@ class VhEpisode(
                         subtitle = "S${episode.season?.number ?: 0} E${episode.number} • ${episode.title}",
                         videoType = PlayerFragment.VideoType.Episode(
                             id = episode.id,
+                            number = episode.number,
+                            title = episode.title,
+                            poster = episode.poster,
+                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                                id = episode.tvShow?.id ?: "",
+                                title = episode.tvShow?.title ?: "",
+                                poster = episode.tvShow?.poster,
+                                banner = episode.tvShow?.banner,
+                            ),
+                            season = PlayerFragment.VideoType.Episode.Season(
+                                number = episode.season?.number ?: 0,
+                                title = episode.season?.title ?: "",
+                            ),
                         ),
                     )
                 )

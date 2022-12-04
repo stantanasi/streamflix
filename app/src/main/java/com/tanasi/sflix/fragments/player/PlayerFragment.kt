@@ -52,7 +52,26 @@ class PlayerFragment : Fragment() {
         @Parcelize
         data class Episode(
             val id: String,
-        ) : VideoType()
+            val number: Int,
+            val title: String,
+            val poster: String?,
+            val tvShow: TvShow,
+            val season: Season,
+        ) : VideoType() {
+            @Parcelize
+            data class TvShow(
+                val id: String,
+                val title: String,
+                val poster: String?,
+                val banner: String?,
+            ) : Parcelable
+
+            @Parcelize
+            data class Season(
+                val number: Int,
+                val title: String,
+            ) : Parcelable
+        }
     }
 
     private var _binding: FragmentPlayerBinding? = null
