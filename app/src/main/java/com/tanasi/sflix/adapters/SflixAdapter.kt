@@ -21,6 +21,7 @@ class SflixAdapter(
         CATEGORY_SWIPER,
 
         EPISODE_ITEM,
+        EPISODE_CONTINUE_WATCHING_ITEM,
 
         MOVIE_ITEM,
         MOVIE_GRID_ITEM,
@@ -67,6 +68,13 @@ class SflixAdapter(
 
             Type.EPISODE_ITEM -> VhEpisode(
                 ItemEpisodeBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+            Type.EPISODE_CONTINUE_WATCHING_ITEM -> VhEpisode(
+                ItemEpisodeContinueWatchingBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
