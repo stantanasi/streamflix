@@ -30,10 +30,7 @@ import com.tanasi.sflix.fragments.tv_show.TvShowFragment
 import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.TvShow
-import com.tanasi.sflix.utils.format
-import com.tanasi.sflix.utils.getCurrentFragment
-import com.tanasi.sflix.utils.map
-import com.tanasi.sflix.utils.toActivity
+import com.tanasi.sflix.utils.*
 
 @SuppressLint("RestrictedApi")
 class VhMovie(
@@ -200,7 +197,7 @@ class VhMovie(
                 null,
                 null,
             )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == movie.id }
+                ?.find { it.contentId == movie.id && it.internalProviderId == AppPreferences.currentProvider.name }
 
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()

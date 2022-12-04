@@ -31,6 +31,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ContentExoControllerBinding
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
+import com.tanasi.sflix.utils.AppPreferences
 import com.tanasi.sflix.utils.map
 import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration.Companion.minutes
@@ -189,7 +190,7 @@ class PlayerFragment : Fragment() {
                         null,
                         null
                     )?.map { WatchNextProgram.fromCursor(it) }
-                        ?.find { it.contentId == args.id }
+                        ?.find { it.contentId == args.id && it.internalProviderId == AppPreferences.currentProvider.name }
 
                     when {
                         player.hasStarted() -> {
@@ -247,7 +248,7 @@ class PlayerFragment : Fragment() {
             null,
             null
         )?.map { WatchNextProgram.fromCursor(it) }
-            ?.find { it.contentId == args.id }
+            ?.find { it.contentId == args.id && it.internalProviderId == AppPreferences.currentProvider.name }
             ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
 
         player.seekTo(lastPlaybackPositionMillis ?: 0)

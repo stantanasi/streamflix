@@ -14,6 +14,7 @@ import com.tanasi.sflix.databinding.ItemEpisodeBinding
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.fragments.season.SeasonFragmentDirections
 import com.tanasi.sflix.models.Episode
+import com.tanasi.sflix.utils.AppPreferences
 import com.tanasi.sflix.utils.map
 
 @SuppressLint("RestrictedApi")
@@ -75,7 +76,7 @@ class VhEpisode(
                 null,
                 null,
             )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == episode.id }
+                ?.find { it.contentId == episode.id && it.internalProviderId == AppPreferences.currentProvider.name }
 
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
