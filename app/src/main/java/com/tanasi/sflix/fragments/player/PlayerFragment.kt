@@ -220,18 +220,31 @@ class PlayerFragment : Fragment() {
                                 val builder = WatchNextProgram.Builder()
                                     .setTitle(args.title)
                                     .setDescription(args.subtitle)
-                                    .setType(
-                                        when (args.videoType as VideoType) {
-                                            is VideoType.Movie -> TvContractCompat.PreviewPrograms.TYPE_MOVIE
-                                            is VideoType.Episode -> TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE
-                                        }
-                                    )
                                     .setWatchNextType(TvContractCompat.WatchNextPrograms.WATCH_NEXT_TYPE_CONTINUE)
                                     .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
                                     .setLastPlaybackPositionMillis(player.currentPosition.toInt())
                                     .setDurationMillis(player.duration.toInt())
                                     .setContentId(args.id)
                                     .setInternalProviderId(AppPreferences.currentProvider.name)
+
+                                when (val videoType = args.videoType as VideoType) {
+                                    is VideoType.Movie -> {
+                                        builder
+                                            .setType(TvContractCompat.PreviewPrograms.TYPE_MOVIE)
+                                            .setReleaseDate(videoType.releaseDate)
+                                            .setPosterArtUri(Uri.parse(videoType.poster))
+                                    }
+                                    is VideoType.Episode -> {
+                                        builder
+                                            .setType(TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE)
+                                            .setSeriesId(videoType.tvShow.id)
+                                            .setEpisodeNumber(videoType.number)
+                                            .setEpisodeTitle(videoType.title)
+                                            .setSeasonNumber(videoType.season.number)
+                                            .setSeasonTitle(videoType.season.title)
+                                            .setPosterArtUri(Uri.parse(videoType.tvShow.poster ?: videoType.tvShow.banner))
+                                    }
+                                }
 
                                 requireContext().contentResolver.insert(
                                     TvContractCompat.WatchNextPrograms.CONTENT_URI,
