@@ -97,6 +97,7 @@ class HomeFragment : Fragment() {
                     null
                 )?.map { WatchNextProgram.fromCursor(it) }
                     ?.filter { it.internalProviderId == AppPreferences.currentProvider.name }
+                    ?.sortedBy { it.lastEngagementTimeUtcMillis }?.reversed()
                     ?.mapNotNull {
                         when (it.type) {
                             TvContractCompat.PreviewPrograms.TYPE_MOVIE -> Movie(
