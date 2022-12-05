@@ -3,6 +3,7 @@ package com.tanasi.sflix.fragments.player
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
+import android.os.Parcelable
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.view.LayoutInflater
@@ -30,16 +31,47 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ContentExoControllerBinding
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
+import com.tanasi.sflix.utils.AppPreferences
 import com.tanasi.sflix.utils.map
+import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("RestrictedApi")
 class PlayerFragment : Fragment() {
 
-    enum class VideoType {
-        Movie,
-        Episode;
+    sealed class VideoType : Parcelable {
+        @Parcelize
+        data class Movie(
+            val id: String,
+            val title: String,
+            val releaseDate: String,
+            val poster: String,
+        ) : VideoType()
+
+        @Parcelize
+        data class Episode(
+            val id: String,
+            val number: Int,
+            val title: String,
+            val poster: String?,
+            val tvShow: TvShow,
+            val season: Season,
+        ) : VideoType() {
+            @Parcelize
+            data class TvShow(
+                val id: String,
+                val title: String,
+                val poster: String?,
+                val banner: String?,
+            ) : Parcelable
+
+            @Parcelize
+            data class Season(
+                val number: Int,
+                val title: String,
+            ) : Parcelable
+        }
     }
 
     private var _binding: FragmentPlayerBinding? = null
@@ -180,7 +212,7 @@ class PlayerFragment : Fragment() {
                         null,
                         null
                     )?.map { WatchNextProgram.fromCursor(it) }
-                        ?.find { it.contentId == args.id }
+                        ?.find { it.contentId == args.id && it.internalProviderId == AppPreferences.currentProvider.name }
 
                     when {
                         player.hasStarted() -> {
@@ -188,17 +220,31 @@ class PlayerFragment : Fragment() {
                                 val builder = WatchNextProgram.Builder()
                                     .setTitle(args.title)
                                     .setDescription(args.subtitle)
-                                    .setType(
-                                        when (args.videoType as VideoType) {
-                                            VideoType.Movie -> TvContractCompat.PreviewPrograms.TYPE_MOVIE
-                                            VideoType.Episode -> TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE
-                                        }
-                                    )
                                     .setWatchNextType(TvContractCompat.WatchNextPrograms.WATCH_NEXT_TYPE_CONTINUE)
                                     .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
                                     .setLastPlaybackPositionMillis(player.currentPosition.toInt())
                                     .setDurationMillis(player.duration.toInt())
                                     .setContentId(args.id)
+                                    .setInternalProviderId(AppPreferences.currentProvider.name)
+
+                                when (val videoType = args.videoType as VideoType) {
+                                    is VideoType.Movie -> {
+                                        builder
+                                            .setType(TvContractCompat.PreviewPrograms.TYPE_MOVIE)
+                                            .setReleaseDate(videoType.releaseDate)
+                                            .setPosterArtUri(Uri.parse(videoType.poster))
+                                    }
+                                    is VideoType.Episode -> {
+                                        builder
+                                            .setType(TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE)
+                                            .setSeriesId(videoType.tvShow.id)
+                                            .setEpisodeNumber(videoType.number)
+                                            .setEpisodeTitle(videoType.title)
+                                            .setSeasonNumber(videoType.season.number)
+                                            .setSeasonTitle(videoType.season.title)
+                                            .setPosterArtUri(Uri.parse(videoType.tvShow.poster ?: videoType.tvShow.banner))
+                                    }
+                                }
 
                                 requireContext().contentResolver.insert(
                                     TvContractCompat.WatchNextPrograms.CONTENT_URI,
@@ -237,7 +283,7 @@ class PlayerFragment : Fragment() {
             null,
             null
         )?.map { WatchNextProgram.fromCursor(it) }
-            ?.find { it.contentId == args.id }
+            ?.find { it.contentId == args.id && it.internalProviderId == AppPreferences.currentProvider.name }
             ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
 
         player.seekTo(lastPlaybackPositionMillis ?: 0)

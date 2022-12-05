@@ -4,7 +4,7 @@ import com.tanasi.sflix.adapters.SflixAdapter
 
 class Category(
     val name: String,
-    val list: List<Show>,
+    val list: List<SflixAdapter.Item>,
 ) : SflixAdapter.Item {
 
     var selectedIndex = 0

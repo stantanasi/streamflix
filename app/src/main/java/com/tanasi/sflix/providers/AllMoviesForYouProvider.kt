@@ -680,8 +680,8 @@ object AllMoviesForYouProvider : Provider {
 
     override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
         val document = when (videoType) {
-            PlayerFragment.VideoType.Movie -> service.getMovie(id)
-            PlayerFragment.VideoType.Episode -> service.getEpisode(id)
+            is PlayerFragment.VideoType.Movie -> service.getMovie(id)
+            is PlayerFragment.VideoType.Episode -> service.getEpisode(id)
         }
 
         val links = document.select("body iframe")

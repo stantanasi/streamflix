@@ -628,8 +628,8 @@ object SflixProvider : Provider {
 
     override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
         val servers = when (videoType) {
-            PlayerFragment.VideoType.Movie -> service.getMovieServersById(id)
-            PlayerFragment.VideoType.Episode -> service.getEpisodeServersById(id)
+            is PlayerFragment.VideoType.Movie -> service.getMovieServersById(id)
+            is PlayerFragment.VideoType.Episode -> service.getEpisodeServersById(id)
         }.select("a").map {
             object {
                 val id = it.attr("data-id")
