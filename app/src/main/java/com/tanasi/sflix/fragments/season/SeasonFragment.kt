@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentSeasonBinding
 import com.tanasi.sflix.models.Episode
@@ -66,7 +67,7 @@ class SeasonFragment : Fragment() {
 
         binding.vgvEpisodes.apply {
             adapter = sflixAdapter
-            setItemSpacing(60)
+            setItemSpacing(resources.getDimension(R.dimen.season_episodes_spacing).toInt())
         }
     }
 
