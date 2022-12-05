@@ -1,5 +1,6 @@
 package com.tanasi.sflix.providers
 
+import android.net.Uri
 import android.util.Base64
 import com.google.gson.*
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
@@ -14,6 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import java.lang.Integer.min
 import java.lang.reflect.Type
+import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import javax.crypto.Cipher
@@ -651,7 +653,9 @@ object SflixProvider : Provider {
             val sources = when (response) {
                 is SflixService.Sources -> response
                 is SflixService.Sources.Encrypted -> response.decrypt(
-                    secret = service.getSourceEncryptedKey().text()
+                    secret = service.getSourceEncryptedKey(
+                        domain = URI(link.link).host.substringBefore("."),
+                    ).text()
                 )
             }
 
@@ -774,8 +778,8 @@ object SflixProvider : Provider {
             @Query("id") id: String,
         ): SourcesResponse
 
-        @GET("https://raw.githubusercontent.com/consumet/rapidclown/dokicloud/key.txt")
-        suspend fun getSourceEncryptedKey(): Document
+        @GET("https://raw.githubusercontent.com/consumet/rapidclown/{domain}/key.txt")
+        suspend fun getSourceEncryptedKey(@Path("domain") domain: String): Document
 
 
         data class Link(
