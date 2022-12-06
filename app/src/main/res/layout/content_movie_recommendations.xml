@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="70dp"
         android:layout_marginEnd="70dp"
-        android:text="You may also like"
+        android:text="@string/movie_you_may_also_like"
         android:textColor="#FFFFFF"
         android:textSize="22sp"
         android:textStyle="bold"

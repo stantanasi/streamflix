@@ -104,9 +104,9 @@ class VhTvShow(
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
-                "S${season.number} E${episode.number}"
+                context.getString(R.string.tv_show_item_season_number_episode_number, season.number, episode.number)
             }
-        } ?: "TV"
+        } ?: context.getString(R.string.tv_show_item_type)
 
         binding.tvTvShowTitle.text = tvShow.title
     }
@@ -146,9 +146,9 @@ class VhTvShow(
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
-                "S${season.number} E${episode.number}"
+                context.getString(R.string.tv_show_item_season_number_episode_number, season.number, episode.number)
             }
-        } ?: "TV"
+        } ?: context.getString(R.string.tv_show_item_type)
 
         binding.tvTvShowTitle.text = tvShow.title
     }
@@ -171,10 +171,10 @@ class VhTvShow(
             val hours = it / 60
             val minutes = it % 60
             when {
-                hours > 0 -> "$hours h $minutes min"
-                else -> "$minutes min"
+                hours > 0 -> context.getString(R.string.tv_show_runtime_hours_minutes, hours, minutes)
+                else -> context.getString(R.string.tv_show_runtime_minutes, minutes)
             }
-        } ?: "0 min"
+        } ?: context.getString(R.string.tv_show_runtime_minutes, 0)
 
         binding.tvTvShowOverview.text = tvShow.overview
 

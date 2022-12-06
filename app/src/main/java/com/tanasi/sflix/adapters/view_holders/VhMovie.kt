@@ -231,10 +231,10 @@ class VhMovie(
             val hours = it / 60
             val minutes = it % 60
             when {
-                hours > 0 -> "$hours h $minutes min"
-                else -> "$minutes min"
+                hours > 0 -> context.getString(R.string.movie_runtime_hours_minutes, hours, minutes)
+                else -> context.getString(R.string.movie_runtime_minutes, minutes)
             }
-        } ?: "0 min"
+        } ?: context.getString(R.string.movie_runtime_minutes, 0)
 
         binding.tvMovieOverview.text = movie.overview
 

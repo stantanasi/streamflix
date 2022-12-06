@@ -88,7 +88,7 @@ class HomeFragment : Fragment() {
             }
 
             Category(
-                name = "Continue Watching",
+                name = getString(R.string.home_continue_watching),
                 list = requireContext().contentResolver.query(
                     TvContractCompat.WatchNextPrograms.CONTENT_URI,
                     WatchNextProgram.PROJECTION,

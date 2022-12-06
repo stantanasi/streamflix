@@ -6,21 +6,21 @@
     <item
         android:id="@id/search"
         android:icon="@drawable/ic_outline_search_24"
-        android:title="Search" />
+        android:title="@string/main_menu_search" />
 
     <item
         android:id="@id/home"
         android:icon="@drawable/ic_outline_home_24"
-        android:title="Home" />
+        android:title="@string/main_menu_home" />
 
     <item
         android:id="@id/movies"
         android:icon="@drawable/ic_outline_movie_24"
-        android:title="Movies" />
+        android:title="@string/main_menu_movies" />
 
     <item
         android:id="@id/tv_shows"
         android:icon="@drawable/ic_outline_tv_24"
-        android:title="TV Shows" />
+        android:title="@string/main_menu_tv_shows" />
 
 </menu>

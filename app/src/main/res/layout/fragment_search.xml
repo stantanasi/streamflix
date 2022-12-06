@@ -18,7 +18,7 @@
         android:drawablePadding="10dp"
         android:drawableTint="#FFFFFF"
         android:gravity="center_vertical"
-        android:hint="Search movies, TV shows"
+        android:hint="@string/search_input_hint"
         android:imeOptions="actionSearch"
         android:inputType="text"
         android:maxLines="1"
