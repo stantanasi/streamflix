@@ -74,9 +74,9 @@ class VhCategory(
             text = when (selected) {
                 is TvShow -> selected.seasons.lastOrNull()?.let { season ->
                     season.episodes.lastOrNull()?.let { episode ->
-                        "S${season.number} E${episode.number}"
+                        context.getString(R.string.tv_show_item_season_number_episode_number, season.number, episode.number)
                     }
-                } ?: "TV"
+                } ?: context.getString(R.string.tv_show_item_type)
                 else -> ""
             }
             visibility = when (selected) {

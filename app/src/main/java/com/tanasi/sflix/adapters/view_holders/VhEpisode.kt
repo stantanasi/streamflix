@@ -49,7 +49,12 @@ class VhEpisode(
                     SeasonFragmentDirections.actionSeasonToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
-                        subtitle = "S${episode.season?.number ?: 0} E${episode.number} • ${episode.title}",
+                        subtitle = context.getString(
+                            R.string.video_tv_show_subtitle,
+                            episode.season?.number ?: 0,
+                            episode.number,
+                            episode.title
+                        ),
                         videoType = PlayerFragment.VideoType.Episode(
                             id = episode.id,
                             number = episode.number,
@@ -107,7 +112,7 @@ class VhEpisode(
             }
         }
 
-        binding.tvEpisodeInfo.text = "Episode ${episode.number}"
+        binding.tvEpisodeInfo.text = context.getString(R.string.seasons_episode_number, episode.number)
 
         binding.tvEpisodeTitle.text = episode.title
     }
@@ -185,6 +190,6 @@ class VhEpisode(
 
         binding.tvEpisodeTvShowTitle.text = episode.tvShow?.title ?: ""
 
-        binding.tvEpisodeInfo.text = "S${episode.season?.number ?: 0} E${episode.number} • ${episode.title}"
+        binding.tvEpisodeInfo.text = context.getString(R.string.episode_item_info, episode.season?.number ?: 0, episode.number, episode.title)
     }
 }
