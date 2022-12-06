@@ -12,8 +12,7 @@
     </item>
 
     <item>
-        <shape android:shape="rectangle">
-        </shape>
+        <shape android:shape="rectangle"></shape>
     </item>
 
 </selector>

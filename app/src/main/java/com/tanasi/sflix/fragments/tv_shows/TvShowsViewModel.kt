@@ -21,6 +21,7 @@ class TvShowsViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
+
     fun getTvShows() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 

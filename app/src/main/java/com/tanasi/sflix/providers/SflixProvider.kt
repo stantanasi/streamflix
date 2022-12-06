@@ -1,6 +1,5 @@
 package com.tanasi.sflix.providers
 
-import android.net.Uri
 import android.util.Base64
 import com.google.gson.*
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory

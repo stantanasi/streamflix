@@ -17,10 +17,7 @@ class SeasonViewModel : ViewModel() {
     sealed class State {
         object LoadingEpisodes : State()
 
-        data class SuccessLoadingEpisodes(
-            val seasonId: String,
-            val episodes: List<Episode>,
-        ) : State()
+        data class SuccessLoadingEpisodes(val seasonId: String, val episodes: List<Episode>) : State()
         data class FailedLoadingEpisodes(val error: Exception) : State()
     }
 

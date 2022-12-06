@@ -11,7 +11,7 @@ class SpacingItemDecoration(
     private val horizontal: Int,
 ) : RecyclerView.ItemDecoration() {
 
-    constructor(spacing: Int): this(spacing, spacing)
+    constructor(spacing: Int) : this(spacing, spacing)
 
     override fun getItemOffsets(
         outRect: Rect,
