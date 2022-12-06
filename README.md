@@ -18,17 +18,17 @@
 <details>
   <summary>Table of Contents</summary>
 
-  - [About the project](#about-the-project)
-    - [Features](#features)
-    - [Built with](#built-with)
-  - [Getting started](#getting-started)
-    - [Prerequisites](#prerequisites)
-    - [Setup](#setup)
-  - [Development](#development)
-  - [Contributing](#contributing)
-  - [Disclaimer](#disclaimer)
-  - [Author](#author)
-  - [License](#license)
+- [About the project](#about-the-project)
+  - [Features](#features)
+  - [Built with](#built-with)
+- [Getting started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Setup](#setup)
+- [Development](#development)
+- [Contributing](#contributing)
+- [Disclaimer](#disclaimer)
+- [Author](#author)
+- [License](#license)
 </details>
 
 ## About the project
@@ -49,11 +49,18 @@ New titles are updated on the app daily to make sure fun never ends on SFlix.
 - An enormous collection of movies and TV shows with multiple subtitles.
 - No account or registration needed.
 - Optimized UI & UX.
+- Multiple providers.
+- Resume from last playback position.
 
 ### Built with
 
 - [Android Studio](https://developer.android.com/studio)
-- [Kotlin](https://kotlinlang.org/)
+- [Kotlin](https://kotlinlang.org)
+- [Retrofit](https://square.github.io/retrofit)
+- [ExoPlayer](https://exoplayer.dev)
+- Coroutines
+- MVVM Architecture
+- Android Architecture Components
 
 
 ## Getting started
