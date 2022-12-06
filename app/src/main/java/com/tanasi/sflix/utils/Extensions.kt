@@ -21,7 +21,7 @@ fun String.toCalendar(): Calendar? {
     patterns.forEach { sdf ->
         try {
             return Calendar.getInstance().also { it.time = sdf.parse(this)!! }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
     }
     return null
@@ -38,10 +38,6 @@ fun Calendar.format(pattern: String): String? {
 
 fun Fragment.hideKeyboard() {
     view?.let { activity?.hideKeyboard(it) }
-}
-
-fun Activity.hideKeyboard() {
-    hideKeyboard(currentFocus ?: View(this))
 }
 
 fun Context.hideKeyboard(view: View) {

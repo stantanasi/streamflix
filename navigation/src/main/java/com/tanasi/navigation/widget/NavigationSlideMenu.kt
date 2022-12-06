@@ -3,7 +3,6 @@ package com.tanasi.navigation.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.MenuItem
-import android.view.SubMenu
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuItemImpl
 

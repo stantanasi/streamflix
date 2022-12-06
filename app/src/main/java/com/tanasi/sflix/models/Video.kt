@@ -10,6 +10,5 @@ class Video(
         val label: String,
         val file: String,
         val default: Boolean = false,
-    ) {
-    }
+    )
 }
