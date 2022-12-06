@@ -1,3 +1,38 @@
 <resources>
     <string name="app_name">SFlix</string>
+
+    <string name="providers_choose_title">Choose a provider</string>
+
+    <string name="main_menu_search">Search</string>
+    <string name="main_menu_home">Home</string>
+    <string name="main_menu_movies">Movies</string>
+    <string name="main_menu_tv_shows">TV Shows</string>
+
+    <string name="search_input_hint">Search movies, TV shows</string>
+
+    <string name="home_swiper_watch_now">Watch Now</string>
+    <string name="home_continue_watching">Continue Watching</string>
+
+    <string name="episode_item_info">S%d E%d • %s</string>
+
+    <string name="tv_show_item_season_number_episode_number">S%d E%d</string>
+    <string name="tv_show_item_type">TV</string>
+
+    <string name="tv_show_runtime_hours_minutes">%d h %d min</string>
+    <string name="tv_show_runtime_minutes">%d min</string>
+    <string name="tv_show_trailer">Trailer</string>
+    <string name="tv_show_seasons">Seasons</string>
+    <string name="tv_show_casts">Casts</string>
+    <string name="tv_show_you_may_also_like">You may also like</string>
+
+    <string name="movie_runtime_hours_minutes">%d h %d min</string>
+    <string name="movie_runtime_minutes">%d min</string>
+    <string name="movie_watch_now">Watch Now</string>
+    <string name="movie_trailer">Trailer</string>
+    <string name="movie_casts">Casts</string>
+    <string name="movie_you_may_also_like">You may also like</string>
+
+    <string name="seasons_episode_number">Episode %d</string>
+
+    <string name="video_tv_show_subtitle">S%d E%d • %s</string>
 </resources>
