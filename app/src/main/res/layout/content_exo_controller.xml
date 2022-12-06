@@ -136,7 +136,6 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.google.android.exoplayer2.ui.SubtitleView
