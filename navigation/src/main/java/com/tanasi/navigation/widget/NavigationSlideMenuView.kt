@@ -3,6 +3,7 @@ package com.tanasi.navigation.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.ShapeDrawable
+import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -83,21 +84,11 @@ class NavigationSlideMenuView(
             child.initialize(item as MenuItemImpl, 0)
             child.itemPosition = i
 
-            child.setOnFocusChangeListener { _, _ ->
-                when (childs.any { it.hasFocus() }) {
-                    true -> navigationSlideView.open()
-                    false -> navigationSlideView.close()
-                }
-            }
-
-            child.setOnClickListener {
-                if (!menu.performItemAction(item, presenter, 0)) {
-                    item.isChecked = true
-                }
-            }
-
             addView(child)
         }
+
+        navigationSlideView.buildNavigation()
+
         selectedItemPosition = min(menu.size() - 1, selectedItemPosition)
         menu.getItem(selectedItemPosition).isChecked = true
     }
@@ -122,11 +113,10 @@ class NavigationSlideMenuView(
             presenter.updateSuspended = false
         }
 
-        when (navigationSlideView.isOpen) {
-            true -> navigationSlideView.open()
-            false -> navigationSlideView.close()
-        }
+        navigationSlideView.buildNavigation()
     }
+
+    override fun hasFocus() = childs.any { it.hasFocus() }
 
     fun open() {
         childs.forEach {
@@ -143,6 +133,12 @@ class NavigationSlideMenuView(
             it.isFocusableInTouchMode = it.isSelected
 
             it.close()
+        }
+    }
+
+    fun forEach(action: (child: NavigationSlideItemView, item: MenuItem) -> Unit) {
+        childs.forEach {
+            action(it, it.itemData)
         }
     }
 }

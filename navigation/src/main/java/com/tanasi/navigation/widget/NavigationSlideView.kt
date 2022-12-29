@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.FrameLayout
+import androidx.annotation.LayoutRes
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.res.getResourceIdOrThrow
@@ -20,7 +22,8 @@ class NavigationSlideView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     val menu = NavigationSlideMenu(context)
-    private val menuView = NavigationSlideMenuView(context).also {
+    var headerView: NavigationSlideHeaderView? = null
+    val menuView = NavigationSlideMenuView(context).also {
         it.navigationSlideView = this
     }
     private val presenter = NavigationSlidePresenter()
@@ -77,6 +80,14 @@ class NavigationSlideView @JvmOverloads constructor(
         menu.addMenuPresenter(presenter)
         presenter.initForMenu(getContext(), menu)
 
+        val headerLayoutRes = attributes.getResourceId(
+            R.styleable.NavigationSlideView_headerLayout,
+            0
+        )
+        if (headerLayoutRes != 0) {
+            addHeaderView(headerLayoutRes)
+        }
+
         menuGravity = attributes.getInt(
             R.styleable.NavigationSlideView_menuGravity,
             DEFAULT_MENU_GRAVITY
@@ -93,18 +104,17 @@ class NavigationSlideView @JvmOverloads constructor(
 
         addView(menuView)
 
-        menu.setCallback(
-            object : MenuBuilder.Callback {
-                override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
-                    if (reselectedListener != null && item.itemId == selectedItemId) {
-                        reselectedListener?.invoke(item)
-                        return true
-                    }
-                    return !(selectedListener?.invoke(item) ?: true)
+        menu.setCallback(object : MenuBuilder.Callback {
+            override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
+                if (reselectedListener != null && item.itemId == selectedItemId) {
+                    reselectedListener?.invoke(item)
+                    return true
                 }
+                return !(selectedListener?.invoke(item) ?: true)
+            }
 
-                override fun onMenuModeChange(menu: MenuBuilder) {}
-            })
+            override fun onMenuModeChange(menu: MenuBuilder) {}
+        })
     }
 
 
@@ -131,21 +141,71 @@ class NavigationSlideView @JvmOverloads constructor(
         presenter.updateMenuView(true)
     }
 
+    fun buildNavigation() {
+        headerView?.setOnFocusChangeListener { _, _ ->
+            when {
+                headerView?.hasFocus() == true || menuView.hasFocus() -> open()
+                else -> close()
+            }
+        }
+        menuView.forEach { child, item ->
+            child.setOnFocusChangeListener { _, _ ->
+                when {
+                    headerView?.hasFocus() == true || menuView.hasFocus() -> open()
+                    else -> close()
+                }
+            }
+
+            child.setOnClickListener {
+                if (!menu.performItemAction(item, presenter, 0)) {
+                    item.isChecked = true
+                }
+            }
+        }
+
+        when {
+            isOpen -> open()
+            else -> close()
+        }
+    }
+
+    fun addHeaderView(@LayoutRes layoutRes: Int) {
+        val headerView = LayoutInflater.from(context).inflate(layoutRes, this, false)
+        if (headerView is NavigationSlideHeaderView) {
+            addHeaderView(headerView)
+        }
+    }
+
+    fun addHeaderView(headerView: NavigationSlideHeaderView) {
+        removeHeaderView()
+        this.headerView = headerView
+        addView(headerView, 0)
+    }
+
+    fun removeHeaderView() {
+        if (headerView != null) {
+            removeView(headerView)
+            headerView = null
+        }
+    }
+
     fun open() {
         isOpen = true
 
+        headerView?.open()
         menuView.open()
     }
 
     fun close() {
         isOpen = false
 
+        headerView?.close()
         menuView.close()
     }
 
 
     companion object {
-        const val DEFAULT_MENU_GRAVITY = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+        const val DEFAULT_MENU_GRAVITY = Gravity.TOP or Gravity.START
         const val DEFAULT_MENU_SPACING = 0
     }
 }

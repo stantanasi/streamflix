@@ -2,6 +2,7 @@
 <resources>
 
     <declare-styleable name="NavigationSlideView">
+        <attr name="headerLayout" format="reference" />
         <attr name="menu" format="reference" />
         <attr name="menuGravity" />
         <attr name="menuSpacing" format="dimension" />
