@@ -165,12 +165,14 @@ class NavigationSlideView @JvmOverloads constructor(
     fun open() {
         isOpen = true
 
+        headerView?.open()
         menuView.open()
     }
 
     fun close() {
         isOpen = false
 
+        headerView?.close()
         menuView.close()
     }
 
