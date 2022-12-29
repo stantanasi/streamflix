@@ -84,21 +84,11 @@ class NavigationSlideMenuView(
             child.initialize(item as MenuItemImpl, 0)
             child.itemPosition = i
 
-            child.setOnFocusChangeListener { _, _ ->
-                when (childs.any { it.hasFocus() }) {
-                    true -> navigationSlideView.open()
-                    false -> navigationSlideView.close()
-                }
-            }
-
-            child.setOnClickListener {
-                if (!menu.performItemAction(item, presenter, 0)) {
-                    item.isChecked = true
-                }
-            }
-
             addView(child)
         }
+
+        navigationSlideView.buildNavigation()
+
         selectedItemPosition = min(menu.size() - 1, selectedItemPosition)
         menu.getItem(selectedItemPosition).isChecked = true
     }
@@ -123,10 +113,7 @@ class NavigationSlideMenuView(
             presenter.updateSuspended = false
         }
 
-        when (navigationSlideView.isOpen) {
-            true -> navigationSlideView.open()
-            false -> navigationSlideView.close()
-        }
+        navigationSlideView.buildNavigation()
     }
 
     override fun hasFocus() = childs.any { it.hasFocus() }

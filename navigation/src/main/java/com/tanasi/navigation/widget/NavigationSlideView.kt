@@ -142,6 +142,34 @@ class NavigationSlideView @JvmOverloads constructor(
         presenter.updateMenuView(true)
     }
 
+    fun buildNavigation() {
+        headerView?.setOnFocusChangeListener { _, _ ->
+            when {
+                headerView?.hasFocus() == true || menuView.hasFocus() -> open()
+                else -> close()
+            }
+        }
+        menuView.forEach { child, item ->
+            child.setOnFocusChangeListener { _, _ ->
+                when {
+                    headerView?.hasFocus() == true || menuView.hasFocus() -> open()
+                    else -> close()
+                }
+            }
+
+            child.setOnClickListener {
+                if (!menu.performItemAction(item, presenter, 0)) {
+                    item.isChecked = true
+                }
+            }
+        }
+
+        when {
+            isOpen -> open()
+            else -> close()
+        }
+    }
+
     fun addHeaderView(@LayoutRes layoutRes: Int) {
         val headerView = LayoutInflater.from(context).inflate(layoutRes, this, false)
         if (headerView is NavigationSlideHeaderView) {
