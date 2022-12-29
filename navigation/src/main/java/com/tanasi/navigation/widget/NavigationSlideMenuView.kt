@@ -3,6 +3,7 @@ package com.tanasi.navigation.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.ShapeDrawable
+import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -145,6 +146,12 @@ class NavigationSlideMenuView(
             it.isFocusableInTouchMode = it.isSelected
 
             it.close()
+        }
+    }
+
+    fun forEach(action: (child: NavigationSlideItemView, item: MenuItem) -> Unit) {
+        childs.forEach {
+            action(it, it.itemData)
         }
     }
 }
