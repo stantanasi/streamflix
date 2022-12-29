@@ -162,4 +162,5 @@
         android:name="com.tanasi.sflix.fragments.providers.ProvidersFragment"
         android:label="fragment_providers"
         tools:layout="@layout/fragment_providers" />
+    <action android:id="@+id/action_global_providers" app:destination="@id/providers" />
 </navigation>
