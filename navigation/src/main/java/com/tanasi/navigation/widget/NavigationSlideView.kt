@@ -4,9 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.FrameLayout
+import androidx.annotation.LayoutRes
 import androidx.appcompat.view.SupportMenuInflater
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.res.getResourceIdOrThrow
@@ -20,6 +22,7 @@ class NavigationSlideView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     val menu = NavigationSlideMenu(context)
+    var headerView: NavigationSlideHeaderView? = null
     private val menuView = NavigationSlideMenuView(context).also {
         it.navigationSlideView = this
     }
@@ -77,6 +80,14 @@ class NavigationSlideView @JvmOverloads constructor(
         menu.addMenuPresenter(presenter)
         presenter.initForMenu(getContext(), menu)
 
+        val headerLayoutRes = attributes.getResourceId(
+            R.styleable.NavigationSlideView_headerLayout,
+            0
+        )
+        if (headerLayoutRes != 0) {
+            addHeaderView(headerLayoutRes)
+        }
+
         menuGravity = attributes.getInt(
             R.styleable.NavigationSlideView_menuGravity,
             DEFAULT_MENU_GRAVITY
@@ -129,6 +140,26 @@ class NavigationSlideView @JvmOverloads constructor(
         menuInflater.inflate(resId, menu)
         presenter.updateSuspended = false
         presenter.updateMenuView(true)
+    }
+
+    fun addHeaderView(@LayoutRes layoutRes: Int) {
+        val headerView = LayoutInflater.from(context).inflate(layoutRes, this, false)
+        if (headerView is NavigationSlideHeaderView) {
+            addHeaderView(headerView)
+        }
+    }
+
+    fun addHeaderView(headerView: NavigationSlideHeaderView) {
+        removeHeaderView()
+        this.headerView = headerView
+        addView(headerView, 0)
+    }
+
+    fun removeHeaderView() {
+        if (headerView != null) {
+            removeView(headerView)
+            headerView = null
+        }
     }
 
     fun open() {
