@@ -23,7 +23,7 @@ class NavigationSlideView @JvmOverloads constructor(
 
     val menu = NavigationSlideMenu(context)
     var headerView: NavigationSlideHeaderView? = null
-    private val menuView = NavigationSlideMenuView(context).also {
+    val menuView = NavigationSlideMenuView(context).also {
         it.navigationSlideView = this
     }
     private val presenter = NavigationSlidePresenter()
@@ -104,18 +104,17 @@ class NavigationSlideView @JvmOverloads constructor(
 
         addView(menuView)
 
-        menu.setCallback(
-            object : MenuBuilder.Callback {
-                override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
-                    if (reselectedListener != null && item.itemId == selectedItemId) {
-                        reselectedListener?.invoke(item)
-                        return true
-                    }
-                    return !(selectedListener?.invoke(item) ?: true)
+        menu.setCallback(object : MenuBuilder.Callback {
+            override fun onMenuItemSelected(menu: MenuBuilder, item: MenuItem): Boolean {
+                if (reselectedListener != null && item.itemId == selectedItemId) {
+                    reselectedListener?.invoke(item)
+                    return true
                 }
+                return !(selectedListener?.invoke(item) ?: true)
+            }
 
-                override fun onMenuModeChange(menu: MenuBuilder) {}
-            })
+            override fun onMenuModeChange(menu: MenuBuilder) {}
+        })
     }
 
 
