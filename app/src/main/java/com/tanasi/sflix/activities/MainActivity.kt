@@ -4,10 +4,14 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
+import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController
+import com.tanasi.sflix.NavMainGraphDirections
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ActivityMainBinding
+import com.tanasi.sflix.databinding.ContentHeaderMenuMainBinding
 import com.tanasi.sflix.fragments.player.PlayerFragment
+import com.tanasi.sflix.utils.AppPreferences
 
 class MainActivity : FragmentActivity() {
 
@@ -24,6 +28,29 @@ class MainActivity : FragmentActivity() {
             .navController
 
         binding.navMain.setupWithNavController(navController)
+
+        binding.navMain.headerView?.apply {
+            val header = ContentHeaderMenuMainBinding.bind(this)
+
+            Glide.with(context)
+                .load(AppPreferences.currentProvider.logo)
+                .into(header.ivNavigationHeaderIcon)
+            header.tvNavigationHeaderTitle.text = AppPreferences.currentProvider.name
+            header.tvNavigationHeaderSubtitle.text = getString(R.string.main_menu_change_provider)
+
+            setOnOpenListener {
+                header.tvNavigationHeaderTitle.visibility = View.VISIBLE
+                header.tvNavigationHeaderSubtitle.visibility = View.VISIBLE
+            }
+            setOnCloseListener {
+                header.tvNavigationHeaderTitle.visibility = View.GONE
+                header.tvNavigationHeaderSubtitle.visibility = View.GONE
+            }
+
+            setOnClickListener {
+                navController.navigate(NavMainGraphDirections.actionGlobalProviders())
+            }
+        }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {

@@ -76,5 +76,7 @@ class ProvidersFragment : Fragment() {
             addAll(providers)
         }
         sflixAdapter.notifyDataSetChanged()
+
+        binding.rvProviders.requestFocus()
     }
 }

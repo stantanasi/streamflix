@@ -3,6 +3,7 @@
 
     <string name="providers_choose_title">Choose a provider</string>
 
+    <string name="main_menu_change_provider">Change provider</string>
     <string name="main_menu_search">Search</string>
     <string name="main_menu_home">Home</string>
     <string name="main_menu_movies">Movies</string>
