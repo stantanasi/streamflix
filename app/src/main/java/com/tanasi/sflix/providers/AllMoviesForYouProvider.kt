@@ -140,8 +140,10 @@ object AllMoviesForYouProvider : Provider {
             Category(
                 name = "Latest Movies",
                 list = document
-                    .select("section[data-id=movies] article.TPost.B")
-                    .map {
+                    .select("section")
+                    .find { it.attr("data-id") == "movies" }
+                    ?.select("article.TPost.B")
+                    ?.map {
                         Movie(
                             id = it.selectFirst("a")?.attr("href")
                                 ?.substringBeforeLast("/")?.substringAfterLast("/") ?: "",
@@ -182,7 +184,7 @@ object AllMoviesForYouProvider : Provider {
                                 )
                             },
                         )
-                    },
+                    } ?: listOf(),
             )
         )
 
@@ -190,8 +192,10 @@ object AllMoviesForYouProvider : Provider {
             Category(
                 name = "Latest TV Shows",
                 list = document
-                    .select("section[data-id=series] article.TPost.B")
-                    .map {
+                    .select("section")
+                    .find { it.attr("data-id") == "series" }
+                    ?.select("article.TPost.B")
+                    ?.map {
                         TvShow(
                             id = it.selectFirst("a")?.attr("href")
                                 ?.substringBeforeLast("/")?.substringAfterLast("/") ?: "",
@@ -230,7 +234,7 @@ object AllMoviesForYouProvider : Provider {
                                 )
                             },
                         )
-                    },
+                    } ?: listOf(),
             )
         )
 
