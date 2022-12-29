@@ -206,7 +206,7 @@ class NavigationSlideView @JvmOverloads constructor(
 
 
     companion object {
-        const val DEFAULT_MENU_GRAVITY = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+        const val DEFAULT_MENU_GRAVITY = Gravity.TOP or Gravity.START
         const val DEFAULT_MENU_SPACING = 0
     }
 }
