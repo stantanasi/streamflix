@@ -157,4 +157,9 @@
             android:id="@+id/action_people_to_tv_show"
             app:destination="@id/tv_show" />
     </fragment>
+    <fragment
+        android:id="@+id/providers"
+        android:name="com.tanasi.sflix.fragments.providers.ProvidersFragment"
+        android:label="fragment_providers"
+        tools:layout="@layout/fragment_providers" />
 </navigation>
