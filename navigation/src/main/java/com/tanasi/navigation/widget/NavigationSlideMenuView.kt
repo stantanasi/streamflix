@@ -128,6 +128,8 @@ class NavigationSlideMenuView(
         }
     }
 
+    override fun hasFocus() = childs.any { it.hasFocus() }
+
     fun open() {
         childs.forEach {
             it.isFocusable = true
