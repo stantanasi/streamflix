@@ -638,6 +638,8 @@ object SflixProvider : Provider {
             }
         }
 
+        if (servers.isEmpty()) throw Exception("No links found")
+
         val video = retry(min(servers.size, 2)) { attempt ->
             val link = service.getLink(servers.getOrNull(attempt - 1)?.id ?: "")
 

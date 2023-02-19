@@ -57,6 +57,7 @@ fun FragmentActivity.getCurrentFragment(): Fragment? = when (this) {
 }
 
 suspend fun <T> retry(retries: Int, predicate: suspend (attempt: Int) -> T): T {
+    require(retries > 0) { "Expected positive amount of retries, but had $retries" }
     var throwable: Throwable? = null
     (1..retries).forEach { attempt ->
         try {
