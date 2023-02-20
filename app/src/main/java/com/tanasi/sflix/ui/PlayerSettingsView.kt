@@ -25,6 +25,25 @@ class PlayerSettingsView @JvmOverloads constructor(
 
     fun show() {
         this.visibility = View.VISIBLE
+
+        displaySetting(Setting.Main)
+    }
+
+    private fun displaySetting(setting: Setting) {
+        binding.tvSettingsHeader.text = when (setting) {
+            Setting.Main -> "Settings"
+            Setting.Quality -> "Quality for current video"
+            Setting.Subtitle -> "Subtitles/closed captions"
+            Setting.Speed -> "Video speed"
+        }
+
+        binding.rvSettings.adapter = when (setting) {
+            Setting.Main -> TODO()
+            Setting.Quality -> TODO()
+            Setting.Subtitle -> TODO()
+            Setting.Speed -> TODO()
+        }
+        binding.rvSettings.requestFocus()
     }
 
     fun hide() {
