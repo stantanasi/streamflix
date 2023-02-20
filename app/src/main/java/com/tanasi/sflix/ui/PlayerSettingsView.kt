@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.exoplayer2.ExoPlayer
 import com.tanasi.sflix.databinding.ViewPlayerSettingsBinding
 
 class PlayerSettingsView @JvmOverloads constructor(
@@ -17,4 +18,6 @@ class PlayerSettingsView @JvmOverloads constructor(
         this,
         true
     )
+
+    var player: ExoPlayer? = null
 }

@@ -167,6 +167,7 @@ class PlayerFragment : Fragment() {
 
 
         binding.pvPlayer.player = player
+        binding.settings.player = player
 
         binding.pvPlayer.controller.tvExoTitle.text = args.title
 
