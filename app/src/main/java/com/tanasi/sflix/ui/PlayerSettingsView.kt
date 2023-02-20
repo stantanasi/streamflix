@@ -161,6 +161,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         .flatMap { trackGroup ->
                             trackGroup.trackFormats
                                 .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
+                                .filter { it.label != null }
                                 .mapIndexed { trackIndex, trackFormat ->
                                     TextTrackInformation(
                                         name = DefaultTrackNameProvider(resources)
