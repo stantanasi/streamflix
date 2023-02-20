@@ -14,6 +14,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.activities.MainActivity
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
 
 fun String.toCalendar(): Calendar? {
     val patterns = listOf(
@@ -90,3 +91,7 @@ val Tracks.Group.trackFormats: List<Format>
         }
         return trackFormats
     }
+
+fun <T> List<T>.findClosest(value: Float, selector: (T) -> Float): T? {
+    return minByOrNull { abs(value - selector(it)) }
+}
