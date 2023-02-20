@@ -9,6 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Tracks
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemSettingBinding
 import com.tanasi.sflix.databinding.ViewPlayerSettingsBinding
@@ -140,6 +141,96 @@ class PlayerSettingsView @JvmOverloads constructor(
         }
 
         override fun getItemCount() = settings.size
+    }
+
+
+    private class VideoTrackInformation(
+        val name: String,
+        val width: Int,
+        val height: Int,
+        val bitrate: Int,
+
+        val player: ExoPlayer,
+        val trackGroup: Tracks.Group,
+        val trackIndex: Int,
+    ) {
+        val isSelected: Boolean
+            get() = player.videoFormat?.bitrate == bitrate && trackGroup.isTrackSelected(trackIndex)
+    }
+
+    private class VideoTrackSelectionAdapter(
+        private val tracks: List<VideoTrackInformation>,
+    ) : RecyclerView.Adapter<SettingViewHolder>() {
+
+        lateinit var playerSettingsView: PlayerSettingsView
+        var selectedIndex = 0
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingViewHolder {
+            return SettingViewHolder(
+                ItemSettingBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+        }
+
+        override fun onBindViewHolder(holder: SettingViewHolder, position: Int) {
+            if (position == 0) {
+                holder.binding.root.setOnClickListener {
+                    selectedIndex = 0
+                    playerSettingsView.player?.let { player ->
+                        player.trackSelectionParameters = player.trackSelectionParameters
+                            .buildUpon()
+                            .setMaxVideoBitrate(Int.MAX_VALUE)
+                            .setForceHighestSupportedBitrate(false)
+                            .build()
+                    }
+                    playerSettingsView.hide()
+                }
+
+                holder.binding.ivSettingIcon.visibility = View.GONE
+
+                holder.binding.tvSettingMainText.text = when (selectedIndex) {
+                    0 -> "Auto • ${tracks.find { it.isSelected }?.height ?: 0}p"
+                    else -> "Auto"
+                }
+
+                holder.binding.tvSettingSubText.visibility = View.GONE
+
+                holder.binding.ivSettingCheck.visibility = when (selectedIndex) {
+                    0 -> View.VISIBLE
+                    else -> View.GONE
+                }
+            } else {
+                val track = tracks[position - 1]
+
+                holder.binding.root.setOnClickListener {
+                    selectedIndex = holder.bindingAdapterPosition
+                    playerSettingsView.player?.let { player ->
+                        player.trackSelectionParameters = player.trackSelectionParameters
+                            .buildUpon()
+                            .setMaxVideoBitrate(track.bitrate)
+                            .setForceHighestSupportedBitrate(true)
+                            .build()
+                    }
+                    playerSettingsView.hide()
+                }
+
+                holder.binding.ivSettingIcon.visibility = View.GONE
+
+                holder.binding.tvSettingMainText.text = "${track.height}p"
+
+                holder.binding.tvSettingSubText.visibility = View.GONE
+
+                holder.binding.ivSettingCheck.visibility = when (position) {
+                    selectedIndex -> View.VISIBLE
+                    else -> View.GONE
+                }
+            }
+        }
+
+        override fun getItemCount() = tracks.size + 1
     }
 
 
