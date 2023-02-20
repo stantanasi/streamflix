@@ -398,6 +398,56 @@ class PlayerSettingsView @JvmOverloads constructor(
     }
 
 
+    private class PlaybackSpeed(
+        val text: String,
+        val speed: Float,
+    ) {
+        var isSelected: Boolean = false
+    }
+
+    private class PlaybackSpeedAdapter(
+        private val playbackSpeeds: List<PlaybackSpeed>,
+    ) : RecyclerView.Adapter<SettingViewHolder?>() {
+
+        lateinit var playerSettingsView: PlayerSettingsView
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingViewHolder {
+            return SettingViewHolder(
+                ItemSettingBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+        }
+
+        override fun onBindViewHolder(holder: SettingViewHolder, position: Int) {
+            val playbackSpeed = playbackSpeeds[position]
+
+            holder.binding.root.setOnClickListener {
+                playerSettingsView.player?.let { player ->
+                    player.playbackParameters = player.playbackParameters
+                        .withSpeed(playbackSpeed.speed)
+                }
+                playerSettingsView.hide()
+            }
+
+            holder.binding.ivSettingIcon.visibility = View.GONE
+
+            holder.binding.tvSettingMainText.text = playbackSpeed.text
+
+            holder.binding.tvSettingSubText.visibility = View.GONE
+
+            holder.binding.ivSettingCheck.visibility = when {
+                playbackSpeed.isSelected -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+
+        override fun getItemCount() = playbackSpeeds.size
+    }
+
+
     private class SettingViewHolder(
         val binding: ItemSettingBinding,
     ) : RecyclerView.ViewHolder(binding.root)
