@@ -17,6 +17,7 @@ import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemSettingBinding
 import com.tanasi.sflix.databinding.ViewPlayerSettingsBinding
+import com.tanasi.sflix.utils.findClosest
 import com.tanasi.sflix.utils.trackFormats
 
 class PlayerSettingsView @JvmOverloads constructor(
@@ -38,6 +39,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         Setting.Main.adapter.playerSettingsView = this
         Setting.Quality.adapter.playerSettingsView = this
         Setting.Subtitle.adapter.playerSettingsView = this
+        Setting.Speed.adapter.playerSettingsView = this
     }
 
     fun onBackPressed() {
@@ -66,7 +68,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.Main -> Setting.Main.adapter
             Setting.Quality -> Setting.Quality.adapter
             Setting.Subtitle -> Setting.Subtitle.adapter
-            Setting.Speed -> TODO()
+            Setting.Speed -> Setting.Speed.adapter
         }
         binding.rvSettings.requestFocus()
     }
@@ -144,7 +146,27 @@ class PlayerSettingsView @JvmOverloads constructor(
             }
         }
 
-        object Speed : Setting()
+        object Speed : Setting() {
+            private val list = listOf(
+                PlaybackSpeed("0.25x", 0.25f),
+                PlaybackSpeed("0.5x", 0.5f),
+                PlaybackSpeed("0.75x", 0.75f),
+                PlaybackSpeed("Normal", 1f),
+                PlaybackSpeed("1.25x", 1.25f),
+                PlaybackSpeed("1.5x", 1.5f),
+                PlaybackSpeed("1.75x", 1.75f),
+                PlaybackSpeed("2x", 2f),
+            )
+            val adapter = PlaybackSpeedAdapter(list)
+
+            val selected: PlaybackSpeed?
+                get() = list.find { it.isSelected }
+
+            fun updateSelected(player: ExoPlayer) {
+                list.forEach { it.isSelected = false }
+                list.findClosest(player.playbackParameters.speed) { it.speed }?.isSelected = true
+            }
+        }
     }
 
 
@@ -208,6 +230,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         }
                     } ?: ""
                     Setting.Subtitle -> Setting.Subtitle.selected?.name ?: "Off"
+                    Setting.Speed -> Setting.Speed.selected?.text ?: ""
                     else -> ""
                 }
                 visibility = when (text) {
