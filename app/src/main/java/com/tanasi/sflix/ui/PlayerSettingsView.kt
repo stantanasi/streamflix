@@ -5,7 +5,9 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.ExoPlayer
+import com.tanasi.sflix.databinding.ItemSettingBinding
 import com.tanasi.sflix.databinding.ViewPlayerSettingsBinding
 
 class PlayerSettingsView @JvmOverloads constructor(
@@ -61,4 +63,9 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         object Speed : Setting()
     }
+
+
+    private class SettingViewHolder(
+        val binding: ItemSettingBinding,
+    ) : RecyclerView.ViewHolder(binding.root)
 }
