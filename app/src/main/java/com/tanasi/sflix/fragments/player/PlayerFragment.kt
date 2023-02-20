@@ -174,6 +174,10 @@ class PlayerFragment : Fragment() {
         binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
 
         binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10 * 1000)
+
+        binding.pvPlayer.controller.exoSettings.setOnClickListener {
+            binding.settings.show()
+        }
     }
 
     private fun displayVideo(video: Video) {
@@ -196,6 +200,17 @@ class PlayerFragment : Fragment() {
                 })
                 .build()
         )
+
+        player.addListener(object : Player.Listener {
+            override fun onEvents(player: Player, events: Player.Events) {
+                if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
+                    binding.pvPlayer.controller.exoSettings.apply {
+                        isEnabled = true
+                        alpha = 1.0F
+                    }
+                }
+            }
+        })
 
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
