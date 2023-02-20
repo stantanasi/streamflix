@@ -32,6 +32,13 @@ class PlayerSettingsView @JvmOverloads constructor(
         Setting.Main.adapter.playerSettingsView = this
     }
 
+    fun onBackPressed() {
+        when (binding.rvSettings.adapter) {
+            is SettingsAdapter -> hide()
+            else -> displaySetting(Setting.Main)
+        }
+    }
+
 
     fun show() {
         this.visibility = View.VISIBLE
