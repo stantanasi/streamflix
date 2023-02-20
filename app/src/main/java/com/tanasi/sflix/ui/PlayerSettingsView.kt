@@ -278,6 +278,91 @@ class PlayerSettingsView @JvmOverloads constructor(
     }
 
 
+    private class TextTrackInformation(
+        val name: String,
+
+        val trackGroup: Tracks.Group,
+        val trackIndex: Int,
+    ) {
+        val isSelected: Boolean
+            get() = trackGroup.isTrackSelected(trackIndex)
+    }
+
+    private class TextTrackSelectionAdapter(
+        private val tracks: List<TextTrackInformation>,
+    ) : RecyclerView.Adapter<SettingViewHolder>() {
+
+        lateinit var playerSettingsView: PlayerSettingsView
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingViewHolder {
+            return SettingViewHolder(
+                ItemSettingBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+        }
+
+        override fun onBindViewHolder(holder: SettingViewHolder, position: Int) {
+            if (position == 0) {
+                holder.binding.root.setOnClickListener {
+                    playerSettingsView.player?.let { player ->
+                        player.trackSelectionParameters = player.trackSelectionParameters
+                            .buildUpon()
+                            .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                            .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
+                            .build()
+                    }
+                    playerSettingsView.hide()
+                }
+
+                holder.binding.ivSettingIcon.visibility = View.GONE
+
+                holder.binding.tvSettingMainText.text = "Off"
+
+                holder.binding.tvSettingSubText.visibility = View.GONE
+
+                holder.binding.ivSettingCheck.visibility = when {
+                    !tracks.any { it.isSelected } -> View.VISIBLE
+                    else -> View.GONE
+                }
+            } else {
+                val track = tracks[position - 1]
+
+                holder.binding.root.setOnClickListener {
+                    playerSettingsView.player?.let { player ->
+                        player.trackSelectionParameters = player.trackSelectionParameters
+                            .buildUpon()
+                            .setOverrideForType(
+                                TrackSelectionOverride(
+                                    track.trackGroup.mediaTrackGroup,
+                                    listOf(track.trackIndex)
+                                )
+                            )
+                            .setTrackTypeDisabled(track.trackGroup.type, false)
+                            .build()
+                    }
+                    playerSettingsView.hide()
+                }
+
+                holder.binding.ivSettingIcon.visibility = View.GONE
+
+                holder.binding.tvSettingMainText.text = track.name
+
+                holder.binding.tvSettingSubText.visibility = View.GONE
+
+                holder.binding.ivSettingCheck.visibility = when {
+                    track.isSelected -> View.VISIBLE
+                    else -> View.GONE
+                }
+            }
+        }
+
+        override fun getItemCount() = tracks.size + 1
+    }
+
+
     private class SettingViewHolder(
         val binding: ItemSettingBinding,
     ) : RecyclerView.ViewHolder(binding.root)
