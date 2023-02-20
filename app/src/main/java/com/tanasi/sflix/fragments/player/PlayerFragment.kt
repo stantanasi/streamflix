@@ -220,11 +220,7 @@ class PlayerFragment : Fragment() {
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 binding.pvPlayer.keepScreenOn = isPlaying
-            }
-        })
 
-        player.addListener(object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
                 if (!isPlaying) {
                     val program = requireContext().contentResolver.query(
                         TvContractCompat.WatchNextPrograms.CONTENT_URI,
@@ -263,7 +259,12 @@ class PlayerFragment : Fragment() {
                                             .setEpisodeTitle(videoType.title)
                                             .setSeasonNumber(videoType.season.number)
                                             .setSeasonTitle(videoType.season.title)
-                                            .setPosterArtUri(Uri.parse(videoType.tvShow.poster ?: videoType.tvShow.banner))
+                                            .setPosterArtUri(
+                                                Uri.parse(
+                                                    videoType.tvShow.poster
+                                                        ?: videoType.tvShow.banner
+                                                )
+                                            )
                                     }
                                 }
 
