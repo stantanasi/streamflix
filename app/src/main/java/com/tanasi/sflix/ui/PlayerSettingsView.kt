@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
@@ -33,6 +34,24 @@ class PlayerSettingsView @JvmOverloads constructor(
     )
 
     var player: ExoPlayer? = null
+        set(value) {
+            if (field === value) return
+
+            value?.addListener(object : Player.Listener {
+                override fun onEvents(player: Player, events: Player.Events) {
+                    if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
+                        Setting.Quality.init(value, resources)
+                        Setting.Subtitle.init(value, resources)
+                    }
+                    if (events.contains(Player.EVENT_PLAYBACK_PARAMETERS_CHANGED)) {
+                        Setting.Speed.updateSelected(value)
+                    }
+                }
+            })
+            value?.let { Setting.Speed.updateSelected(it) }
+
+            field = value
+        }
 
 
     init {
