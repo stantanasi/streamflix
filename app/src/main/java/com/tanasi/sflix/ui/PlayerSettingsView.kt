@@ -2,6 +2,7 @@ package com.tanasi.sflix.ui
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -265,7 +266,13 @@ class PlayerSettingsView @JvmOverloads constructor(
                 }
             }
 
-            holder.binding.ivSettingCheck.visibility = View.GONE
+            holder.binding.ivSettingCheck.apply {
+                setColorFilter(Color.parseColor("#808080"))
+                setImageDrawable(
+                    ContextCompat.getDrawable(context, R.drawable.ic_setting_arrow_right)
+                )
+                visibility = View.VISIBLE
+            }
         }
 
         override fun getItemCount() = settings.size
