@@ -4,9 +4,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.ExoPlayer
+import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemSettingBinding
 import com.tanasi.sflix.databinding.ViewPlayerSettingsBinding
 
@@ -62,6 +65,67 @@ class PlayerSettingsView @JvmOverloads constructor(
         object Subtitle : Setting()
 
         object Speed : Setting()
+    }
+
+
+    private class SettingsAdapter(
+        private val settings: List<Setting>,
+    ) : RecyclerView.Adapter<SettingViewHolder>() {
+
+        lateinit var playerSettingsView: PlayerSettingsView
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SettingViewHolder {
+            return SettingViewHolder(
+                ItemSettingBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+        }
+
+        override fun onBindViewHolder(holder: SettingViewHolder, position: Int) {
+            val setting = settings[position]
+
+            holder.binding.root.setOnClickListener {
+                playerSettingsView.displaySetting(setting)
+            }
+
+            holder.binding.ivSettingIcon.apply {
+                when (setting) {
+                    Setting.Quality -> setImageDrawable(
+                        ContextCompat.getDrawable(context, R.drawable.ic_settings_quality)
+                    )
+                    Setting.Subtitle -> setImageDrawable(
+                        ContextCompat.getDrawable(context, R.drawable.ic_settings_subtitle_off)
+                    )
+                    Setting.Speed -> setImageDrawable(
+                        ContextCompat.getDrawable(context, R.drawable.ic_settings_playback_speed)
+                    )
+                    else -> {}
+                }
+                visibility = View.VISIBLE
+            }
+
+            holder.binding.tvSettingMainText.text = when (setting) {
+                Setting.Quality -> "Quality"
+                Setting.Subtitle -> "Captions"
+                Setting.Speed -> "Speed"
+                else -> ""
+            }
+
+            holder.binding.tvSettingSubText.apply {
+                text = ""
+                visibility = when (text) {
+                    "" -> View.GONE
+                    else -> View.VISIBLE
+                }
+            }
+
+            holder.binding.ivSettingCheck.visibility = View.GONE
+        }
+
+        override fun getItemCount() = settings.size
     }
 
 
