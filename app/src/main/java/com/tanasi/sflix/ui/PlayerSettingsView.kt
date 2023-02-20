@@ -84,11 +84,13 @@ class PlayerSettingsView @JvmOverloads constructor(
     }
 
     private fun displaySetting(setting: Setting) {
-        binding.tvSettingsHeader.text = when (setting) {
-            Setting.Main -> "Settings"
-            Setting.Quality -> "Quality for current video"
-            Setting.Subtitle -> "Subtitles/closed captions"
-            Setting.Speed -> "Video speed"
+        binding.tvSettingsHeader.apply {
+            text = when (setting) {
+                Setting.Main -> context.getString(R.string.player_settings_title)
+                Setting.Quality -> context.getString(R.string.player_settings_quality_title)
+                Setting.Subtitle -> context.getString(R.string.player_settings_subtitles_title)
+                Setting.Speed -> context.getString(R.string.player_settings_speed_title)
+            }
         }
 
         binding.rvSettings.adapter = when (setting) {
@@ -175,14 +177,14 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         object Speed : Setting() {
             private val list = listOf(
-                PlaybackSpeed("0.25x", 0.25f),
-                PlaybackSpeed("0.5x", 0.5f),
-                PlaybackSpeed("0.75x", 0.75f),
-                PlaybackSpeed("Normal", 1f),
-                PlaybackSpeed("1.25x", 1.25f),
-                PlaybackSpeed("1.5x", 1.5f),
-                PlaybackSpeed("1.75x", 1.75f),
-                PlaybackSpeed("2x", 2f),
+                PlaybackSpeed(R.string.player_settings_speed_0_25, 0.25F),
+                PlaybackSpeed(R.string.player_settings_speed_0_5, 0.5F),
+                PlaybackSpeed(R.string.player_settings_speed_0_75, 0.75F),
+                PlaybackSpeed(R.string.player_settings_speed_1, 1F),
+                PlaybackSpeed(R.string.player_settings_speed_1_25, 1.25F),
+                PlaybackSpeed(R.string.player_settings_speed_1_5, 1.5F),
+                PlaybackSpeed(R.string.player_settings_speed_1_75, 1.75F),
+                PlaybackSpeed(R.string.player_settings_speed_2, 2F),
             )
             val adapter = PlaybackSpeedAdapter(list)
 
@@ -241,27 +243,35 @@ class PlayerSettingsView @JvmOverloads constructor(
                 visibility = View.VISIBLE
             }
 
-            holder.binding.tvSettingMainText.text = when (setting) {
-                Setting.Quality -> "Quality"
-                Setting.Subtitle -> "Captions"
-                Setting.Speed -> "Speed"
-                else -> ""
+            holder.binding.tvSettingMainText.apply {
+                text = when (setting) {
+                    Setting.Quality -> context.getString(R.string.player_settings_quality_label)
+                    Setting.Subtitle -> context.getString(R.string.player_settings_subtitles_label)
+                    Setting.Speed -> context.getString(R.string.player_settings_speed_label)
+                    else -> ""
+                }
             }
 
             holder.binding.tvSettingSubText.apply {
                 text = when (setting) {
                     Setting.Quality -> Setting.Quality.selected?.let {
                         when (Setting.Quality.adapter.selectedIndex) {
-                            0 -> "Auto (${it.height}p)"
-                            else -> "${it.height}p"
+                            0 -> context.getString(
+                                R.string.player_settings_quality_sub_label_auto,
+                                it.height
+                            )
+                            else -> context.getString(R.string.player_settings_quality, it.height)
                         }
                     } ?: ""
-                    Setting.Subtitle -> Setting.Subtitle.selected?.name ?: "Off"
-                    Setting.Speed -> Setting.Speed.selected?.text ?: ""
+                    Setting.Subtitle -> Setting.Subtitle.selected?.name
+                        ?: context.getString(R.string.player_settings_subtitles_off)
+                    Setting.Speed -> Setting.Speed.selected?.let {
+                        context.getString(it.stringId)
+                    } ?: ""
                     else -> ""
                 }
-                visibility = when (text) {
-                    "" -> View.GONE
+                visibility = when {
+                    text.isEmpty() -> View.GONE
                     else -> View.VISIBLE
                 }
             }
@@ -326,9 +336,16 @@ class PlayerSettingsView @JvmOverloads constructor(
 
                 holder.binding.ivSettingIcon.visibility = View.GONE
 
-                holder.binding.tvSettingMainText.text = when (selectedIndex) {
-                    0 -> "Auto • ${Setting.Quality.selected?.height ?: 0}p"
-                    else -> "Auto"
+                holder.binding.tvSettingMainText.apply {
+                    text = when (selectedIndex) {
+                        0 -> Setting.Quality.selected?.let {
+                            context.getString(
+                                R.string.player_settings_quality_auto_selected,
+                                it.height
+                            )
+                        } ?: context.getString(R.string.player_settings_quality_auto)
+                        else -> context.getString(R.string.player_settings_quality_auto)
+                    }
                 }
 
                 holder.binding.tvSettingSubText.visibility = View.GONE
@@ -354,7 +371,9 @@ class PlayerSettingsView @JvmOverloads constructor(
 
                 holder.binding.ivSettingIcon.visibility = View.GONE
 
-                holder.binding.tvSettingMainText.text = "${track.height}p"
+                holder.binding.tvSettingMainText.apply {
+                    text = context.getString(R.string.player_settings_quality, track.height)
+                }
 
                 holder.binding.tvSettingSubText.visibility = View.GONE
 
@@ -410,7 +429,9 @@ class PlayerSettingsView @JvmOverloads constructor(
 
                 holder.binding.ivSettingIcon.visibility = View.GONE
 
-                holder.binding.tvSettingMainText.text = "Off"
+                holder.binding.tvSettingMainText.apply {
+                    text = context.getString(R.string.player_settings_subtitles_off)
+                }
 
                 holder.binding.tvSettingSubText.visibility = View.GONE
 
@@ -455,7 +476,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
 
     private class PlaybackSpeed(
-        val text: String,
+        val stringId: Int,
         val speed: Float,
     ) {
         var isSelected: Boolean = false
@@ -490,7 +511,9 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             holder.binding.ivSettingIcon.visibility = View.GONE
 
-            holder.binding.tvSettingMainText.text = playbackSpeed.text
+            holder.binding.tvSettingMainText.apply {
+                text = context.getString(playbackSpeed.stringId)
+            }
 
             holder.binding.tvSettingSubText.visibility = View.GONE
 

@@ -36,4 +36,24 @@
     <string name="seasons_episode_number">Episode %d</string>
 
     <string name="video_tv_show_subtitle">S%d E%d • %s</string>
+    <string name="player_settings_title">Settings</string>
+    <string name="player_settings_quality_title">Quality for current video</string>
+    <string name="player_settings_quality_label">Quality</string>
+    <string name="player_settings_quality_sub_label_auto">Auto (%dp)</string>
+    <string name="player_settings_quality_auto">Auto</string>
+    <string name="player_settings_quality_auto_selected">Auto • %dp</string>
+    <string name="player_settings_quality">%dp</string>
+    <string name="player_settings_subtitles_title">Subtitles/closed captions</string>
+    <string name="player_settings_subtitles_label">Captions</string>
+    <string name="player_settings_subtitles_off">Off</string>
+    <string name="player_settings_speed_title">Video speed</string>
+    <string name="player_settings_speed_label">Speed</string>
+    <string name="player_settings_speed_0_25">× 0.25</string>
+    <string name="player_settings_speed_0_5">× 0.5</string>
+    <string name="player_settings_speed_0_75">× 0.75</string>
+    <string name="player_settings_speed_1">Normal</string>
+    <string name="player_settings_speed_1_25">× 1.25</string>
+    <string name="player_settings_speed_1_5">× 1.5</string>
+    <string name="player_settings_speed_1_75">× 1.75</string>
+    <string name="player_settings_speed_2">× 2</string>
 </resources>
