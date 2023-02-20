@@ -30,4 +30,16 @@ class PlayerSettingsView @JvmOverloads constructor(
     fun hide() {
         this.visibility = View.GONE
     }
+
+
+    private sealed class Setting {
+
+        object Main : Setting()
+
+        object Quality : Setting()
+
+        object Subtitle : Setting()
+
+        object Speed : Setting()
+    }
 }
