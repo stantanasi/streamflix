@@ -28,6 +28,11 @@ class PlayerSettingsView @JvmOverloads constructor(
     var player: ExoPlayer? = null
 
 
+    init {
+        Setting.Main.adapter.playerSettingsView = this
+    }
+
+
     fun show() {
         this.visibility = View.VISIBLE
 
@@ -43,7 +48,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         }
 
         binding.rvSettings.adapter = when (setting) {
-            Setting.Main -> TODO()
+            Setting.Main -> Setting.Main.adapter
             Setting.Quality -> TODO()
             Setting.Subtitle -> TODO()
             Setting.Speed -> TODO()
@@ -58,7 +63,9 @@ class PlayerSettingsView @JvmOverloads constructor(
 
     private sealed class Setting {
 
-        object Main : Setting()
+        object Main : Setting() {
+            val adapter = SettingsAdapter(listOf(Quality, Subtitle, Speed))
+        }
 
         object Quality : Setting()
 
