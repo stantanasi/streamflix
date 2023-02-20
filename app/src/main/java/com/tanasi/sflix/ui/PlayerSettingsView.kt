@@ -68,6 +68,13 @@ class PlayerSettingsView @JvmOverloads constructor(
         }
     }
 
+    override fun focusSearch(focused: View, direction: Int): View {
+        return when {
+            binding.rvSettings.hasFocus() -> focused
+            else -> super.focusSearch(focused, direction)
+        }
+    }
+
 
     fun show() {
         this.visibility = View.VISIBLE
