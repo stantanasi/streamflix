@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Tracks
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemSettingBinding
@@ -36,6 +37,7 @@ class PlayerSettingsView @JvmOverloads constructor(
     init {
         Setting.Main.adapter.playerSettingsView = this
         Setting.Quality.adapter.playerSettingsView = this
+        Setting.Subtitle.adapter.playerSettingsView = this
     }
 
     fun onBackPressed() {
@@ -63,7 +65,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         binding.rvSettings.adapter = when (setting) {
             Setting.Main -> Setting.Main.adapter
             Setting.Quality -> Setting.Quality.adapter
-            Setting.Subtitle -> TODO()
+            Setting.Subtitle -> Setting.Subtitle.adapter
             Setting.Speed -> TODO()
         }
         binding.rvSettings.requestFocus()
@@ -113,7 +115,34 @@ class PlayerSettingsView @JvmOverloads constructor(
             }
         }
 
-        object Subtitle : Setting()
+        object Subtitle : Setting() {
+            private val list = mutableListOf<TextTrackInformation>()
+            val adapter = TextTrackSelectionAdapter(list)
+
+            val selected: TextTrackInformation?
+                get() = list.find { it.isSelected }
+
+            fun init(player: ExoPlayer, resources: Resources) {
+                list.clear()
+                list.addAll(
+                    player.currentTracks.groups
+                        .filter { it.type == C.TRACK_TYPE_TEXT }
+                        .flatMap { trackGroup ->
+                            trackGroup.trackFormats
+                                .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
+                                .mapIndexed { trackIndex, trackFormat ->
+                                    TextTrackInformation(
+                                        name = DefaultTrackNameProvider(resources)
+                                            .getTrackName(trackFormat),
+
+                                        trackGroup = trackGroup,
+                                        trackIndex = trackIndex,
+                                    )
+                                }
+                        }
+                )
+            }
+        }
 
         object Speed : Setting()
     }
@@ -148,7 +177,12 @@ class PlayerSettingsView @JvmOverloads constructor(
                         ContextCompat.getDrawable(context, R.drawable.ic_settings_quality)
                     )
                     Setting.Subtitle -> setImageDrawable(
-                        ContextCompat.getDrawable(context, R.drawable.ic_settings_subtitle_off)
+                        ContextCompat.getDrawable(
+                            context, when (Setting.Subtitle.selected) {
+                                null -> R.drawable.ic_settings_subtitle_off
+                                else -> R.drawable.ic_settings_subtitle_on
+                            }
+                        )
                     )
                     Setting.Speed -> setImageDrawable(
                         ContextCompat.getDrawable(context, R.drawable.ic_settings_playback_speed)
@@ -173,6 +207,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                             else -> "${it.height}p"
                         }
                     } ?: ""
+                    Setting.Subtitle -> Setting.Subtitle.selected?.name ?: "Off"
                     else -> ""
                 }
                 visibility = when (text) {
@@ -323,8 +358,8 @@ class PlayerSettingsView @JvmOverloads constructor(
 
                 holder.binding.tvSettingSubText.visibility = View.GONE
 
-                holder.binding.ivSettingCheck.visibility = when {
-                    !tracks.any { it.isSelected } -> View.VISIBLE
+                holder.binding.ivSettingCheck.visibility = when (Setting.Subtitle.selected) {
+                    null -> View.VISIBLE
                     else -> View.GONE
                 }
             } else {
