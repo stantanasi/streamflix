@@ -1,6 +1,7 @@
 package com.tanasi.sflix.ui
 
 import android.content.Context
+import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -8,11 +9,14 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Tracks
+import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemSettingBinding
 import com.tanasi.sflix.databinding.ViewPlayerSettingsBinding
+import com.tanasi.sflix.utils.trackFormats
 
 class PlayerSettingsView @JvmOverloads constructor(
     context: Context,
@@ -31,6 +35,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
     init {
         Setting.Main.adapter.playerSettingsView = this
+        Setting.Quality.adapter.playerSettingsView = this
     }
 
     fun onBackPressed() {
@@ -57,7 +62,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         binding.rvSettings.adapter = when (setting) {
             Setting.Main -> Setting.Main.adapter
-            Setting.Quality -> TODO()
+            Setting.Quality -> Setting.Quality.adapter
             Setting.Subtitle -> TODO()
             Setting.Speed -> TODO()
         }
@@ -75,7 +80,38 @@ class PlayerSettingsView @JvmOverloads constructor(
             val adapter = SettingsAdapter(listOf(Quality, Subtitle, Speed))
         }
 
-        object Quality : Setting()
+        object Quality : Setting() {
+            private val list = mutableListOf<VideoTrackInformation>()
+            val adapter = VideoTrackSelectionAdapter(list)
+
+            val selected: VideoTrackInformation?
+                get() = list.find { it.isSelected }
+
+            fun init(player: ExoPlayer, resources: Resources) {
+                list.clear()
+                list.addAll(
+                    player.currentTracks.groups
+                        .filter { it.type == C.TRACK_TYPE_VIDEO }
+                        .flatMap { trackGroup ->
+                            trackGroup.trackFormats
+                                .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
+                                .mapIndexed { trackIndex, trackFormat ->
+                                    VideoTrackInformation(
+                                        name = DefaultTrackNameProvider(resources)
+                                            .getTrackName(trackFormat),
+                                        width = trackFormat.width,
+                                        height = trackFormat.height,
+                                        bitrate = trackFormat.bitrate,
+
+                                        player = player,
+                                        trackGroup = trackGroup,
+                                        trackIndex = trackIndex,
+                                    )
+                                }
+                        }
+                )
+            }
+        }
 
         object Subtitle : Setting()
 
@@ -130,7 +166,15 @@ class PlayerSettingsView @JvmOverloads constructor(
             }
 
             holder.binding.tvSettingSubText.apply {
-                text = ""
+                text = when (setting) {
+                    Setting.Quality -> Setting.Quality.selected?.let {
+                        when (Setting.Quality.adapter.selectedIndex) {
+                            0 -> "Auto (${it.height}p)"
+                            else -> "${it.height}p"
+                        }
+                    } ?: ""
+                    else -> ""
+                }
                 visibility = when (text) {
                     "" -> View.GONE
                     else -> View.VISIBLE
@@ -192,7 +236,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 holder.binding.ivSettingIcon.visibility = View.GONE
 
                 holder.binding.tvSettingMainText.text = when (selectedIndex) {
-                    0 -> "Auto • ${tracks.find { it.isSelected }?.height ?: 0}p"
+                    0 -> "Auto • ${Setting.Quality.selected?.height ?: 0}p"
                     else -> "Auto"
                 }
 
