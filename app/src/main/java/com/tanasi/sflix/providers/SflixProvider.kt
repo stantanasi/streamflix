@@ -14,7 +14,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import java.lang.Integer.min
 import java.lang.reflect.Type
-import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import javax.crypto.Cipher

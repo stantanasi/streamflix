@@ -112,7 +112,10 @@ class VhEpisode(
             }
         }
 
-        binding.tvEpisodeInfo.text = context.getString(R.string.seasons_episode_number, episode.number)
+        binding.tvEpisodeInfo.text = context.getString(
+            R.string.seasons_episode_number,
+            episode.number
+        )
 
         binding.tvEpisodeTitle.text = episode.title
     }
@@ -190,6 +193,11 @@ class VhEpisode(
 
         binding.tvEpisodeTvShowTitle.text = episode.tvShow?.title ?: ""
 
-        binding.tvEpisodeInfo.text = context.getString(R.string.episode_item_info, episode.season?.number ?: 0, episode.number, episode.title)
+        binding.tvEpisodeInfo.text = context.getString(
+            R.string.episode_item_info,
+            episode.season?.number ?: 0,
+            episode.number,
+            episode.title
+        )
     }
 }

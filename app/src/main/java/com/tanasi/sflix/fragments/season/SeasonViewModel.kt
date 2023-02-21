@@ -17,7 +17,7 @@ class SeasonViewModel : ViewModel() {
     sealed class State {
         object LoadingEpisodes : State()
 
-        data class SuccessLoadingEpisodes(val seasonId: String, val episodes: List<Episode>) : State()
+        data class SuccessLoadingEpisodes(val episodes: List<Episode>) : State()
         data class FailedLoadingEpisodes(val error: Exception) : State()
     }
 
@@ -28,7 +28,7 @@ class SeasonViewModel : ViewModel() {
         try {
             val episodes = AppPreferences.currentProvider.getSeasonEpisodes(seasonId)
 
-            _state.postValue(State.SuccessLoadingEpisodes(seasonId, episodes))
+            _state.postValue(State.SuccessLoadingEpisodes(episodes))
         } catch (e: Exception) {
             _state.postValue(State.FailedLoadingEpisodes(e))
         }
