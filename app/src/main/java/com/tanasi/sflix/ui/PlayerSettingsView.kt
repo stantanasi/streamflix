@@ -128,6 +128,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         .flatMap { trackGroup ->
                             trackGroup.trackFormats
                                 .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
+                                .distinctBy { it.width to it.height }
                                 .mapIndexed { trackIndex, trackFormat ->
                                     VideoTrackInformation(
                                         name = DefaultTrackNameProvider(resources)
@@ -142,6 +143,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                     )
                                 }
                         }
+                        .sortedByDescending { it.height }
                 )
             }
         }
@@ -172,6 +174,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                     )
                                 }
                         }
+                        .sortedBy { it.name }
                 )
             }
         }
