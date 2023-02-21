@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -138,7 +139,11 @@ class PlayerFragment : Fragment() {
         mediaSession.release()
     }
 
-    fun onBackPressed() = when {
+    fun onBackPressed(): Boolean = when {
+        binding.settings.isVisible -> {
+            binding.settings.onBackPressed()
+            true
+        }
         binding.pvPlayer.isControllerVisible -> {
             binding.pvPlayer.hideController()
             true
@@ -167,12 +172,17 @@ class PlayerFragment : Fragment() {
 
 
         binding.pvPlayer.player = player
+        binding.settings.player = player
 
         binding.pvPlayer.controller.tvExoTitle.text = args.title
 
         binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
 
         binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10 * 1000)
+
+        binding.pvPlayer.controller.exoSettings.setOnClickListener {
+            binding.settings.show()
+        }
     }
 
     private fun displayVideo(video: Video) {
@@ -197,13 +207,20 @@ class PlayerFragment : Fragment() {
         )
 
         player.addListener(object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                binding.pvPlayer.keepScreenOn = isPlaying
+            override fun onEvents(player: Player, events: Player.Events) {
+                if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
+                    binding.pvPlayer.controller.exoSettings.apply {
+                        isEnabled = true
+                        alpha = 1.0F
+                    }
+                }
             }
         })
 
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
+                binding.pvPlayer.keepScreenOn = isPlaying
+
                 if (!isPlaying) {
                     val program = requireContext().contentResolver.query(
                         TvContractCompat.WatchNextPrograms.CONTENT_URI,
@@ -242,7 +259,12 @@ class PlayerFragment : Fragment() {
                                             .setEpisodeTitle(videoType.title)
                                             .setSeasonNumber(videoType.season.number)
                                             .setSeasonTitle(videoType.season.title)
-                                            .setPosterArtUri(Uri.parse(videoType.tvShow.poster ?: videoType.tvShow.banner))
+                                            .setPosterArtUri(
+                                                Uri.parse(
+                                                    videoType.tvShow.poster
+                                                        ?: videoType.tvShow.banner
+                                                )
+                                            )
                                     }
                                 }
 

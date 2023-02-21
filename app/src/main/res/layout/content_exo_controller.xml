@@ -51,6 +51,7 @@
         android:background="@drawable/bg_btn_exoplayer"
         android:nextFocusLeft="@id/exo_play_pause"
         android:nextFocusRight="@id/exo_play_pause"
+        android:nextFocusDown="@id/exo_progress"
         android:padding="2dp"
         android:src="@drawable/exo_styled_controls_play"
         android:tint="#FFFFFF"
@@ -121,15 +122,17 @@
             tools:text="00:00:00" />
 
         <ImageView
-            android:id="@id/exo_subtitle"
+            android:id="@id/exo_settings"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginTop="7dp"
             android:layout_marginBottom="7dp"
+            android:alpha="0.33"
             android:background="@drawable/bg_btn_exoplayer"
-            android:nextFocusLeft="@id/exo_subtitle"
+            android:enabled="false"
+            android:nextFocusLeft="@id/exo_settings"
             android:padding="12dp"
-            android:src="@drawable/exo_styled_controls_subtitle_off"
+            android:src="@drawable/exo_styled_controls_settings"
             android:tint="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

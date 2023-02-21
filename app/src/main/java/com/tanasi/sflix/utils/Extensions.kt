@@ -8,10 +8,13 @@ import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
+import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.Tracks
 import com.tanasi.sflix.R
 import com.tanasi.sflix.activities.MainActivity
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.abs
 
 fun String.toCalendar(): Calendar? {
     val patterns = listOf(
@@ -76,4 +79,20 @@ fun <T> Cursor.map(transform: (Cursor) -> T): List<T> {
     }
     this.close()
     return items.toList()
+}
+
+val Tracks.Group.trackFormats: List<Format>
+    get() {
+        val trackFormats = mutableListOf<Format>()
+        for (trackIndex in 0 until this.length) {
+            if (!this.isTrackSupported(trackIndex)) {
+                continue
+            }
+            trackFormats.add(this.getTrackFormat(trackIndex))
+        }
+        return trackFormats
+    }
+
+fun <T> List<T>.findClosest(value: Float, selector: (T) -> Float): T? {
+    return minByOrNull { abs(value - selector(it)) }
 }
