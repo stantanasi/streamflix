@@ -35,7 +35,7 @@
 
     <string name="seasons_episode_number">Episode %d</string>
 
-    <string name="video_tv_show_subtitle">S%d E%d • %s</string>
+    <string name="player_subtitle_tv_show">S%d E%d • %s</string>
     <string name="player_settings_title">Settings</string>
     <string name="player_settings_quality_title">Quality for current video</string>
     <string name="player_settings_quality_label">Quality</string>

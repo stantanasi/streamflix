@@ -50,7 +50,7 @@ class VhEpisode(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
                         subtitle = context.getString(
-                            R.string.video_tv_show_subtitle,
+                            R.string.player_subtitle_tv_show,
                             episode.season?.number ?: 0,
                             episode.number,
                             episode.title
