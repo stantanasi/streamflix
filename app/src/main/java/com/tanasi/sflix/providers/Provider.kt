@@ -5,8 +5,9 @@ import com.tanasi.sflix.models.*
 
 interface Provider {
 
-    var name: String
-    var logo: String
+    val name: String
+    val logo: String
+    val url: String
 
 
     suspend fun getHome(): List<Category>

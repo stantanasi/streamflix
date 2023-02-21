@@ -15,8 +15,9 @@ import retrofit2.http.Url
 
 object AllMoviesForYouProvider : Provider {
 
-    override var name = "AllMoviesForYou"
-    override var logo = "https://i0.wp.com/allmoviesforyou.net/wp-content/uploads/2021/04/cropped-cropped-allmoviesforyou-logo-header-HD.png?w=800&ssl=1"
+    override val name = "AllMoviesForYou"
+    override val logo = "https://i0.wp.com/allmoviesforyou.net/wp-content/uploads/2021/04/cropped-cropped-allmoviesforyou-logo-header-HD.png?w=800&ssl=1"
+    override val url = "https://allmoviesforyou.net/"
 
     private val service = AllMoviesForYouService.build()
 
@@ -760,7 +761,7 @@ object AllMoviesForYouProvider : Provider {
         companion object {
             fun build(): AllMoviesForYouService {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("https://allmoviesforyou.net/")
+                    .baseUrl(url)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .build()
 

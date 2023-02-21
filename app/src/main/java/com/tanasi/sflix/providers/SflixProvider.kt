@@ -23,8 +23,9 @@ import javax.crypto.spec.SecretKeySpec
 
 object SflixProvider : Provider {
 
-    override var name = "SFlix"
-    override var logo = "https://img.sflix.to/xxrz/400x400/100/66/35/66356c25ce98cb12993249e21742b129/66356c25ce98cb12993249e21742b129.png"
+    override val name = "SFlix"
+    override val logo = "https://img.sflix.to/xxrz/400x400/100/66/35/66356c25ce98cb12993249e21742b129/66356c25ce98cb12993249e21742b129.png"
+    override val url = "https://sflix.to/"
 
     private val service = SflixService.build()
 
@@ -704,7 +705,7 @@ object SflixProvider : Provider {
         companion object {
             fun build(): SflixService {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("https://sflix.to/")
+                    .baseUrl(url)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(
                         GsonConverterFactory.create(
