@@ -61,7 +61,9 @@ class TvShowsFragment : Fragment() {
     private fun initializeTvShows() {
         binding.vgvTvShows.apply {
             adapter = sflixAdapter
-            setItemSpacing(requireContext().resources.getDimension(R.dimen.tv_shows_spacing).toInt())
+            setItemSpacing(
+                requireContext().resources.getDimension(R.dimen.tv_shows_spacing).toInt()
+            )
         }
     }
 

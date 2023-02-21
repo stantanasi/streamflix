@@ -35,7 +35,8 @@ body:
       description: What version of our app are you running?
       multiple: false
       options:
-        - v1.2.1 (Latest)
+        - v1.3.0 (Latest)
+        - v1.2.1
         - v1.2.0
         - v1.1.0
         - v1.0.0

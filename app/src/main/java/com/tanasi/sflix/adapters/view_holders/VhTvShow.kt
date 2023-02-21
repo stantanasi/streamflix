@@ -104,7 +104,11 @@ class VhTvShow(
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
-                context.getString(R.string.tv_show_item_season_number_episode_number, season.number, episode.number)
+                context.getString(
+                    R.string.tv_show_item_season_number_episode_number,
+                    season.number,
+                    episode.number
+                )
             }
         } ?: context.getString(R.string.tv_show_item_type)
 
@@ -146,7 +150,11 @@ class VhTvShow(
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
-                context.getString(R.string.tv_show_item_season_number_episode_number, season.number, episode.number)
+                context.getString(
+                    R.string.tv_show_item_season_number_episode_number,
+                    season.number,
+                    episode.number
+                )
             }
         } ?: context.getString(R.string.tv_show_item_type)
 
@@ -171,7 +179,11 @@ class VhTvShow(
             val hours = it / 60
             val minutes = it % 60
             when {
-                hours > 0 -> context.getString(R.string.tv_show_runtime_hours_minutes, hours, minutes)
+                hours > 0 -> context.getString(
+                    R.string.tv_show_runtime_hours_minutes,
+                    hours,
+                    minutes
+                )
                 else -> context.getString(R.string.tv_show_runtime_minutes, minutes)
             }
         } ?: context.getString(R.string.tv_show_runtime_minutes, 0)
