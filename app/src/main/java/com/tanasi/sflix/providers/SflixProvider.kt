@@ -654,9 +654,7 @@ object SflixProvider : Provider {
             val sources = when (response) {
                 is SflixService.Sources -> response
                 is SflixService.Sources.Encrypted -> response.decrypt(
-                    secret = service.getSourceEncryptedKey(
-                        domain = URI(link.link).host.substringBefore("."),
-                    ).text()
+                    secret = service.getSourceEncryptedKey().text()
                 )
             }
 
@@ -779,8 +777,8 @@ object SflixProvider : Provider {
             @Query("id") id: String,
         ): SourcesResponse
 
-        @GET("https://raw.githubusercontent.com/consumet/rapidclown/{domain}/key.txt")
-        suspend fun getSourceEncryptedKey(@Path("domain") domain: String): Document
+        @GET("https://raw.githubusercontent.com/enimax-anime/key/e4/key.txt")
+        suspend fun getSourceEncryptedKey(): Document
 
 
         data class Link(
