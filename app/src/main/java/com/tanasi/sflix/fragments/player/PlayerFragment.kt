@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.tvprovider.media.tv.TvContractCompat
@@ -34,6 +33,7 @@ import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
 import com.tanasi.sflix.utils.AppPreferences
 import com.tanasi.sflix.utils.map
+import com.tanasi.sflix.utils.viewModelsFactory
 import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -89,7 +89,7 @@ class PlayerFragment : Fragment() {
         }
 
     private val args by navArgs<PlayerFragmentArgs>()
-    private val viewModel by viewModels<PlayerViewModel>()
+    private val viewModel by viewModelsFactory { PlayerViewModel(args.videoType, args.id) }
 
     private lateinit var player: ExoPlayer
     private lateinit var mediaSession: MediaSessionCompat
@@ -100,7 +100,6 @@ class PlayerFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPlayerBinding.inflate(inflater, container, false)
-        viewModel.getVideo(args.videoType, args.id)
         return binding.root
     }
 

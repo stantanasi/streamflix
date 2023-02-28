@@ -9,7 +9,7 @@ import com.tanasi.sflix.utils.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SeasonViewModel : ViewModel() {
+class SeasonViewModel(seasonId: String) : ViewModel() {
 
     private val _state = MutableLiveData<State>(State.LoadingEpisodes)
     val state: LiveData<State> = _state
@@ -21,8 +21,12 @@ class SeasonViewModel : ViewModel() {
         data class FailedLoadingEpisodes(val error: Exception) : State()
     }
 
+    init {
+        getSeasonEpisodesById(seasonId)
+    }
 
-    fun getSeasonEpisodesById(seasonId: String) = viewModelScope.launch(Dispatchers.IO) {
+
+    private fun getSeasonEpisodesById(seasonId: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.LoadingEpisodes)
 
         try {

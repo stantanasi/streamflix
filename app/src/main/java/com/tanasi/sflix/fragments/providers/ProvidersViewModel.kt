@@ -21,8 +21,12 @@ class ProvidersViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
+    init {
+        getProviders()
+    }
 
-    fun getProviders() = viewModelScope.launch(Dispatchers.IO) {
+
+    private fun getProviders() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {

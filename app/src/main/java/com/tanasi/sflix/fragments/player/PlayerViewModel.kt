@@ -9,7 +9,10 @@ import com.tanasi.sflix.utils.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class PlayerViewModel : ViewModel() {
+class PlayerViewModel(
+    videoType: PlayerFragment.VideoType,
+    id: String,
+) : ViewModel() {
 
     private val _state = MutableLiveData<State>(State.Loading)
     val state: LiveData<State> = _state
@@ -21,10 +24,14 @@ class PlayerViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
+    init {
+        getVideo(videoType, id)
+    }
+
 
     fun getVideo(
         videoType: PlayerFragment.VideoType,
-        id: String
+        id: String,
     ) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 

@@ -27,7 +27,6 @@ class MoviesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMoviesBinding.inflate(inflater, container, false)
-        viewModel.getMovies()
         return binding.root
     }
 

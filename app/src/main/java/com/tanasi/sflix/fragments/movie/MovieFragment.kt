@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentMovieBinding
 import com.tanasi.sflix.models.Movie
+import com.tanasi.sflix.utils.viewModelsFactory
 
 class MovieFragment : Fragment() {
 
@@ -19,7 +19,7 @@ class MovieFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val args by navArgs<MovieFragmentArgs>()
-    private val viewModel by viewModels<MovieViewModel>()
+    private val viewModel by viewModelsFactory { MovieViewModel(args.id) }
 
     private val sflixAdapter = SflixAdapter()
 
@@ -29,7 +29,6 @@ class MovieFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMovieBinding.inflate(inflater, container, false)
-        viewModel.getMovieById(args.id)
         return binding.root
     }
 

@@ -21,8 +21,12 @@ class MoviesViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
+    init {
+        getMovies()
+    }
 
-    fun getMovies() = viewModelScope.launch(Dispatchers.IO) {
+
+    private fun getMovies() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {

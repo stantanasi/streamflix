@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
@@ -14,14 +13,15 @@ import com.tanasi.sflix.databinding.FragmentSeasonBinding
 import com.tanasi.sflix.models.Episode
 import com.tanasi.sflix.models.Season
 import com.tanasi.sflix.models.TvShow
+import com.tanasi.sflix.utils.viewModelsFactory
 
 class SeasonFragment : Fragment() {
 
     private var _binding: FragmentSeasonBinding? = null
     private val binding get() = _binding!!
 
-    val viewModel by viewModels<SeasonViewModel>()
     private val args by navArgs<SeasonFragmentArgs>()
+    private val viewModel by viewModelsFactory { SeasonViewModel(args.seasonId) }
 
     private val sflixAdapter = SflixAdapter()
 
@@ -31,7 +31,6 @@ class SeasonFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSeasonBinding.inflate(inflater, container, false)
-        viewModel.getSeasonEpisodesById(args.seasonId)
         return binding.root
     }
 

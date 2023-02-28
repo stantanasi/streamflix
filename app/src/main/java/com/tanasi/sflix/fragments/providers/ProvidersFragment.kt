@@ -28,7 +28,6 @@ class ProvidersFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentProvidersBinding.inflate(inflater, container, false)
-        viewModel.getProviders()
         return binding.root
     }
 

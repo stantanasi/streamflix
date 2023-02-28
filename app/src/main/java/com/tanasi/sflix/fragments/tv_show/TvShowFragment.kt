@@ -6,20 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentTvShowBinding
 import com.tanasi.sflix.models.TvShow
+import com.tanasi.sflix.utils.viewModelsFactory
 
 class TvShowFragment : Fragment() {
 
     private var _binding: FragmentTvShowBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<TvShowViewModel>()
     private val args by navArgs<TvShowFragmentArgs>()
+    private val viewModel by viewModelsFactory { TvShowViewModel(args.id) }
 
     private val sflixAdapter = SflixAdapter()
 
@@ -29,7 +29,6 @@ class TvShowFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTvShowBinding.inflate(inflater, container, false)
-        viewModel.getTvShowById(args.id)
         return binding.root
     }
 

@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentPeopleBinding
 import com.tanasi.sflix.models.People
+import com.tanasi.sflix.utils.viewModelsFactory
 
 class PeopleFragment : Fragment() {
 
@@ -18,7 +18,7 @@ class PeopleFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val args by navArgs<PeopleFragmentArgs>()
-    private val viewModel by viewModels<PeopleViewModel>()
+    private val viewModel by viewModelsFactory { PeopleViewModel(args.id) }
 
     private val sflixAdapter = SflixAdapter()
 
@@ -28,7 +28,6 @@ class PeopleFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentPeopleBinding.inflate(inflater, container, false)
-        viewModel.getPeopleById(args.id)
         return binding.root
     }
 

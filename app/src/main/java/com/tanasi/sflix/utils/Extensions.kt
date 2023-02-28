@@ -7,6 +7,9 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.Tracks
@@ -95,4 +98,14 @@ val Tracks.Group.trackFormats: List<Format>
 
 fun <T> List<T>.findClosest(value: Float, selector: (T) -> Float): T? {
     return minByOrNull { abs(value - selector(it)) }
+}
+
+inline fun <reified T : ViewModel> Fragment.viewModelsFactory(crossinline viewModelInitialization: () -> T): Lazy<T> {
+    return viewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return viewModelInitialization.invoke() as T
+            }
+        }
+    }
 }

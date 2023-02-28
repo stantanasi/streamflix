@@ -27,7 +27,6 @@ class TvShowsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTvShowsBinding.inflate(inflater, container, false)
-        viewModel.getTvShows()
         return binding.root
     }
 

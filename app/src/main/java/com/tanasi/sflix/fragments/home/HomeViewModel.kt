@@ -21,8 +21,12 @@ class HomeViewModel : ViewModel() {
         data class FailedLoading(val error: Exception) : State()
     }
 
+    init {
+        getHome()
+    }
 
-    fun getHome() = viewModelScope.launch(Dispatchers.IO) {
+
+    private fun getHome() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {
