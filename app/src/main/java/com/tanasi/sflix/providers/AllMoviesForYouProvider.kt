@@ -44,7 +44,7 @@ object AllMoviesForYouProvider : Provider {
                     val rating = it.selectFirst("span.st-vote")
                         ?.text()?.toDoubleOrNull()
                     val banner = it.selectFirst("div.Image img")
-                        ?.attr("src")?.toSafeUrl()
+                        ?.attr("data-src")?.toSafeUrl()
 
                     val genres = it.select("div.Description > p.Genre a").map { element ->
                         Genre(
