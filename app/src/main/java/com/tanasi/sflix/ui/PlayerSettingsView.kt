@@ -38,6 +38,8 @@ class PlayerSettingsView @JvmOverloads constructor(
         set(value) {
             if (field === value) return
 
+            Setting.Quality.adapter.selectedIndex = 0
+
             value?.addListener(object : Player.Listener {
                 override fun onEvents(player: Player, events: Player.Events) {
                     if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
@@ -119,6 +121,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             val selected: VideoTrackInformation?
                 get() = list.find { it.isSelected }
+                    ?: list.getOrNull(adapter.selectedIndex - 1)
 
             fun init(player: ExoPlayer, resources: Resources) {
                 list.clear()
@@ -129,7 +132,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                             trackGroup.trackFormats
                                 .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
                                 .distinctBy { it.width to it.height }
-                                .mapIndexed { trackIndex, trackFormat ->
+                                .map { trackFormat ->
                                     VideoTrackInformation(
                                         name = DefaultTrackNameProvider(resources)
                                             .getTrackName(trackFormat),
@@ -138,8 +141,6 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         bitrate = trackFormat.bitrate,
 
                                         player = player,
-                                        trackGroup = trackGroup,
-                                        trackIndex = trackIndex,
                                     )
                                 }
                         }
@@ -258,15 +259,20 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             holder.binding.tvSettingSubText.apply {
                 text = when (setting) {
-                    Setting.Quality -> Setting.Quality.selected?.let {
-                        when (Setting.Quality.adapter.selectedIndex) {
-                            0 -> context.getString(
-                                R.string.player_settings_quality_sub_label_auto,
+                    Setting.Quality -> when (Setting.Quality.adapter.selectedIndex) {
+                        0 -> Setting.Quality.selected?.let {
+                            context.getString(
+                                R.string.player_settings_quality_auto_selected,
                                 it.height
                             )
-                            else -> context.getString(R.string.player_settings_quality, it.height)
-                        }
-                    } ?: ""
+                        } ?: context.getString(R.string.player_settings_quality_auto)
+                        else -> Setting.Quality.selected?.let {
+                            context.getString(
+                                R.string.player_settings_quality,
+                                it.height
+                            )
+                        } ?: ""
+                    }
                     Setting.Subtitle -> Setting.Subtitle.selected?.name
                         ?: context.getString(R.string.player_settings_subtitles_off)
                     Setting.Speed -> Setting.Speed.selected?.let {
@@ -300,11 +306,9 @@ class PlayerSettingsView @JvmOverloads constructor(
         val bitrate: Int,
 
         val player: ExoPlayer,
-        val trackGroup: Tracks.Group,
-        val trackIndex: Int,
     ) {
         val isSelected: Boolean
-            get() = player.videoFormat?.bitrate == bitrate && trackGroup.isTrackSelected(trackIndex)
+            get() = player.videoFormat?.let { it.bitrate == bitrate } ?: false
     }
 
     private class VideoTrackSelectionAdapter(
