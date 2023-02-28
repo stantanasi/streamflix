@@ -63,16 +63,18 @@ class SearchFragment : Fragment() {
 
 
     private fun initializeSearch() {
-        binding.etSearch.setOnEditorActionListener { _, actionId, _ ->
-            val query = binding.etSearch.text.toString().trim()
+        binding.etSearch.apply {
+            setOnEditorActionListener { _, actionId, _ ->
+                val query = text.toString().trim()
 
-            when (actionId) {
-                EditorInfo.IME_ACTION_SEARCH -> {
-                    viewModel.search(query)
-                    hideKeyboard()
-                    true
+                when (actionId) {
+                    EditorInfo.IME_ACTION_SEARCH -> {
+                        viewModel.search(query)
+                        hideKeyboard()
+                        true
+                    }
+                    else -> false
                 }
-                else -> false
             }
         }
 
