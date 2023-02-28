@@ -29,7 +29,7 @@ class PeopleFragment : Fragment() {
     ): View {
         if (_binding == null) {
             _binding = FragmentPeopleBinding.inflate(inflater, container, false)
-            viewModel.getPeopleById(args.slug)
+            viewModel.getPeopleById(args.id)
         }
         return binding.root
     }

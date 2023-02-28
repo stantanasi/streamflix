@@ -148,7 +148,7 @@
         android:label="fragment_people"
         tools:layout="@layout/fragment_people">
         <argument
-            android:name="slug"
+            android:name="id"
             app:argType="string" />
         <action
             android:id="@+id/action_people_to_movie"
