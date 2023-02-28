@@ -27,10 +27,8 @@ class PeopleFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (_binding == null) {
-            _binding = FragmentPeopleBinding.inflate(inflater, container, false)
-            viewModel.getPeopleById(args.id)
-        }
+        _binding = FragmentPeopleBinding.inflate(inflater, container, false)
+        viewModel.getPeopleById(args.id)
         return binding.root
     }
 
@@ -56,6 +54,11 @@ class PeopleFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

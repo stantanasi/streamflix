@@ -30,10 +30,8 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (_binding == null) {
-            _binding = FragmentSearchBinding.inflate(inflater, container, false)
-            viewModel.search("")
-        }
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        viewModel.search("")
         return binding.root
     }
 
@@ -59,6 +57,11 @@ class SearchFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

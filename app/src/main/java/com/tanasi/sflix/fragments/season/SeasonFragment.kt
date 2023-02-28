@@ -30,10 +30,8 @@ class SeasonFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (_binding == null) {
-            _binding = FragmentSeasonBinding.inflate(inflater, container, false)
-            viewModel.getSeasonEpisodesById(args.seasonId)
-        }
+        _binding = FragmentSeasonBinding.inflate(inflater, container, false)
+        viewModel.getSeasonEpisodesById(args.seasonId)
         return binding.root
     }
 
@@ -59,6 +57,11 @@ class SeasonFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

@@ -26,10 +26,8 @@ class MoviesFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (_binding == null) {
-            _binding = FragmentMoviesBinding.inflate(inflater, container, false)
-            viewModel.getMovies()
-        }
+        _binding = FragmentMoviesBinding.inflate(inflater, container, false)
+        viewModel.getMovies()
         return binding.root
     }
 
@@ -55,6 +53,11 @@ class MoviesFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

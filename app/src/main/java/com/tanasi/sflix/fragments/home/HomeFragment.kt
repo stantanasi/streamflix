@@ -33,10 +33,8 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (_binding == null) {
-            _binding = FragmentHomeBinding.inflate(inflater, container, false)
-            viewModel.getHome()
-        }
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        viewModel.getHome()
         return binding.root
     }
 
@@ -62,6 +60,11 @@ class HomeFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

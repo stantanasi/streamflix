@@ -26,10 +26,8 @@ class TvShowsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (_binding == null) {
-            _binding = FragmentTvShowsBinding.inflate(inflater, container, false)
-            viewModel.getTvShows()
-        }
+        _binding = FragmentTvShowsBinding.inflate(inflater, container, false)
+        viewModel.getTvShows()
         return binding.root
     }
 
@@ -55,6 +53,11 @@ class TvShowsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

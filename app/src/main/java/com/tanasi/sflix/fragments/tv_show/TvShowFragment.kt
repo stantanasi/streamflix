@@ -28,10 +28,8 @@ class TvShowFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (_binding == null) {
-            _binding = FragmentTvShowBinding.inflate(inflater, container, false)
-            viewModel.getTvShowById(args.id)
-        }
+        _binding = FragmentTvShowBinding.inflate(inflater, container, false)
+        viewModel.getTvShowById(args.id)
         return binding.root
     }
 
@@ -57,6 +55,11 @@ class TvShowFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 

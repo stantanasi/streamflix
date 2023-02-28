@@ -137,6 +137,7 @@ class PlayerFragment : Fragment() {
         super.onDestroyView()
         player.release()
         mediaSession.release()
+        _binding = null
     }
 
     fun onBackPressed(): Boolean = when {

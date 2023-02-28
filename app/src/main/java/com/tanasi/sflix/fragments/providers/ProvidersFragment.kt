@@ -27,10 +27,8 @@ class ProvidersFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        if (_binding == null) {
-            _binding = FragmentProvidersBinding.inflate(inflater, container, false)
-            viewModel.getProviders()
-        }
+        _binding = FragmentProvidersBinding.inflate(inflater, container, false)
+        viewModel.getProviders()
         return binding.root
     }
 
@@ -56,6 +54,11 @@ class ProvidersFragment : Fragment() {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 
