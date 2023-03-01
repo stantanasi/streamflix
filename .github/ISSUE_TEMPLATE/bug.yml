@@ -22,13 +22,6 @@ body:
         4. See error
     validations:
       required: true
-  - type: input
-    attributes:
-      label: Operating system
-      description: Which operating system do you use? Please provide the version as well.
-      placeholder: Chromecast with Google TV, Android 12.0
-    validations:
-      required: false
   - type: dropdown
     attributes:
       label: App version
@@ -40,6 +33,13 @@ body:
         - v1.2.0
         - v1.1.0
         - v1.0.0
+    validations:
+      required: false
+  - type: input
+    attributes:
+      label: Operating system
+      description: Which operating system do you use? Please provide the version as well.
+      placeholder: Chromecast with Google TV, Android 12.0
     validations:
       required: false
   - type: textarea
