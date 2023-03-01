@@ -47,7 +47,7 @@ class PeopleFragment : Fragment() {
                 is PeopleViewModel.State.FailedLoading -> {
                     Toast.makeText(
                         requireContext(),
-                        state.error.message,
+                        state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
                 }

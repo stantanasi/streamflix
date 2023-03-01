@@ -48,7 +48,7 @@ class MovieFragment : Fragment() {
                 is MovieViewModel.State.FailedLoading -> {
                     Toast.makeText(
                         requireContext(),
-                        state.error.message,
+                        state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
