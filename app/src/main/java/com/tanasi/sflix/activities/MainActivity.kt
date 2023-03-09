@@ -2,6 +2,7 @@ package com.tanasi.sflix.activities
 
 import android.os.Bundle
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
@@ -23,9 +24,9 @@ class MainActivity : FragmentActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navController = (supportFragmentManager
-            .findFragmentById(binding.navMainFragment.id) as NavHostFragment)
-            .navController
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(binding.navMainFragment.id) as NavHostFragment
+        val navController = navHostFragment.navController
 
         binding.navMain.setupWithNavController(navController)
 
@@ -61,36 +62,36 @@ class MainActivity : FragmentActivity() {
                 else -> binding.navMain.visibility = View.GONE
             }
         }
-    }
 
-    override fun onBackPressed() {
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(binding.navMainFragment.id) as NavHostFragment
-        val navController = navHostFragment.navController
-
-        when (navController.currentDestination?.id) {
-            R.id.home -> when {
-                binding.navMain.hasFocus() -> finish()
-                else -> binding.navMain.requestFocus()
-            }
-            R.id.search,
-            R.id.movies,
-            R.id.tv_shows -> when {
-                binding.navMain.hasFocus() -> binding.navMain.findViewById<View>(R.id.home).let {
-                    it.requestFocus()
-                    it.performClick()
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                when (navController.currentDestination?.id) {
+                    R.id.home -> when {
+                        binding.navMain.hasFocus() -> finish()
+                        else -> binding.navMain.requestFocus()
+                    }
+                    R.id.search,
+                    R.id.movies,
+                    R.id.tv_shows -> when {
+                        binding.navMain.hasFocus() -> binding.navMain.findViewById<View>(R.id.home)
+                            .let {
+                                it.requestFocus()
+                                it.performClick()
+                            }
+                        else -> binding.navMain.requestFocus()
+                    }
+                    else -> {
+                        val currentFragment = navHostFragment.childFragmentManager.fragments
+                            .firstOrNull()
+                        when (currentFragment) {
+                            is PlayerFragment -> currentFragment.onBackPressed()
+                            else -> false
+                        }.takeIf { !it }?.let {
+                            navController.navigateUp()
+                        }
+                    }
                 }
-                else -> binding.navMain.requestFocus()
             }
-            else -> {
-                val currentFragment = navHostFragment.childFragmentManager.fragments.firstOrNull()
-                when (currentFragment) {
-                    is PlayerFragment -> currentFragment.onBackPressed()
-                    else -> false
-                }.takeIf { !it }?.let {
-                    super.onBackPressed()
-                }
-            }
-        }
+        })
     }
 }
