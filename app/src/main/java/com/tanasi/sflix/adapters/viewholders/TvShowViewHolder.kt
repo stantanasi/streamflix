@@ -1,4 +1,4 @@
-package com.tanasi.sflix.adapters.view_holders
+package com.tanasi.sflix.adapters.viewholders
 
 import android.content.Intent
 import android.net.Uri
@@ -29,7 +29,7 @@ import com.tanasi.sflix.utils.format
 import com.tanasi.sflix.utils.getCurrentFragment
 import com.tanasi.sflix.utils.toActivity
 
-class VhTvShow(
+class TvShowViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
     _binding.root

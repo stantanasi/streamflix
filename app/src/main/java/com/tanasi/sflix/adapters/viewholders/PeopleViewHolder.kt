@@ -1,4 +1,4 @@
-package com.tanasi.sflix.adapters.view_holders
+package com.tanasi.sflix.adapters.viewholders
 
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
@@ -20,7 +20,7 @@ import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.getCurrentFragment
 import com.tanasi.sflix.utils.toActivity
 
-class VhPeople(
+class PeopleViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
     _binding.root

@@ -1,4 +1,4 @@
-package com.tanasi.sflix.adapters.view_holders
+package com.tanasi.sflix.adapters.viewholders
 
 import android.annotation.SuppressLint
 import android.view.View
@@ -23,7 +23,7 @@ import com.tanasi.sflix.utils.map
 import com.tanasi.sflix.utils.toActivity
 
 @SuppressLint("RestrictedApi")
-class VhEpisode(
+class EpisodeViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
     _binding.root

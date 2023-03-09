@@ -1,4 +1,4 @@
-package com.tanasi.sflix.adapters.view_holders
+package com.tanasi.sflix.adapters.viewholders
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -33,7 +33,7 @@ import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.*
 
 @SuppressLint("RestrictedApi")
-class VhMovie(
+class MovieViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
     _binding.root

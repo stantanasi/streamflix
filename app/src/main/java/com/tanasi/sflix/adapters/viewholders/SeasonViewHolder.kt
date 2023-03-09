@@ -1,4 +1,4 @@
-package com.tanasi.sflix.adapters.view_holders
+package com.tanasi.sflix.adapters.viewholders
 
 import android.view.animation.AnimationUtils
 import androidx.navigation.findNavController
@@ -11,7 +11,7 @@ import com.tanasi.sflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.sflix.models.Season
 
 
-class VhSeason(
+class SeasonViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
     _binding.root

@@ -1,4 +1,4 @@
-package com.tanasi.sflix.adapters.view_holders
+package com.tanasi.sflix.adapters.viewholders
 
 import android.view.KeyEvent
 import android.view.View
@@ -20,7 +20,7 @@ import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.getCurrentFragment
 import com.tanasi.sflix.utils.toActivity
 
-class VhCategory(
+class CategoryViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
     _binding.root

@@ -1,4 +1,4 @@
-package com.tanasi.sflix.adapters.view_holders
+package com.tanasi.sflix.adapters.viewholders
 
 import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
@@ -10,7 +10,7 @@ import com.tanasi.sflix.models.Provider
 import com.tanasi.sflix.utils.AppPreferences
 import com.tanasi.sflix.utils.toActivity
 
-class VhProvider(
+class ProviderViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
     _binding.root
