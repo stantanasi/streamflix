@@ -598,85 +598,100 @@ object AllMoviesForYouProvider : Provider {
 
 
     override suspend fun getPeople(id: String): People {
-        val document = service.getPeople(id)
+        val cast = service.getCast(id)
+        val castTv = service.getCastTv(id)
 
         val people = People(
             id = id,
-            name = document.selectFirst("h2.Title")
+            name = cast.selectFirst("h2.Title")
                 ?.text() ?: "",
 
-            filmography = document.select("ul.MovieList article.TPost.B").map {
-                val showId = it.selectFirst("a")?.attr("href")
-                    ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
-                val showTitle = it.selectFirst("h2.Title")
-                    ?.text() ?: ""
-                val showOverview = it.selectFirst("div.Description > p")
-                    ?.text() ?: ""
-                val showReleased = it.selectFirst("div.Image span.Yr")
-                    ?.text()
-                val showRuntime = it.selectFirst("span.Time")
-                    ?.text()?.toMinutes()
-                val showRating = it.selectFirst("div.Vote > div.post-ratings > span")
-                    ?.text()?.toDoubleOrNull()
-                val showPoster = it.selectFirst("div.Image img")
-                    ?.attr("data-src")?.toSafeUrl()
+            filmography = listOf(
+                cast.select("ul.MovieList article.TPost.B"),
+                castTv.select("ul.MovieList article.TPost.B"),
+            )
+                .flatMap { elements ->
+                    elements.map {
+                        val showId = it.selectFirst("a")?.attr("href")
+                            ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
+                        val showTitle = it.selectFirst("h2.Title")
+                            ?.text() ?: ""
+                        val showOverview = it.selectFirst("div.Description > p")
+                            ?.text() ?: ""
+                        val showReleased = it.selectFirst("div.Image span.Yr")
+                            ?.text()
+                        val showRuntime = it.selectFirst("span.Time")
+                            ?.text()?.toMinutes()
+                        val showRating = it.selectFirst("div.Vote > div.post-ratings > span")
+                            ?.text()?.toDoubleOrNull()
+                        val showPoster = it.selectFirst("div.Image img")
+                            ?.attr("data-src")?.toSafeUrl()
 
-                val showGenres = it.select("div.Description > p.Genre a").map { element ->
-                    Genre(
-                        id = element.attr("href")
-                            .substringBeforeLast("/").substringAfterLast("/"),
-                        name = element.text(),
-                    )
-                }
-                val showDirectors = it.select("div.Description > p.Director a").map { element ->
-                    People(
-                        id = element.attr("href")
-                            .substringBeforeLast("/").substringAfterLast("/"),
-                        name = element.text(),
-                    )
-                }
-                val showCast = it.select("div.Description > p.Cast a").map { element ->
-                    People(
-                        id = element.attr("href")
-                            .substringBeforeLast("/").substringAfterLast("/"),
-                        name = element.text(),
-                    )
-                }
+                        val showGenres = it.select("div.Description > p.Genre a").map { element ->
+                            Genre(
+                                id = element.attr("href")
+                                    .substringBeforeLast("/").substringAfterLast("/"),
+                                name = element.text(),
+                            )
+                        }
+                        val showDirectors =
+                            it.select("div.Description > p.Director a").map { element ->
+                                People(
+                                    id = element.attr("href")
+                                        .substringBeforeLast("/").substringAfterLast("/"),
+                                    name = element.text(),
+                                )
+                            }
+                        val showCast = it.select("div.Description > p.Cast a").map { element ->
+                            People(
+                                id = element.attr("href")
+                                    .substringBeforeLast("/").substringAfterLast("/"),
+                                name = element.text(),
+                            )
+                        }
 
-                when {
-                    it.isMovie() -> {
-                        Movie(
-                            id = showId,
-                            title = showTitle,
-                            overview = showOverview,
-                            released = showReleased,
-                            runtime = showRuntime,
-                            quality = it.selectFirst("div.Image span.Qlty")?.text(),
-                            rating = showRating,
-                            poster = showPoster,
+                        when {
+                            it.isMovie() -> {
+                                Movie(
+                                    id = showId,
+                                    title = showTitle,
+                                    overview = showOverview,
+                                    released = showReleased,
+                                    runtime = showRuntime,
+                                    quality = it.selectFirst("div.Image span.Qlty")?.text(),
+                                    rating = showRating,
+                                    poster = showPoster,
 
-                            genres = showGenres,
-                            directors = showDirectors,
-                            cast = showCast,
-                        )
+                                    genres = showGenres,
+                                    directors = showDirectors,
+                                    cast = showCast,
+                                )
+                            }
+                            else -> {
+                                TvShow(
+                                    id = showId,
+                                    title = showTitle,
+                                    overview = showOverview,
+                                    released = showReleased,
+                                    runtime = showRuntime,
+                                    rating = showRating,
+                                    poster = showPoster,
+
+                                    genres = showGenres,
+                                    directors = showDirectors,
+                                    cast = showCast,
+                                )
+                            }
+                        }
                     }
-                    else -> {
-                        TvShow(
-                            id = showId,
-                            title = showTitle,
-                            overview = showOverview,
-                            released = showReleased,
-                            runtime = showRuntime,
-                            rating = showRating,
-                            poster = showPoster,
-
-                            genres = showGenres,
-                            directors = showDirectors,
-                            cast = showCast,
-                        )
-                    }
                 }
-            },
+                .sortedByDescending {
+                    when (it) {
+                        is Movie -> it.released
+                        is TvShow -> it.released
+                        else -> null
+                    }
+                },
         )
 
         return people
@@ -798,7 +813,10 @@ object AllMoviesForYouProvider : Provider {
 
 
         @GET("cast/{slug}")
-        suspend fun getPeople(@Path("slug") slug: String): Document
+        suspend fun getCast(@Path("slug") slug: String): Document
+
+        @GET("cast_tv/{slug}")
+        suspend fun getCastTv(@Path("slug") slug: String): Document
 
 
         @GET
