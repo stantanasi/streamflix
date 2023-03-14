@@ -16,7 +16,8 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription"
         tools:layout_constraintDimensionRatio="2:3"
-        tools:layout_height="0dp" />
+        tools:layout_height="0dp"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/tv_tv_show_title"
@@ -30,6 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginStart="70dp"
         tools:text="Title" />
 
     <TextView
@@ -38,8 +40,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginTop="15dp"
+        app:layout_constraintBottom_toTopOf="@id/barrier1"
         app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
         app:layout_constraintTop_toBottomOf="@id/tv_tv_show_title"
+        app:layout_goneMarginStart="70dp"
         tools:text="#.#" />
 
     <TextView
@@ -50,9 +54,11 @@
         android:layout_marginTop="15dp"
         android:textAllCaps="true"
         android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toTopOf="@id/barrier1"
         app:layout_constraintStart_toEndOf="@id/tv_tv_show_rating"
         app:layout_constraintTop_toBottomOf="@id/tv_tv_show_title"
-        tools:text="HD" />
+        tools:text="HD"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/tv_tv_show_released"
@@ -60,9 +66,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
         android:layout_marginTop="15dp"
+        app:layout_constraintBottom_toTopOf="@id/barrier1"
         app:layout_constraintStart_toEndOf="@id/tv_tv_show_quality"
         app:layout_constraintTop_toBottomOf="@id/tv_tv_show_title"
-        tools:text="yyyy" />
+        tools:text="yyyy"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/tv_tv_show_runtime"
@@ -70,16 +78,18 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
         android:layout_marginTop="15dp"
+        app:layout_constraintBottom_toTopOf="@id/barrier1"
         app:layout_constraintStart_toEndOf="@id/tv_tv_show_released"
         app:layout_constraintTop_toBottomOf="@id/tv_tv_show_title"
-        tools:text="# h # min" />
+        tools:text="# h # min"
+        tools:visibility="visible" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="tv_tv_show_quality" />
+        app:constraint_referenced_ids="tv_tv_show_rating,tv_tv_show_quality,tv_tv_show_released,tv_tv_show_runtime" />
 
     <TextView
         android:id="@+id/tv_tv_show_overview"
@@ -91,6 +101,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
         app:layout_constraintTop_toBottomOf="@id/barrier1"
+        app:layout_goneMarginStart="70dp"
         tools:text="Overview" />
 
     <TextView
@@ -102,6 +113,7 @@
         android:layout_marginTop="30dp"
         android:text="@string/tv_show_trailer"
         app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
-        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview" />
+        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview"
+        app:layout_goneMarginStart="70dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

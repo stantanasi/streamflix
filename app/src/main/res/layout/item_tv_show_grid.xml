@@ -25,10 +25,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:textAllCaps="true"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_tv_show_poster"
-        tools:text="HD" />
+        tools:text="HD"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/tv_tv_show_last_episode"
@@ -38,6 +40,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toEndOf="@id/tv_tv_show_quality"
         app:layout_constraintTop_toBottomOf="@id/iv_tv_show_poster"
+        app:layout_goneMarginStart="8dp"
         tools:text="S1 E1" />
 
     <androidx.constraintlayout.widget.Barrier

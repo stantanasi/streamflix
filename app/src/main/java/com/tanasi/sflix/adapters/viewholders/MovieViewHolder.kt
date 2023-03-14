@@ -104,9 +104,16 @@ class MovieViewHolder(
             .centerCrop()
             .into(binding.ivMoviePoster)
 
-        binding.tvMovieQuality.text = movie.quality ?: "N/A"
+        binding.tvMovieQuality.apply {
+            text = movie.quality ?: ""
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
 
-        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
+        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
+            ?: context.getString(R.string.movie_item_type)
 
         binding.tvMovieTitle.text = movie.title
     }
@@ -143,9 +150,16 @@ class MovieViewHolder(
             .centerCrop()
             .into(binding.ivMoviePoster)
 
-        binding.tvMovieQuality.text = movie.quality ?: "N/A"
+        binding.tvMovieQuality.apply {
+            text = movie.quality ?: ""
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
 
-        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
+        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
+            ?: context.getString(R.string.movie_item_type)
 
         binding.tvMovieTitle.text = movie.title
     }
@@ -215,26 +229,50 @@ class MovieViewHolder(
 
 
     private fun displayMovie(binding: ContentMovieBinding) {
-        Glide.with(context)
-            .load(movie.poster)
-            .into(binding.ivMoviePoster)
+        binding.ivMoviePoster.run {
+            Glide.with(context)
+                .load(movie.poster)
+                .into(this)
+            visibility = when {
+                movie.poster.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
 
         binding.tvMovieTitle.text = movie.title
 
         binding.tvMovieRating.text = movie.rating?.let { String.format("%.1f", it) } ?: "N/A"
 
-        binding.tvMovieQuality.text = movie.quality ?: "N/A"
-
-        binding.tvMovieReleased.text = movie.released?.format("yyyy")
-
-        binding.tvMovieRuntime.text = movie.runtime?.let {
-            val hours = it / 60
-            val minutes = it % 60
-            when {
-                hours > 0 -> context.getString(R.string.movie_runtime_hours_minutes, hours, minutes)
-                else -> context.getString(R.string.movie_runtime_minutes, minutes)
+        binding.tvMovieQuality.apply {
+            text = movie.quality
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
             }
-        } ?: context.getString(R.string.movie_runtime_minutes, 0)
+        }
+
+        binding.tvMovieReleased.apply {
+            text = movie.released?.format("yyyy")
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvMovieRuntime.apply {
+            text = movie.runtime?.let {
+                val hours = it / 60
+                val minutes = it % 60
+                when {
+                    hours > 0 -> context.getString(R.string.movie_runtime_hours_minutes, hours, minutes)
+                    else -> context.getString(R.string.movie_runtime_minutes, minutes)
+                }
+            }
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
 
         binding.tvMovieOverview.text = movie.overview
 

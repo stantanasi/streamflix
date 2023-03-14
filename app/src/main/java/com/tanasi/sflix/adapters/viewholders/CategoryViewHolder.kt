@@ -17,6 +17,7 @@ import com.tanasi.sflix.models.Category
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.models.Show
 import com.tanasi.sflix.models.TvShow
+import com.tanasi.sflix.utils.format
 import com.tanasi.sflix.utils.getCurrentFragment
 import com.tanasi.sflix.utils.toActivity
 
@@ -65,9 +66,26 @@ class CategoryViewHolder(
             is TvShow -> selected.rating?.let { String.format("%.1f", it) } ?: "N/A"
         }
 
-        binding.tvSwiperQuality.text = when (selected) {
-            is Movie -> selected.quality ?: "N/A"
-            is TvShow -> selected.quality ?: "N/A"
+        binding.tvSwiperQuality.apply {
+            text = when (selected) {
+                is Movie -> selected.quality
+                is TvShow -> selected.quality
+            }
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvSwiperReleased.apply {
+            text = when (selected) {
+                is Movie -> selected.released?.format("yyyy")
+                is TvShow -> selected.released?.format("yyyy")
+            }
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
         }
 
         binding.tvSwiperTvShowLastEpisode.apply {
@@ -81,11 +99,11 @@ class CategoryViewHolder(
                         )
                     }
                 } ?: context.getString(R.string.tv_show_item_type)
-                else -> ""
+                else -> context.getString(R.string.movie_item_type)
             }
-            visibility = when (selected) {
-                is TvShow -> View.VISIBLE
-                else -> View.GONE
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
             }
         }
 
@@ -111,10 +129,12 @@ class CategoryViewHolder(
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     when (event.keyCode) {
                         KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                            category.selectedIndex = (category.selectedIndex + 1) % category.list.size
+                            category.selectedIndex =
+                                (category.selectedIndex + 1) % category.list.size
 
                             when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                                is HomeFragment -> when (val it = category.list[category.selectedIndex]) {
+                                is HomeFragment -> when (val it =
+                                    category.list[category.selectedIndex]) {
                                     is Movie -> fragment.updateBackground(it.banner)
                                     is TvShow -> fragment.updateBackground(it.banner)
                                 }

@@ -2,6 +2,7 @@ package com.tanasi.sflix.adapters.viewholders
 
 import android.content.Intent
 import android.net.Uri
+import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.navigation.findNavController
@@ -100,7 +101,13 @@ class TvShowViewHolder(
             .centerCrop()
             .into(binding.ivTvShowPoster)
 
-        binding.tvTvShowQuality.text = tvShow.quality ?: "N/A"
+        binding.tvTvShowQuality.apply {
+            text = tvShow.quality ?: ""
+            visibility = when {
+                tvShow.quality.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
@@ -146,7 +153,13 @@ class TvShowViewHolder(
             .centerCrop()
             .into(binding.ivTvShowPoster)
 
-        binding.tvTvShowQuality.text = tvShow.quality ?: "N/A"
+        binding.tvTvShowQuality.apply {
+            text = tvShow.quality ?: ""
+            visibility = when {
+                tvShow.quality.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
@@ -163,30 +176,54 @@ class TvShowViewHolder(
 
 
     private fun displayTvShow(binding: ContentTvShowBinding) {
-        Glide.with(context)
-            .load(tvShow.poster)
-            .into(binding.ivTvShowPoster)
+        binding.ivTvShowPoster.run {
+            Glide.with(context)
+                .load(tvShow.poster)
+                .into(this)
+            visibility = when {
+                tvShow.poster.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
 
         binding.tvTvShowTitle.text = tvShow.title
 
         binding.tvTvShowRating.text = tvShow.rating?.let { String.format("%.1f", it) } ?: "N/A"
 
-        binding.tvTvShowQuality.text = tvShow.quality ?: "N/A"
-
-        binding.tvTvShowReleased.text = tvShow.released?.format("yyyy")
-
-        binding.tvTvShowRuntime.text = tvShow.runtime?.let {
-            val hours = it / 60
-            val minutes = it % 60
-            when {
-                hours > 0 -> context.getString(
-                    R.string.tv_show_runtime_hours_minutes,
-                    hours,
-                    minutes
-                )
-                else -> context.getString(R.string.tv_show_runtime_minutes, minutes)
+        binding.tvTvShowQuality.apply {
+            text = tvShow.quality
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
             }
-        } ?: context.getString(R.string.tv_show_runtime_minutes, 0)
+        }
+
+        binding.tvTvShowReleased.apply {
+            text = tvShow.released?.format("yyyy")
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvTvShowRuntime.apply {
+            text = tvShow.runtime?.let {
+                val hours = it / 60
+                val minutes = it % 60
+                when {
+                    hours > 0 -> context.getString(
+                        R.string.tv_show_runtime_hours_minutes,
+                        hours,
+                        minutes
+                    )
+                    else -> context.getString(R.string.tv_show_runtime_minutes, minutes)
+                }
+            }
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
 
         binding.tvTvShowOverview.text = tvShow.overview
 
