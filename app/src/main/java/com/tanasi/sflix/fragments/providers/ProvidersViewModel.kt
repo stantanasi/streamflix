@@ -16,7 +16,6 @@ class ProvidersViewModel : ViewModel() {
 
     sealed class State {
         object Loading : State()
-
         data class SuccessLoading(val providers: List<Provider>) : State()
         data class FailedLoading(val error: Exception) : State()
     }

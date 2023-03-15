@@ -42,7 +42,6 @@ class SearchFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 SearchViewModel.State.Searching -> binding.isLoading.root.visibility = View.VISIBLE
-
                 is SearchViewModel.State.SuccessSearching -> {
                     displaySearch(state.results)
                     binding.isLoading.root.visibility = View.GONE

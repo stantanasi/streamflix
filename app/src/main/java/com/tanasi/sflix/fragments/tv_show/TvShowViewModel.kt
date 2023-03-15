@@ -16,7 +16,6 @@ class TvShowViewModel(id: String) : ViewModel() {
 
     sealed class State {
         object Loading : State()
-
         data class SuccessLoading(val tvShow: TvShow) : State()
         data class FailedLoading(val error: Exception) : State()
     }

@@ -38,7 +38,6 @@ class TvShowsFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 TvShowsViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
-
                 is TvShowsViewModel.State.SuccessLoading -> {
                     displayTvShows(state.tvShows)
                     binding.isLoading.root.visibility = View.GONE

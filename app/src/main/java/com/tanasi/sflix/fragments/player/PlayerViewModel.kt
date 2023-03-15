@@ -19,7 +19,6 @@ class PlayerViewModel(
 
     sealed class State {
         object Loading : State()
-
         data class SuccessLoading(val video: Video) : State()
         data class FailedLoading(val error: Exception) : State()
     }

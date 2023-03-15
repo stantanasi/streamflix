@@ -16,7 +16,6 @@ class HomeViewModel : ViewModel() {
 
     sealed class State {
         object Loading : State()
-
         data class SuccessLoading(val categories: List<Category>) : State()
         data class FailedLoading(val error: Exception) : State()
     }

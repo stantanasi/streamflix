@@ -111,7 +111,6 @@ class PlayerFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 PlayerViewModel.State.Loading -> {}
-
                 is PlayerViewModel.State.SuccessLoading -> {
                     displayVideo(state.video)
                 }

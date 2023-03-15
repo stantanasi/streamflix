@@ -38,7 +38,6 @@ class MoviesFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 MoviesViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
-
                 is MoviesViewModel.State.SuccessLoading -> {
                     displayMovies(state.movies)
                     binding.isLoading.root.visibility = View.GONE

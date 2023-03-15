@@ -16,7 +16,6 @@ class MovieViewModel(id: String) : ViewModel() {
 
     sealed class State {
         object Loading : State()
-
         data class SuccessLoading(val movie: Movie) : State()
         data class FailedLoading(val error: Exception) : State()
     }

@@ -39,7 +39,6 @@ class ProvidersFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 ProvidersViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
-
                 is ProvidersViewModel.State.SuccessLoading -> {
                     displayProviders(state.providers)
                     binding.isLoading.root.visibility = View.GONE

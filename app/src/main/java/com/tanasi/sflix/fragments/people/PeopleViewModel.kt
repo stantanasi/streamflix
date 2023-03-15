@@ -16,7 +16,6 @@ class PeopleViewModel(id: String) : ViewModel() {
 
     sealed class State {
         object Loading : State()
-
         data class SuccessLoading(val people: People) : State()
         data class FailedLoading(val error: Exception) : State()
     }

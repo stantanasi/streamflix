@@ -16,7 +16,6 @@ class SearchViewModel : ViewModel() {
 
     sealed class State {
         object Searching : State()
-
         data class SuccessSearching(val results: List<Show>) : State()
         data class FailedSearching(val error: Exception) : State()
     }

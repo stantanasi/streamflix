@@ -16,7 +16,6 @@ class MoviesViewModel : ViewModel() {
 
     sealed class State {
         object Loading : State()
-
         data class SuccessLoading(val movies: List<Movie>) : State()
         data class FailedLoading(val error: Exception) : State()
     }
