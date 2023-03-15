@@ -22,11 +22,11 @@ class MovieViewModel(id: String) : ViewModel() {
     }
 
     init {
-        getMovieById(id)
+        getMovie(id)
     }
 
 
-    private fun getMovieById(id: String) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getMovie(id: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {

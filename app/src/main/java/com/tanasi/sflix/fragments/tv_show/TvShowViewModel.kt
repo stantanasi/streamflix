@@ -22,11 +22,11 @@ class TvShowViewModel(id: String) : ViewModel() {
     }
 
     init {
-        getTvShowById(id)
+        getTvShow(id)
     }
 
 
-    private fun getTvShowById(id: String) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getTvShow(id: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {

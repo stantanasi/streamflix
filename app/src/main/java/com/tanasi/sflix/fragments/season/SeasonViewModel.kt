@@ -22,11 +22,11 @@ class SeasonViewModel(seasonId: String) : ViewModel() {
     }
 
     init {
-        getSeasonEpisodesById(seasonId)
+        getSeasonEpisodes(seasonId)
     }
 
 
-    private fun getSeasonEpisodesById(seasonId: String) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getSeasonEpisodes(seasonId: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.LoadingEpisodes)
 
         try {

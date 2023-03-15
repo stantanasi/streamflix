@@ -22,11 +22,11 @@ class PeopleViewModel(id: String) : ViewModel() {
     }
 
     init {
-        getPeopleById(id)
+        getPeople(id)
     }
 
 
-    private fun getPeopleById(id: String) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getPeople(id: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {
