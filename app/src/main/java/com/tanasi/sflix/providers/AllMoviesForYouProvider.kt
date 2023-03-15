@@ -5,6 +5,7 @@ import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.models.*
 import com.tanasi.sflix.utils.JsUnpacker
 import com.tanasi.sflix.utils.retry
+import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import retrofit2.Retrofit
@@ -12,6 +13,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
+import java.util.concurrent.TimeUnit
 
 object AllMoviesForYouProvider : Provider {
 
@@ -775,9 +777,15 @@ object AllMoviesForYouProvider : Provider {
 
         companion object {
             fun build(): AllMoviesForYouService {
+                val client = OkHttpClient.Builder()
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .build()
+
                 val retrofit = Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(JsoupConverterFactory.create())
+                    .client(client)
                     .build()
 
                 return retrofit.create(AllMoviesForYouService::class.java)
