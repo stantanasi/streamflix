@@ -341,7 +341,7 @@ object SflixProvider : Provider {
 
 
     override suspend fun getMovie(id: String): Movie {
-        val document = service.getMovieById(id)
+        val document = service.getMovie(id)
 
         val movie = Movie(
             id = id,
@@ -438,7 +438,7 @@ object SflixProvider : Provider {
 
 
     override suspend fun getTvShow(id: String): TvShow {
-        val document = service.getTvShowById(id)
+        val document = service.getTvShow(id)
 
         val tvShow = TvShow(
             id = id,
@@ -463,7 +463,7 @@ object SflixProvider : Provider {
             banner = document.selectFirst("div.detail-container > div.cover_follow")
                 ?.attr("style")?.substringAfter("background-image: url(")?.substringBefore(");"),
 
-            seasons = service.getTvShowSeasonsById(id)
+            seasons = service.getTvShowSeasons(id)
                 .select("div.dropdown-menu.dropdown-menu-model > a")
                 .mapIndexed { seasonNumber, seasonElement ->
                     Season(
@@ -543,7 +543,7 @@ object SflixProvider : Provider {
     }
 
     override suspend fun getSeasonEpisodes(seasonId: String): List<Episode> {
-        val document = service.getSeasonEpisodesById(seasonId)
+        val document = service.getSeasonEpisodes(seasonId)
 
         val episodes = document.select("div.flw-item.film_single-item.episode-item.eps-item")
             .mapIndexed { episodeNumber, episodeElement ->
@@ -564,7 +564,7 @@ object SflixProvider : Provider {
 
 
     override suspend fun getPeople(id: String): People {
-        val document = service.getPeopleBySlug(id)
+        val document = service.getPeople(id)
 
         val people = People(
             id = id,
@@ -629,8 +629,8 @@ object SflixProvider : Provider {
 
     override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
         val servers = when (videoType) {
-            is PlayerFragment.VideoType.Movie -> service.getMovieServersById(id)
-            is PlayerFragment.VideoType.Episode -> service.getEpisodeServersById(id)
+            is PlayerFragment.VideoType.Movie -> service.getMovieServers(id)
+            is PlayerFragment.VideoType.Episode -> service.getEpisodeServers(id)
         }.select("a").map {
             object {
                 val id = it.attr("data-id")
@@ -737,27 +737,27 @@ object SflixProvider : Provider {
 
 
         @GET("movie/free-{id}")
-        suspend fun getMovieById(@Path("id") id: String): Document
+        suspend fun getMovie(@Path("id") id: String): Document
 
         @GET("ajax/movie/episodes/{id}")
-        suspend fun getMovieServersById(@Path("id") movieId: String): Document
+        suspend fun getMovieServers(@Path("id") movieId: String): Document
 
 
         @GET("tv/free-{id}")
-        suspend fun getTvShowById(@Path("id") id: String): Document
+        suspend fun getTvShow(@Path("id") id: String): Document
 
         @GET("ajax/v2/tv/seasons/{id}")
-        suspend fun getTvShowSeasonsById(@Path("id") tvShowId: String): Document
+        suspend fun getTvShowSeasons(@Path("id") tvShowId: String): Document
 
         @GET("ajax/v2/season/episodes/{id}")
-        suspend fun getSeasonEpisodesById(@Path("id") seasonId: String): Document
+        suspend fun getSeasonEpisodes(@Path("id") seasonId: String): Document
 
         @GET("ajax/v2/episode/servers/{id}")
-        suspend fun getEpisodeServersById(@Path("id") episodeId: String): Document
+        suspend fun getEpisodeServers(@Path("id") episodeId: String): Document
 
 
-        @GET("cast/{slug}")
-        suspend fun getPeopleBySlug(@Path("slug") slug: String): Document
+        @GET("cast/{id}")
+        suspend fun getPeople(@Path("id") id: String): Document
 
 
         @GET("ajax/get_link/{id}")
