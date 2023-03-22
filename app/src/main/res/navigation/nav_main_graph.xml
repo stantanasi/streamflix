@@ -91,6 +91,9 @@
         <action
             android:id="@+id/action_search_to_tv_show"
             app:destination="@id/tv_show" />
+        <action
+            android:id="@+id/action_search_to_genre"
+            app:destination="@id/genre" />
     </fragment>
     <fragment
         android:id="@+id/season"
@@ -163,4 +166,16 @@
         android:label="fragment_providers"
         tools:layout="@layout/fragment_providers" />
     <action android:id="@+id/action_global_providers" app:destination="@id/providers" />
+    <fragment
+        android:id="@+id/genre"
+        android:name="com.tanasi.sflix.fragments.genre.GenreFragment"
+        android:label="fragment_genre"
+        tools:layout="@layout/fragment_genre" >
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <argument
+            android:name="name"
+            app:argType="string" />
+    </fragment>
 </navigation>
