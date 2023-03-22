@@ -3,6 +3,7 @@ package com.tanasi.sflix.providers
 import android.util.Base64
 import com.google.gson.*
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.models.*
 import com.tanasi.sflix.utils.retry
@@ -221,8 +222,22 @@ object SflixProvider : Provider {
         return categories
     }
 
-    override suspend fun search(query: String): List<Show> {
-        if (query.isEmpty()) return listOf()
+    override suspend fun search(query: String): List<SflixAdapter.Item> {
+        if (query.isEmpty()) {
+            val document = service.getHome()
+
+            val genres = document.select("div#sidebar_subs_genre li.nav-item a.nav-link")
+                .map {
+                    Genre(
+                        id = it.attr("href")
+                            .substringAfterLast("/"),
+                        name = it.text(),
+                    )
+                }
+                .sortedBy { it.name }
+
+            return genres
+        }
 
         val document = service.search(query.replace(" ", "-"))
 

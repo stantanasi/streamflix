@@ -12,7 +12,6 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentSearchBinding
 import com.tanasi.sflix.models.Movie
-import com.tanasi.sflix.models.Show
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.hideKeyboard
 
@@ -93,7 +92,7 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private fun displaySearch(list: List<Show>) {
+    private fun displaySearch(list: List<SflixAdapter.Item>) {
         sflixAdapter.items.apply {
             clear()
             addAll(list.onEach {

@@ -1,6 +1,7 @@
 package com.tanasi.sflix.providers
 
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.models.*
 import com.tanasi.sflix.utils.JsUnpacker
@@ -244,8 +245,23 @@ object AllMoviesForYouProvider : Provider {
         return categories
     }
 
-    override suspend fun search(query: String): List<Show> {
-        if (query.isEmpty()) return listOf()
+    override suspend fun search(query: String): List<SflixAdapter.Item> {
+        if (query.isEmpty()) {
+            val document = service.getHome()
+
+            val genres = document.select("div.Description > p.Genre a")
+                .map {
+                    Genre(
+                        id = it.attr("href")
+                            .substringBeforeLast("/").substringAfterLast("/"),
+                        name = it.text(),
+                    )
+                }
+                .distinctBy { it.id }
+                .sortedBy { it.name }
+
+            return genres
+        }
 
         val document = service.search(query)
 
