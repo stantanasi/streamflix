@@ -177,5 +177,11 @@
         <argument
             android:name="name"
             app:argType="string" />
+        <action
+            android:id="@+id/action_genre_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_genre_to_tv_show"
+            app:destination="@id/tv_show" />
     </fragment>
 </navigation>
