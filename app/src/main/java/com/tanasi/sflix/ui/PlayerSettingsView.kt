@@ -60,8 +60,9 @@ class PlayerSettingsView @JvmOverloads constructor(
     }
 
     fun onBackPressed() {
-        when (binding.rvSettings.adapter) {
-            is SettingsAdapter -> hide()
+        val adapter = binding.rvSettings.adapter as? SettingsAdapter
+        when (adapter?.setting) {
+            Setting.Main -> hide()
             else -> displaySetting(Setting.Main)
         }
     }
@@ -212,7 +213,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
 
     private class SettingsAdapter(
-        private val setting: Setting,
+        val setting: Setting,
     ) : RecyclerView.Adapter<SettingViewHolder>() {
 
         lateinit var playerSettingsView: PlayerSettingsView
