@@ -12,6 +12,8 @@ import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.*
+import com.tanasi.sflix.fragments.genre.GenreFragment
+import com.tanasi.sflix.fragments.genre.GenreFragmentDirections
 import com.tanasi.sflix.fragments.home.HomeFragment
 import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.movie.MovieFragment
@@ -126,6 +128,11 @@ class TvShowViewHolder(
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
+                    is GenreFragment -> findNavController().navigate(
+                        GenreFragmentDirections.actionGenreToTvShow(
+                            id = tvShow.id
+                        )
+                    )
                     is SearchFragment -> findNavController().navigate(
                         SearchFragmentDirections.actionSearchToTvShow(
                             id = tvShow.id

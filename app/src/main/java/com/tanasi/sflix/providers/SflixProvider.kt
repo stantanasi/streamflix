@@ -3,6 +3,7 @@ package com.tanasi.sflix.providers
 import android.util.Base64
 import com.google.gson.*
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.models.*
 import com.tanasi.sflix.utils.retry
@@ -221,8 +222,22 @@ object SflixProvider : Provider {
         return categories
     }
 
-    override suspend fun search(query: String): List<Show> {
-        if (query.isEmpty()) return listOf()
+    override suspend fun search(query: String): List<SflixAdapter.Item> {
+        if (query.isEmpty()) {
+            val document = service.getHome()
+
+            val genres = document.select("div#sidebar_subs_genre li.nav-item a.nav-link")
+                .map {
+                    Genre(
+                        id = it.attr("href")
+                            .substringAfterLast("/"),
+                        name = it.text(),
+                    )
+                }
+                .sortedBy { it.name }
+
+            return genres
+        }
 
         val document = service.search(query.replace(" ", "-"))
 
@@ -563,6 +578,70 @@ object SflixProvider : Provider {
     }
 
 
+    override suspend fun getGenre(id: String): Genre {
+        val document = service.getGenre(id)
+
+        val genre = Genre(
+            id = id,
+            name = document.selectFirst("h2.cat-heading")
+                ?.text()?.removeSuffix(" Movies and TV Shows") ?: "",
+
+            shows = document.select("div.flw-item").map {
+                val showId = it.selectFirst("a")
+                    ?.attr("href")?.substringAfterLast("-") ?: ""
+                val showTitle = it.selectFirst("h2.film-name")
+                    ?.text() ?: ""
+                val showPoster = it.selectFirst("div.film-poster > img.film-poster-img")
+                    ?.attr("data-src")
+
+                when {
+                    it.isMovie() -> {
+                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+
+                        Movie(
+                            id = showId,
+                            title = showTitle,
+                            released = info.released,
+                            quality = info.quality,
+                            rating = info.rating,
+                            poster = showPoster,
+                        )
+                    }
+                    else -> {
+                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+
+                        TvShow(
+                            id = showId,
+                            title = showTitle,
+                            quality = info.quality,
+                            rating = info.rating,
+                            poster = showPoster,
+
+                            seasons = info.lastEpisode?.let { lastEpisode ->
+                                listOf(
+                                    Season(
+                                        id = "",
+                                        number = lastEpisode.season,
+
+                                        episodes = listOf(
+                                            Episode(
+                                                id = "",
+                                                number = lastEpisode.episode,
+                                            )
+                                        )
+                                    )
+                                )
+                            } ?: listOf(),
+                        )
+                    }
+                }
+            }
+        )
+
+        return genre
+    }
+
+
     override suspend fun getPeople(id: String): People {
         val document = service.getPeople(id)
 
@@ -754,6 +833,10 @@ object SflixProvider : Provider {
 
         @GET("ajax/v2/episode/servers/{id}")
         suspend fun getEpisodeServers(@Path("id") episodeId: String): Document
+
+
+        @GET("genre/{id}")
+        suspend fun getGenre(@Path("id") id: String): Document
 
 
         @GET("cast/{id}")

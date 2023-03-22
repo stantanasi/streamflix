@@ -1,4 +1,40 @@
 <resources>
     <color name="ic_launcher_background">#1E2129</color>
     <color name="ic_banner_background">#1E2129</color>
+
+    <array name="genres">
+        <item>#E13300</item>
+        <item>#7358FF</item>
+        <item>#1E3264</item>
+        <item>#E8115B</item>
+        <item>#BC5900</item>
+        <item>#148A08</item>
+        <item>#202F72</item>
+        <item>#E1118C</item>
+        <item>#8D67AB</item>
+        <item>#D84000</item>
+        <item>#E91429</item>
+        <item>#777777</item>
+        <item>#DC148C</item>
+        <item>#537AA1</item>
+        <item>#006450</item>
+        <item>#5179A1</item>
+        <item>#BA5D07</item>
+        <item>#E61E32</item>
+        <item>#B02897</item>
+        <item>#056952</item>
+        <item>#7D4B32</item>
+        <item>#503750</item>
+        <item>#EB1E32</item>
+        <item>#A56752</item>
+        <item>#477D95</item>
+        <item>#B06239</item>
+        <item>#0D73EC</item>
+        <item>#0D72ED</item>
+        <item>#8C1932</item>
+        <item>#AF2896</item>
+        <item>#E41D63</item>
+        <item>#27856A</item>
+        <item>#FF0090</item>
+    </array>
 </resources>

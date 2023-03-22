@@ -1,6 +1,7 @@
 package com.tanasi.sflix.providers
 
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
+import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.models.*
 import com.tanasi.sflix.utils.JsUnpacker
@@ -244,8 +245,23 @@ object AllMoviesForYouProvider : Provider {
         return categories
     }
 
-    override suspend fun search(query: String): List<Show> {
-        if (query.isEmpty()) return listOf()
+    override suspend fun search(query: String): List<SflixAdapter.Item> {
+        if (query.isEmpty()) {
+            val document = service.getHome()
+
+            val genres = document.select("div.Description > p.Genre a")
+                .map {
+                    Genre(
+                        id = it.attr("href")
+                            .substringBeforeLast("/").substringAfterLast("/"),
+                        name = it.text(),
+                    )
+                }
+                .distinctBy { it.id }
+                .sortedBy { it.name }
+
+            return genres
+        }
 
         val document = service.search(query)
 
@@ -599,6 +615,93 @@ object AllMoviesForYouProvider : Provider {
     }
 
 
+    override suspend fun getGenre(id: String): Genre {
+        val document = service.getGenre(id)
+
+        val genre = Genre(
+            id = id,
+            name = document.selectFirst("h2.Title")
+                ?.text() ?: "",
+
+            shows = document.select("ul.MovieList article.TPost.B").map {
+                val showId = it.selectFirst("a")?.attr("href")
+                    ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
+                val showTitle = it.selectFirst("h2.Title")
+                    ?.text() ?: ""
+                val showOverview = it.selectFirst("div.Description > p")
+                    ?.text() ?: ""
+                val showReleased = it.selectFirst("div.Image span.Yr")
+                    ?.text()
+                val showRuntime = it.selectFirst("span.Time")
+                    ?.text()?.toMinutes()
+                val showRating = it.selectFirst("div.Vote > div.post-ratings > span")
+                    ?.text()?.toDoubleOrNull()
+                val showPoster = it.selectFirst("div.Image img")
+                    ?.attr("data-src")?.toSafeUrl()
+
+                val showGenres = it.select("div.Description > p.Genre a").map { element ->
+                    Genre(
+                        id = element.attr("href")
+                            .substringBeforeLast("/").substringAfterLast("/"),
+                        name = element.text(),
+                    )
+                }
+                val showDirectors =
+                    it.select("div.Description > p.Director a").map { element ->
+                        People(
+                            id = element.attr("href")
+                                .substringBeforeLast("/").substringAfterLast("/"),
+                            name = element.text(),
+                        )
+                    }
+                val showCast = it.select("div.Description > p.Cast a").map { element ->
+                    People(
+                        id = element.attr("href")
+                            .substringBeforeLast("/").substringAfterLast("/"),
+                        name = element.text(),
+                    )
+                }
+
+                when {
+                    it.isMovie() -> {
+                        Movie(
+                            id = showId,
+                            title = showTitle,
+                            overview = showOverview,
+                            released = showReleased,
+                            runtime = showRuntime,
+                            quality = it.selectFirst("div.Image span.Qlty")?.text(),
+                            rating = showRating,
+                            poster = showPoster,
+
+                            genres = showGenres,
+                            directors = showDirectors,
+                            cast = showCast,
+                        )
+                    }
+                    else -> {
+                        TvShow(
+                            id = showId,
+                            title = showTitle,
+                            overview = showOverview,
+                            released = showReleased,
+                            runtime = showRuntime,
+                            rating = showRating,
+                            poster = showPoster,
+
+                            genres = showGenres,
+                            directors = showDirectors,
+                            cast = showCast,
+                        )
+                    }
+                }
+            }
+        )
+
+        return genre
+    }
+
+
     override suspend fun getPeople(id: String): People {
         val cast = service.getCast(id)
         val castTv = service.getCastTv(id)
@@ -818,6 +921,10 @@ object AllMoviesForYouProvider : Provider {
 
         @GET("episode/{id}")
         suspend fun getEpisode(@Path("id") id: String): Document
+
+
+        @GET("category/{id}")
+        suspend fun getGenre(@Path("id") id: String): Document
 
 
         @GET("cast/{slug}")
