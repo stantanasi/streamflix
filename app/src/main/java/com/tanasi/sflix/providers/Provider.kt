@@ -28,6 +28,9 @@ interface Provider {
     suspend fun getSeasonEpisodes(seasonId: String): List<Episode>
 
 
+    suspend fun getGenre(id: String): Genre
+
+
     suspend fun getPeople(id: String): People
 
 

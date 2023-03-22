@@ -578,6 +578,11 @@ object SflixProvider : Provider {
     }
 
 
+    override suspend fun getGenre(id: String): Genre {
+        TODO("Not yet implemented")
+    }
+
+
     override suspend fun getPeople(id: String): People {
         val document = service.getPeople(id)
 
