@@ -2,10 +2,12 @@ package com.tanasi.sflix.adapters.viewholders
 
 import android.graphics.drawable.GradientDrawable
 import android.view.animation.AnimationUtils
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ItemGenreGridBinding
+import com.tanasi.sflix.fragments.search.SearchFragmentDirections
 import com.tanasi.sflix.models.Genre
 
 
@@ -33,6 +35,12 @@ class GenreViewHolder(
             (background as? GradientDrawable)?.setColor(colors[bindingAdapterPosition % colors.size])
 
             setOnClickListener {
+                findNavController().navigate(
+                    SearchFragmentDirections.actionSearchToGenre(
+                        id = genre.id,
+                        name = genre.name,
+                    )
+                )
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {
