@@ -23,6 +23,8 @@ class SflixAdapter(
         EPISODE_ITEM,
         EPISODE_CONTINUE_WATCHING_ITEM,
 
+        GENRE_GRID_ITEM,
+
         MOVIE_ITEM,
         MOVIE_GRID_ITEM,
         MOVIE_CONTINUE_WATCHING_ITEM,
@@ -75,6 +77,14 @@ class SflixAdapter(
             )
             Type.EPISODE_CONTINUE_WATCHING_ITEM -> EpisodeViewHolder(
                 ItemEpisodeContinueWatchingBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.GENRE_GRID_ITEM -> GenreViewHolder(
+                ItemGenreGridBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -206,6 +216,7 @@ class SflixAdapter(
         when (holder) {
             is CategoryViewHolder -> holder.bind(items[position] as Category)
             is EpisodeViewHolder -> holder.bind(items[position] as Episode)
+            is GenreViewHolder -> holder.bind(items[position] as Genre)
             is MovieViewHolder -> holder.bind(items[position] as Movie)
             is PeopleViewHolder -> holder.bind(items[position] as People)
             is ProviderViewHolder -> holder.bind(items[position] as Provider)
