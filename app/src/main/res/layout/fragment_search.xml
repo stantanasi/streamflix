@@ -22,6 +22,7 @@
         android:imeOptions="actionSearch"
         android:inputType="text"
         android:maxLines="1"
+        android:nextFocusDown="@id/vgv_search"
         android:padding="14dp"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"

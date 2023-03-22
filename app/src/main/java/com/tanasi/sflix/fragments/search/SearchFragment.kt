@@ -67,11 +67,6 @@ class SearchFragment : Fragment() {
 
     private fun initializeSearch() {
         binding.etSearch.apply {
-            nextFocusDownId = when {
-                sflixAdapter.items.isNotEmpty() -> binding.vgvSearch.id
-                else -> binding.etSearch.id
-            }
-
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_SEARCH -> {
@@ -88,9 +83,6 @@ class SearchFragment : Fragment() {
         binding.vgvSearch.apply {
             adapter = sflixAdapter
             setItemSpacing(requireContext().resources.getDimension(R.dimen.search_spacing).toInt())
-
-            isFocusable = sflixAdapter.items.isNotEmpty()
-            isFocusableInTouchMode = sflixAdapter.items.isNotEmpty()
         }
     }
 
@@ -107,15 +99,7 @@ class SearchFragment : Fragment() {
         }
         sflixAdapter.notifyDataSetChanged()
 
-        binding.etSearch.nextFocusDownId = when {
-            sflixAdapter.items.isNotEmpty() -> binding.vgvSearch.id
-            else -> binding.etSearch.id
-        }
-
         binding.vgvSearch.apply {
-            isFocusable = sflixAdapter.items.isNotEmpty()
-            isFocusableInTouchMode = sflixAdapter.items.isNotEmpty()
-
             setNumColumns(
                 when (query) {
                     "" -> 5
