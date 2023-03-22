@@ -36,6 +36,8 @@
 
     <string name="seasons_episode_number">Episode %d</string>
 
+    <string name="genre_header_name">%s Movies and TV Shows</string>
+
     <string name="player_subtitle_tv_show">S%d E%d • %s</string>
     <string name="player_settings_title">Settings</string>
     <string name="player_settings_quality_title">Quality for current video</string>
