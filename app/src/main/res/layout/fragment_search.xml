@@ -14,7 +14,7 @@
         android:layout_marginTop="32dp"
         android:layout_marginEnd="100dp"
         android:background="@drawable/bg_search_edittext"
-        android:drawableStart="@drawable/ic_outline_search_24"
+        android:drawableStart="@drawable/ic_search"
         android:drawablePadding="10dp"
         android:drawableTint="#FFFFFF"
         android:gravity="center_vertical"

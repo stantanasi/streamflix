@@ -5,22 +5,22 @@
 
     <item
         android:id="@id/search"
-        android:icon="@drawable/ic_outline_search_24"
+        android:icon="@drawable/ic_menu_search"
         android:title="@string/main_menu_search" />
 
     <item
         android:id="@id/home"
-        android:icon="@drawable/ic_outline_home_24"
+        android:icon="@drawable/ic_menu_home"
         android:title="@string/main_menu_home" />
 
     <item
         android:id="@id/movies"
-        android:icon="@drawable/ic_outline_movie_24"
+        android:icon="@drawable/ic_menu_movie"
         android:title="@string/main_menu_movies" />
 
     <item
         android:id="@id/tv_shows"
-        android:icon="@drawable/ic_outline_tv_24"
+        android:icon="@drawable/ic_menu_tv"
         android:title="@string/main_menu_tv_shows" />
 
 </menu>
