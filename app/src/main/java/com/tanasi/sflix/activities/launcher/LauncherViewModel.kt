@@ -1,6 +1,7 @@
 package com.tanasi.sflix.activities.launcher
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -55,6 +56,19 @@ class LauncherViewModel : ViewModel() {
             val apk = InAppUpdater.downloadApk(context, asset)
 
             _state.postValue(State.SuccessDownloadingUpdate(apk))
+        } catch (e: Exception) {
+            _state.postValue(State.FailedUpdate(e))
+        }
+    }
+
+    fun installUpdate(
+        context: Context,
+        apk: File,
+    ) = viewModelScope.launch(Dispatchers.IO) {
+        _state.postValue(State.InstallingUpdate)
+
+        try {
+            InAppUpdater.installApk(context, Uri.fromFile(apk))
         } catch (e: Exception) {
             _state.postValue(State.FailedUpdate(e))
         }
