@@ -1,4 +1,4 @@
-package com.tanasi.sflix.activities
+package com.tanasi.sflix.activities.launcher
 
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity

@@ -21,7 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.SFlix">
         <activity
-            android:name=".activities.LauncherActivity"
+            android:name=".activities.launcher.LauncherActivity"
             android:exported="true"
             android:theme="@style/AppTheme.SplashScreen">
             <intent-filter>
