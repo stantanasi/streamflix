@@ -35,10 +35,21 @@ class LauncherActivity : FragmentActivity() {
                     if (asset != null) {
                         updateDialog = UpdateDialog(this).also {
                             it.release = state.release
+                            it.setOnUpdateClickListener { _ ->
+                                if (!it.isLoading) viewModel.downloadUpdate(this, asset)
+                            }
                             it.show()
                         }
                     }
                 }
+
+                LauncherViewModel.State.DownloadingUpdate -> updateDialog.isLoading = true
+                is LauncherViewModel.State.SuccessDownloadingUpdate -> {
+                    viewModel.installUpdate(this, state.apk)
+                    updateDialog.hide()
+                }
+
+                LauncherViewModel.State.InstallingUpdate -> updateDialog.isLoading = true
 
                 is LauncherViewModel.State.FailedUpdate -> {
                     Toast.makeText(
