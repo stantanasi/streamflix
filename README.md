@@ -51,6 +51,7 @@ New titles are updated on the app daily to make sure fun never ends on SFlix.
 - Optimized UI & UX.
 - Multiple providers.
 - Resume from last playback position.
+- In-app update.
 
 ### Built with
 
