@@ -1,6 +1,9 @@
 package com.tanasi.sflix.utils
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.core.content.FileProvider
 import com.tanasi.sflix.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -59,5 +62,19 @@ object InAppUpdater {
         }
 
         return apk
+    }
+
+    fun installApk(context: Context, uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW).also { intent ->
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
+            intent.data = FileProvider.getUriForFile(
+                context,
+                BuildConfig.APPLICATION_ID + ".provider",
+                File(uri.path!!)
+            )
+        }
+        context.startActivity(intent)
     }
 }
