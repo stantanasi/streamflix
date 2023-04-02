@@ -1,6 +1,12 @@
 package com.tanasi.sflix.utils
 
+import android.content.Context
 import com.tanasi.sflix.BuildConfig
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
 import kotlin.math.max
 
 object InAppUpdater {
@@ -32,5 +38,26 @@ object InAppUpdater {
         }
 
         return null
+    }
+
+    suspend fun downloadApk(context: Context, asset: GitHub.Release.Asset): File {
+        context.cacheDir.listFiles()
+            ?.filter { it.extension == "apk" }
+            ?.forEach { it.deleteOnExit() }
+
+        val apk = withContext(Dispatchers.IO) {
+            File.createTempFile(
+                "${File(asset.name).nameWithoutExtension}-",
+                ".${File(asset.name).extension}"
+            )
+        }
+
+        withContext(Dispatchers.IO) {
+            URL(asset.browserDownloadUrl).openStream()
+        }.use { input ->
+            FileOutputStream(apk).use { output -> input.copyTo(output) }
+        }
+
+        return apk
     }
 }
