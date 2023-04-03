@@ -12,4 +12,5 @@
         <item name="android:textColor">@drawable/color_button_text</item>
         <item name="android:textSize">16sp</item>
     </style>
+
 </resources>

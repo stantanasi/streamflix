@@ -271,7 +271,11 @@ class MovieViewHolder(
                 val hours = it / 60
                 val minutes = it % 60
                 when {
-                    hours > 0 -> context.getString(R.string.movie_runtime_hours_minutes, hours, minutes)
+                    hours > 0 -> context.getString(
+                        R.string.movie_runtime_hours_minutes,
+                        hours,
+                        minutes
+                    )
                     else -> context.getString(R.string.movie_runtime_minutes, minutes)
                 }
             }

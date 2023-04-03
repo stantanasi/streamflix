@@ -15,10 +15,10 @@
         android:layout_height="0dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
+        app:headerLayout="@layout/content_header_menu_main"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:headerLayout="@layout/content_header_menu_main"
         app:menu="@menu/menu_main_activity"
         app:menuGravity="center"
         app:menuSpacing="8dp" />

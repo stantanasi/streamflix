@@ -165,12 +165,14 @@
         android:name="com.tanasi.sflix.fragments.providers.ProvidersFragment"
         android:label="fragment_providers"
         tools:layout="@layout/fragment_providers" />
-    <action android:id="@+id/action_global_providers" app:destination="@id/providers" />
+    <action
+        android:id="@+id/action_global_providers"
+        app:destination="@id/providers" />
     <fragment
         android:id="@+id/genre"
         android:name="com.tanasi.sflix.fragments.genre.GenreFragment"
         android:label="fragment_genre"
-        tools:layout="@layout/fragment_genre" >
+        tools:layout="@layout/fragment_genre">
         <argument
             android:name="id"
             app:argType="string" />
