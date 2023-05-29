@@ -24,7 +24,7 @@
         app:show_next_button="false"
         app:show_previous_button="false"
         app:show_subtitle_button="true"
-        app:show_timeout="5000" />
+        app:show_timeout="2000" />
 
     <com.tanasi.sflix.ui.PlayerSettingsView
         android:id="@+id/settings"
