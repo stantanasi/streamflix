@@ -31,7 +31,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ContentExoControllerBinding
 import com.tanasi.sflix.databinding.FragmentPlayerBinding
 import com.tanasi.sflix.models.Video
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 import com.tanasi.sflix.utils.map
 import com.tanasi.sflix.utils.viewModelsFactory
 import kotlinx.parcelize.Parcelize
@@ -228,7 +228,7 @@ class PlayerFragment : Fragment() {
                         null,
                         null
                     )?.map { WatchNextProgram.fromCursor(it) }
-                        ?.find { it.contentId == args.id && it.internalProviderId == AppPreferences.currentProvider.name }
+                        ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider.name }
 
                     when {
                         player.hasStarted() -> {
@@ -241,7 +241,7 @@ class PlayerFragment : Fragment() {
                                     .setLastPlaybackPositionMillis(player.currentPosition.toInt())
                                     .setDurationMillis(player.duration.toInt())
                                     .setContentId(args.id)
-                                    .setInternalProviderId(AppPreferences.currentProvider.name)
+                                    .setInternalProviderId(UserPreferences.currentProvider.name)
 
                                 when (val videoType = args.videoType as VideoType) {
                                     is VideoType.Movie -> {
@@ -304,7 +304,7 @@ class PlayerFragment : Fragment() {
             null,
             null
         )?.map { WatchNextProgram.fromCursor(it) }
-            ?.find { it.contentId == args.id && it.internalProviderId == AppPreferences.currentProvider.name }
+            ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider.name }
             ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
 
         player.seekTo(lastPlaybackPositionMillis ?: 0)

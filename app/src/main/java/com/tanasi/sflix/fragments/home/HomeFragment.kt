@@ -15,7 +15,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.adapters.SflixAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
 import com.tanasi.sflix.models.*
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 import com.tanasi.sflix.utils.map
 
 @SuppressLint("RestrictedApi")
@@ -97,7 +97,7 @@ class HomeFragment : Fragment() {
                     null,
                     null
                 )?.map { WatchNextProgram.fromCursor(it) }
-                    ?.filter { it.internalProviderId == AppPreferences.currentProvider.name }
+                    ?.filter { it.internalProviderId == UserPreferences.currentProvider.name }
                     ?.sortedBy { it.lastEngagementTimeUtcMillis }?.reversed()
                     ?.mapNotNull {
                         when (it.type) {

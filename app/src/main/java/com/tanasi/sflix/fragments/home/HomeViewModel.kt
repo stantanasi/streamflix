@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Category
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -29,7 +29,7 @@ class HomeViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val categories = AppPreferences.currentProvider.getHome()
+            val categories = UserPreferences.currentProvider.getHome()
 
             _state.postValue(State.SuccessLoading(categories))
         } catch (e: Exception) {

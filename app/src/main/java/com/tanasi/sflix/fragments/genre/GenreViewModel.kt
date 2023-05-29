@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Genre
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -29,7 +29,7 @@ class GenreViewModel(id: String) : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val genre = AppPreferences.currentProvider.getGenre(id)
+            val genre = UserPreferences.currentProvider.getGenre(id)
 
             _state.postValue(State.SuccessLoading(genre))
         } catch (e: Exception) {

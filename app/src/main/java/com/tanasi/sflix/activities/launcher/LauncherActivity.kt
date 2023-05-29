@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ActivityLauncherBinding
 import com.tanasi.sflix.ui.UpdateDialog
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 
 class LauncherActivity : FragmentActivity() {
 
@@ -24,7 +24,7 @@ class LauncherActivity : FragmentActivity() {
         _binding = ActivityLauncherBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        AppPreferences.setup(this)
+        UserPreferences.setup(this)
 
         viewModel.state.observe(this) { state ->
             when (state) {

@@ -7,7 +7,7 @@ import com.tanasi.sflix.providers.AllMoviesForYouProvider
 import com.tanasi.sflix.providers.Provider
 import com.tanasi.sflix.providers.SflixProvider
 
-object AppPreferences {
+object UserPreferences {
 
     private lateinit var prefs: SharedPreferences
 

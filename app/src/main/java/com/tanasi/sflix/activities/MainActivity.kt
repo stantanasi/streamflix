@@ -12,7 +12,7 @@ import com.tanasi.sflix.R
 import com.tanasi.sflix.databinding.ActivityMainBinding
 import com.tanasi.sflix.databinding.ContentHeaderMenuMainBinding
 import com.tanasi.sflix.fragments.player.PlayerFragment
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 
 class MainActivity : FragmentActivity() {
 
@@ -34,9 +34,9 @@ class MainActivity : FragmentActivity() {
             val header = ContentHeaderMenuMainBinding.bind(this)
 
             Glide.with(context)
-                .load(AppPreferences.currentProvider.logo)
+                .load(UserPreferences.currentProvider.logo)
                 .into(header.ivNavigationHeaderIcon)
-            header.tvNavigationHeaderTitle.text = AppPreferences.currentProvider.name
+            header.tvNavigationHeaderTitle.text = UserPreferences.currentProvider.name
             header.tvNavigationHeaderSubtitle.text = getString(R.string.main_menu_change_provider)
 
             setOnOpenListener {

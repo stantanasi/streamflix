@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Provider
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -29,7 +29,7 @@ class ProvidersViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val providers = AppPreferences.providers.map {
+            val providers = UserPreferences.providers.map {
                 Provider(
                     name = it.name,
                     logo = it.logo,

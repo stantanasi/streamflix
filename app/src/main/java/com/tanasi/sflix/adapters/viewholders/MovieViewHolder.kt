@@ -217,7 +217,7 @@ class MovieViewHolder(
                 null,
                 null,
             )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == movie.id && it.internalProviderId == AppPreferences.currentProvider.name }
+                ?.find { it.contentId == movie.id && it.internalProviderId == UserPreferences.currentProvider.name }
 
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
@@ -313,7 +313,7 @@ class MovieViewHolder(
                 null,
                 null,
             )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == movie.id && it.internalProviderId == AppPreferences.currentProvider.name }
+                ?.find { it.contentId == movie.id && it.internalProviderId == UserPreferences.currentProvider.name }
 
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()

@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.tanasi.sflix.activities.MainActivity
 import com.tanasi.sflix.databinding.ItemProviderBinding
 import com.tanasi.sflix.models.Provider
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 import com.tanasi.sflix.utils.toActivity
 
 class ProviderViewHolder(
@@ -31,7 +31,7 @@ class ProviderViewHolder(
     private fun displayItem(binding: ItemProviderBinding) {
         binding.root.apply {
             setOnClickListener {
-                AppPreferences.currentProvider = provider.provider
+                UserPreferences.currentProvider = provider.provider
                 context.startActivity(Intent(context, MainActivity::class.java))
                 context.toActivity()?.finish()
             }

@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.sflix.models.Video
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -35,7 +35,7 @@ class PlayerViewModel(
         _state.postValue(State.Loading)
 
         try {
-            val video = AppPreferences.currentProvider.getVideo(id, videoType)
+            val video = UserPreferences.currentProvider.getVideo(id, videoType)
 
             if (video.sources.isEmpty()) throw Exception("No links found")
 

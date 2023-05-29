@@ -17,7 +17,7 @@ import com.tanasi.sflix.fragments.home.HomeFragmentDirections
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.fragments.season.SeasonFragmentDirections
 import com.tanasi.sflix.models.Episode
-import com.tanasi.sflix.utils.AppPreferences
+import com.tanasi.sflix.utils.UserPreferences
 import com.tanasi.sflix.utils.getCurrentFragment
 import com.tanasi.sflix.utils.map
 import com.tanasi.sflix.utils.toActivity
@@ -100,7 +100,7 @@ class EpisodeViewHolder(
                 null,
                 null,
             )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == episode.id && it.internalProviderId == AppPreferences.currentProvider.name }
+                ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider.name }
 
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
@@ -179,7 +179,7 @@ class EpisodeViewHolder(
                 null,
                 null,
             )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == episode.id && it.internalProviderId == AppPreferences.currentProvider.name }
+                ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider.name }
 
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
