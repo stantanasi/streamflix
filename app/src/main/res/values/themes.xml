@@ -6,5 +6,5 @@
         <item name="android:windowBackground">@drawable/bg_splash_screen</item>
     </style>
 
-    <style name="AppTheme.SFlix" parent="AppTheme" />
+    <style name="AppTheme.Base" parent="AppTheme" />
 </resources>

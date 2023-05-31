@@ -19,7 +19,7 @@ class LauncherActivity : FragmentActivity() {
     private lateinit var updateDialog: UpdateDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme_SFlix)
+        setTheme(R.style.AppTheme_Base)
         super.onCreate(savedInstanceState)
         _binding = ActivityLauncherBinding.inflate(layoutInflater)
         setContentView(binding.root)
