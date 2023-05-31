@@ -1,9 +1,9 @@
 package com.tanasi.sflix.models
 
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.utils.toCalendar
 
-sealed class Show : SflixAdapter.Item {
+sealed class Show : AppAdapter.Item {
 
     enum class Type {
         Movie,
@@ -27,12 +27,12 @@ class Movie(
     val directors: List<People> = listOf(),
     val cast: List<People> = listOf(),
     val recommendations: List<Show> = listOf(),
-) : Show(), SflixAdapter.Item, Cloneable {
+) : Show(), AppAdapter.Item, Cloneable {
 
     val released = released?.toCalendar()
 
 
-    override lateinit var itemType: SflixAdapter.Type
+    override lateinit var itemType: AppAdapter.Type
 
     public override fun clone() = super.clone() as Movie
 }
@@ -54,12 +54,12 @@ class TvShow(
     val directors: List<People> = listOf(),
     val cast: List<People> = listOf(),
     val recommendations: List<Show> = listOf(),
-) : Show(), SflixAdapter.Item, Cloneable {
+) : Show(), AppAdapter.Item, Cloneable {
 
     val released = released?.toCalendar()
 
 
-    override lateinit var itemType: SflixAdapter.Type
+    override lateinit var itemType: AppAdapter.Type
 
     public override fun clone() = super.clone() as TvShow
 }

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.ContentPeopleBinding
 import com.tanasi.sflix.databinding.ItemPeopleBinding
 import com.tanasi.sflix.fragments.movie.MovieFragment
@@ -89,11 +89,11 @@ class PeopleViewHolder(
 
         binding.hgvPeopleFilmography.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter().apply {
+            adapter = AppAdapter().apply {
                 items.addAll(people.filmography.onEach {
                     when (it) {
-                        is Movie -> it.itemType = SflixAdapter.Type.MOVIE_ITEM
-                        is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_ITEM
+                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_ITEM
+                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_ITEM
                     }
                 })
             }

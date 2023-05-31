@@ -1,13 +1,13 @@
 package com.tanasi.sflix.models
 
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 
 class Genre(
     val id: String,
     val name: String,
 
     val shows: List<Show> = listOf(),
-) : SflixAdapter.Item {
+) : AppAdapter.Item {
 
-    override lateinit var itemType: SflixAdapter.Type
+    override lateinit var itemType: AppAdapter.Type
 }

@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentGenreBinding
 import com.tanasi.sflix.models.Genre
 import com.tanasi.sflix.models.Movie
@@ -23,7 +23,7 @@ class GenreFragment : Fragment() {
     private val args by navArgs<GenreFragmentArgs>()
     private val viewModel by viewModelsFactory { GenreViewModel(args.id) }
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,21 +67,21 @@ class GenreFragment : Fragment() {
         binding.tvGenreName.text = getString(R.string.genre_header_name, args.name)
 
         binding.vgvGenre.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             setItemSpacing(requireContext().resources.getDimension(R.dimen.genre_spacing).toInt())
         }
     }
 
     private fun displayGenre(genre: Genre) {
-        sflixAdapter.items.apply {
+        appAdapter.items.apply {
             clear()
             addAll(genre.shows.onEach {
                 when (it) {
-                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_GRID_ITEM
-                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_GRID_ITEM
+                    is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
+                    is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
                 }
             })
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
     }
 }

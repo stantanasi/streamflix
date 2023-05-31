@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentProvidersBinding
 import com.tanasi.sflix.models.Provider
 import com.tanasi.sflix.ui.SpacingItemDecoration
@@ -20,7 +20,7 @@ class ProvidersFragment : Fragment() {
 
     private val viewModel by viewModels<ProvidersViewModel>()
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,7 +62,7 @@ class ProvidersFragment : Fragment() {
 
     private fun initializeProviders() {
         binding.rvProviders.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             addItemDecoration(
                 SpacingItemDecoration(
                     requireContext().resources.getDimension(R.dimen.providers_spacing).toInt()
@@ -72,11 +72,11 @@ class ProvidersFragment : Fragment() {
     }
 
     private fun displayProviders(providers: List<Provider>) {
-        sflixAdapter.items.apply {
+        appAdapter.items.apply {
             clear()
             addAll(providers)
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
 
         binding.rvProviders.requestFocus()
     }

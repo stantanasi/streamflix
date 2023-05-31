@@ -12,7 +12,7 @@ import androidx.tvprovider.media.tv.TvContractCompat
 import androidx.tvprovider.media.tv.WatchNextProgram
 import com.bumptech.glide.Glide
 import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentHomeBinding
 import com.tanasi.sflix.models.*
 import com.tanasi.sflix.utils.UserPreferences
@@ -26,7 +26,7 @@ class HomeFragment : Fragment() {
 
     private val viewModel by viewModels<HomeViewModel>()
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,17 +74,17 @@ class HomeFragment : Fragment() {
 
     private fun initializeHome() {
         binding.vgvHome.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
         }
     }
 
     private fun displayHome(categories: List<Category>) {
-        sflixAdapter.items.apply {
+        appAdapter.items.apply {
             clear()
 
             categories.find { it.name == "Featured" }?.let { category ->
-                category.itemType = SflixAdapter.Type.CATEGORY_SWIPER
+                category.itemType = AppAdapter.Type.CATEGORY_SWIPER
                 add(category)
             }
 
@@ -129,12 +129,12 @@ class HomeFragment : Fragment() {
             ).takeIf { it.list.isNotEmpty() }?.let {
                 it.list.onEach { show ->
                     when (show) {
-                        is Movie -> show.itemType = SflixAdapter.Type.MOVIE_CONTINUE_WATCHING_ITEM
-                        is Episode -> show.itemType = SflixAdapter.Type.EPISODE_CONTINUE_WATCHING_ITEM
+                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_CONTINUE_WATCHING_ITEM
+                        is Episode -> show.itemType = AppAdapter.Type.EPISODE_CONTINUE_WATCHING_ITEM
                     }
                 }
                 it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-                it.itemType = SflixAdapter.Type.CATEGORY_ITEM
+                it.itemType = AppAdapter.Type.CATEGORY_ITEM
                 add(it)
             }
 
@@ -143,15 +143,15 @@ class HomeFragment : Fragment() {
                 .onEach { category ->
                     category.list.onEach { show ->
                         when (show) {
-                            is Movie -> show.itemType = SflixAdapter.Type.MOVIE_ITEM
-                            is TvShow -> show.itemType = SflixAdapter.Type.TV_SHOW_ITEM
+                            is Movie -> show.itemType = AppAdapter.Type.MOVIE_ITEM
+                            is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_ITEM
                         }
                     }
                     category.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-                    category.itemType = SflixAdapter.Type.CATEGORY_ITEM
+                    category.itemType = AppAdapter.Type.CATEGORY_ITEM
                     add(category)
                 }
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
     }
 }

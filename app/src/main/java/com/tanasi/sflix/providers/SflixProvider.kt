@@ -3,7 +3,7 @@ package com.tanasi.sflix.providers
 import android.util.Base64
 import com.google.gson.*
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.models.*
 import com.tanasi.sflix.utils.retry
@@ -222,7 +222,7 @@ object SflixProvider : Provider {
         return categories
     }
 
-    override suspend fun search(query: String): List<SflixAdapter.Item> {
+    override suspend fun search(query: String): List<AppAdapter.Item> {
         if (query.isEmpty()) {
             val document = service.getHome()
 

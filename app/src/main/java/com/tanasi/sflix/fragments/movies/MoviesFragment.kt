@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentMoviesBinding
 import com.tanasi.sflix.models.Movie
 
@@ -19,7 +19,7 @@ class MoviesFragment : Fragment() {
 
     private val viewModel by viewModels<MoviesViewModel>()
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,18 +61,18 @@ class MoviesFragment : Fragment() {
 
     private fun initializeMovies() {
         binding.vgvMovies.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             setItemSpacing(requireContext().resources.getDimension(R.dimen.movies_spacing).toInt())
         }
     }
 
     private fun displayMovies(movies: List<Movie>) {
-        sflixAdapter.items.apply {
+        appAdapter.items.apply {
             clear()
             addAll(movies.onEach {
-                it.itemType = SflixAdapter.Type.MOVIE_GRID_ITEM
+                it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
             })
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
     }
 }

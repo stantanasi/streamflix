@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentSearchBinding
 import com.tanasi.sflix.models.Genre
 import com.tanasi.sflix.models.Movie
@@ -23,7 +23,7 @@ class SearchFragment : Fragment() {
 
     private val viewModel by viewModels<SearchViewModel>()
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     private var query = ""
 
@@ -89,23 +89,23 @@ class SearchFragment : Fragment() {
         }
 
         binding.vgvSearch.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             setItemSpacing(requireContext().resources.getDimension(R.dimen.search_spacing).toInt())
         }
     }
 
-    private fun displaySearch(list: List<SflixAdapter.Item>) {
-        sflixAdapter.items.apply {
+    private fun displaySearch(list: List<AppAdapter.Item>) {
+        appAdapter.items.apply {
             clear()
             addAll(list.onEach {
                 when (it) {
-                    is Genre -> it.itemType = SflixAdapter.Type.GENRE_GRID_ITEM
-                    is Movie -> it.itemType = SflixAdapter.Type.MOVIE_GRID_ITEM
-                    is TvShow -> it.itemType = SflixAdapter.Type.TV_SHOW_GRID_ITEM
+                    is Genre -> it.itemType = AppAdapter.Type.GENRE_GRID_ITEM
+                    is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
+                    is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
                 }
             })
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
 
         binding.vgvSearch.apply {
             setNumColumns(

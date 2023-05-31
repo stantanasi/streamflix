@@ -1,6 +1,6 @@
 package com.tanasi.sflix.models
 
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.utils.toCalendar
 
 class Episode(
@@ -12,10 +12,10 @@ class Episode(
 
     var tvShow: TvShow? = null,
     var season: Season? = null,
-) : SflixAdapter.Item {
+) : AppAdapter.Item {
 
     val released = released?.toCalendar()
 
 
-    override var itemType = SflixAdapter.Type.EPISODE_ITEM
+    override var itemType = AppAdapter.Type.EPISODE_ITEM
 }

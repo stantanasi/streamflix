@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentTvShowBinding
 import com.tanasi.sflix.models.TvShow
 import com.tanasi.sflix.utils.viewModelsFactory
@@ -21,7 +21,7 @@ class TvShowFragment : Fragment() {
     private val args by navArgs<TvShowFragmentArgs>()
     private val viewModel by viewModelsFactory { TvShowViewModel(args.id) }
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,7 +63,7 @@ class TvShowFragment : Fragment() {
 
     private fun initializeTvShow() {
         binding.vgvTvShow.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             setItemSpacing(80)
         }
     }
@@ -77,16 +77,16 @@ class TvShowFragment : Fragment() {
             it.tvShow = tvShow
         }
 
-        sflixAdapter.items.apply {
+        appAdapter.items.apply {
             clear()
-            add(tvShow.apply { itemType = SflixAdapter.Type.TV_SHOW })
+            add(tvShow.apply { itemType = AppAdapter.Type.TV_SHOW })
             if (tvShow.seasons.isNotEmpty())
-                add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_SEASONS })
+                add(tvShow.clone().apply { itemType = AppAdapter.Type.TV_SHOW_SEASONS })
             if (tvShow.cast.isNotEmpty())
-                add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_CASTS })
+                add(tvShow.clone().apply { itemType = AppAdapter.Type.TV_SHOW_CASTS })
             if (tvShow.recommendations.isNotEmpty())
-                add(tvShow.clone().apply { itemType = SflixAdapter.Type.TV_SHOW_RECOMMENDATIONS })
+                add(tvShow.clone().apply { itemType = AppAdapter.Type.TV_SHOW_RECOMMENDATIONS })
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
     }
 }

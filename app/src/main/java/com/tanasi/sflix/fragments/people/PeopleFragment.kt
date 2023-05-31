@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentPeopleBinding
 import com.tanasi.sflix.models.People
 import com.tanasi.sflix.utils.viewModelsFactory
@@ -20,7 +20,7 @@ class PeopleFragment : Fragment() {
     private val args by navArgs<PeopleFragmentArgs>()
     private val viewModel by viewModelsFactory { PeopleViewModel(args.id) }
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,16 +62,16 @@ class PeopleFragment : Fragment() {
 
     private fun initializePeople() {
         binding.vgvPeople.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             setItemSpacing(80)
         }
     }
 
     private fun displayPeople(people: People) {
-        sflixAdapter.items.apply {
+        appAdapter.items.apply {
             clear()
-            add(people.apply { itemType = SflixAdapter.Type.PEOPLE })
+            add(people.apply { itemType = AppAdapter.Type.PEOPLE })
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
     }
 }

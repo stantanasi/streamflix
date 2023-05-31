@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentTvShowsBinding
 import com.tanasi.sflix.models.TvShow
 
@@ -19,7 +19,7 @@ class TvShowsFragment : Fragment() {
 
     private val viewModel by viewModels<TvShowsViewModel>()
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,7 +61,7 @@ class TvShowsFragment : Fragment() {
 
     private fun initializeTvShows() {
         binding.vgvTvShows.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             setItemSpacing(
                 requireContext().resources.getDimension(R.dimen.tv_shows_spacing).toInt()
             )
@@ -69,12 +69,12 @@ class TvShowsFragment : Fragment() {
     }
 
     private fun displayTvShows(tvShows: List<TvShow>) {
-        sflixAdapter.items.apply {
+        appAdapter.items.apply {
             clear()
             addAll(tvShows.onEach {
-                it.itemType = SflixAdapter.Type.TV_SHOW_GRID_ITEM
+                it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
             })
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
     }
 }

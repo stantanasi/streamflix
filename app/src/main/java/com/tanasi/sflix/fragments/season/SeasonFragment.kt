@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentSeasonBinding
 import com.tanasi.sflix.models.Episode
 import com.tanasi.sflix.models.Season
@@ -23,7 +23,7 @@ class SeasonFragment : Fragment() {
     private val args by navArgs<SeasonFragmentArgs>()
     private val viewModel by viewModelsFactory { SeasonViewModel(args.seasonId) }
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,13 +67,13 @@ class SeasonFragment : Fragment() {
         binding.tvSeasonTitle.text = args.seasonTitle
 
         binding.vgvEpisodes.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             setItemSpacing(resources.getDimension(R.dimen.season_episodes_spacing).toInt())
         }
     }
 
     private fun displaySeason(episodes: List<Episode>) {
-        sflixAdapter.items.apply {
+        appAdapter.items.apply {
             clear()
             addAll(episodes.onEach {
                 it.tvShow = TvShow(
@@ -89,6 +89,6 @@ class SeasonFragment : Fragment() {
                 )
             })
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
     }
 }

@@ -1,6 +1,6 @@
 package com.tanasi.sflix.models
 
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 
 class Season(
     val id: String,
@@ -10,8 +10,8 @@ class Season(
 
     var tvShow: TvShow? = null,
     var episodes: List<Episode> = listOf(),
-) : SflixAdapter.Item {
+) : AppAdapter.Item {
 
 
-    override var itemType = SflixAdapter.Type.SEASON_ITEM
+    override var itemType = AppAdapter.Type.SEASON_ITEM
 }

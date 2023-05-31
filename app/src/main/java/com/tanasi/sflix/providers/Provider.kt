@@ -1,6 +1,6 @@
 package com.tanasi.sflix.providers
 
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.fragments.player.PlayerFragment
 import com.tanasi.sflix.models.*
 
@@ -13,7 +13,7 @@ interface Provider {
 
     suspend fun getHome(): List<Category>
 
-    suspend fun search(query: String): List<SflixAdapter.Item>
+    suspend fun search(query: String): List<AppAdapter.Item>
 
     suspend fun getMovies(): List<Movie>
 

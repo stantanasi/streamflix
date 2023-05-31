@@ -8,7 +8,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.tanasi.sflix.R
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.ContentCategorySwiperBinding
 import com.tanasi.sflix.databinding.ItemCategoryBinding
 import com.tanasi.sflix.fragments.home.HomeFragment
@@ -46,7 +46,7 @@ class CategoryViewHolder(
 
         binding.hgvCategory.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
-            adapter = SflixAdapter().apply {
+            adapter = AppAdapter().apply {
                 items.addAll(category.list)
             }
             setItemSpacing(category.itemSpacing)

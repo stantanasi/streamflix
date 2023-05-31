@@ -1,6 +1,6 @@
 package com.tanasi.sflix.models
 
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 
 class People(
     val id: String,
@@ -8,7 +8,7 @@ class People(
     val image: String = "",
 
     val filmography: List<Show> = listOf(),
-) : SflixAdapter.Item {
+) : AppAdapter.Item {
 
-    override var itemType = SflixAdapter.Type.PEOPLE_ITEM
+    override var itemType = AppAdapter.Type.PEOPLE_ITEM
 }

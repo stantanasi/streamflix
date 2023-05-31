@@ -1,14 +1,14 @@
 package com.tanasi.sflix.models
 
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 
 class Provider(
     val name: String,
     val logo: String,
 
     val provider: com.tanasi.sflix.providers.Provider,
-) : SflixAdapter.Item {
+) : AppAdapter.Item {
 
 
-    override var itemType = SflixAdapter.Type.PROVIDER
+    override var itemType = AppAdapter.Type.PROVIDER
 }

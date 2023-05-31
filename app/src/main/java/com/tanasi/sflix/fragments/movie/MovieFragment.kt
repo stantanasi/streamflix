@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
-import com.tanasi.sflix.adapters.SflixAdapter
+import com.tanasi.sflix.adapters.AppAdapter
 import com.tanasi.sflix.databinding.FragmentMovieBinding
 import com.tanasi.sflix.models.Movie
 import com.tanasi.sflix.utils.viewModelsFactory
@@ -21,7 +21,7 @@ class MovieFragment : Fragment() {
     private val args by navArgs<MovieFragmentArgs>()
     private val viewModel by viewModelsFactory { MovieViewModel(args.id) }
 
-    private val sflixAdapter = SflixAdapter()
+    private val appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,7 +63,7 @@ class MovieFragment : Fragment() {
 
     private fun initializeMovie() {
         binding.vgvMovie.apply {
-            adapter = sflixAdapter
+            adapter = appAdapter
             setItemSpacing(80)
         }
     }
@@ -73,14 +73,14 @@ class MovieFragment : Fragment() {
             .load(movie.banner)
             .into(binding.ivMovieBanner)
 
-        sflixAdapter.items.apply {
+        appAdapter.items.apply {
             clear()
-            add(movie.apply { itemType = SflixAdapter.Type.MOVIE })
+            add(movie.apply { itemType = AppAdapter.Type.MOVIE })
             if (movie.cast.isNotEmpty())
-                add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_CASTS })
+                add(movie.clone().apply { itemType = AppAdapter.Type.MOVIE_CASTS })
             if (movie.recommendations.isNotEmpty())
-                add(movie.clone().apply { itemType = SflixAdapter.Type.MOVIE_RECOMMENDATIONS })
+                add(movie.clone().apply { itemType = AppAdapter.Type.MOVIE_RECOMMENDATIONS })
         }
-        sflixAdapter.notifyDataSetChanged()
+        appAdapter.notifyDataSetChanged()
     }
 }

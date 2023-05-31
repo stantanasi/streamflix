@@ -7,7 +7,7 @@ import com.tanasi.sflix.adapters.viewholders.*
 import com.tanasi.sflix.databinding.*
 import com.tanasi.sflix.models.*
 
-class SflixAdapter(
+class AppAdapter(
     val items: MutableList<Item> = mutableListOf()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
