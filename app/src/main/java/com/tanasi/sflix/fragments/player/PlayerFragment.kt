@@ -221,17 +221,6 @@ class PlayerFragment : Fragment() {
         )
 
         player.addListener(object : Player.Listener {
-            override fun onEvents(player: Player, events: Player.Events) {
-                if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
-                    binding.pvPlayer.controller.exoSettings.apply {
-                        isEnabled = true
-                        alpha = 1.0F
-                    }
-                }
-            }
-        })
-
-        player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 binding.pvPlayer.keepScreenOn = isPlaying
 

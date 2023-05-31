@@ -68,6 +68,7 @@
         android:layout_marginStart="22dp"
         android:layout_marginEnd="22dp"
         android:layout_marginBottom="4dp"
+        android:nextFocusDown="@id/exo_settings"
         app:layout_constraintBottom_toTopOf="@id/exo_bottom_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -127,9 +128,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="7dp"
             android:layout_marginBottom="7dp"
-            android:alpha="0.33"
             android:background="@drawable/bg_btn_exoplayer"
-            android:enabled="false"
             android:nextFocusLeft="@id/exo_settings"
             android:padding="12dp"
             android:src="@drawable/exo_styled_controls_settings"
