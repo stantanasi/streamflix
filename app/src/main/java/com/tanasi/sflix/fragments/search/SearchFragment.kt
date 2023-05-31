@@ -70,13 +70,21 @@ class SearchFragment : Fragment() {
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_SEARCH -> {
-                        query = text.toString().trim()
+                        query = text.toString()
                         viewModel.search(query)
                         hideKeyboard()
                         true
                     }
                     else -> false
                 }
+            }
+        }
+
+        binding.btnSearchClear.setOnClickListener {
+            if (query.isNotEmpty()) {
+                query = ""
+                binding.etSearch.setText(query)
+                viewModel.search(query)
             }
         }
 
