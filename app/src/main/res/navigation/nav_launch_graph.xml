@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/providers"
-        android:name="com.tanasi.sflix.fragments.providers.ProvidersFragment"
+        android:name="com.tanasi.streamflix.fragments.providers.ProvidersFragment"
         android:label="fragment_providers"
         tools:layout="@layout/fragment_providers" />
 </navigation>
