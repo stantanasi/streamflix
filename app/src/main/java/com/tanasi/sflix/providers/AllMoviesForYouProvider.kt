@@ -825,17 +825,17 @@ object AllMoviesForYouProvider : Provider {
         val video = retry(links.size) { attempt ->
             val link = service.getSource(links.getOrNull(attempt - 1) ?: "")
 
-            val jsEval = Regex("eval((.|\\n)*?)</script>").find(link.toString())?.let {
-                it.groupValues[1]
-            } ?: throw Exception("No sources found")
+            val packedJS = Regex("(eval\\(function\\(p,a,c,k,e,d\\)(.|\\n)*?)</script>")
+                .find(link.toString())?.let { it.groupValues[1] }
+                ?: throw Exception("No sources found")
 
-            val unPacked = JsUnpacker("eval$jsEval").unpack()
+            val unPacked = JsUnpacker(packedJS).unpack()
                 ?: throw Exception("No sources found")
 
             val sources = Regex("src:\"(.*?)\"").findAll(
-                Regex("\\{sources:\\[(.*?)]").find(unPacked)?.let {
-                    it.groupValues[1]
-                } ?: throw Exception("No sources found")
+                Regex("\\{sources:\\[(.*?)]")
+                    .find(unPacked)?.let { it.groupValues[1] }
+                    ?: throw Exception("No sources found")
             ).map { it.groupValues[1] }.toList()
 
             Video(
