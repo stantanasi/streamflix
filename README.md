@@ -5,14 +5,14 @@
   <br />
   An Android TV app to stream movies and TV shows for free, made with Android Studio, in Kotlin
   <br />
-  <a href="https://github.com/stantanasi/sflix/releases">
+  <a href="https://github.com/stantanasi/streamflix/releases">
     <strong>Download app »</strong>
   </a>
   <br />
   <br />
-  <a href="https://github.com/stantanasi/sflix/issues">Report Bug</a>
+  <a href="https://github.com/stantanasi/streamflix/issues">Report Bug</a>
   ·
-  <a href="https://github.com/stantanasi/sflix/issues">Request Feature</a>
+  <a href="https://github.com/stantanasi/streamflix/issues">Request Feature</a>
 </p>
 
 <details>
@@ -75,7 +75,7 @@ Install [Android Studio](https://developer.android.com/studio)
 1. Clone the project to your local machine
 
 ```bash
-git clone https://github.com/stantanasi/sflix.git
+git clone https://github.com/stantanasi/streamflix.git
 ```
 
 2. Open the project in Android Studio
