@@ -1,18 +1,18 @@
-<h1 align="center">SFlix</h1>
+<h1 align="center">StreamFlix</h1>
 
 <p align="center">
   <img src="./app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" height="100px" />
   <br />
   An Android TV app to stream movies and TV shows for free, made with Android Studio, in Kotlin
   <br />
-  <a href="https://github.com/stantanasi/sflix/releases">
+  <a href="https://github.com/stantanasi/streamflix/releases">
     <strong>Download app »</strong>
   </a>
   <br />
   <br />
-  <a href="https://github.com/stantanasi/sflix/issues">Report Bug</a>
+  <a href="https://github.com/stantanasi/streamflix/issues">Report Bug</a>
   ·
-  <a href="https://github.com/stantanasi/sflix/issues">Request Feature</a>
+  <a href="https://github.com/stantanasi/streamflix/issues">Request Feature</a>
 </p>
 
 <details>
@@ -34,14 +34,14 @@
 ## About the project
 
 <p align="center">
-  <img src="./.github/docs/screenshot.png" alt="SFlix Preview">
+  <img src="./.github/docs/screenshot.png" alt="StreamFlix Preview">
 </p>
 
-SFlix is an Android TV app that allows users to watch movies and TV shows online in HD quality for free.
+StreamFlix is an Android TV app that allows users to watch movies and TV shows online in HD quality for free.
 
 With no registration or payment required, you can binge-watch hundreds of thousands of movies and TV shows in 1080p and 720p, with multiple subtitles, seamlessly and safely. 
 
-New titles are updated on the app daily to make sure fun never ends on SFlix.
+New titles are updated on the app daily to make sure fun never ends on StreamFlix.
 
 ### Features
 
@@ -75,7 +75,7 @@ Install [Android Studio](https://developer.android.com/studio)
 1. Clone the project to your local machine
 
 ```bash
-git clone https://github.com/stantanasi/sflix.git
+git clone https://github.com/stantanasi/streamflix.git
 ```
 
 2. Open the project in Android Studio
@@ -106,7 +106,7 @@ The app is purely for educational and personal use.
 
 It is the responsibility of user to avoid any actions that might violate the laws governing his/her locality.
 
-SFlix does not host any content on the app, and has no control over what media is put up or taken down. SFlix functions like any other search engine, such as Google. SFlix does not host, upload or manage any videos, films or content. It simply crawls, aggregates and displayes links in a convenient, user-friendly interface.
+StreamFlix does not host any content on the app, and has no control over what media is put up or taken down. StreamFlix functions like any other search engine, such as Google. StreamFlix does not host, upload or manage any videos, films or content. It simply crawls, aggregates and displayes links in a convenient, user-friendly interface.
 
 ## Author
 

@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace 'com.tanasi.sflix'
+    namespace 'com.tanasi.streamflix'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.tanasi.sflix"
+        applicationId "com.tanasi.streamflix"
         minSdk 23
         targetSdk 33
         versionCode 5

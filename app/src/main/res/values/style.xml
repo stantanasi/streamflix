@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme.Widget.Button" parent="AppTheme.SFlix">
+    <style name="AppTheme.Widget.Button" parent="AppTheme.Base">
         <item name="android:background">@drawable/bg_button</item>
         <item name="android:focusable">true</item>
         <item name="android:focusableInTouchMode">true</item>

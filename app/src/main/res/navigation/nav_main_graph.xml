@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/home"
-        android:name="com.tanasi.sflix.fragments.home.HomeFragment"
+        android:name="com.tanasi.streamflix.fragments.home.HomeFragment"
         android:label="HomeFragment"
         tools:layout="@layout/fragment_home">
         <action
@@ -22,7 +22,7 @@
     </fragment>
     <fragment
         android:id="@+id/movie"
-        android:name="com.tanasi.sflix.fragments.movie.MovieFragment"
+        android:name="com.tanasi.streamflix.fragments.movie.MovieFragment"
         android:label="fragment_movie"
         tools:layout="@layout/fragment_movie">
         <argument
@@ -43,7 +43,7 @@
     </fragment>
     <fragment
         android:id="@+id/player"
-        android:name="com.tanasi.sflix.fragments.player.PlayerFragment"
+        android:name="com.tanasi.streamflix.fragments.player.PlayerFragment"
         android:label="PlayerFragment"
         tools:layout="@layout/fragment_player">
         <argument
@@ -57,11 +57,11 @@
             app:argType="string" />
         <argument
             android:name="videoType"
-            app:argType="com.tanasi.sflix.fragments.player.PlayerFragment$VideoType" />
+            app:argType="com.tanasi.streamflix.fragments.player.PlayerFragment$VideoType" />
     </fragment>
     <fragment
         android:id="@+id/tv_show"
-        android:name="com.tanasi.sflix.fragments.tv_show.TvShowFragment"
+        android:name="com.tanasi.streamflix.fragments.tv_show.TvShowFragment"
         android:label="fragment_tv_show"
         tools:layout="@layout/fragment_tv_show">
         <argument
@@ -82,7 +82,7 @@
     </fragment>
     <fragment
         android:id="@+id/search"
-        android:name="com.tanasi.sflix.fragments.search.SearchFragment"
+        android:name="com.tanasi.streamflix.fragments.search.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search">
         <action
@@ -97,7 +97,7 @@
     </fragment>
     <fragment
         android:id="@+id/season"
-        android:name="com.tanasi.sflix.fragments.season.SeasonFragment"
+        android:name="com.tanasi.streamflix.fragments.season.SeasonFragment"
         android:label="fragment_season"
         tools:layout="@layout/fragment_season">
         <action
@@ -129,7 +129,7 @@
     </fragment>
     <fragment
         android:id="@+id/movies"
-        android:name="com.tanasi.sflix.fragments.movies.MoviesFragment"
+        android:name="com.tanasi.streamflix.fragments.movies.MoviesFragment"
         android:label="MoviesFragment"
         tools:layout="@layout/fragment_movies">
         <action
@@ -138,7 +138,7 @@
     </fragment>
     <fragment
         android:id="@+id/tv_shows"
-        android:name="com.tanasi.sflix.fragments.tv_shows.TvShowsFragment"
+        android:name="com.tanasi.streamflix.fragments.tv_shows.TvShowsFragment"
         android:label="TvShowsFragment"
         tools:layout="@layout/fragment_tv_shows">
         <action
@@ -147,7 +147,7 @@
     </fragment>
     <fragment
         android:id="@+id/people"
-        android:name="com.tanasi.sflix.fragments.people.PeopleFragment"
+        android:name="com.tanasi.streamflix.fragments.people.PeopleFragment"
         android:label="fragment_people"
         tools:layout="@layout/fragment_people">
         <argument
@@ -162,7 +162,7 @@
     </fragment>
     <fragment
         android:id="@+id/providers"
-        android:name="com.tanasi.sflix.fragments.providers.ProvidersFragment"
+        android:name="com.tanasi.streamflix.fragments.providers.ProvidersFragment"
         android:label="fragment_providers"
         tools:layout="@layout/fragment_providers" />
     <action
@@ -170,7 +170,7 @@
         app:destination="@id/providers" />
     <fragment
         android:id="@+id/genre"
-        android:name="com.tanasi.sflix.fragments.genre.GenreFragment"
+        android:name="com.tanasi.streamflix.fragments.genre.GenreFragment"
         android:label="fragment_genre"
         tools:layout="@layout/fragment_genre">
         <argument
