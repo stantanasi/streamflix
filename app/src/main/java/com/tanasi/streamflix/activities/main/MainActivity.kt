@@ -29,6 +29,7 @@ class MainActivity : FragmentActivity() {
     private lateinit var updateDialog: UpdateDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.AppTheme_Base)
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
