@@ -29,7 +29,7 @@ class MovieViewModel(id: String) : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val movie = UserPreferences.currentProvider.getMovie(id)
+            val movie = UserPreferences.currentProvider!!.getMovie(id)
 
             _state.postValue(State.SuccessLoading(movie))
         } catch (e: Exception) {

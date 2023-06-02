@@ -34,9 +34,9 @@ class MainActivity : FragmentActivity() {
             val header = ContentHeaderMenuMainBinding.bind(this)
 
             Glide.with(context)
-                .load(UserPreferences.currentProvider.logo)
+                .load(UserPreferences.currentProvider?.logo)
                 .into(header.ivNavigationHeaderIcon)
-            header.tvNavigationHeaderTitle.text = UserPreferences.currentProvider.name
+            header.tvNavigationHeaderTitle.text = UserPreferences.currentProvider?.name
             header.tvNavigationHeaderSubtitle.text = getString(R.string.main_menu_change_provider)
 
             setOnOpenListener {

@@ -29,7 +29,7 @@ class TvShowViewModel(id: String) : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val tvShow = UserPreferences.currentProvider.getTvShow(id)
+            val tvShow = UserPreferences.currentProvider!!.getTvShow(id)
 
             _state.postValue(State.SuccessLoading(tvShow))
         } catch (e: Exception) {

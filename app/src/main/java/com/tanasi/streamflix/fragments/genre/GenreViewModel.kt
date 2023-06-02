@@ -29,7 +29,7 @@ class GenreViewModel(id: String) : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val genre = UserPreferences.currentProvider.getGenre(id)
+            val genre = UserPreferences.currentProvider!!.getGenre(id)
 
             _state.postValue(State.SuccessLoading(genre))
         } catch (e: Exception) {

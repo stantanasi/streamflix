@@ -100,7 +100,7 @@ class EpisodeViewHolder(
                 null,
                 null,
             )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider.name }
+                ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
 
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
@@ -179,7 +179,7 @@ class EpisodeViewHolder(
                 null,
                 null,
             )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider.name }
+                ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
 
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()

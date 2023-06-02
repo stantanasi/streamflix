@@ -29,7 +29,7 @@ class HomeViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val categories = UserPreferences.currentProvider.getHome()
+            val categories = UserPreferences.currentProvider!!.getHome()
 
             _state.postValue(State.SuccessLoading(categories))
         } catch (e: Exception) {
