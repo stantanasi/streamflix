@@ -1,4 +1,4 @@
-package com.tanasi.streamflix.activities
+package com.tanasi.streamflix.activities.main
 
 import android.os.Bundle
 import android.view.View

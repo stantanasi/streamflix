@@ -14,7 +14,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.Tracks
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.activities.MainActivity
+import com.tanasi.streamflix.activities.main.MainActivity
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.abs
