@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController
@@ -27,6 +28,17 @@ class MainActivity : FragmentActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(binding.navMainFragment.id) as NavHostFragment
         val navController = navHostFragment.navController
+
+        UserPreferences.setup(this)
+        UserPreferences.currentProvider?.let {
+            navController.navigate(
+                resId = R.id.home,
+                args = null,
+                navOptions = NavOptions.Builder()
+                    .setPopUpTo(R.id.providers, true)
+                    .build()
+            )
+        }
 
         binding.navMain.setupWithNavController(navController)
 
