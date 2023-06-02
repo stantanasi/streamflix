@@ -14,6 +14,8 @@ class SearchViewModel : ViewModel() {
     private val _state = MutableLiveData<State>(State.SuccessSearching(listOf()))
     val state: LiveData<State> = _state
 
+    var query = ""
+
     sealed class State {
         object Searching : State()
         data class SuccessSearching(val results: List<AppAdapter.Item>) : State()
@@ -21,7 +23,7 @@ class SearchViewModel : ViewModel() {
     }
 
     init {
-        search("")
+        search(query)
     }
 
 
@@ -32,6 +34,7 @@ class SearchViewModel : ViewModel() {
             val results = UserPreferences.currentProvider!!.search(query)
 
             _state.postValue(State.SuccessSearching(results))
+                .run { this@SearchViewModel.query = query }
         } catch (e: Exception) {
             _state.postValue(State.FailedSearching(e))
         }

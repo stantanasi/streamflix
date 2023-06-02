@@ -25,8 +25,6 @@ class SearchFragment : Fragment() {
 
     private val appAdapter = AppAdapter()
 
-    private var query = ""
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,8 +68,7 @@ class SearchFragment : Fragment() {
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_SEARCH -> {
-                        query = text.toString()
-                        viewModel.search(query)
+                        viewModel.search(text.toString())
                         hideKeyboard()
                         true
                     }
@@ -81,11 +78,8 @@ class SearchFragment : Fragment() {
         }
 
         binding.btnSearchClear.setOnClickListener {
-            if (query.isNotEmpty()) {
-                query = ""
-                binding.etSearch.setText(query)
-                viewModel.search(query)
-            }
+            binding.etSearch.setText("")
+            viewModel.search("")
         }
 
         binding.vgvSearch.apply {
@@ -109,10 +103,8 @@ class SearchFragment : Fragment() {
 
         binding.vgvSearch.apply {
             setNumColumns(
-                when (query) {
-                    "" -> 5
-                    else -> 6
-                }
+                if (viewModel.query == "") 5
+                else 6
             )
         }
     }
