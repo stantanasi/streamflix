@@ -29,7 +29,7 @@ class PeopleViewModel(id: String) : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val people = UserPreferences.currentProvider.getPeople(id)
+            val people = UserPreferences.currentProvider!!.getPeople(id)
 
             _state.postValue(State.SuccessLoading(people))
         } catch (e: Exception) {

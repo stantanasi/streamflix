@@ -35,7 +35,7 @@ class PlayerViewModel(
         _state.postValue(State.Loading)
 
         try {
-            val video = UserPreferences.currentProvider.getVideo(id, videoType)
+            val video = UserPreferences.currentProvider!!.getVideo(id, videoType)
 
             if (video.sources.isEmpty()) throw Exception("No links found")
 

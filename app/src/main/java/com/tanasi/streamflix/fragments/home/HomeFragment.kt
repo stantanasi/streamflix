@@ -97,7 +97,7 @@ class HomeFragment : Fragment() {
                     null,
                     null
                 )?.map { WatchNextProgram.fromCursor(it) }
-                    ?.filter { it.internalProviderId == UserPreferences.currentProvider.name }
+                    ?.filter { it.internalProviderId == UserPreferences.currentProvider!!.name }
                     ?.sortedBy { it.lastEngagementTimeUtcMillis }?.reversed()
                     ?.mapNotNull {
                         when (it.type) {

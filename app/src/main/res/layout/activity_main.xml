@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#181818"
-    tools:context=".activities.MainActivity"
+    tools:context=".activities.main.MainActivity"
     tools:deviceIds="tv"
     tools:ignore="MergeRootFrame">
 

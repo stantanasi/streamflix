@@ -24,11 +24,9 @@ object UserPreferences {
         AllMoviesForYouProvider,
     )
 
-    var currentProvider: Provider
-        get() = Key.CURRENT_PROVIDER.getString()?.let { name ->
-            providers.find { it.name == name }
-        } ?: SflixProvider
-        set(value) = Key.CURRENT_PROVIDER.setString(value.name)
+    var currentProvider: Provider?
+        get() = providers.find { it.name == Key.CURRENT_PROVIDER.getString() }
+        set(value) = Key.CURRENT_PROVIDER.setString(value?.name)
 
 
     private enum class Key {

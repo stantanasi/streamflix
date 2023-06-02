@@ -29,7 +29,7 @@ class SearchViewModel : ViewModel() {
         _state.postValue(State.Searching)
 
         try {
-            val results = UserPreferences.currentProvider.search(query)
+            val results = UserPreferences.currentProvider!!.search(query)
 
             _state.postValue(State.SuccessSearching(results))
         } catch (e: Exception) {

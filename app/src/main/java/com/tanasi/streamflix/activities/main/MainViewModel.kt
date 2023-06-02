@@ -1,4 +1,4 @@
-package com.tanasi.streamflix.activities.launcher
+package com.tanasi.streamflix.activities.main
 
 import android.content.Context
 import android.net.Uri
@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
-class LauncherViewModel : ViewModel() {
+class MainViewModel : ViewModel() {
 
     private val _state = MutableLiveData<State>(State.CheckingUpdate)
     val state: LiveData<State> = _state

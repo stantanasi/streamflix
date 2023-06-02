@@ -232,7 +232,7 @@ class PlayerFragment : Fragment() {
                         null,
                         null
                     )?.map { WatchNextProgram.fromCursor(it) }
-                        ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider.name }
+                        ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
 
                     when {
                         player.hasStarted() -> {
@@ -245,7 +245,7 @@ class PlayerFragment : Fragment() {
                                     .setLastPlaybackPositionMillis(player.currentPosition.toInt())
                                     .setDurationMillis(player.duration.toInt())
                                     .setContentId(args.id)
-                                    .setInternalProviderId(UserPreferences.currentProvider.name)
+                                    .setInternalProviderId(UserPreferences.currentProvider!!.name)
 
                                 when (val videoType = args.videoType as VideoType) {
                                     is VideoType.Movie -> {
@@ -308,7 +308,7 @@ class PlayerFragment : Fragment() {
             null,
             null
         )?.map { WatchNextProgram.fromCursor(it) }
-            ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider.name }
+            ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
             ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
 
         player.seekTo(lastPlaybackPositionMillis ?: 0)
