@@ -14,6 +14,7 @@ import com.tanasi.streamflix.databinding.ActivityMainBinding
 import com.tanasi.streamflix.databinding.ContentHeaderMenuMainBinding
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.getCurrentFragment
 
 class MainActivity : FragmentActivity() {
 
@@ -25,9 +26,9 @@ class MainActivity : FragmentActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(binding.navMainFragment.id) as NavHostFragment
-        val navController = navHostFragment.navController
+        val navController = (supportFragmentManager
+            .findFragmentById(binding.navMainFragment.id) as NavHostFragment)
+            .navController
 
         UserPreferences.setup(this)
         UserPreferences.currentProvider?.let {
@@ -93,9 +94,7 @@ class MainActivity : FragmentActivity() {
                         else -> binding.navMain.requestFocus()
                     }
                     else -> {
-                        val currentFragment = navHostFragment.childFragmentManager.fragments
-                            .firstOrNull()
-                        when (currentFragment) {
+                        when (val currentFragment = getCurrentFragment()) {
                             is PlayerFragment -> currentFragment.onBackPressed()
                             else -> false
                         }.takeIf { !it }?.let {
