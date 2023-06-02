@@ -40,13 +40,7 @@ class MainActivity : FragmentActivity() {
 
         UserPreferences.setup(this)
         UserPreferences.currentProvider?.let {
-            navController.navigate(
-                resId = R.id.home,
-                args = null,
-                navOptions = NavOptions.Builder()
-                    .setPopUpTo(R.id.providers, true)
-                    .build()
-            )
+            navController.navigate(R.id.home)
         }
 
         binding.navMain.setupWithNavController(navController)
