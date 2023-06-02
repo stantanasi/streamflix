@@ -51,30 +51,32 @@ class MainActivity : FragmentActivity() {
 
         binding.navMain.setupWithNavController(navController)
 
-        binding.navMain.headerView?.apply {
-            val header = ContentHeaderMenuMainBinding.bind(this)
-
-            Glide.with(context)
-                .load(UserPreferences.currentProvider?.logo)
-                .into(header.ivNavigationHeaderIcon)
-            header.tvNavigationHeaderTitle.text = UserPreferences.currentProvider?.name
-            header.tvNavigationHeaderSubtitle.text = getString(R.string.main_menu_change_provider)
-
-            setOnOpenListener {
-                header.tvNavigationHeaderTitle.visibility = View.VISIBLE
-                header.tvNavigationHeaderSubtitle.visibility = View.VISIBLE
-            }
-            setOnCloseListener {
-                header.tvNavigationHeaderTitle.visibility = View.GONE
-                header.tvNavigationHeaderSubtitle.visibility = View.GONE
-            }
-
-            setOnClickListener {
-                navController.navigate(NavMainGraphDirections.actionGlobalProviders())
-            }
-        }
-
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.navMain.headerView?.apply {
+                val header = ContentHeaderMenuMainBinding.bind(this)
+
+                Glide.with(context)
+                    .load(UserPreferences.currentProvider?.logo)
+                    .into(header.ivNavigationHeaderIcon)
+                header.tvNavigationHeaderTitle.text = UserPreferences.currentProvider?.name
+                header.tvNavigationHeaderSubtitle.text = getString(
+                    R.string.main_menu_change_provider
+                )
+
+                setOnOpenListener {
+                    header.tvNavigationHeaderTitle.visibility = View.VISIBLE
+                    header.tvNavigationHeaderSubtitle.visibility = View.VISIBLE
+                }
+                setOnCloseListener {
+                    header.tvNavigationHeaderTitle.visibility = View.GONE
+                    header.tvNavigationHeaderSubtitle.visibility = View.GONE
+                }
+
+                setOnClickListener {
+                    navController.navigate(NavMainGraphDirections.actionGlobalProviders())
+                }
+            }
+
             when (destination.id) {
                 R.id.search,
                 R.id.home,
