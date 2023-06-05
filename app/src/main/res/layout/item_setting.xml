@@ -7,6 +7,8 @@
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
     android:background="@drawable/bg_item_setting"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:minHeight="52dp">
 
     <ImageView
