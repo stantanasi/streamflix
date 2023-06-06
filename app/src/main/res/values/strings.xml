@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">StreamFlix</string>
+    <string name="app_name">Streamflix</string>
 
     <string name="update_title">New Update Available</string>
     <string name="update_message">A new version of the app is available!</string>
