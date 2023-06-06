@@ -22,7 +22,7 @@ body:
         4. See error
     validations:
       required: true
-  - type: dropdown
+  - type: input
     attributes:
       label: App version
       description: What version of our app are you running?
