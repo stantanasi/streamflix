@@ -89,6 +89,13 @@ class SearchFragment : Fragment() {
     }
 
     private fun displaySearch(list: List<AppAdapter.Item>) {
+        binding.vgvSearch.apply {
+            setNumColumns(
+                if (viewModel.query == "") 5
+                else 6
+            )
+        }
+
         appAdapter.items.apply {
             clear()
             addAll(list.onEach {
@@ -100,12 +107,5 @@ class SearchFragment : Fragment() {
             })
         }
         appAdapter.notifyDataSetChanged()
-
-        binding.vgvSearch.apply {
-            setNumColumns(
-                if (viewModel.query == "") 5
-                else 6
-            )
-        }
     }
 }

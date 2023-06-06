@@ -192,7 +192,7 @@ class PlayerFragment : Fragment() {
 
         binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
 
-        binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10 * 1000)
+        binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10_000)
 
         binding.pvPlayer.controller.exoSettings.setOnClickListener {
             binding.settings.show()
