@@ -41,7 +41,6 @@ fun Calendar.format(pattern: String): String? {
     }
 }
 
-
 fun Fragment.hideKeyboard() {
     view?.let { activity?.hideKeyboard(it) }
 }
@@ -55,8 +54,8 @@ fun Context.toActivity(): FragmentActivity? = this as? FragmentActivity
 
 fun FragmentActivity.getCurrentFragment(): Fragment? = when (this) {
     is MainActivity -> {
-        val navHostFragment =
-            this.supportFragmentManager.findFragmentById(R.id.nav_main_fragment) as NavHostFragment
+        val navHostFragment = this.supportFragmentManager
+            .findFragmentById(R.id.nav_main_fragment) as NavHostFragment
         navHostFragment.childFragmentManager.fragments.firstOrNull()
     }
     else -> null

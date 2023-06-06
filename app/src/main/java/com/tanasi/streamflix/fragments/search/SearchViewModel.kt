@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class SearchViewModel : ViewModel() {
 
-    private val _state = MutableLiveData<State>(State.SuccessSearching(listOf()))
+    private val _state = MutableLiveData<State>(State.Searching)
     val state: LiveData<State> = _state
 
     var query = ""
