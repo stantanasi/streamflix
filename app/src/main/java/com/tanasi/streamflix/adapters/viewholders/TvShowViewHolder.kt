@@ -232,6 +232,14 @@ class TvShowViewHolder(
             }
         }
 
+        binding.tvTvShowGenres.apply {
+            text = tvShow.genres.joinToString(", ") { it.name }
+            visibility = when {
+                tvShow.genres.isEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
         binding.tvTvShowOverview.text = tvShow.overview
 
         binding.btnTvShowTrailer.setOnClickListener {
