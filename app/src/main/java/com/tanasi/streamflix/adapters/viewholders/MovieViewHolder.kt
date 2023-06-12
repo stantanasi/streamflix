@@ -285,6 +285,14 @@ class MovieViewHolder(
             }
         }
 
+        binding.tvMovieGenres.apply {
+            text = movie.genres.joinToString(", ") { it.name }
+            visibility = when {
+                movie.genres.isEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
         binding.tvMovieOverview.text = movie.overview
 
         binding.btnMovieWatchNow.apply {
