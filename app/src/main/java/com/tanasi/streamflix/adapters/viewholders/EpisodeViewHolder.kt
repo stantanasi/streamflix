@@ -41,7 +41,7 @@ class EpisodeViewHolder(
         }
     }
 
-
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun displayItem(binding: ItemEpisodeBinding) {
         binding.root.apply {
             setOnClickListener {
@@ -119,7 +119,7 @@ class EpisodeViewHolder(
 
         binding.tvEpisodeTitle.text = episode.title
     }
-
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun displayContinueWatchingItem(binding: ItemEpisodeContinueWatchingBinding) {
         binding.root.apply {
             setOnClickListener {

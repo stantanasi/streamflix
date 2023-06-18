@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController
@@ -116,7 +115,8 @@ class MainActivity : FragmentActivity() {
         }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
+            @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+            override fun  handleOnBackPressed() {
                 when (navController.currentDestination?.id) {
                     R.id.home -> when {
                         binding.navMain.hasFocus() -> finish()
