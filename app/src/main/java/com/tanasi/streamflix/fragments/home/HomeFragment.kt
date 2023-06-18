@@ -14,7 +14,11 @@ import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.databinding.FragmentHomeBinding
-import com.tanasi.streamflix.models.*
+import com.tanasi.streamflix.models.Category
+import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.models.Movie
+import com.tanasi.streamflix.models.Season
+import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.map
 

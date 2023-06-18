@@ -3,9 +3,44 @@ package com.tanasi.streamflix.adapters
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.tanasi.streamflix.adapters.viewholders.*
-import com.tanasi.streamflix.databinding.*
-import com.tanasi.streamflix.models.*
+import com.tanasi.streamflix.adapters.viewholders.CategoryViewHolder
+import com.tanasi.streamflix.adapters.viewholders.EpisodeViewHolder
+import com.tanasi.streamflix.adapters.viewholders.GenreViewHolder
+import com.tanasi.streamflix.adapters.viewholders.MovieViewHolder
+import com.tanasi.streamflix.adapters.viewholders.PeopleViewHolder
+import com.tanasi.streamflix.adapters.viewholders.ProviderViewHolder
+import com.tanasi.streamflix.adapters.viewholders.SeasonViewHolder
+import com.tanasi.streamflix.adapters.viewholders.TvShowViewHolder
+import com.tanasi.streamflix.databinding.ContentCategorySwiperBinding
+import com.tanasi.streamflix.databinding.ContentMovieBinding
+import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
+import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
+import com.tanasi.streamflix.databinding.ContentPeopleBinding
+import com.tanasi.streamflix.databinding.ContentTvShowBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
+import com.tanasi.streamflix.databinding.ItemCategoryBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingBinding
+import com.tanasi.streamflix.databinding.ItemGenreGridBinding
+import com.tanasi.streamflix.databinding.ItemMovieBinding
+import com.tanasi.streamflix.databinding.ItemMovieContinueWatchingBinding
+import com.tanasi.streamflix.databinding.ItemMovieGridBinding
+import com.tanasi.streamflix.databinding.ItemPeopleBinding
+import com.tanasi.streamflix.databinding.ItemProviderBinding
+import com.tanasi.streamflix.databinding.ItemSeasonBinding
+import com.tanasi.streamflix.databinding.ItemTvShowBinding
+import com.tanasi.streamflix.databinding.ItemTvShowGridBinding
+import com.tanasi.streamflix.models.Category
+import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.models.Genre
+import com.tanasi.streamflix.models.Movie
+import com.tanasi.streamflix.models.People
+import com.tanasi.streamflix.models.Provider
+import com.tanasi.streamflix.models.Season
+import com.tanasi.streamflix.models.TvShow
+
 
 class AppAdapter(
     val items: MutableList<Item> = mutableListOf()

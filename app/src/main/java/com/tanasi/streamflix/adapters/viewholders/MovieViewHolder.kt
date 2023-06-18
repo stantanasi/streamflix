@@ -14,7 +14,12 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
-import com.tanasi.streamflix.databinding.*
+import com.tanasi.streamflix.databinding.ContentMovieBinding
+import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
+import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
+import com.tanasi.streamflix.databinding.ItemMovieBinding
+import com.tanasi.streamflix.databinding.ItemMovieContinueWatchingBinding
+import com.tanasi.streamflix.databinding.ItemMovieGridBinding
 import com.tanasi.streamflix.fragments.genre.GenreFragment
 import com.tanasi.streamflix.fragments.genre.GenreFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeFragment
@@ -32,7 +37,11 @@ import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.utils.*
+import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.format
+import com.tanasi.streamflix.utils.getCurrentFragment
+import com.tanasi.streamflix.utils.map
+import com.tanasi.streamflix.utils.toActivity
 
 @SuppressLint("RestrictedApi")
 class MovieViewHolder(
@@ -170,7 +179,7 @@ class MovieViewHolder(
 
         binding.tvMovieTitle.text = movie.title
     }
-
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun displayItemContinueWatching(binding: ItemMovieContinueWatchingBinding) {
         binding.root.apply {
             setOnClickListener {
@@ -234,7 +243,7 @@ class MovieViewHolder(
         binding.tvMovieTitle.text = movie.title
     }
 
-
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun displayMovie(binding: ContentMovieBinding) {
         binding.ivMoviePoster.run {
             Glide.with(context)

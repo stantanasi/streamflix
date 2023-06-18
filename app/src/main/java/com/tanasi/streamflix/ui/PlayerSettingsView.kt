@@ -10,12 +10,13 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.Tracks
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
-import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
+import androidx.media3.common.C
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.common.TrackSelectionOverride
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.DefaultTrackNameProvider
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
@@ -113,7 +114,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             val selected: PlayerSettingsView.Quality
                 get() = list.find { it.isSelected } ?: PlayerSettingsView.Quality.Auto
-
+            @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
             fun init(player: ExoPlayer, resources: Resources) {
                 list.clear()
                 list.add(PlayerSettingsView.Quality.Auto)
@@ -146,6 +147,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             val selected: PlayerSettingsView.Subtitle
                 get() = list.find { it.isSelected } ?: PlayerSettingsView.Subtitle.None
+            @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 
             fun init(player: ExoPlayer, resources: Resources) {
                 list.clear()
@@ -464,7 +466,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                     .none { it.isSelected }
         }
 
-        class VideoTrackInformation(
+        @UnstableApi class VideoTrackInformation(
             val name: String,
             val width: Int,
             val height: Int,

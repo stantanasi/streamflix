@@ -11,7 +11,12 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
-import com.tanasi.streamflix.databinding.*
+import com.tanasi.streamflix.databinding.ContentTvShowBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
+import com.tanasi.streamflix.databinding.ItemTvShowBinding
+import com.tanasi.streamflix.databinding.ItemTvShowGridBinding
 import com.tanasi.streamflix.fragments.genre.GenreFragment
 import com.tanasi.streamflix.fragments.genre.GenreFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeFragment

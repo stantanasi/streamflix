@@ -11,12 +11,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
-import com.google.android.exoplayer2.Format
-import com.google.android.exoplayer2.Tracks
+import androidx.media3.common.Format
+import androidx.media3.common.Tracks
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.activities.main.MainActivity
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 import kotlin.math.abs
 
 fun String.toCalendar(): Calendar? {
