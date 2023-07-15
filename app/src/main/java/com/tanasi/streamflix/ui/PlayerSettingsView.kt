@@ -108,14 +108,14 @@ class PlayerSettingsView @JvmOverloads constructor(
         }
 
         object Quality : Setting() {
-            val list = mutableListOf<PlayerSettingsView.Quality>()
+            val list = mutableListOf<Settings.Quality>()
 
-            val selected: PlayerSettingsView.Quality
-                get() = list.find { it.isSelected } ?: PlayerSettingsView.Quality.Auto
+            val selected: Settings.Quality
+                get() = list.find { it.isSelected } ?: Settings.Quality.Auto
 
             fun init(player: ExoPlayer, resources: Resources) {
                 list.clear()
-                list.add(PlayerSettingsView.Quality.Auto)
+                list.add(Settings.Quality.Auto)
                 list.addAll(
                     player.currentTracks.groups
                         .filter { it.type == C.TRACK_TYPE_VIDEO }
@@ -124,7 +124,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
                                 .distinctBy { it.width to it.height }
                                 .map { trackFormat ->
-                                    PlayerSettingsView.Quality.VideoTrackInformation(
+                                    Settings.Quality.VideoTrackInformation(
                                         name = DefaultTrackNameProvider(resources)
                                             .getTrackName(trackFormat),
                                         width = trackFormat.width,
@@ -141,14 +141,14 @@ class PlayerSettingsView @JvmOverloads constructor(
         }
 
         object Subtitle : Setting() {
-            val list = mutableListOf<PlayerSettingsView.Subtitle>()
+            val list = mutableListOf<Settings.Subtitle>()
 
-            val selected: PlayerSettingsView.Subtitle
-                get() = list.find { it.isSelected } ?: PlayerSettingsView.Subtitle.None
+            val selected: Settings.Subtitle
+                get() = list.find { it.isSelected } ?: Settings.Subtitle.None
 
             fun init(player: ExoPlayer, resources: Resources) {
                 list.clear()
-                list.add(PlayerSettingsView.Subtitle.None)
+                list.add(Settings.Subtitle.None)
                 list.addAll(
                     player.currentTracks.groups
                         .filter { it.type == C.TRACK_TYPE_TEXT }
@@ -157,7 +157,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
                                 .filter { it.label != null }
                                 .mapIndexed { trackIndex, trackFormat ->
-                                    PlayerSettingsView.Subtitle.TextTrackInformation(
+                                    Settings.Subtitle.TextTrackInformation(
                                         name = DefaultTrackNameProvider(resources)
                                             .getTrackName(trackFormat),
 
@@ -173,20 +173,20 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         object Speed : Setting() {
             val list = listOf(
-                PlaybackSpeed(R.string.player_settings_speed_0_25, 0.25F),
-                PlaybackSpeed(R.string.player_settings_speed_0_5, 0.5F),
-                PlaybackSpeed(R.string.player_settings_speed_0_75, 0.75F),
-                PlaybackSpeed(R.string.player_settings_speed_1, 1F),
-                PlaybackSpeed(R.string.player_settings_speed_1_25, 1.25F),
-                PlaybackSpeed(R.string.player_settings_speed_1_5, 1.5F),
-                PlaybackSpeed(R.string.player_settings_speed_1_75, 1.75F),
-                PlaybackSpeed(R.string.player_settings_speed_2, 2F),
+                Settings.Speed(R.string.player_settings_speed_0_25, 0.25F),
+                Settings.Speed(R.string.player_settings_speed_0_5, 0.5F),
+                Settings.Speed(R.string.player_settings_speed_0_75, 0.75F),
+                Settings.Speed(R.string.player_settings_speed_1, 1F),
+                Settings.Speed(R.string.player_settings_speed_1_25, 1.25F),
+                Settings.Speed(R.string.player_settings_speed_1_5, 1.5F),
+                Settings.Speed(R.string.player_settings_speed_1_75, 1.75F),
+                Settings.Speed(R.string.player_settings_speed_2, 2F),
             )
 
-            val selected: PlaybackSpeed
+            val selected: Settings.Speed
                 get() = list.find { it.isSelected }
                     ?: list.find { it.speed == 1F }
-                    ?: PlaybackSpeed(R.string.player_settings_speed_1, 1F)
+                    ?: Settings.Speed(R.string.player_settings_speed_1, 1F)
 
             fun refresh(player: ExoPlayer) {
                 list.forEach { it.isSelected = false }
@@ -265,8 +265,8 @@ class PlayerSettingsView @JvmOverloads constructor(
                         ContextCompat.getDrawable(
                             context,
                             when (setting.selected) {
-                                is Subtitle.None -> R.drawable.ic_settings_subtitle_off
-                                is Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
+                                is Settings.Subtitle.None -> R.drawable.ic_settings_subtitle_off
+                                is Settings.Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
                             }
                         )
                     )
@@ -290,21 +290,21 @@ class PlayerSettingsView @JvmOverloads constructor(
             binding.tvSettingSubText.apply {
                 text = when (setting) {
                     is Setting.Quality -> when (val selected = setting.selected) {
-                        is Quality.Auto -> when (val track = selected.currentTrack) {
+                        is Settings.Quality.Auto -> when (val track = selected.currentTrack) {
                             null -> context.getString(R.string.player_settings_quality_auto)
                             else -> context.getString(
                                 R.string.player_settings_quality_auto_selected,
                                 track.height
                             )
                         }
-                        is Quality.VideoTrackInformation -> context.getString(
+                        is Settings.Quality.VideoTrackInformation -> context.getString(
                             R.string.player_settings_quality,
                             selected.height
                         )
                     }
                     is Setting.Subtitle -> when (val selected = setting.selected) {
-                        is Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
-                        is Subtitle.TextTrackInformation -> selected.name
+                        is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
+                        is Settings.Subtitle.TextTrackInformation -> selected.name
                     }
                     is Setting.Speed -> context.getString(setting.selected.stringId)
                     else -> ""
@@ -320,18 +320,18 @@ class PlayerSettingsView @JvmOverloads constructor(
             binding.ivSettingIsSelected.visibility = View.GONE
         }
 
-        fun displayQualitySetting(quality: Quality) {
+        fun displayQualitySetting(quality: Settings.Quality) {
             binding.root.setOnClickListener {
                 playerSettingsView.player?.let { player ->
                     when (quality) {
-                        is Quality.Auto -> {
+                        is Settings.Quality.Auto -> {
                             player.trackSelectionParameters = player.trackSelectionParameters
                                 .buildUpon()
                                 .setMaxVideoBitrate(Int.MAX_VALUE)
                                 .setForceHighestSupportedBitrate(false)
                                 .build()
                         }
-                        is Quality.VideoTrackInformation -> {
+                        is Settings.Quality.VideoTrackInformation -> {
                             player.trackSelectionParameters = player.trackSelectionParameters
                                 .buildUpon()
                                 .setMaxVideoBitrate(quality.bitrate)
@@ -348,7 +348,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             binding.tvSettingMainText.apply {
 
                 text = when (quality) {
-                    is Quality.Auto -> when {
+                    is Settings.Quality.Auto -> when {
                         quality.isSelected -> when (val track = quality.currentTrack) {
                             null -> context.getString(R.string.player_settings_quality_auto)
                             else -> context.getString(
@@ -358,7 +358,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         }
                         else -> context.getString(R.string.player_settings_quality_auto)
                     }
-                    is Quality.VideoTrackInformation -> context.getString(
+                    is Settings.Quality.VideoTrackInformation -> context.getString(
                         R.string.player_settings_quality,
                         quality.height
                     )
@@ -376,18 +376,18 @@ class PlayerSettingsView @JvmOverloads constructor(
             }
         }
 
-        fun displaySubtitleSetting(subtitle: Subtitle) {
+        fun displaySubtitleSetting(subtitle: Settings.Subtitle) {
             binding.root.setOnClickListener {
                 playerSettingsView.player?.let { player ->
                     when (subtitle) {
-                        is Subtitle.None -> {
+                        is Settings.Subtitle.None -> {
                             player.trackSelectionParameters = player.trackSelectionParameters
                                 .buildUpon()
                                 .clearOverridesOfType(C.TRACK_TYPE_TEXT)
                                 .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
                                 .build()
                         }
-                        is Subtitle.TextTrackInformation -> {
+                        is Settings.Subtitle.TextTrackInformation -> {
                             player.trackSelectionParameters = player.trackSelectionParameters
                                 .buildUpon()
                                 .setOverrideForType(
@@ -409,8 +409,8 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             binding.tvSettingMainText.apply {
                 text = when (subtitle) {
-                    is Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
-                    is Subtitle.TextTrackInformation -> subtitle.name
+                    is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
+                    is Settings.Subtitle.TextTrackInformation -> subtitle.name
                 }
             }
 
@@ -424,7 +424,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             }
         }
 
-        fun displaySpeedSetting(playbackSpeed: PlaybackSpeed) {
+        fun displaySpeedSetting(playbackSpeed: Settings.Speed) {
             binding.root.setOnClickListener {
                 playerSettingsView.player?.let { player ->
                     player.playbackParameters = player.playbackParameters
@@ -450,63 +450,65 @@ class PlayerSettingsView @JvmOverloads constructor(
         }
     }
 
+    sealed class Settings {
 
-    private sealed class Quality {
+        sealed class Quality {
 
-        abstract val isSelected: Boolean
+            abstract val isSelected: Boolean
 
-        object Auto : Quality() {
-            val currentTrack: VideoTrackInformation?
-                get() = Setting.Quality.list
-                    .filterIsInstance<VideoTrackInformation>()
-                    .find { it.isCurrentlyPlayed }
-            override val isSelected: Boolean
-                get() = Setting.Quality.list
-                    .filterIsInstance<VideoTrackInformation>()
-                    .none { it.isSelected }
+            object Auto : Quality() {
+                val currentTrack: VideoTrackInformation?
+                    get() = Setting.Quality.list
+                        .filterIsInstance<VideoTrackInformation>()
+                        .find { it.isCurrentlyPlayed }
+                override val isSelected: Boolean
+                    get() = Setting.Quality.list
+                        .filterIsInstance<VideoTrackInformation>()
+                        .none { it.isSelected }
+            }
+
+            class VideoTrackInformation(
+                val name: String,
+                val width: Int,
+                val height: Int,
+                val bitrate: Int,
+
+                val player: ExoPlayer,
+            ) : Quality() {
+                val isCurrentlyPlayed: Boolean
+                    get() = player.videoFormat?.let { it.bitrate == bitrate } ?: false
+                override val isSelected: Boolean
+                    get() = player.trackSelectionParameters.maxVideoBitrate == bitrate
+            }
         }
 
-        class VideoTrackInformation(
-            val name: String,
-            val width: Int,
-            val height: Int,
-            val bitrate: Int,
+        sealed class Subtitle {
 
-            val player: ExoPlayer,
-        ) : Quality() {
-            val isCurrentlyPlayed: Boolean
-                get() = player.videoFormat?.let { it.bitrate == bitrate } ?: false
-            override val isSelected: Boolean
-                get() = player.trackSelectionParameters.maxVideoBitrate == bitrate
-        }
-    }
+            abstract val isSelected: Boolean
 
-    private sealed class Subtitle {
+            object None : Subtitle() {
+                override val isSelected: Boolean
+                    get() = Setting.Subtitle.list
+                        .filterIsInstance<TextTrackInformation>()
+                        .none { it.isSelected }
+            }
 
-        abstract val isSelected: Boolean
+            class TextTrackInformation(
+                val name: String,
 
-        object None : Subtitle() {
-            override val isSelected: Boolean
-                get() = Setting.Subtitle.list
-                    .filterIsInstance<TextTrackInformation>()
-                    .none { it.isSelected }
+                val trackGroup: Tracks.Group,
+                val trackIndex: Int,
+            ) : Subtitle() {
+                override val isSelected: Boolean
+                    get() = trackGroup.isTrackSelected(trackIndex)
+            }
         }
 
-        class TextTrackInformation(
-            val name: String,
-
-            val trackGroup: Tracks.Group,
-            val trackIndex: Int,
-        ) : Subtitle() {
-            override val isSelected: Boolean
-                get() = trackGroup.isTrackSelected(trackIndex)
+        class Speed(
+            val stringId: Int,
+            val speed: Float,
+        ) {
+            var isSelected: Boolean = false
         }
-    }
-
-    class PlaybackSpeed(
-        val stringId: Int,
-        val speed: Float,
-    ) {
-        var isSelected: Boolean = false
     }
 }
