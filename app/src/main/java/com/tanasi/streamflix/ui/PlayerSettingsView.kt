@@ -2,7 +2,6 @@ package com.tanasi.streamflix.ui
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -316,13 +315,9 @@ class PlayerSettingsView @JvmOverloads constructor(
                 }
             }
 
-            binding.ivSettingCheck.apply {
-                setColorFilter(Color.parseColor("#808080"))
-                setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_setting_arrow_right)
-                )
-                visibility = View.VISIBLE
-            }
+            binding.ivSettingEnter.visibility = View.VISIBLE
+
+            binding.ivSettingIsSelected.visibility = View.GONE
         }
 
         fun displayQualitySetting(quality: Quality) {
@@ -372,7 +367,10 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             binding.tvSettingSubText.visibility = View.GONE
 
-            binding.ivSettingCheck.visibility = when {
+
+            binding.ivSettingEnter.visibility = View.GONE
+
+            binding.ivSettingIsSelected.visibility = when {
                 quality.isSelected -> View.VISIBLE
                 else -> View.GONE
             }
@@ -418,7 +416,9 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             binding.tvSettingSubText.visibility = View.GONE
 
-            binding.ivSettingCheck.visibility = when {
+            binding.ivSettingEnter.visibility = View.GONE
+
+            binding.ivSettingIsSelected.visibility = when {
                 subtitle.isSelected -> View.VISIBLE
                 else -> View.GONE
             }
@@ -441,7 +441,9 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             binding.tvSettingSubText.visibility = View.GONE
 
-            binding.ivSettingCheck.visibility = when {
+            binding.ivSettingEnter.visibility = View.GONE
+
+            binding.ivSettingIsSelected.visibility = when {
                 playbackSpeed.isSelected -> View.VISIBLE
                 else -> View.GONE
             }
