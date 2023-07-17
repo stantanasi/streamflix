@@ -336,7 +336,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             binding.root.setOnClickListener {
                 playerSettingsView.player?.let { player ->
                     player.playbackParameters = player.playbackParameters
-                        .withSpeed(playbackSpeed.speed)
+                        .withSpeed(playbackSpeed.value)
                 }
                 playerSettingsView.hide()
             }
@@ -486,7 +486,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         class Speed(
             val stringId: Int,
-            val speed: Float,
+            val value: Float,
         ) {
             var isSelected: Boolean = false
 
@@ -506,12 +506,12 @@ class PlayerSettingsView @JvmOverloads constructor(
 
                 val selected: Speed
                     get() = list.find { it.isSelected }
-                        ?: list.find { it.speed == 1F }
+                        ?: list.find { it.value == 1F }
                         ?: DEFAULT
 
                 fun refresh(player: ExoPlayer) {
                     list.forEach { it.isSelected = false }
-                    list.findClosest(player.playbackParameters.speed) { it.speed }?.let {
+                    list.findClosest(player.playbackParameters.speed) { it.value }?.let {
                         it.isSelected = true
                     }
                 }
