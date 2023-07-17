@@ -53,10 +53,10 @@ class PlayerSettingsView @JvmOverloads constructor(
             field = value
         }
 
-    private val settingsAdapter = SettingsAdapter(Setting.Main).also { it.playerSettingsView = this }
-    private val qualityAdapter = SettingsAdapter(Setting.Quality).also { it.playerSettingsView = this }
-    private val subtitlesAdapter = SettingsAdapter(Setting.Subtitle).also { it.playerSettingsView = this }
-    private val speedAdapter = SettingsAdapter(Setting.Speed).also { it.playerSettingsView = this }
+    private val settingsAdapter = SettingsAdapter(Setting.Main).also { it.settingsView = this }
+    private val qualityAdapter = SettingsAdapter(Setting.Quality).also { it.settingsView = this }
+    private val subtitlesAdapter = SettingsAdapter(Setting.Subtitle).also { it.settingsView = this }
+    private val speedAdapter = SettingsAdapter(Setting.Speed).also { it.settingsView = this }
 
     fun onBackPressed() {
         val adapter = binding.rvSettings.adapter as? SettingsAdapter
@@ -120,7 +120,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         val setting: Setting,
     ) : RecyclerView.Adapter<SettingViewHolder>() {
 
-        lateinit var playerSettingsView: PlayerSettingsView
+        lateinit var settingsView: PlayerSettingsView
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             SettingViewHolder(
@@ -132,7 +132,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             )
 
         override fun onBindViewHolder(holder: SettingViewHolder, position: Int) {
-            holder.playerSettingsView = playerSettingsView
+            holder.settingsView = settingsView
 
             when (setting) {
                 is Setting.Main -> holder.displaySettings(Settings.list[position])
@@ -154,19 +154,19 @@ class PlayerSettingsView @JvmOverloads constructor(
         val binding: ItemSettingBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        lateinit var playerSettingsView: PlayerSettingsView
+        lateinit var settingsView: PlayerSettingsView
 
         fun displaySettings(item: Item) {
-            val player = playerSettingsView.player ?: return
+            val player = settingsView.player ?: return
 
             binding.root.apply {
                 setOnClickListener {
                     when (item) {
                         is Settings -> {
                             when (item) {
-                                Settings.Quality -> playerSettingsView.displaySetting(Setting.Quality)
-                                Settings.Subtitle -> playerSettingsView.displaySetting(Setting.Subtitle)
-                                Settings.Speed -> playerSettingsView.displaySetting(Setting.Speed)
+                                Settings.Quality -> settingsView.displaySetting(Setting.Quality)
+                                Settings.Subtitle -> settingsView.displaySetting(Setting.Subtitle)
+                                Settings.Speed -> settingsView.displaySetting(Setting.Speed)
                             }
                         }
 
@@ -178,7 +178,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         .setMaxVideoBitrate(Int.MAX_VALUE)
                                         .setForceHighestSupportedBitrate(false)
                                         .build()
-                                    playerSettingsView.hide()
+                                    settingsView.hide()
                                 }
                                 is Settings.Quality.VideoTrackInformation -> {
                                     player.trackSelectionParameters = player.trackSelectionParameters
@@ -186,7 +186,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         .setMaxVideoBitrate(item.bitrate)
                                         .setForceHighestSupportedBitrate(true)
                                         .build()
-                                    playerSettingsView.hide()
+                                    settingsView.hide()
                                 }
                             }
                         }
@@ -199,7 +199,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         .clearOverridesOfType(C.TRACK_TYPE_TEXT)
                                         .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
                                         .build()
-                                    playerSettingsView.hide()
+                                    settingsView.hide()
                                 }
                                 is Settings.Subtitle.TextTrackInformation -> {
                                     player.trackSelectionParameters = player.trackSelectionParameters
@@ -212,7 +212,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         )
                                         .setTrackTypeDisabled(item.trackGroup.type, false)
                                         .build()
-                                    playerSettingsView.hide()
+                                    settingsView.hide()
                                 }
                             }
                         }
@@ -220,7 +220,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         is Settings.Speed -> {
                             player.playbackParameters = player.playbackParameters
                                 .withSpeed(item.value)
-                            playerSettingsView.hide()
+                            settingsView.hide()
                         }
                     }
                 }
