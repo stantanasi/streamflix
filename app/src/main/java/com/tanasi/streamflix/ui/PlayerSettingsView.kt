@@ -325,9 +325,15 @@ class PlayerSettingsView @JvmOverloads constructor(
                         else -> View.GONE
                     }
 
-                    is Settings.Subtitle -> when {
-                        item.isSelected -> View.VISIBLE
-                        else -> View.GONE
+                    is Settings.Subtitle -> when (item) {
+                        is Settings.Subtitle.None -> when {
+                            item.isSelected -> View.VISIBLE
+                            else -> View.GONE
+                        }
+                        is Settings.Subtitle.TextTrackInformation -> when {
+                            item.isSelected -> View.VISIBLE
+                            else -> View.GONE
+                        }
                     }
 
                     is Settings.Speed -> when {
@@ -429,7 +435,12 @@ class PlayerSettingsView @JvmOverloads constructor(
                 val list = mutableListOf<Subtitle>()
 
                 val selected: Subtitle
-                    get() = list.find { it.isSelected } ?: None
+                    get() = list.find {
+                        when (it) {
+                            is None -> it.isSelected
+                            is TextTrackInformation -> it.isSelected
+                        }
+                    } ?: None
 
                 fun init(player: ExoPlayer, resources: Resources) {
                     list.clear()
@@ -456,10 +467,8 @@ class PlayerSettingsView @JvmOverloads constructor(
                 }
             }
 
-            abstract val isSelected: Boolean
-
             object None : Subtitle() {
-                override val isSelected: Boolean
+                val isSelected: Boolean
                     get() = list
                         .filterIsInstance<TextTrackInformation>()
                         .none { it.isSelected }
@@ -471,7 +480,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 val trackGroup: Tracks.Group,
                 val trackIndex: Int,
             ) : Subtitle() {
-                override val isSelected: Boolean
+                val isSelected: Boolean
                     get() = trackGroup.isTrackSelected(trackIndex)
             }
         }
