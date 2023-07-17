@@ -175,18 +175,7 @@ class PlayerFragment : Fragment() {
         binding.pvPlayer.player = player
         binding.settings.player = player
 
-        binding.pvPlayer.subtitleView?.apply {
-            setStyle(
-                CaptionStyleCompat(
-                    Color.WHITE,
-                    Color.argb(128, 0, 0, 0),
-                    Color.TRANSPARENT,
-                    CaptionStyleCompat.EDGE_TYPE_NONE,
-                    Color.WHITE,
-                    null
-                )
-            )
-        }
+        binding.pvPlayer.subtitleView?.setStyle(UserPreferences.captionStyle)
 
         binding.pvPlayer.controller.tvExoTitle.text = args.title
 
