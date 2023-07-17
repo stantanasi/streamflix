@@ -277,6 +277,10 @@ class PlayerSettingsView @JvmOverloads constructor(
                 }
             }
 
+            binding.vSettingColor.apply {
+                visibility = View.GONE
+            }
+
             binding.tvSettingMainText.apply {
                 text = when (item) {
                     is Settings -> when (item) {
