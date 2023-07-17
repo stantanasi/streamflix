@@ -78,6 +78,7 @@ class PlayerSettingsView @JvmOverloads constructor(
     private val backgroundColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.BackgroundColor.list)
     private val backgroundOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.BackgroundOpacity.list)
     private val windowColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowColor.list)
+    private val windowOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowOpacity.list)
     private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
 
     fun onBackPressed() {
@@ -92,7 +93,8 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.CAPTION_STYLE_EDGE_STYLE,
             Setting.CAPTION_STYLE_BACKGROUND_COLOR,
             Setting.CAPTION_STYLE_BACKGROUND_OPACITY,
-            Setting.CAPTION_STYLE_WINDOW_COLOR -> displaySetting(Setting.CAPTION_STYLE)
+            Setting.CAPTION_STYLE_WINDOW_COLOR,
+            Setting.CAPTION_STYLE_WINDOW_OPACITY -> displaySetting(Setting.CAPTION_STYLE)
         }
     }
 
@@ -125,6 +127,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 Setting.CAPTION_STYLE_BACKGROUND_COLOR -> context.getString(R.string.player_settings_caption_style_background_color_title)
                 Setting.CAPTION_STYLE_BACKGROUND_OPACITY -> context.getString(R.string.player_settings_caption_style_background_opacity_title)
                 Setting.CAPTION_STYLE_WINDOW_COLOR -> context.getString(R.string.player_settings_caption_style_window_color_title)
+                Setting.CAPTION_STYLE_WINDOW_OPACITY -> context.getString(R.string.player_settings_caption_style_window_opacity_title)
                 Setting.SPEED -> context.getString(R.string.player_settings_speed_title)
             }
         }
@@ -140,6 +143,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.CAPTION_STYLE_BACKGROUND_COLOR -> backgroundColorAdapter
             Setting.CAPTION_STYLE_BACKGROUND_OPACITY -> backgroundOpacityAdapter
             Setting.CAPTION_STYLE_WINDOW_COLOR -> windowColorAdapter
+            Setting.CAPTION_STYLE_WINDOW_OPACITY -> windowOpacityAdapter
             Setting.SPEED -> speedAdapter
         }
         binding.rvSettings.requestFocus()
@@ -161,6 +165,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         CAPTION_STYLE_BACKGROUND_COLOR,
         CAPTION_STYLE_BACKGROUND_OPACITY,
         CAPTION_STYLE_WINDOW_COLOR,
+        CAPTION_STYLE_WINDOW_OPACITY,
         SPEED
     }
 
@@ -286,6 +291,9 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 Settings.Subtitle.Style.WindowColor -> {
                                     settingsView.displaySetting(Setting.CAPTION_STYLE_WINDOW_COLOR)
                                 }
+                                Settings.Subtitle.Style.WindowOpacity -> {
+                                    settingsView.displaySetting(Setting.CAPTION_STYLE_WINDOW_OPACITY)
+                                }
                             }
                         }
 
@@ -359,6 +367,19 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 UserPreferences.captionStyle.foregroundColor,
                                 UserPreferences.captionStyle.backgroundColor,
                                 UserPreferences.captionStyle.windowColor.setRgb(item.color),
+                                UserPreferences.captionStyle.edgeType,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.WindowOpacity -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor,
+                                UserPreferences.captionStyle.backgroundColor,
+                                UserPreferences.captionStyle.windowColor.setAlpha(item.alpha),
                                 UserPreferences.captionStyle.edgeType,
                                 UserPreferences.captionStyle.edgeColor,
                                 null
@@ -472,6 +493,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         Settings.Subtitle.Style.BackgroundColor -> context.getString(R.string.player_settings_caption_style_background_color_label)
                         Settings.Subtitle.Style.BackgroundOpacity -> context.getString(R.string.player_settings_caption_style_background_opacity_label)
                         Settings.Subtitle.Style.WindowColor -> context.getString(R.string.player_settings_caption_style_window_color_label)
+                        Settings.Subtitle.Style.WindowOpacity -> context.getString(R.string.player_settings_caption_style_window_opacity_label)
                     }
 
                     is Settings.Subtitle.Style.FontColor -> context.getString(item.stringId)
@@ -485,6 +507,8 @@ class PlayerSettingsView @JvmOverloads constructor(
                     is Settings.Subtitle.Style.BackgroundOpacity -> context.getString(item.stringId)
 
                     is Settings.Subtitle.Style.WindowColor -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.WindowOpacity -> context.getString(item.stringId)
 
                     is Settings.Speed -> context.getString(item.stringId)
 
@@ -529,6 +553,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         Settings.Subtitle.Style.BackgroundColor -> context.getString(Settings.Subtitle.Style.BackgroundColor.selected.stringId)
                         Settings.Subtitle.Style.BackgroundOpacity -> context.getString(Settings.Subtitle.Style.BackgroundOpacity.selected.stringId)
                         Settings.Subtitle.Style.WindowColor -> context.getString(Settings.Subtitle.Style.WindowColor.selected.stringId)
+                        Settings.Subtitle.Style.WindowOpacity -> context.getString(Settings.Subtitle.Style.WindowOpacity.selected.stringId)
                     }
 
                     else -> ""
@@ -584,6 +609,11 @@ class PlayerSettingsView @JvmOverloads constructor(
                     }
 
                     is Settings.Subtitle.Style.WindowColor -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.WindowOpacity -> when {
                         item.isSelected -> View.VISIBLE
                         else -> View.GONE
                     }
@@ -753,6 +783,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         BackgroundColor,
                         BackgroundOpacity,
                         WindowColor,
+                        WindowOpacity,
                     )
                 }
 
@@ -1016,6 +1047,47 @@ class PlayerSettingsView @JvmOverloads constructor(
                         )
 
                         val selected: WindowColor
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class WindowOpacity(
+                    val stringId: Int,
+                    private val value: Float,
+                ) : Item {
+                    val alpha: Int
+                        get() = (value * 255).roundToInt()
+
+                    val isSelected: Boolean
+                        get() = alpha == UserPreferences.captionStyle.windowColor.getAlpha()
+
+                    companion object : Style() {
+                        private val DEFAULT = WindowOpacity(
+                            R.string.player_settings_caption_style_window_opacity_0,
+                            0F
+                        )
+
+                        val list = listOf(
+                            DEFAULT,
+                            WindowOpacity(
+                                R.string.player_settings_caption_style_window_opacity_0_25,
+                                0.25F
+                            ),
+                            WindowOpacity(
+                                R.string.player_settings_caption_style_window_opacity_0_5,
+                                0.5F
+                            ),
+                            WindowOpacity(
+                                R.string.player_settings_caption_style_window_opacity_0_75,
+                                0.75F
+                            ),
+                            WindowOpacity(
+                                R.string.player_settings_caption_style_window_opacity_1,
+                                1F
+                            ),
+                        )
+
+                        val selected: WindowOpacity
                             get() = list.find { it.isSelected } ?: DEFAULT
                     }
                 }

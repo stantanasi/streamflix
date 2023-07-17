@@ -109,6 +109,13 @@
     <string name="player_settings_caption_style_window_color_magenta">Magenta</string>
     <string name="player_settings_caption_style_window_color_red">Red</string>
     <string name="player_settings_caption_style_window_color_white">White</string>
+    <string name="player_settings_caption_style_window_opacity_title">Window opacity</string>
+    <string name="player_settings_caption_style_window_opacity_label">Window opacity</string>
+    <string name="player_settings_caption_style_window_opacity_0">0%</string>
+    <string name="player_settings_caption_style_window_opacity_0_25">25%</string>
+    <string name="player_settings_caption_style_window_opacity_0_5">50%</string>
+    <string name="player_settings_caption_style_window_opacity_0_75">75%</string>
+    <string name="player_settings_caption_style_window_opacity_1">100%</string>
     <string name="player_settings_speed_title">Video speed</string>
     <string name="player_settings_speed_label">Speed</string>
     <string name="player_settings_speed_0_25">× 0.25</string>
