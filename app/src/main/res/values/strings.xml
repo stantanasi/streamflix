@@ -70,6 +70,13 @@
     <string name="player_settings_caption_style_font_color_magenta">Magenta</string>
     <string name="player_settings_caption_style_font_color_red">Red</string>
     <string name="player_settings_caption_style_font_color_black">Black</string>
+    <string name="player_settings_caption_style_text_size_title">Text size</string>
+    <string name="player_settings_caption_style_text_size_label">Text size</string>
+    <string name="player_settings_caption_style_text_size_0_5">50%</string>
+    <string name="player_settings_caption_style_text_size_0_75">75%</string>
+    <string name="player_settings_caption_style_text_size_1">100%</string>
+    <string name="player_settings_caption_style_text_size_2">200%</string>
+    <string name="player_settings_caption_style_text_size_3">300%</string>
     <string name="player_settings_caption_style_font_opacity_title">Font opacity</string>
     <string name="player_settings_caption_style_font_opacity_label">Font opacity</string>
     <string name="player_settings_caption_style_font_opacity_0_5">50%</string>

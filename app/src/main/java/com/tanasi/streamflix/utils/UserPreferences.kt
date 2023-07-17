@@ -31,7 +31,8 @@ object UserPreferences {
         set(value) = Key.CURRENT_PROVIDER.setString(value?.name)
 
     var captionTextSize: Float
-        get() = Key.CAPTION_TEXT_SIZE.getFloat() ?: 1F
+        get() = Key.CAPTION_TEXT_SIZE.getFloat()
+            ?: PlayerSettingsView.Settings.Subtitle.Style.TextSize.DEFAULT.value
         set(value) {
             Key.CAPTION_TEXT_SIZE.setFloat(value)
         }

@@ -73,6 +73,7 @@ class PlayerSettingsView @JvmOverloads constructor(
     private val subtitlesAdapter = SettingsAdapter(this, Settings.Subtitle.list)
     private val captionStyleAdapter = SettingsAdapter(this, Settings.Subtitle.Style.list)
     private val fontColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.FontColor.list)
+    private val textSizeAdapter = SettingsAdapter(this, Settings.Subtitle.Style.TextSize.list)
     private val fontOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.FontOpacity.list)
     private val edgeStyleAdapter = SettingsAdapter(this, Settings.Subtitle.Style.EdgeStyle.list)
     private val backgroundColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.BackgroundColor.list)
@@ -89,6 +90,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.SPEED -> displaySetting(Setting.MAIN)
             Setting.CAPTION_STYLE -> displaySetting(Setting.SUBTITLES)
             Setting.CAPTION_STYLE_FONT_COLOR,
+            Setting.CAPTION_STYLE_TEXT_SIZE,
             Setting.CAPTION_STYLE_FONT_OPACITY,
             Setting.CAPTION_STYLE_EDGE_STYLE,
             Setting.CAPTION_STYLE_BACKGROUND_COLOR,
@@ -122,6 +124,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 Setting.SUBTITLES -> context.getString(R.string.player_settings_subtitles_title)
                 Setting.CAPTION_STYLE -> context.getString(R.string.player_settings_caption_style_title)
                 Setting.CAPTION_STYLE_FONT_COLOR -> context.getString(R.string.player_settings_caption_style_font_color_title)
+                Setting.CAPTION_STYLE_TEXT_SIZE -> context.getString(R.string.player_settings_caption_style_text_size_title)
                 Setting.CAPTION_STYLE_FONT_OPACITY -> context.getString(R.string.player_settings_caption_style_font_opacity_title)
                 Setting.CAPTION_STYLE_EDGE_STYLE -> context.getString(R.string.player_settings_caption_style_edge_style_title)
                 Setting.CAPTION_STYLE_BACKGROUND_COLOR -> context.getString(R.string.player_settings_caption_style_background_color_title)
@@ -138,6 +141,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.SUBTITLES -> subtitlesAdapter
             Setting.CAPTION_STYLE -> captionStyleAdapter
             Setting.CAPTION_STYLE_FONT_COLOR -> fontColorAdapter
+            Setting.CAPTION_STYLE_TEXT_SIZE -> textSizeAdapter
             Setting.CAPTION_STYLE_FONT_OPACITY -> fontOpacityAdapter
             Setting.CAPTION_STYLE_EDGE_STYLE -> edgeStyleAdapter
             Setting.CAPTION_STYLE_BACKGROUND_COLOR -> backgroundColorAdapter
@@ -160,6 +164,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         SUBTITLES,
         CAPTION_STYLE,
         CAPTION_STYLE_FONT_COLOR,
+        CAPTION_STYLE_TEXT_SIZE,
         CAPTION_STYLE_FONT_OPACITY,
         CAPTION_STYLE_EDGE_STYLE,
         CAPTION_STYLE_BACKGROUND_COLOR,
@@ -269,12 +274,21 @@ class PlayerSettingsView @JvmOverloads constructor(
                         is Settings.Subtitle.Style -> {
                             when (item) {
                                 Settings.Subtitle.Style.ResetStyle -> {
-                                    UserPreferences.captionStyle = Settings.Subtitle.Style.DEFAULT
-                                    subtitleView.setStyle(UserPreferences.captionStyle)
+                                    UserPreferences.also {
+                                        it.captionTextSize = Settings.Subtitle.Style.TextSize.DEFAULT.value
+                                        it.captionStyle = Settings.Subtitle.Style.DEFAULT
+                                    }
+                                    subtitleView.also {
+                                        it.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
+                                        it.setStyle(UserPreferences.captionStyle)
+                                    }
                                     settingsView.hide()
                                 }
                                 Settings.Subtitle.Style.FontColor -> {
                                     settingsView.displaySetting(Setting.CAPTION_STYLE_FONT_COLOR)
+                                }
+                                Settings.Subtitle.Style.TextSize -> {
+                                    settingsView.displaySetting(Setting.CAPTION_STYLE_TEXT_SIZE)
                                 }
                                 Settings.Subtitle.Style.FontOpacity -> {
                                     settingsView.displaySetting(Setting.CAPTION_STYLE_FONT_OPACITY)
@@ -307,6 +321,12 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 null
                             )
                             subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.TextSize -> {
+                            UserPreferences.captionTextSize = item.value
+                            subtitleView.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
                             settingsView.displaySetting(Setting.CAPTION_STYLE)
                         }
 
@@ -488,6 +508,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                     is Settings.Subtitle.Style -> when (item) {
                         Settings.Subtitle.Style.ResetStyle -> context.getString(R.string.player_settings_caption_style_reset_style_label)
                         Settings.Subtitle.Style.FontColor -> context.getString(R.string.player_settings_caption_style_font_color_label)
+                        Settings.Subtitle.Style.TextSize -> context.getString(R.string.player_settings_caption_style_text_size_label)
                         Settings.Subtitle.Style.FontOpacity -> context.getString(R.string.player_settings_caption_style_font_opacity_label)
                         Settings.Subtitle.Style.EdgeStyle -> context.getString(R.string.player_settings_caption_style_edge_style_label)
                         Settings.Subtitle.Style.BackgroundColor -> context.getString(R.string.player_settings_caption_style_background_color_label)
@@ -497,6 +518,8 @@ class PlayerSettingsView @JvmOverloads constructor(
                     }
 
                     is Settings.Subtitle.Style.FontColor -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.TextSize -> context.getString(item.stringId)
 
                     is Settings.Subtitle.Style.FontOpacity -> context.getString(item.stringId)
 
@@ -548,6 +571,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                     is Settings.Subtitle.Style -> when (item) {
                         Settings.Subtitle.Style.ResetStyle -> ""
                         Settings.Subtitle.Style.FontColor -> context.getString(Settings.Subtitle.Style.FontColor.selected.stringId)
+                        Settings.Subtitle.Style.TextSize -> context.getString(Settings.Subtitle.Style.TextSize.selected.stringId)
                         Settings.Subtitle.Style.FontOpacity -> context.getString(Settings.Subtitle.Style.FontOpacity.selected.stringId)
                         Settings.Subtitle.Style.EdgeStyle -> context.getString(Settings.Subtitle.Style.EdgeStyle.selected.stringId)
                         Settings.Subtitle.Style.BackgroundColor -> context.getString(Settings.Subtitle.Style.BackgroundColor.selected.stringId)
@@ -584,6 +608,11 @@ class PlayerSettingsView @JvmOverloads constructor(
                     }
 
                     is Settings.Subtitle.Style.FontColor -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.TextSize -> when {
                         item.isSelected -> View.VISIBLE
                         else -> View.GONE
                     }
@@ -778,6 +807,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                     val list = listOf(
                         ResetStyle,
                         FontColor,
+                        TextSize,
                         FontOpacity,
                         EdgeStyle,
                         BackgroundColor,
@@ -835,6 +865,29 @@ class PlayerSettingsView @JvmOverloads constructor(
                         )
 
                         val selected: FontColor
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class TextSize(
+                    val stringId: Int,
+                    val value: Float,
+                ) : Item {
+                    val isSelected: Boolean
+                        get() = value == UserPreferences.captionTextSize
+
+                    companion object : Style() {
+                        val DEFAULT = TextSize(R.string.player_settings_caption_style_text_size_1, 1F)
+
+                        val list = listOf(
+                            TextSize(R.string.player_settings_caption_style_text_size_0_5, 0.5F),
+                            TextSize(R.string.player_settings_caption_style_text_size_0_75, 0.75F),
+                            DEFAULT,
+                            TextSize(R.string.player_settings_caption_style_text_size_2, 2F),
+                            TextSize(R.string.player_settings_caption_style_text_size_3, 3F),
+                        )
+
+                        val selected: TextSize
                             get() = list.find { it.isSelected } ?: DEFAULT
                     }
                 }
