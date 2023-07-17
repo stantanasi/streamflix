@@ -20,6 +20,7 @@ import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
 import com.tanasi.streamflix.utils.findClosest
+import com.tanasi.streamflix.utils.margin
 import com.tanasi.streamflix.utils.trackFormats
 
 class PlayerSettingsView @JvmOverloads constructor(
@@ -60,6 +61,7 @@ class PlayerSettingsView @JvmOverloads constructor(
     private val settingsAdapter = SettingsAdapter(this, Settings.list)
     private val qualityAdapter = SettingsAdapter(this, Settings.Quality.list)
     private val subtitlesAdapter = SettingsAdapter(this, Settings.Subtitle.list)
+    private val captionStyleAdapter = SettingsAdapter(this, Settings.Subtitle.Style.list)
     private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
 
     fun onBackPressed() {
@@ -68,6 +70,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.QUALITY,
             Setting.SUBTITLES,
             Setting.SPEED -> displaySetting(Setting.MAIN)
+            Setting.CAPTION_STYLE -> displaySetting(Setting.SUBTITLES)
         }
     }
 
@@ -93,6 +96,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 Setting.MAIN -> context.getString(R.string.player_settings_title)
                 Setting.QUALITY -> context.getString(R.string.player_settings_quality_title)
                 Setting.SUBTITLES -> context.getString(R.string.player_settings_subtitles_title)
+                Setting.CAPTION_STYLE -> context.getString(R.string.player_settings_caption_style_title)
                 Setting.SPEED -> context.getString(R.string.player_settings_speed_title)
             }
         }
@@ -101,6 +105,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.MAIN -> settingsAdapter
             Setting.QUALITY -> qualityAdapter
             Setting.SUBTITLES -> subtitlesAdapter
+            Setting.CAPTION_STYLE -> captionStyleAdapter
             Setting.SPEED -> speedAdapter
         }
         binding.rvSettings.requestFocus()
@@ -115,6 +120,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         MAIN,
         QUALITY,
         SUBTITLES,
+        CAPTION_STYLE,
         SPEED
     }
 
@@ -150,6 +156,9 @@ class PlayerSettingsView @JvmOverloads constructor(
             val player = settingsView.player ?: return
 
             binding.root.apply {
+                when (item) {
+                    Settings.Subtitle.Style -> margin(bottom = 16F)
+                }
                 setOnClickListener {
                     when (item) {
                         is Settings -> {
@@ -183,6 +192,9 @@ class PlayerSettingsView @JvmOverloads constructor(
 
                         is Settings.Subtitle -> {
                             when (item) {
+                                Settings.Subtitle.Style -> {
+                                    settingsView.displaySetting(Setting.CAPTION_STYLE)
+                                }
                                 is Settings.Subtitle.None -> {
                                     player.trackSelectionParameters = player.trackSelectionParameters
                                         .buildUpon()
@@ -227,6 +239,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 ContextCompat.getDrawable(
                                     context,
                                     when (Settings.Subtitle.selected) {
+                                        Settings.Subtitle.Style,
                                         is Settings.Subtitle.None -> R.drawable.ic_settings_subtitle_off
                                         is Settings.Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
                                     }
@@ -275,6 +288,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                     }
 
                     is Settings.Subtitle -> when (item) {
+                        Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_label)
                         is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
                         is Settings.Subtitle.TextTrackInformation -> item.name
                     }
@@ -302,13 +316,17 @@ class PlayerSettingsView @JvmOverloads constructor(
                             )
                         }
                         Settings.Subtitle -> when (val selected = Settings.Subtitle.selected) {
+                            Settings.Subtitle.Style,
                             is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
                             is Settings.Subtitle.TextTrackInformation -> selected.name
                         }
                         Settings.Speed -> context.getString(Settings.Speed.selected.stringId)
                     }
 
-                    is Settings.Subtitle -> ""
+                    is Settings.Subtitle -> when (item) {
+                        Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_sub_label)
+                        else -> ""
+                    }
 
                     else -> ""
                 }
@@ -326,6 +344,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                     }
 
                     is Settings.Subtitle -> when (item) {
+                        Settings.Subtitle.Style -> View.GONE
                         is Settings.Subtitle.None -> when {
                             item.isSelected -> View.VISIBLE
                             else -> View.GONE
@@ -348,6 +367,13 @@ class PlayerSettingsView @JvmOverloads constructor(
             binding.ivSettingEnter.apply {
                 visibility = when (item) {
                     is Settings -> View.VISIBLE
+
+                    is Settings.Subtitle -> when (item) {
+                        Settings.Subtitle.Style -> View.VISIBLE
+                        is Settings.Subtitle.None -> View.GONE
+                        is Settings.Subtitle.TextTrackInformation -> View.GONE
+                    }
+
                     else -> View.GONE
                 }
             }
@@ -439,11 +465,13 @@ class PlayerSettingsView @JvmOverloads constructor(
                         when (it) {
                             is None -> it.isSelected
                             is TextTrackInformation -> it.isSelected
+                            else -> false
                         }
                     } ?: None
 
                 fun init(player: ExoPlayer, resources: Resources) {
                     list.clear()
+                    list.add(Style)
                     list.add(None)
                     list.addAll(
                         player.currentTracks.groups
@@ -463,6 +491,14 @@ class PlayerSettingsView @JvmOverloads constructor(
                                     }
                             }
                             .sortedBy { it.name }
+                    )
+                }
+            }
+
+            sealed class Style : Item {
+
+                companion object : Subtitle() {
+                    val list = listOf<Style>(
                     )
                 }
             }
