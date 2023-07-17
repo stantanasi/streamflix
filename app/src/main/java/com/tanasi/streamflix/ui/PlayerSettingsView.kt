@@ -2,6 +2,7 @@ package com.tanasi.streamflix.ui
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
 import com.google.android.exoplayer2.ui.SubtitleView
 import com.tanasi.streamflix.R
@@ -21,6 +23,7 @@ import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
 import com.tanasi.streamflix.utils.findClosest
 import com.tanasi.streamflix.utils.margin
+import com.tanasi.streamflix.utils.setAlpha
 import com.tanasi.streamflix.utils.trackFormats
 
 class PlayerSettingsView @JvmOverloads constructor(
@@ -498,6 +501,15 @@ class PlayerSettingsView @JvmOverloads constructor(
             sealed class Style : Item {
 
                 companion object : Subtitle() {
+                    val DEFAULT = CaptionStyleCompat(
+                        Color.WHITE,
+                        Color.BLACK.setAlpha(128),
+                        Color.TRANSPARENT,
+                        CaptionStyleCompat.EDGE_TYPE_NONE,
+                        Color.BLACK,
+                        null
+                    )
+
                     val list = listOf<Style>(
                     )
                 }

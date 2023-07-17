@@ -7,6 +7,7 @@ import com.tanasi.streamflix.BuildConfig
 import com.tanasi.streamflix.providers.AllMoviesForYouProvider
 import com.tanasi.streamflix.providers.Provider
 import com.tanasi.streamflix.providers.SflixProvider
+import com.tanasi.streamflix.ui.PlayerSettingsView
 
 object UserPreferences {
 
@@ -32,16 +33,16 @@ object UserPreferences {
     var captionStyle: CaptionStyleCompat
         get() = CaptionStyleCompat(
             Key.CAPTION_STYLE_FONT_COLOR.getInt()
-                ?: CaptionStyleCompat.DEFAULT.foregroundColor,
+                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.foregroundColor,
             Key.CAPTION_STYLE_BACKGROUND_COLOR.getInt()
-                ?: CaptionStyleCompat.DEFAULT.backgroundColor,
+                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.backgroundColor,
             Key.CAPTION_STYLE_WINDOW_COLOR.getInt()
-                ?: CaptionStyleCompat.DEFAULT.windowColor,
+                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.windowColor,
             Key.CAPTION_STYLE_EDGE_TYPE.getInt()
-                ?: CaptionStyleCompat.DEFAULT.edgeType,
+                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.edgeType,
             Key.CAPTION_STYLE_EDGE_COLOR.getInt()
-                ?: CaptionStyleCompat.DEFAULT.edgeColor,
-            CaptionStyleCompat.DEFAULT.typeface
+                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.edgeColor,
+            PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.typeface
         )
         set(value) {
             Key.CAPTION_STYLE_FONT_COLOR.setInt(value.foregroundColor)
