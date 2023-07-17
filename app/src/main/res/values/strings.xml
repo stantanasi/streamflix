@@ -75,6 +75,13 @@
     <string name="player_settings_caption_style_font_opacity_0_5">50%</string>
     <string name="player_settings_caption_style_font_opacity_0_75">75%</string>
     <string name="player_settings_caption_style_font_opacity_1">100%</string>
+    <string name="player_settings_caption_style_edge_style_title">Character edge style</string>
+    <string name="player_settings_caption_style_edge_style_label">Character edge style</string>
+    <string name="player_settings_caption_style_edge_style_none">None</string>
+    <string name="player_settings_caption_style_edge_style_raised">Raised</string>
+    <string name="player_settings_caption_style_edge_style_depressed">Depressed</string>
+    <string name="player_settings_caption_style_edge_style_outline">Uniform</string>
+    <string name="player_settings_caption_style_edge_style_drop_shadow">Drop Shadow</string>
     <string name="player_settings_speed_title">Video speed</string>
     <string name="player_settings_speed_label">Speed</string>
     <string name="player_settings_speed_0_25">× 0.25</string>
