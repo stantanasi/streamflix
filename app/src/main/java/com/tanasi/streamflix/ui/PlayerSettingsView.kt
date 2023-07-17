@@ -77,6 +77,7 @@ class PlayerSettingsView @JvmOverloads constructor(
     private val edgeStyleAdapter = SettingsAdapter(this, Settings.Subtitle.Style.EdgeStyle.list)
     private val backgroundColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.BackgroundColor.list)
     private val backgroundOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.BackgroundOpacity.list)
+    private val windowColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowColor.list)
     private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
 
     fun onBackPressed() {
@@ -90,7 +91,8 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.CAPTION_STYLE_FONT_OPACITY,
             Setting.CAPTION_STYLE_EDGE_STYLE,
             Setting.CAPTION_STYLE_BACKGROUND_COLOR,
-            Setting.CAPTION_STYLE_BACKGROUND_OPACITY -> displaySetting(Setting.CAPTION_STYLE)
+            Setting.CAPTION_STYLE_BACKGROUND_OPACITY,
+            Setting.CAPTION_STYLE_WINDOW_COLOR -> displaySetting(Setting.CAPTION_STYLE)
         }
     }
 
@@ -122,6 +124,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 Setting.CAPTION_STYLE_EDGE_STYLE -> context.getString(R.string.player_settings_caption_style_edge_style_title)
                 Setting.CAPTION_STYLE_BACKGROUND_COLOR -> context.getString(R.string.player_settings_caption_style_background_color_title)
                 Setting.CAPTION_STYLE_BACKGROUND_OPACITY -> context.getString(R.string.player_settings_caption_style_background_opacity_title)
+                Setting.CAPTION_STYLE_WINDOW_COLOR -> context.getString(R.string.player_settings_caption_style_window_color_title)
                 Setting.SPEED -> context.getString(R.string.player_settings_speed_title)
             }
         }
@@ -136,6 +139,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.CAPTION_STYLE_EDGE_STYLE -> edgeStyleAdapter
             Setting.CAPTION_STYLE_BACKGROUND_COLOR -> backgroundColorAdapter
             Setting.CAPTION_STYLE_BACKGROUND_OPACITY -> backgroundOpacityAdapter
+            Setting.CAPTION_STYLE_WINDOW_COLOR -> windowColorAdapter
             Setting.SPEED -> speedAdapter
         }
         binding.rvSettings.requestFocus()
@@ -156,6 +160,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         CAPTION_STYLE_EDGE_STYLE,
         CAPTION_STYLE_BACKGROUND_COLOR,
         CAPTION_STYLE_BACKGROUND_OPACITY,
+        CAPTION_STYLE_WINDOW_COLOR,
         SPEED
     }
 
@@ -278,6 +283,9 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 Settings.Subtitle.Style.BackgroundOpacity -> {
                                     settingsView.displaySetting(Setting.CAPTION_STYLE_BACKGROUND_OPACITY)
                                 }
+                                Settings.Subtitle.Style.WindowColor -> {
+                                    settingsView.displaySetting(Setting.CAPTION_STYLE_WINDOW_COLOR)
+                                }
                             }
                         }
 
@@ -346,6 +354,19 @@ class PlayerSettingsView @JvmOverloads constructor(
                             settingsView.displaySetting(Setting.CAPTION_STYLE)
                         }
 
+                        is Settings.Subtitle.Style.WindowColor -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor,
+                                UserPreferences.captionStyle.backgroundColor,
+                                UserPreferences.captionStyle.windowColor.setRgb(item.color),
+                                UserPreferences.captionStyle.edgeType,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                        }
+
                         is Settings.Speed -> {
                             player.playbackParameters = player.playbackParameters
                                 .withSpeed(item.value)
@@ -400,6 +421,11 @@ class PlayerSettingsView @JvmOverloads constructor(
                         visibility = View.VISIBLE
                     }
 
+                    is Settings.Subtitle.Style.WindowColor -> {
+                        backgroundTintList = ColorStateList.valueOf(item.color)
+                        visibility = View.VISIBLE
+                    }
+
                     else -> {
                         visibility = View.GONE
                     }
@@ -445,6 +471,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         Settings.Subtitle.Style.EdgeStyle -> context.getString(R.string.player_settings_caption_style_edge_style_label)
                         Settings.Subtitle.Style.BackgroundColor -> context.getString(R.string.player_settings_caption_style_background_color_label)
                         Settings.Subtitle.Style.BackgroundOpacity -> context.getString(R.string.player_settings_caption_style_background_opacity_label)
+                        Settings.Subtitle.Style.WindowColor -> context.getString(R.string.player_settings_caption_style_window_color_label)
                     }
 
                     is Settings.Subtitle.Style.FontColor -> context.getString(item.stringId)
@@ -456,6 +483,8 @@ class PlayerSettingsView @JvmOverloads constructor(
                     is Settings.Subtitle.Style.BackgroundColor -> context.getString(item.stringId)
 
                     is Settings.Subtitle.Style.BackgroundOpacity -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.WindowColor -> context.getString(item.stringId)
 
                     is Settings.Speed -> context.getString(item.stringId)
 
@@ -499,6 +528,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         Settings.Subtitle.Style.EdgeStyle -> context.getString(Settings.Subtitle.Style.EdgeStyle.selected.stringId)
                         Settings.Subtitle.Style.BackgroundColor -> context.getString(Settings.Subtitle.Style.BackgroundColor.selected.stringId)
                         Settings.Subtitle.Style.BackgroundOpacity -> context.getString(Settings.Subtitle.Style.BackgroundOpacity.selected.stringId)
+                        Settings.Subtitle.Style.WindowColor -> context.getString(Settings.Subtitle.Style.WindowColor.selected.stringId)
                     }
 
                     else -> ""
@@ -549,6 +579,11 @@ class PlayerSettingsView @JvmOverloads constructor(
                     }
 
                     is Settings.Subtitle.Style.BackgroundOpacity -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.WindowColor -> when {
                         item.isSelected -> View.VISIBLE
                         else -> View.GONE
                     }
@@ -717,6 +752,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         EdgeStyle,
                         BackgroundColor,
                         BackgroundOpacity,
+                        WindowColor,
                     )
                 }
 
@@ -930,6 +966,56 @@ class PlayerSettingsView @JvmOverloads constructor(
                         )
 
                         val selected: BackgroundOpacity
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class WindowColor(
+                    val stringId: Int,
+                    val color: Int,
+                ) : Item {
+                    val isSelected: Boolean
+                        get() = color == UserPreferences.captionStyle.windowColor.getRgb()
+
+                    companion object : Style() {
+                        private val DEFAULT = WindowColor(
+                            R.string.player_settings_caption_style_window_color_black,
+                            Color.BLACK
+                        )
+
+                        val list = listOf(
+                            DEFAULT,
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_yellow,
+                                Color.YELLOW
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_green,
+                                Color.GREEN
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_cyan,
+                                Color.CYAN
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_blue,
+                                Color.BLUE
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_magenta,
+                                Color.MAGENTA
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_red,
+                                Color.RED
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_white,
+                                Color.WHITE
+                            ),
+                        )
+
+                        val selected: WindowColor
                             get() = list.find { it.isSelected } ?: DEFAULT
                     }
                 }
