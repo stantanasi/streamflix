@@ -53,16 +53,19 @@ class PlayerSettingsView @JvmOverloads constructor(
             field = value
         }
 
-    private val settingsAdapter = SettingsAdapter(Setting.Main).also { it.settingsView = this }
-    private val qualityAdapter = SettingsAdapter(Setting.Quality).also { it.settingsView = this }
-    private val subtitlesAdapter = SettingsAdapter(Setting.Subtitle).also { it.settingsView = this }
-    private val speedAdapter = SettingsAdapter(Setting.Speed).also { it.settingsView = this }
+    private var currentSettings = Setting.MAIN
+
+    private val settingsAdapter = SettingsAdapter(this, Settings.list)
+    private val qualityAdapter = SettingsAdapter(this, Settings.Quality.list)
+    private val subtitlesAdapter = SettingsAdapter(this, Settings.Subtitle.list)
+    private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
 
     fun onBackPressed() {
-        val adapter = binding.rvSettings.adapter as? SettingsAdapter
-        when (adapter?.setting) {
-            Setting.Main -> hide()
-            else -> displaySetting(Setting.Main)
+        when (currentSettings) {
+            Setting.MAIN -> hide()
+            Setting.QUALITY,
+            Setting.SUBTITLES,
+            Setting.SPEED -> displaySetting(Setting.MAIN)
         }
     }
 
@@ -77,24 +80,26 @@ class PlayerSettingsView @JvmOverloads constructor(
     fun show() {
         this.visibility = View.VISIBLE
 
-        displaySetting(Setting.Main)
+        displaySetting(Setting.MAIN)
     }
 
     private fun displaySetting(setting: Setting) {
+        currentSettings = setting
+
         binding.tvSettingsHeader.apply {
             text = when (setting) {
-                is Setting.Main -> context.getString(R.string.player_settings_title)
-                is Setting.Quality -> context.getString(R.string.player_settings_quality_title)
-                is Setting.Subtitle -> context.getString(R.string.player_settings_subtitles_title)
-                is Setting.Speed -> context.getString(R.string.player_settings_speed_title)
+                Setting.MAIN -> context.getString(R.string.player_settings_title)
+                Setting.QUALITY -> context.getString(R.string.player_settings_quality_title)
+                Setting.SUBTITLES -> context.getString(R.string.player_settings_subtitles_title)
+                Setting.SPEED -> context.getString(R.string.player_settings_speed_title)
             }
         }
 
         binding.rvSettings.adapter = when (setting) {
-            is Setting.Main -> settingsAdapter
-            is Setting.Quality -> qualityAdapter
-            is Setting.Subtitle -> subtitlesAdapter
-            is Setting.Speed -> speedAdapter
+            Setting.MAIN -> settingsAdapter
+            Setting.QUALITY -> qualityAdapter
+            Setting.SUBTITLES -> subtitlesAdapter
+            Setting.SPEED -> speedAdapter
         }
         binding.rvSettings.requestFocus()
     }
@@ -104,26 +109,22 @@ class PlayerSettingsView @JvmOverloads constructor(
     }
 
 
-    private sealed class Setting {
-
-        object Main : Setting()
-
-        object Quality : Setting()
-
-        object Subtitle : Setting()
-
-        object Speed : Setting()
+    private enum class Setting {
+        MAIN,
+        QUALITY,
+        SUBTITLES,
+        SPEED
     }
 
 
     private class SettingsAdapter(
-        val setting: Setting,
+        private val settingsView: PlayerSettingsView,
+        private val items: List<Item>,
     ) : RecyclerView.Adapter<SettingViewHolder>() {
-
-        lateinit var settingsView: PlayerSettingsView
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             SettingViewHolder(
+                settingsView,
                 ItemSettingBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -132,29 +133,16 @@ class PlayerSettingsView @JvmOverloads constructor(
             )
 
         override fun onBindViewHolder(holder: SettingViewHolder, position: Int) {
-            holder.settingsView = settingsView
-
-            when (setting) {
-                is Setting.Main -> holder.displaySettings(Settings.list[position])
-                is Setting.Quality -> holder.displaySettings(Settings.Quality.list[position])
-                is Setting.Subtitle -> holder.displaySettings(Settings.Subtitle.list[position])
-                is Setting.Speed -> holder.displaySettings(Settings.Speed.list[position])
-            }
+            holder.displaySettings(items[position])
         }
 
-        override fun getItemCount() = when (setting) {
-            is Setting.Main -> Settings.list.size
-            is Setting.Quality -> Settings.Quality.list.size
-            is Setting.Subtitle -> Settings.Subtitle.list.size
-            is Setting.Speed -> Settings.Speed.list.size
-        }
+        override fun getItemCount() = items.size
     }
 
     private class SettingViewHolder(
+        private val settingsView: PlayerSettingsView,
         val binding: ItemSettingBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
-
-        lateinit var settingsView: PlayerSettingsView
 
         fun displaySettings(item: Item) {
             val player = settingsView.player ?: return
@@ -164,9 +152,9 @@ class PlayerSettingsView @JvmOverloads constructor(
                     when (item) {
                         is Settings -> {
                             when (item) {
-                                Settings.Quality -> settingsView.displaySetting(Setting.Quality)
-                                Settings.Subtitle -> settingsView.displaySetting(Setting.Subtitle)
-                                Settings.Speed -> settingsView.displaySetting(Setting.Speed)
+                                Settings.Quality -> settingsView.displaySetting(Setting.QUALITY)
+                                Settings.Subtitle -> settingsView.displaySetting(Setting.SUBTITLES)
+                                Settings.Speed -> settingsView.displaySetting(Setting.SPEED)
                             }
                         }
 
