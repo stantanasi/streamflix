@@ -174,6 +174,7 @@ class PlayerFragment : Fragment() {
 
         binding.pvPlayer.player = player
         binding.settings.player = player
+        binding.settings.subtitleView = binding.pvPlayer.subtitleView
 
         binding.pvPlayer.subtitleView?.setStyle(UserPreferences.captionStyle)
 

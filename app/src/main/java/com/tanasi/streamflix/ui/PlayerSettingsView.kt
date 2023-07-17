@@ -15,6 +15,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
+import com.google.android.exoplayer2.ui.SubtitleView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
@@ -52,6 +53,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             field = value
         }
+    var subtitleView: SubtitleView? = null
 
     private var currentSettings = Setting.MAIN
 
