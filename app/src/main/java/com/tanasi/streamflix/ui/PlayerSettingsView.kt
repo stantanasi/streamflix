@@ -358,7 +358,9 @@ class PlayerSettingsView @JvmOverloads constructor(
         }
     }
 
-    sealed class Settings {
+    private interface Item
+
+    sealed class Settings : Item {
 
         companion object {
             val list = listOf(
@@ -368,7 +370,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             )
         }
 
-        sealed class Quality {
+        sealed class Quality : Item {
 
             companion object : Settings() {
                 val list = mutableListOf<Quality>()
@@ -431,7 +433,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             }
         }
 
-        sealed class Subtitle {
+        sealed class Subtitle : Item {
 
             companion object : Settings() {
                 val list = mutableListOf<Subtitle>()
@@ -487,7 +489,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         class Speed(
             val stringId: Int,
             val value: Float,
-        ) {
+        ) : Item {
             var isSelected: Boolean = false
 
             companion object : Settings() {
