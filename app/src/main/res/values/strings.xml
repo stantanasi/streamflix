@@ -60,6 +60,16 @@
     <string name="player_settings_caption_style_label">Caption style</string>
     <string name="player_settings_caption_style_sub_label">Change text color and background style</string>
     <string name="player_settings_caption_style_reset_style_label">Reset style</string>
+    <string name="player_settings_caption_style_font_color_title">Font color</string>
+    <string name="player_settings_caption_style_font_color_label">Font color</string>
+    <string name="player_settings_caption_style_font_color_white">White</string>
+    <string name="player_settings_caption_style_font_color_yellow">Yellow</string>
+    <string name="player_settings_caption_style_font_color_green">Green</string>
+    <string name="player_settings_caption_style_font_color_cyan">Cyan</string>
+    <string name="player_settings_caption_style_font_color_blue">Blue</string>
+    <string name="player_settings_caption_style_font_color_magenta">Magenta</string>
+    <string name="player_settings_caption_style_font_color_red">Red</string>
+    <string name="player_settings_caption_style_font_color_black">Black</string>
     <string name="player_settings_speed_title">Video speed</string>
     <string name="player_settings_speed_label">Speed</string>
     <string name="player_settings_speed_0_25">× 0.25</string>
