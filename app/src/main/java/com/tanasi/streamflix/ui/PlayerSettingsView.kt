@@ -53,10 +53,10 @@ class PlayerSettingsView @JvmOverloads constructor(
             field = value
         }
 
-
-    init {
-        Setting.init(this)
-    }
+    private val settingsAdapter = SettingsAdapter(Setting.Main).also { it.playerSettingsView = this }
+    private val qualityAdapter = SettingsAdapter(Setting.Quality).also { it.playerSettingsView = this }
+    private val subtitlesAdapter = SettingsAdapter(Setting.Subtitle).also { it.playerSettingsView = this }
+    private val speedAdapter = SettingsAdapter(Setting.Speed).also { it.playerSettingsView = this }
 
     fun onBackPressed() {
         val adapter = binding.rvSettings.adapter as? SettingsAdapter
@@ -90,7 +90,12 @@ class PlayerSettingsView @JvmOverloads constructor(
             }
         }
 
-        binding.rvSettings.adapter = setting.adapter
+        binding.rvSettings.adapter = when (setting) {
+            is Setting.Main -> settingsAdapter
+            is Setting.Quality -> qualityAdapter
+            is Setting.Subtitle -> subtitlesAdapter
+            is Setting.Speed -> speedAdapter
+        }
         binding.rvSettings.requestFocus()
     }
 
@@ -101,8 +106,6 @@ class PlayerSettingsView @JvmOverloads constructor(
 
     private sealed class Setting {
 
-        lateinit var adapter: SettingsAdapter
-
         object Main : Setting()
 
         object Quality : Setting()
@@ -110,19 +113,6 @@ class PlayerSettingsView @JvmOverloads constructor(
         object Subtitle : Setting()
 
         object Speed : Setting()
-
-
-        companion object {
-            fun init(playerSettingsView: PlayerSettingsView) {
-                values().forEach { setting ->
-                    setting.adapter = SettingsAdapter(setting).also {
-                        it.playerSettingsView = playerSettingsView
-                    }
-                }
-            }
-
-            fun values() = listOf(Main, Quality, Subtitle, Speed)
-        }
     }
 
 
