@@ -21,6 +21,7 @@ import com.google.android.exoplayer2.ui.SubtitleView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
+import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.findClosest
 import com.tanasi.streamflix.utils.margin
 import com.tanasi.streamflix.utils.setAlpha
@@ -157,10 +158,12 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         fun displaySettings(item: Item) {
             val player = settingsView.player ?: return
+            val subtitleView = settingsView.subtitleView ?: return
 
             binding.root.apply {
                 when (item) {
-                    Settings.Subtitle.Style -> margin(bottom = 16F)
+                    Settings.Subtitle.Style,
+                    Settings.Subtitle.Style.ResetStyle -> margin(bottom = 16F)
                 }
                 setOnClickListener {
                     when (item) {
@@ -217,6 +220,16 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         )
                                         .setTrackTypeDisabled(item.trackGroup.type, false)
                                         .build()
+                                    settingsView.hide()
+                                }
+                            }
+                        }
+
+                        is Settings.Subtitle.Style -> {
+                            when (item) {
+                                Settings.Subtitle.Style.ResetStyle -> {
+                                    UserPreferences.captionStyle = Settings.Subtitle.Style.DEFAULT
+                                    subtitleView.setStyle(UserPreferences.captionStyle)
                                     settingsView.hide()
                                 }
                             }
@@ -296,6 +309,10 @@ class PlayerSettingsView @JvmOverloads constructor(
                         is Settings.Subtitle.TextTrackInformation -> item.name
                     }
 
+                    is Settings.Subtitle.Style -> when (item) {
+                        Settings.Subtitle.Style.ResetStyle -> context.getString(R.string.player_settings_caption_style_reset_style_label)
+                    }
+
                     is Settings.Speed -> context.getString(item.stringId)
 
                     else -> ""
@@ -329,6 +346,10 @@ class PlayerSettingsView @JvmOverloads constructor(
                     is Settings.Subtitle -> when (item) {
                         Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_sub_label)
                         else -> ""
+                    }
+
+                    is Settings.Subtitle.Style -> when (item) {
+                        Settings.Subtitle.Style.ResetStyle -> ""
                     }
 
                     else -> ""
@@ -375,6 +396,10 @@ class PlayerSettingsView @JvmOverloads constructor(
                         Settings.Subtitle.Style -> View.VISIBLE
                         is Settings.Subtitle.None -> View.GONE
                         is Settings.Subtitle.TextTrackInformation -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style -> when (item) {
+                        Settings.Subtitle.Style.ResetStyle -> View.GONE
                     }
 
                     else -> View.GONE
@@ -511,8 +536,11 @@ class PlayerSettingsView @JvmOverloads constructor(
                     )
 
                     val list = listOf<Style>(
+                        ResetStyle,
                     )
                 }
+
+                object ResetStyle : Style()
             }
 
             object None : Subtitle() {
