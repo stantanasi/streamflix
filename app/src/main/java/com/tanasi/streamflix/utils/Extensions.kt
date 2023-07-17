@@ -3,6 +3,7 @@ package com.tanasi.streamflix.utils
 import android.app.Activity
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Color
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -127,3 +128,26 @@ fun View.margin(left: Float? = null, top: Float? = null, right: Float? = null, b
         bottom?.run { bottomMargin = dpToPx(this) }
     }
 }
+
+
+fun Int.getAlpha(): Int = Color.alpha(this)
+
+fun Int.setAlpha(alpha: Int): Int = Color.argb(
+    alpha,
+    Color.red(this),
+    Color.green(this),
+    Color.blue(this),
+)
+
+fun Int.getRgb(): Int = Color.rgb(
+    Color.red(this),
+    Color.green(this),
+    Color.blue(this)
+)
+
+fun Int.setRgb(rgb: Int): Int = Color.argb(
+    Color.alpha(this),
+    Color.red(rgb),
+    Color.green(rgb),
+    Color.blue(rgb),
+)
