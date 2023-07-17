@@ -87,8 +87,8 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.MAIN -> hide()
             Setting.QUALITY,
             Setting.SUBTITLES,
-            Setting.SPEED -> displaySetting(Setting.MAIN)
-            Setting.CAPTION_STYLE -> displaySetting(Setting.SUBTITLES)
+            Setting.SPEED -> displaySettings(Setting.MAIN)
+            Setting.CAPTION_STYLE -> displaySettings(Setting.SUBTITLES)
             Setting.CAPTION_STYLE_FONT_COLOR,
             Setting.CAPTION_STYLE_TEXT_SIZE,
             Setting.CAPTION_STYLE_FONT_OPACITY,
@@ -96,7 +96,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.CAPTION_STYLE_BACKGROUND_COLOR,
             Setting.CAPTION_STYLE_BACKGROUND_OPACITY,
             Setting.CAPTION_STYLE_WINDOW_COLOR,
-            Setting.CAPTION_STYLE_WINDOW_OPACITY -> displaySetting(Setting.CAPTION_STYLE)
+            Setting.CAPTION_STYLE_WINDOW_OPACITY -> displaySettings(Setting.CAPTION_STYLE)
         }
     }
 
@@ -111,10 +111,10 @@ class PlayerSettingsView @JvmOverloads constructor(
     fun show() {
         this.visibility = View.VISIBLE
 
-        displaySetting(Setting.MAIN)
+        displaySettings(Setting.MAIN)
     }
 
-    private fun displaySetting(setting: Setting) {
+    private fun displaySettings(setting: Setting) {
         currentSettings = setting
 
         binding.tvSettingsHeader.apply {
@@ -215,9 +215,9 @@ class PlayerSettingsView @JvmOverloads constructor(
                     when (item) {
                         is Settings -> {
                             when (item) {
-                                Settings.Quality -> settingsView.displaySetting(Setting.QUALITY)
-                                Settings.Subtitle -> settingsView.displaySetting(Setting.SUBTITLES)
-                                Settings.Speed -> settingsView.displaySetting(Setting.SPEED)
+                                Settings.Quality -> settingsView.displaySettings(Setting.QUALITY)
+                                Settings.Subtitle -> settingsView.displaySettings(Setting.SUBTITLES)
+                                Settings.Speed -> settingsView.displaySettings(Setting.SPEED)
                             }
                         }
 
@@ -245,7 +245,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         is Settings.Subtitle -> {
                             when (item) {
                                 Settings.Subtitle.Style -> {
-                                    settingsView.displaySetting(Setting.CAPTION_STYLE)
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE)
                                 }
                                 is Settings.Subtitle.None -> {
                                     player.trackSelectionParameters = player.trackSelectionParameters
@@ -285,28 +285,28 @@ class PlayerSettingsView @JvmOverloads constructor(
                                     settingsView.hide()
                                 }
                                 Settings.Subtitle.Style.FontColor -> {
-                                    settingsView.displaySetting(Setting.CAPTION_STYLE_FONT_COLOR)
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_FONT_COLOR)
                                 }
                                 Settings.Subtitle.Style.TextSize -> {
-                                    settingsView.displaySetting(Setting.CAPTION_STYLE_TEXT_SIZE)
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_TEXT_SIZE)
                                 }
                                 Settings.Subtitle.Style.FontOpacity -> {
-                                    settingsView.displaySetting(Setting.CAPTION_STYLE_FONT_OPACITY)
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_FONT_OPACITY)
                                 }
                                 Settings.Subtitle.Style.EdgeStyle -> {
-                                    settingsView.displaySetting(Setting.CAPTION_STYLE_EDGE_STYLE)
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_EDGE_STYLE)
                                 }
                                 Settings.Subtitle.Style.BackgroundColor -> {
-                                    settingsView.displaySetting(Setting.CAPTION_STYLE_BACKGROUND_COLOR)
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_BACKGROUND_COLOR)
                                 }
                                 Settings.Subtitle.Style.BackgroundOpacity -> {
-                                    settingsView.displaySetting(Setting.CAPTION_STYLE_BACKGROUND_OPACITY)
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_BACKGROUND_OPACITY)
                                 }
                                 Settings.Subtitle.Style.WindowColor -> {
-                                    settingsView.displaySetting(Setting.CAPTION_STYLE_WINDOW_COLOR)
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_WINDOW_COLOR)
                                 }
                                 Settings.Subtitle.Style.WindowOpacity -> {
-                                    settingsView.displaySetting(Setting.CAPTION_STYLE_WINDOW_OPACITY)
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_WINDOW_OPACITY)
                                 }
                             }
                         }
@@ -321,13 +321,13 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 null
                             )
                             subtitleView.setStyle(UserPreferences.captionStyle)
-                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.TextSize -> {
                             UserPreferences.captionTextSize = item.value
                             subtitleView.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
-                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.FontOpacity -> {
@@ -340,7 +340,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 null
                             )
                             subtitleView.setStyle(UserPreferences.captionStyle)
-                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.EdgeStyle -> {
@@ -353,7 +353,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 null
                             )
                             subtitleView.setStyle(UserPreferences.captionStyle)
-                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.BackgroundColor -> {
@@ -366,7 +366,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 null
                             )
                             subtitleView.setStyle(UserPreferences.captionStyle)
-                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.BackgroundOpacity -> {
@@ -379,7 +379,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 null
                             )
                             subtitleView.setStyle(UserPreferences.captionStyle)
-                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.WindowColor -> {
@@ -392,7 +392,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 null
                             )
                             subtitleView.setStyle(UserPreferences.captionStyle)
-                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.WindowOpacity -> {
@@ -405,7 +405,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 null
                             )
                             subtitleView.setStyle(UserPreferences.captionStyle)
-                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Speed -> {
