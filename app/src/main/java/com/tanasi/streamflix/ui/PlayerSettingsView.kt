@@ -40,15 +40,15 @@ class PlayerSettingsView @JvmOverloads constructor(
             value?.addListener(object : Player.Listener {
                 override fun onEvents(player: Player, events: Player.Events) {
                     if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
-                        Setting.Quality.init(value, resources)
-                        Setting.Subtitle.init(value, resources)
+                        Settings.Quality.init(value, resources)
+                        Settings.Subtitle.init(value, resources)
                     }
                     if (events.contains(Player.EVENT_PLAYBACK_PARAMETERS_CHANGED)) {
-                        Setting.Speed.refresh(value)
+                        Settings.Speed.refresh(value)
                     }
                 }
             })
-            value?.let { Setting.Speed.refresh(it) }
+            value?.let { Settings.Speed.refresh(it) }
 
             field = value
         }
@@ -103,98 +103,13 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         lateinit var adapter: SettingsAdapter
 
-        object Main : Setting() {
-            val list = listOf(Quality, Subtitle, Speed)
-        }
+        object Main : Setting()
 
-        object Quality : Setting() {
-            val list = mutableListOf<Settings.Quality>()
+        object Quality : Setting()
 
-            val selected: Settings.Quality
-                get() = list.find { it.isSelected } ?: Settings.Quality.Auto
+        object Subtitle : Setting()
 
-            fun init(player: ExoPlayer, resources: Resources) {
-                list.clear()
-                list.add(Settings.Quality.Auto)
-                list.addAll(
-                    player.currentTracks.groups
-                        .filter { it.type == C.TRACK_TYPE_VIDEO }
-                        .flatMap { trackGroup ->
-                            trackGroup.trackFormats
-                                .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
-                                .distinctBy { it.width to it.height }
-                                .map { trackFormat ->
-                                    Settings.Quality.VideoTrackInformation(
-                                        name = DefaultTrackNameProvider(resources)
-                                            .getTrackName(trackFormat),
-                                        width = trackFormat.width,
-                                        height = trackFormat.height,
-                                        bitrate = trackFormat.bitrate,
-
-                                        player = player,
-                                    )
-                                }
-                        }
-                        .sortedByDescending { it.height }
-                )
-            }
-        }
-
-        object Subtitle : Setting() {
-            val list = mutableListOf<Settings.Subtitle>()
-
-            val selected: Settings.Subtitle
-                get() = list.find { it.isSelected } ?: Settings.Subtitle.None
-
-            fun init(player: ExoPlayer, resources: Resources) {
-                list.clear()
-                list.add(Settings.Subtitle.None)
-                list.addAll(
-                    player.currentTracks.groups
-                        .filter { it.type == C.TRACK_TYPE_TEXT }
-                        .flatMap { trackGroup ->
-                            trackGroup.trackFormats
-                                .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
-                                .filter { it.label != null }
-                                .mapIndexed { trackIndex, trackFormat ->
-                                    Settings.Subtitle.TextTrackInformation(
-                                        name = DefaultTrackNameProvider(resources)
-                                            .getTrackName(trackFormat),
-
-                                        trackGroup = trackGroup,
-                                        trackIndex = trackIndex,
-                                    )
-                                }
-                        }
-                        .sortedBy { it.name }
-                )
-            }
-        }
-
-        object Speed : Setting() {
-            val list = listOf(
-                Settings.Speed(R.string.player_settings_speed_0_25, 0.25F),
-                Settings.Speed(R.string.player_settings_speed_0_5, 0.5F),
-                Settings.Speed(R.string.player_settings_speed_0_75, 0.75F),
-                Settings.Speed(R.string.player_settings_speed_1, 1F),
-                Settings.Speed(R.string.player_settings_speed_1_25, 1.25F),
-                Settings.Speed(R.string.player_settings_speed_1_5, 1.5F),
-                Settings.Speed(R.string.player_settings_speed_1_75, 1.75F),
-                Settings.Speed(R.string.player_settings_speed_2, 2F),
-            )
-
-            val selected: Settings.Speed
-                get() = list.find { it.isSelected }
-                    ?: list.find { it.speed == 1F }
-                    ?: Settings.Speed(R.string.player_settings_speed_1, 1F)
-
-            fun refresh(player: ExoPlayer) {
-                list.forEach { it.isSelected = false }
-                list.findClosest(player.playbackParameters.speed) { it.speed }?.let {
-                    it.isSelected = true
-                }
-            }
-        }
+        object Speed : Setting()
 
 
         companion object {
@@ -230,18 +145,18 @@ class PlayerSettingsView @JvmOverloads constructor(
             holder.playerSettingsView = playerSettingsView
 
             when (setting) {
-                is Setting.Main -> holder.displayMainSetting(setting.list[position])
-                is Setting.Quality -> holder.displayQualitySetting(setting.list[position])
-                is Setting.Subtitle -> holder.displaySubtitleSetting(setting.list[position])
-                is Setting.Speed -> holder.displaySpeedSetting(setting.list[position])
+                is Setting.Main -> holder.displayMainSetting(Settings.list[position])
+                is Setting.Quality -> holder.displayQualitySetting(Settings.Quality.list[position])
+                is Setting.Subtitle -> holder.displaySubtitleSetting(Settings.Subtitle.list[position])
+                is Setting.Speed -> holder.displaySpeedSetting(Settings.Speed.list[position])
             }
         }
 
         override fun getItemCount() = when (setting) {
-            is Setting.Main -> setting.list.size
-            is Setting.Quality -> setting.list.size
-            is Setting.Subtitle -> setting.list.size
-            is Setting.Speed -> setting.list.size
+            is Setting.Main -> Settings.list.size
+            is Setting.Quality -> Settings.Quality.list.size
+            is Setting.Subtitle -> Settings.Subtitle.list.size
+            is Setting.Speed -> Settings.Speed.list.size
         }
     }
 
@@ -251,45 +166,49 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         lateinit var playerSettingsView: PlayerSettingsView
 
-        fun displayMainSetting(setting: Setting) {
+        fun displayMainSetting(settings: Settings) {
             binding.root.setOnClickListener {
-                playerSettingsView.displaySetting(setting)
+                playerSettingsView.displaySetting(
+                    when (settings) {
+                        Settings.Quality -> Setting.Quality
+                        Settings.Subtitle -> Setting.Subtitle
+                        Settings.Speed -> Setting.Speed
+                    }
+                )
             }
 
             binding.ivSettingIcon.apply {
-                when (setting) {
-                    is Setting.Quality -> setImageDrawable(
+                when (settings) {
+                    Settings.Quality -> setImageDrawable(
                         ContextCompat.getDrawable(context, R.drawable.ic_settings_quality)
                     )
-                    is Setting.Subtitle -> setImageDrawable(
+                    Settings.Subtitle -> setImageDrawable(
                         ContextCompat.getDrawable(
                             context,
-                            when (setting.selected) {
+                            when (Settings.Subtitle.selected) {
                                 is Settings.Subtitle.None -> R.drawable.ic_settings_subtitle_off
                                 is Settings.Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
                             }
                         )
                     )
-                    is Setting.Speed -> setImageDrawable(
+                    Settings.Speed -> setImageDrawable(
                         ContextCompat.getDrawable(context, R.drawable.ic_settings_playback_speed)
                     )
-                    else -> {}
                 }
                 visibility = View.VISIBLE
             }
 
             binding.tvSettingMainText.apply {
-                text = when (setting) {
-                    is Setting.Quality -> context.getString(R.string.player_settings_quality_label)
-                    is Setting.Subtitle -> context.getString(R.string.player_settings_subtitles_label)
-                    is Setting.Speed -> context.getString(R.string.player_settings_speed_label)
-                    else -> ""
+                text = when (settings) {
+                    Settings.Quality -> context.getString(R.string.player_settings_quality_label)
+                    Settings.Subtitle -> context.getString(R.string.player_settings_subtitles_label)
+                    Settings.Speed -> context.getString(R.string.player_settings_speed_label)
                 }
             }
 
             binding.tvSettingSubText.apply {
-                text = when (setting) {
-                    is Setting.Quality -> when (val selected = setting.selected) {
+                text = when (settings) {
+                    Settings.Quality -> when (val selected = Settings.Quality.selected) {
                         is Settings.Quality.Auto -> when (val track = selected.currentTrack) {
                             null -> context.getString(R.string.player_settings_quality_auto)
                             else -> context.getString(
@@ -302,12 +221,11 @@ class PlayerSettingsView @JvmOverloads constructor(
                             selected.height
                         )
                     }
-                    is Setting.Subtitle -> when (val selected = setting.selected) {
+                    Settings.Subtitle -> when (val selected = Settings.Subtitle.selected) {
                         is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
                         is Settings.Subtitle.TextTrackInformation -> selected.name
                     }
-                    is Setting.Speed -> context.getString(setting.selected.stringId)
-                    else -> ""
+                    Settings.Speed -> context.getString(Settings.Speed.selected.stringId)
                 }
                 visibility = when {
                     text.isEmpty() -> View.GONE
@@ -452,17 +370,58 @@ class PlayerSettingsView @JvmOverloads constructor(
 
     sealed class Settings {
 
+        companion object {
+            val list = listOf(
+                Quality,
+                Subtitle,
+                Speed,
+            )
+        }
+
         sealed class Quality {
+
+            companion object : Settings() {
+                val list = mutableListOf<Quality>()
+
+                val selected: Quality
+                    get() = list.find { it.isSelected } ?: Auto
+
+                fun init(player: ExoPlayer, resources: Resources) {
+                    list.clear()
+                    list.add(Auto)
+                    list.addAll(
+                        player.currentTracks.groups
+                            .filter { it.type == C.TRACK_TYPE_VIDEO }
+                            .flatMap { trackGroup ->
+                                trackGroup.trackFormats
+                                    .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
+                                    .distinctBy { it.width to it.height }
+                                    .map { trackFormat ->
+                                        VideoTrackInformation(
+                                            name = DefaultTrackNameProvider(resources)
+                                                .getTrackName(trackFormat),
+                                            width = trackFormat.width,
+                                            height = trackFormat.height,
+                                            bitrate = trackFormat.bitrate,
+
+                                            player = player,
+                                        )
+                                    }
+                            }
+                            .sortedByDescending { it.height }
+                    )
+                }
+            }
 
             abstract val isSelected: Boolean
 
             object Auto : Quality() {
                 val currentTrack: VideoTrackInformation?
-                    get() = Setting.Quality.list
+                    get() = list
                         .filterIsInstance<VideoTrackInformation>()
                         .find { it.isCurrentlyPlayed }
                 override val isSelected: Boolean
-                    get() = Setting.Quality.list
+                    get() = list
                         .filterIsInstance<VideoTrackInformation>()
                         .none { it.isSelected }
             }
@@ -484,11 +443,42 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         sealed class Subtitle {
 
+            companion object : Settings() {
+                val list = mutableListOf<Subtitle>()
+
+                val selected: Subtitle
+                    get() = list.find { it.isSelected } ?: None
+
+                fun init(player: ExoPlayer, resources: Resources) {
+                    list.clear()
+                    list.add(None)
+                    list.addAll(
+                        player.currentTracks.groups
+                            .filter { it.type == C.TRACK_TYPE_TEXT }
+                            .flatMap { trackGroup ->
+                                trackGroup.trackFormats
+                                    .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
+                                    .filter { it.label != null }
+                                    .mapIndexed { trackIndex, trackFormat ->
+                                        TextTrackInformation(
+                                            name = DefaultTrackNameProvider(resources)
+                                                .getTrackName(trackFormat),
+
+                                            trackGroup = trackGroup,
+                                            trackIndex = trackIndex,
+                                        )
+                                    }
+                            }
+                            .sortedBy { it.name }
+                    )
+                }
+            }
+
             abstract val isSelected: Boolean
 
             object None : Subtitle() {
                 override val isSelected: Boolean
-                    get() = Setting.Subtitle.list
+                    get() = list
                         .filterIsInstance<TextTrackInformation>()
                         .none { it.isSelected }
             }
@@ -509,6 +499,33 @@ class PlayerSettingsView @JvmOverloads constructor(
             val speed: Float,
         ) {
             var isSelected: Boolean = false
+
+            companion object : Settings() {
+                private val DEFAULT = Speed(R.string.player_settings_speed_1, 1F)
+
+                val list = listOf(
+                    Speed(R.string.player_settings_speed_0_25, 0.25F),
+                    Speed(R.string.player_settings_speed_0_5, 0.5F),
+                    Speed(R.string.player_settings_speed_0_75, 0.75F),
+                    DEFAULT,
+                    Speed(R.string.player_settings_speed_1_25, 1.25F),
+                    Speed(R.string.player_settings_speed_1_5, 1.5F),
+                    Speed(R.string.player_settings_speed_1_75, 1.75F),
+                    Speed(R.string.player_settings_speed_2, 2F),
+                )
+
+                val selected: Speed
+                    get() = list.find { it.isSelected }
+                        ?: list.find { it.speed == 1F }
+                        ?: DEFAULT
+
+                fun refresh(player: ExoPlayer) {
+                    list.forEach { it.isSelected = false }
+                    list.findClosest(player.playbackParameters.speed) { it.speed }?.let {
+                        it.isSelected = true
+                    }
+                }
+            }
         }
     }
 }
