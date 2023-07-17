@@ -24,11 +24,13 @@ import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.findClosest
+import com.tanasi.streamflix.utils.getAlpha
 import com.tanasi.streamflix.utils.getRgb
 import com.tanasi.streamflix.utils.margin
 import com.tanasi.streamflix.utils.setAlpha
 import com.tanasi.streamflix.utils.setRgb
 import com.tanasi.streamflix.utils.trackFormats
+import kotlin.math.roundToInt
 
 
 class PlayerSettingsView @JvmOverloads constructor(
@@ -71,6 +73,7 @@ class PlayerSettingsView @JvmOverloads constructor(
     private val subtitlesAdapter = SettingsAdapter(this, Settings.Subtitle.list)
     private val captionStyleAdapter = SettingsAdapter(this, Settings.Subtitle.Style.list)
     private val fontColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.FontColor.list)
+    private val fontOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.FontOpacity.list)
     private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
 
     fun onBackPressed() {
@@ -80,7 +83,8 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.SUBTITLES,
             Setting.SPEED -> displaySetting(Setting.MAIN)
             Setting.CAPTION_STYLE -> displaySetting(Setting.SUBTITLES)
-            Setting.CAPTION_STYLE_FONT_COLOR -> displaySetting(Setting.CAPTION_STYLE)
+            Setting.CAPTION_STYLE_FONT_COLOR,
+            Setting.CAPTION_STYLE_FONT_OPACITY -> displaySetting(Setting.CAPTION_STYLE)
         }
     }
 
@@ -108,6 +112,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 Setting.SUBTITLES -> context.getString(R.string.player_settings_subtitles_title)
                 Setting.CAPTION_STYLE -> context.getString(R.string.player_settings_caption_style_title)
                 Setting.CAPTION_STYLE_FONT_COLOR -> context.getString(R.string.player_settings_caption_style_font_color_title)
+                Setting.CAPTION_STYLE_FONT_OPACITY -> context.getString(R.string.player_settings_caption_style_font_opacity_title)
                 Setting.SPEED -> context.getString(R.string.player_settings_speed_title)
             }
         }
@@ -118,6 +123,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.SUBTITLES -> subtitlesAdapter
             Setting.CAPTION_STYLE -> captionStyleAdapter
             Setting.CAPTION_STYLE_FONT_COLOR -> fontColorAdapter
+            Setting.CAPTION_STYLE_FONT_OPACITY -> fontOpacityAdapter
             Setting.SPEED -> speedAdapter
         }
         binding.rvSettings.requestFocus()
@@ -134,6 +140,7 @@ class PlayerSettingsView @JvmOverloads constructor(
         SUBTITLES,
         CAPTION_STYLE,
         CAPTION_STYLE_FONT_COLOR,
+        CAPTION_STYLE_FONT_OPACITY,
         SPEED
     }
 
@@ -244,12 +251,28 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 Settings.Subtitle.Style.FontColor -> {
                                     settingsView.displaySetting(Setting.CAPTION_STYLE_FONT_COLOR)
                                 }
+                                Settings.Subtitle.Style.FontOpacity -> {
+                                    settingsView.displaySetting(Setting.CAPTION_STYLE_FONT_OPACITY)
+                                }
                             }
                         }
 
                         is Settings.Subtitle.Style.FontColor -> {
                             UserPreferences.captionStyle = CaptionStyleCompat(
                                 UserPreferences.captionStyle.foregroundColor.setRgb(item.color),
+                                UserPreferences.captionStyle.backgroundColor,
+                                UserPreferences.captionStyle.windowColor,
+                                UserPreferences.captionStyle.edgeType,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySetting(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.FontOpacity -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor.setAlpha(item.alpha),
                                 UserPreferences.captionStyle.backgroundColor,
                                 UserPreferences.captionStyle.windowColor,
                                 UserPreferences.captionStyle.edgeType,
@@ -350,9 +373,12 @@ class PlayerSettingsView @JvmOverloads constructor(
                     is Settings.Subtitle.Style -> when (item) {
                         Settings.Subtitle.Style.ResetStyle -> context.getString(R.string.player_settings_caption_style_reset_style_label)
                         Settings.Subtitle.Style.FontColor -> context.getString(R.string.player_settings_caption_style_font_color_label)
+                        Settings.Subtitle.Style.FontOpacity -> context.getString(R.string.player_settings_caption_style_font_opacity_label)
                     }
 
                     is Settings.Subtitle.Style.FontColor -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.FontOpacity -> context.getString(item.stringId)
 
                     is Settings.Speed -> context.getString(item.stringId)
 
@@ -392,6 +418,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                     is Settings.Subtitle.Style -> when (item) {
                         Settings.Subtitle.Style.ResetStyle -> ""
                         Settings.Subtitle.Style.FontColor -> context.getString(Settings.Subtitle.Style.FontColor.selected.stringId)
+                        Settings.Subtitle.Style.FontOpacity -> context.getString(Settings.Subtitle.Style.FontOpacity.selected.stringId)
                     }
 
                     else -> ""
@@ -422,6 +449,11 @@ class PlayerSettingsView @JvmOverloads constructor(
                     }
 
                     is Settings.Subtitle.Style.FontColor -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.FontOpacity -> when {
                         item.isSelected -> View.VISIBLE
                         else -> View.GONE
                     }
@@ -586,6 +618,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                     val list = listOf(
                         ResetStyle,
                         FontColor,
+                        FontOpacity,
                     )
                 }
 
@@ -637,6 +670,39 @@ class PlayerSettingsView @JvmOverloads constructor(
                         )
 
                         val selected: FontColor
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class FontOpacity(
+                    val stringId: Int,
+                    private val value: Float,
+                ) : Item {
+                    val alpha: Int
+                        get() = (value * 255).roundToInt()
+
+                    val isSelected: Boolean
+                        get() = alpha == UserPreferences.captionStyle.foregroundColor.getAlpha()
+
+                    companion object : Style() {
+                        private val DEFAULT = FontOpacity(
+                            R.string.player_settings_caption_style_font_opacity_1,
+                            1F
+                        )
+
+                        val list = listOf(
+                            FontOpacity(
+                                R.string.player_settings_caption_style_font_opacity_0_5,
+                                0.5F
+                            ),
+                            FontOpacity(
+                                R.string.player_settings_caption_style_font_opacity_0_75,
+                                0.75F
+                            ),
+                            DEFAULT,
+                        )
+
+                        val selected: FontOpacity
                             get() = list.find { it.isSelected } ?: DEFAULT
                     }
                 }
