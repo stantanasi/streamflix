@@ -135,10 +135,10 @@ class PlayerSettingsView @JvmOverloads constructor(
             holder.playerSettingsView = playerSettingsView
 
             when (setting) {
-                is Setting.Main -> holder.displayMainSetting(Settings.list[position])
-                is Setting.Quality -> holder.displayQualitySetting(Settings.Quality.list[position])
-                is Setting.Subtitle -> holder.displaySubtitleSetting(Settings.Subtitle.list[position])
-                is Setting.Speed -> holder.displaySpeedSetting(Settings.Speed.list[position])
+                is Setting.Main -> holder.displaySettings(Settings.list[position])
+                is Setting.Quality -> holder.displaySettings(Settings.Quality.list[position])
+                is Setting.Subtitle -> holder.displaySettings(Settings.Subtitle.list[position])
+                is Setting.Speed -> holder.displaySettings(Settings.Speed.list[position])
             }
         }
 
@@ -156,66 +156,171 @@ class PlayerSettingsView @JvmOverloads constructor(
 
         lateinit var playerSettingsView: PlayerSettingsView
 
-        fun displayMainSetting(settings: Settings) {
-            binding.root.setOnClickListener {
-                playerSettingsView.displaySetting(
-                    when (settings) {
-                        Settings.Quality -> Setting.Quality
-                        Settings.Subtitle -> Setting.Subtitle
-                        Settings.Speed -> Setting.Speed
+        fun displaySettings(item: Item) {
+            val player = playerSettingsView.player ?: return
+
+            binding.root.apply {
+                setOnClickListener {
+                    when (item) {
+                        is Settings -> {
+                            when (item) {
+                                Settings.Quality -> playerSettingsView.displaySetting(Setting.Quality)
+                                Settings.Subtitle -> playerSettingsView.displaySetting(Setting.Subtitle)
+                                Settings.Speed -> playerSettingsView.displaySetting(Setting.Speed)
+                            }
+                        }
+
+                        is Settings.Quality -> {
+                            when (item) {
+                                is Settings.Quality.Auto -> {
+                                    player.trackSelectionParameters = player.trackSelectionParameters
+                                        .buildUpon()
+                                        .setMaxVideoBitrate(Int.MAX_VALUE)
+                                        .setForceHighestSupportedBitrate(false)
+                                        .build()
+                                    playerSettingsView.hide()
+                                }
+                                is Settings.Quality.VideoTrackInformation -> {
+                                    player.trackSelectionParameters = player.trackSelectionParameters
+                                        .buildUpon()
+                                        .setMaxVideoBitrate(item.bitrate)
+                                        .setForceHighestSupportedBitrate(true)
+                                        .build()
+                                    playerSettingsView.hide()
+                                }
+                            }
+                        }
+
+                        is Settings.Subtitle -> {
+                            when (item) {
+                                is Settings.Subtitle.None -> {
+                                    player.trackSelectionParameters = player.trackSelectionParameters
+                                        .buildUpon()
+                                        .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                                        .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
+                                        .build()
+                                    playerSettingsView.hide()
+                                }
+                                is Settings.Subtitle.TextTrackInformation -> {
+                                    player.trackSelectionParameters = player.trackSelectionParameters
+                                        .buildUpon()
+                                        .setOverrideForType(
+                                            TrackSelectionOverride(
+                                                item.trackGroup.mediaTrackGroup,
+                                                listOf(item.trackIndex)
+                                            )
+                                        )
+                                        .setTrackTypeDisabled(item.trackGroup.type, false)
+                                        .build()
+                                    playerSettingsView.hide()
+                                }
+                            }
+                        }
+
+                        is Settings.Speed -> {
+                            player.playbackParameters = player.playbackParameters
+                                .withSpeed(item.value)
+                            playerSettingsView.hide()
+                        }
                     }
-                )
+                }
             }
 
             binding.ivSettingIcon.apply {
-                when (settings) {
-                    Settings.Quality -> setImageDrawable(
-                        ContextCompat.getDrawable(context, R.drawable.ic_settings_quality)
-                    )
-                    Settings.Subtitle -> setImageDrawable(
-                        ContextCompat.getDrawable(
-                            context,
-                            when (Settings.Subtitle.selected) {
-                                is Settings.Subtitle.None -> R.drawable.ic_settings_subtitle_off
-                                is Settings.Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
-                            }
-                        )
-                    )
-                    Settings.Speed -> setImageDrawable(
-                        ContextCompat.getDrawable(context, R.drawable.ic_settings_playback_speed)
-                    )
+                when (item) {
+                    is Settings -> {
+                        when (item) {
+                            Settings.Quality -> setImageDrawable(
+                                ContextCompat.getDrawable(context, R.drawable.ic_settings_quality)
+                            )
+                            Settings.Subtitle -> setImageDrawable(
+                                ContextCompat.getDrawable(
+                                    context,
+                                    when (Settings.Subtitle.selected) {
+                                        is Settings.Subtitle.None -> R.drawable.ic_settings_subtitle_off
+                                        is Settings.Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
+                                    }
+                                )
+                            )
+                            Settings.Speed -> setImageDrawable(
+                                ContextCompat.getDrawable(
+                                    context,
+                                    R.drawable.ic_settings_playback_speed
+                                )
+                            )
+                        }
+                        visibility = View.VISIBLE
+                    }
+
+                    else -> {
+                        visibility = View.GONE
+                    }
                 }
-                visibility = View.VISIBLE
             }
 
             binding.tvSettingMainText.apply {
-                text = when (settings) {
-                    Settings.Quality -> context.getString(R.string.player_settings_quality_label)
-                    Settings.Subtitle -> context.getString(R.string.player_settings_subtitles_label)
-                    Settings.Speed -> context.getString(R.string.player_settings_speed_label)
+                text = when (item) {
+                    is Settings -> when (item) {
+                        Settings.Quality -> context.getString(R.string.player_settings_quality_label)
+                        Settings.Subtitle -> context.getString(R.string.player_settings_subtitles_label)
+                        Settings.Speed -> context.getString(R.string.player_settings_speed_label)
+                    }
+
+                    is Settings.Quality -> when (item) {
+                        is Settings.Quality.Auto -> when {
+                            item.isSelected -> when (val track = item.currentTrack) {
+                                null -> context.getString(R.string.player_settings_quality_auto)
+                                else -> context.getString(
+                                    R.string.player_settings_quality_auto_selected,
+                                    track.height
+                                )
+                            }
+
+                            else -> context.getString(R.string.player_settings_quality_auto)
+                        }
+                        is Settings.Quality.VideoTrackInformation -> context.getString(
+                            R.string.player_settings_quality,
+                            item.height
+                        )
+                    }
+
+                    is Settings.Subtitle -> when (item) {
+                        is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
+                        is Settings.Subtitle.TextTrackInformation -> item.name
+                    }
+
+                    is Settings.Speed -> context.getString(item.stringId)
+
+                    else -> ""
                 }
             }
 
             binding.tvSettingSubText.apply {
-                text = when (settings) {
-                    Settings.Quality -> when (val selected = Settings.Quality.selected) {
-                        is Settings.Quality.Auto -> when (val track = selected.currentTrack) {
-                            null -> context.getString(R.string.player_settings_quality_auto)
-                            else -> context.getString(
-                                R.string.player_settings_quality_auto_selected,
-                                track.height
+                text = when (item) {
+                    is Settings -> when (item) {
+                        Settings.Quality -> when (val selected = Settings.Quality.selected) {
+                            is Settings.Quality.Auto -> when (val track = selected.currentTrack) {
+                                null -> context.getString(R.string.player_settings_quality_auto)
+                                else -> context.getString(
+                                    R.string.player_settings_quality_auto_selected,
+                                    track.height
+                                )
+                            }
+                            is Settings.Quality.VideoTrackInformation -> context.getString(
+                                R.string.player_settings_quality,
+                                selected.height
                             )
                         }
-                        is Settings.Quality.VideoTrackInformation -> context.getString(
-                            R.string.player_settings_quality,
-                            selected.height
-                        )
+                        Settings.Subtitle -> when (val selected = Settings.Subtitle.selected) {
+                            is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
+                            is Settings.Subtitle.TextTrackInformation -> selected.name
+                        }
+                        Settings.Speed -> context.getString(Settings.Speed.selected.stringId)
                     }
-                    Settings.Subtitle -> when (val selected = Settings.Subtitle.selected) {
-                        is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
-                        is Settings.Subtitle.TextTrackInformation -> selected.name
-                    }
-                    Settings.Speed -> context.getString(Settings.Speed.selected.stringId)
+
+                    is Settings.Subtitle -> ""
+
+                    else -> ""
                 }
                 visibility = when {
                     text.isEmpty() -> View.GONE
@@ -223,137 +328,32 @@ class PlayerSettingsView @JvmOverloads constructor(
                 }
             }
 
-            binding.ivSettingEnter.visibility = View.VISIBLE
-
-            binding.ivSettingIsSelected.visibility = View.GONE
-        }
-
-        fun displayQualitySetting(quality: Settings.Quality) {
-            binding.root.setOnClickListener {
-                playerSettingsView.player?.let { player ->
-                    when (quality) {
-                        is Settings.Quality.Auto -> {
-                            player.trackSelectionParameters = player.trackSelectionParameters
-                                .buildUpon()
-                                .setMaxVideoBitrate(Int.MAX_VALUE)
-                                .setForceHighestSupportedBitrate(false)
-                                .build()
-                        }
-                        is Settings.Quality.VideoTrackInformation -> {
-                            player.trackSelectionParameters = player.trackSelectionParameters
-                                .buildUpon()
-                                .setMaxVideoBitrate(quality.bitrate)
-                                .setForceHighestSupportedBitrate(true)
-                                .build()
-                        }
-                    }
-                }
-                playerSettingsView.hide()
-            }
-
-            binding.ivSettingIcon.visibility = View.GONE
-
-            binding.tvSettingMainText.apply {
-
-                text = when (quality) {
-                    is Settings.Quality.Auto -> when {
-                        quality.isSelected -> when (val track = quality.currentTrack) {
-                            null -> context.getString(R.string.player_settings_quality_auto)
-                            else -> context.getString(
-                                R.string.player_settings_quality_auto_selected,
-                                track.height
-                            )
-                        }
-                        else -> context.getString(R.string.player_settings_quality_auto)
-                    }
-                    is Settings.Quality.VideoTrackInformation -> context.getString(
-                        R.string.player_settings_quality,
-                        quality.height
-                    )
-                }
-            }
-
-            binding.tvSettingSubText.visibility = View.GONE
-
-
-            binding.ivSettingEnter.visibility = View.GONE
-
-            binding.ivSettingIsSelected.visibility = when {
-                quality.isSelected -> View.VISIBLE
-                else -> View.GONE
-            }
-        }
-
-        fun displaySubtitleSetting(subtitle: Settings.Subtitle) {
-            binding.root.setOnClickListener {
-                playerSettingsView.player?.let { player ->
-                    when (subtitle) {
-                        is Settings.Subtitle.None -> {
-                            player.trackSelectionParameters = player.trackSelectionParameters
-                                .buildUpon()
-                                .clearOverridesOfType(C.TRACK_TYPE_TEXT)
-                                .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
-                                .build()
-                        }
-                        is Settings.Subtitle.TextTrackInformation -> {
-                            player.trackSelectionParameters = player.trackSelectionParameters
-                                .buildUpon()
-                                .setOverrideForType(
-                                    TrackSelectionOverride(
-                                        subtitle.trackGroup.mediaTrackGroup,
-                                        listOf(subtitle.trackIndex)
-                                    )
-                                )
-                                .setTrackTypeDisabled(subtitle.trackGroup.type, false)
-                                .build()
-                        }
+            binding.ivSettingIsSelected.apply {
+                visibility = when (item) {
+                    is Settings.Quality -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
                     }
 
+                    is Settings.Subtitle -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Speed -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    else -> View.GONE
                 }
-                playerSettingsView.hide()
             }
 
-            binding.ivSettingIcon.visibility = View.GONE
-
-            binding.tvSettingMainText.apply {
-                text = when (subtitle) {
-                    is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
-                    is Settings.Subtitle.TextTrackInformation -> subtitle.name
+            binding.ivSettingEnter.apply {
+                visibility = when (item) {
+                    is Settings -> View.VISIBLE
+                    else -> View.GONE
                 }
-            }
-
-            binding.tvSettingSubText.visibility = View.GONE
-
-            binding.ivSettingEnter.visibility = View.GONE
-
-            binding.ivSettingIsSelected.visibility = when {
-                subtitle.isSelected -> View.VISIBLE
-                else -> View.GONE
-            }
-        }
-
-        fun displaySpeedSetting(playbackSpeed: Settings.Speed) {
-            binding.root.setOnClickListener {
-                playerSettingsView.player?.let { player ->
-                    player.playbackParameters = player.playbackParameters
-                        .withSpeed(playbackSpeed.value)
-                }
-                playerSettingsView.hide()
-            }
-
-            binding.ivSettingIcon.visibility = View.GONE
-
-            binding.tvSettingMainText.apply {
-                text = context.getString(playbackSpeed.stringId)
-            }
-
-            binding.tvSettingSubText.visibility = View.GONE
-
-            binding.ivSettingEnter.visibility = View.GONE
-
-            binding.ivSettingIsSelected.visibility = when {
-                playbackSpeed.isSelected -> View.VISIBLE
-                else -> View.GONE
             }
         }
     }
