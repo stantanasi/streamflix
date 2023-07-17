@@ -30,6 +30,12 @@ object UserPreferences {
         get() = providers.find { it.name == Key.CURRENT_PROVIDER.getString() }
         set(value) = Key.CURRENT_PROVIDER.setString(value?.name)
 
+    var captionTextSize: Float
+        get() = Key.CAPTION_TEXT_SIZE.getFloat() ?: 1F
+        set(value) {
+            Key.CAPTION_TEXT_SIZE.setFloat(value)
+        }
+
     var captionStyle: CaptionStyleCompat
         get() = CaptionStyleCompat(
             Key.CAPTION_STYLE_FONT_COLOR.getInt()
@@ -55,6 +61,7 @@ object UserPreferences {
 
     private enum class Key {
         CURRENT_PROVIDER,
+        CAPTION_TEXT_SIZE,
         CAPTION_STYLE_FONT_COLOR,
         CAPTION_STYLE_BACKGROUND_COLOR,
         CAPTION_STYLE_WINDOW_COLOR,
