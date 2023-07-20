@@ -1,7 +1,6 @@
 package com.tanasi.streamflix.fragments.player
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -25,9 +24,9 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
-import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import com.google.android.exoplayer2.ui.StyledPlayerControlView
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.android.exoplayer2.ui.SubtitleView
 import com.google.android.exoplayer2.util.MimeTypes
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ContentExoControllerBinding
@@ -174,18 +173,11 @@ class PlayerFragment : Fragment() {
 
         binding.pvPlayer.player = player
         binding.settings.player = player
+        binding.settings.subtitleView = binding.pvPlayer.subtitleView
 
         binding.pvPlayer.subtitleView?.apply {
-            setStyle(
-                CaptionStyleCompat(
-                    Color.WHITE,
-                    Color.argb(128, 0, 0, 0),
-                    Color.TRANSPARENT,
-                    CaptionStyleCompat.EDGE_TYPE_NONE,
-                    Color.WHITE,
-                    null
-                )
-            )
+            setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
+            setStyle(UserPreferences.captionStyle)
         }
 
         binding.pvPlayer.controller.tvExoTitle.text = args.title

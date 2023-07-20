@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.ui
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Color
 import android.util.AttributeSet
@@ -15,12 +16,22 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.Tracks
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import com.google.android.exoplayer2.ui.DefaultTrackNameProvider
+import com.google.android.exoplayer2.ui.SubtitleView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
+import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.findClosest
+import com.tanasi.streamflix.utils.getAlpha
+import com.tanasi.streamflix.utils.getRgb
+import com.tanasi.streamflix.utils.margin
+import com.tanasi.streamflix.utils.setAlpha
+import com.tanasi.streamflix.utils.setRgb
 import com.tanasi.streamflix.utils.trackFormats
+import kotlin.math.roundToInt
+
 
 class PlayerSettingsView @JvmOverloads constructor(
     context: Context,
@@ -41,29 +52,51 @@ class PlayerSettingsView @JvmOverloads constructor(
             value?.addListener(object : Player.Listener {
                 override fun onEvents(player: Player, events: Player.Events) {
                     if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
-                        Setting.Quality.init(value, resources)
-                        Setting.Subtitle.init(value, resources)
+                        Settings.Quality.init(value, resources)
+                        Settings.Subtitle.init(value, resources)
                     }
                     if (events.contains(Player.EVENT_PLAYBACK_PARAMETERS_CHANGED)) {
-                        Setting.Speed.refresh(value)
+                        Settings.Speed.refresh(value)
                     }
                 }
             })
-            value?.let { Setting.Speed.refresh(it) }
+            value?.let { Settings.Speed.refresh(it) }
 
             field = value
         }
+    var subtitleView: SubtitleView? = null
 
+    private var currentSettings = Setting.MAIN
 
-    init {
-        Setting.init(this)
-    }
+    private val settingsAdapter = SettingsAdapter(this, Settings.list)
+    private val qualityAdapter = SettingsAdapter(this, Settings.Quality.list)
+    private val subtitlesAdapter = SettingsAdapter(this, Settings.Subtitle.list)
+    private val captionStyleAdapter = SettingsAdapter(this, Settings.Subtitle.Style.list)
+    private val fontColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.FontColor.list)
+    private val textSizeAdapter = SettingsAdapter(this, Settings.Subtitle.Style.TextSize.list)
+    private val fontOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.FontOpacity.list)
+    private val edgeStyleAdapter = SettingsAdapter(this, Settings.Subtitle.Style.EdgeStyle.list)
+    private val backgroundColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.BackgroundColor.list)
+    private val backgroundOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.BackgroundOpacity.list)
+    private val windowColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowColor.list)
+    private val windowOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowOpacity.list)
+    private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
 
     fun onBackPressed() {
-        val adapter = binding.rvSettings.adapter as? SettingsAdapter
-        when (adapter?.setting) {
-            Setting.Main -> hide()
-            else -> displaySetting(Setting.Main)
+        when (currentSettings) {
+            Setting.MAIN -> hide()
+            Setting.QUALITY,
+            Setting.SUBTITLES,
+            Setting.SPEED -> displaySettings(Setting.MAIN)
+            Setting.CAPTION_STYLE -> displaySettings(Setting.SUBTITLES)
+            Setting.CAPTION_STYLE_FONT_COLOR,
+            Setting.CAPTION_STYLE_TEXT_SIZE,
+            Setting.CAPTION_STYLE_FONT_OPACITY,
+            Setting.CAPTION_STYLE_EDGE_STYLE,
+            Setting.CAPTION_STYLE_BACKGROUND_COLOR,
+            Setting.CAPTION_STYLE_BACKGROUND_OPACITY,
+            Setting.CAPTION_STYLE_WINDOW_COLOR,
+            Setting.CAPTION_STYLE_WINDOW_OPACITY -> displaySettings(Setting.CAPTION_STYLE)
         }
     }
 
@@ -78,20 +111,45 @@ class PlayerSettingsView @JvmOverloads constructor(
     fun show() {
         this.visibility = View.VISIBLE
 
-        displaySetting(Setting.Main)
+        displaySettings(Setting.MAIN)
     }
 
-    private fun displaySetting(setting: Setting) {
+    private fun displaySettings(setting: Setting) {
+        currentSettings = setting
+
         binding.tvSettingsHeader.apply {
             text = when (setting) {
-                is Setting.Main -> context.getString(R.string.player_settings_title)
-                is Setting.Quality -> context.getString(R.string.player_settings_quality_title)
-                is Setting.Subtitle -> context.getString(R.string.player_settings_subtitles_title)
-                is Setting.Speed -> context.getString(R.string.player_settings_speed_title)
+                Setting.MAIN -> context.getString(R.string.player_settings_title)
+                Setting.QUALITY -> context.getString(R.string.player_settings_quality_title)
+                Setting.SUBTITLES -> context.getString(R.string.player_settings_subtitles_title)
+                Setting.CAPTION_STYLE -> context.getString(R.string.player_settings_caption_style_title)
+                Setting.CAPTION_STYLE_FONT_COLOR -> context.getString(R.string.player_settings_caption_style_font_color_title)
+                Setting.CAPTION_STYLE_TEXT_SIZE -> context.getString(R.string.player_settings_caption_style_text_size_title)
+                Setting.CAPTION_STYLE_FONT_OPACITY -> context.getString(R.string.player_settings_caption_style_font_opacity_title)
+                Setting.CAPTION_STYLE_EDGE_STYLE -> context.getString(R.string.player_settings_caption_style_edge_style_title)
+                Setting.CAPTION_STYLE_BACKGROUND_COLOR -> context.getString(R.string.player_settings_caption_style_background_color_title)
+                Setting.CAPTION_STYLE_BACKGROUND_OPACITY -> context.getString(R.string.player_settings_caption_style_background_opacity_title)
+                Setting.CAPTION_STYLE_WINDOW_COLOR -> context.getString(R.string.player_settings_caption_style_window_color_title)
+                Setting.CAPTION_STYLE_WINDOW_OPACITY -> context.getString(R.string.player_settings_caption_style_window_opacity_title)
+                Setting.SPEED -> context.getString(R.string.player_settings_speed_title)
             }
         }
 
-        binding.rvSettings.adapter = setting.adapter
+        binding.rvSettings.adapter = when (setting) {
+            Setting.MAIN -> settingsAdapter
+            Setting.QUALITY -> qualityAdapter
+            Setting.SUBTITLES -> subtitlesAdapter
+            Setting.CAPTION_STYLE -> captionStyleAdapter
+            Setting.CAPTION_STYLE_FONT_COLOR -> fontColorAdapter
+            Setting.CAPTION_STYLE_TEXT_SIZE -> textSizeAdapter
+            Setting.CAPTION_STYLE_FONT_OPACITY -> fontOpacityAdapter
+            Setting.CAPTION_STYLE_EDGE_STYLE -> edgeStyleAdapter
+            Setting.CAPTION_STYLE_BACKGROUND_COLOR -> backgroundColorAdapter
+            Setting.CAPTION_STYLE_BACKGROUND_OPACITY -> backgroundOpacityAdapter
+            Setting.CAPTION_STYLE_WINDOW_COLOR -> windowColorAdapter
+            Setting.CAPTION_STYLE_WINDOW_OPACITY -> windowOpacityAdapter
+            Setting.SPEED -> speedAdapter
+        }
         binding.rvSettings.requestFocus()
     }
 
@@ -100,126 +158,31 @@ class PlayerSettingsView @JvmOverloads constructor(
     }
 
 
-    private sealed class Setting {
-
-        lateinit var adapter: SettingsAdapter
-
-        object Main : Setting() {
-            val list = listOf(Quality, Subtitle, Speed)
-        }
-
-        object Quality : Setting() {
-            val list = mutableListOf<PlayerSettingsView.Quality>()
-
-            val selected: PlayerSettingsView.Quality
-                get() = list.find { it.isSelected } ?: PlayerSettingsView.Quality.Auto
-
-            fun init(player: ExoPlayer, resources: Resources) {
-                list.clear()
-                list.add(PlayerSettingsView.Quality.Auto)
-                list.addAll(
-                    player.currentTracks.groups
-                        .filter { it.type == C.TRACK_TYPE_VIDEO }
-                        .flatMap { trackGroup ->
-                            trackGroup.trackFormats
-                                .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
-                                .distinctBy { it.width to it.height }
-                                .map { trackFormat ->
-                                    PlayerSettingsView.Quality.VideoTrackInformation(
-                                        name = DefaultTrackNameProvider(resources)
-                                            .getTrackName(trackFormat),
-                                        width = trackFormat.width,
-                                        height = trackFormat.height,
-                                        bitrate = trackFormat.bitrate,
-
-                                        player = player,
-                                    )
-                                }
-                        }
-                        .sortedByDescending { it.height }
-                )
-            }
-        }
-
-        object Subtitle : Setting() {
-            val list = mutableListOf<PlayerSettingsView.Subtitle>()
-
-            val selected: PlayerSettingsView.Subtitle
-                get() = list.find { it.isSelected } ?: PlayerSettingsView.Subtitle.None
-
-            fun init(player: ExoPlayer, resources: Resources) {
-                list.clear()
-                list.add(PlayerSettingsView.Subtitle.None)
-                list.addAll(
-                    player.currentTracks.groups
-                        .filter { it.type == C.TRACK_TYPE_TEXT }
-                        .flatMap { trackGroup ->
-                            trackGroup.trackFormats
-                                .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
-                                .filter { it.label != null }
-                                .mapIndexed { trackIndex, trackFormat ->
-                                    PlayerSettingsView.Subtitle.TextTrackInformation(
-                                        name = DefaultTrackNameProvider(resources)
-                                            .getTrackName(trackFormat),
-
-                                        trackGroup = trackGroup,
-                                        trackIndex = trackIndex,
-                                    )
-                                }
-                        }
-                        .sortedBy { it.name }
-                )
-            }
-        }
-
-        object Speed : Setting() {
-            val list = listOf(
-                PlaybackSpeed(R.string.player_settings_speed_0_25, 0.25F),
-                PlaybackSpeed(R.string.player_settings_speed_0_5, 0.5F),
-                PlaybackSpeed(R.string.player_settings_speed_0_75, 0.75F),
-                PlaybackSpeed(R.string.player_settings_speed_1, 1F),
-                PlaybackSpeed(R.string.player_settings_speed_1_25, 1.25F),
-                PlaybackSpeed(R.string.player_settings_speed_1_5, 1.5F),
-                PlaybackSpeed(R.string.player_settings_speed_1_75, 1.75F),
-                PlaybackSpeed(R.string.player_settings_speed_2, 2F),
-            )
-
-            val selected: PlaybackSpeed
-                get() = list.find { it.isSelected }
-                    ?: list.find { it.speed == 1F }
-                    ?: PlaybackSpeed(R.string.player_settings_speed_1, 1F)
-
-            fun refresh(player: ExoPlayer) {
-                list.forEach { it.isSelected = false }
-                list.findClosest(player.playbackParameters.speed) { it.speed }?.let {
-                    it.isSelected = true
-                }
-            }
-        }
-
-
-        companion object {
-            fun init(playerSettingsView: PlayerSettingsView) {
-                values().forEach { setting ->
-                    setting.adapter = SettingsAdapter(setting).also {
-                        it.playerSettingsView = playerSettingsView
-                    }
-                }
-            }
-
-            fun values() = listOf(Main, Quality, Subtitle, Speed)
-        }
+    private enum class Setting {
+        MAIN,
+        QUALITY,
+        SUBTITLES,
+        CAPTION_STYLE,
+        CAPTION_STYLE_FONT_COLOR,
+        CAPTION_STYLE_TEXT_SIZE,
+        CAPTION_STYLE_FONT_OPACITY,
+        CAPTION_STYLE_EDGE_STYLE,
+        CAPTION_STYLE_BACKGROUND_COLOR,
+        CAPTION_STYLE_BACKGROUND_OPACITY,
+        CAPTION_STYLE_WINDOW_COLOR,
+        CAPTION_STYLE_WINDOW_OPACITY,
+        SPEED
     }
 
 
     private class SettingsAdapter(
-        val setting: Setting,
+        private val settingsView: PlayerSettingsView,
+        private val items: List<Item>,
     ) : RecyclerView.Adapter<SettingViewHolder>() {
-
-        lateinit var playerSettingsView: PlayerSettingsView
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             SettingViewHolder(
+                settingsView,
                 ItemSettingBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -228,86 +191,395 @@ class PlayerSettingsView @JvmOverloads constructor(
             )
 
         override fun onBindViewHolder(holder: SettingViewHolder, position: Int) {
-            holder.playerSettingsView = playerSettingsView
-
-            when (setting) {
-                is Setting.Main -> holder.displayMainSetting(setting.list[position])
-                is Setting.Quality -> holder.displayQualitySetting(setting.list[position])
-                is Setting.Subtitle -> holder.displaySubtitleSetting(setting.list[position])
-                is Setting.Speed -> holder.displaySpeedSetting(setting.list[position])
-            }
+            holder.displaySettings(items[position])
         }
 
-        override fun getItemCount() = when (setting) {
-            is Setting.Main -> setting.list.size
-            is Setting.Quality -> setting.list.size
-            is Setting.Subtitle -> setting.list.size
-            is Setting.Speed -> setting.list.size
-        }
+        override fun getItemCount() = items.size
     }
 
     private class SettingViewHolder(
+        private val settingsView: PlayerSettingsView,
         val binding: ItemSettingBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        lateinit var playerSettingsView: PlayerSettingsView
+        fun displaySettings(item: Item) {
+            val player = settingsView.player ?: return
+            val subtitleView = settingsView.subtitleView ?: return
 
-        fun displayMainSetting(setting: Setting) {
-            binding.root.setOnClickListener {
-                playerSettingsView.displaySetting(setting)
+            binding.root.apply {
+                when (item) {
+                    Settings.Subtitle.Style,
+                    Settings.Subtitle.Style.ResetStyle -> margin(bottom = 16F)
+                }
+                setOnClickListener {
+                    when (item) {
+                        is Settings -> {
+                            when (item) {
+                                Settings.Quality -> settingsView.displaySettings(Setting.QUALITY)
+                                Settings.Subtitle -> settingsView.displaySettings(Setting.SUBTITLES)
+                                Settings.Speed -> settingsView.displaySettings(Setting.SPEED)
+                            }
+                        }
+
+                        is Settings.Quality -> {
+                            when (item) {
+                                is Settings.Quality.Auto -> {
+                                    player.trackSelectionParameters = player.trackSelectionParameters
+                                        .buildUpon()
+                                        .setMaxVideoBitrate(Int.MAX_VALUE)
+                                        .setForceHighestSupportedBitrate(false)
+                                        .build()
+                                    settingsView.hide()
+                                }
+                                is Settings.Quality.VideoTrackInformation -> {
+                                    player.trackSelectionParameters = player.trackSelectionParameters
+                                        .buildUpon()
+                                        .setMaxVideoBitrate(item.bitrate)
+                                        .setForceHighestSupportedBitrate(true)
+                                        .build()
+                                    settingsView.hide()
+                                }
+                            }
+                        }
+
+                        is Settings.Subtitle -> {
+                            when (item) {
+                                Settings.Subtitle.Style -> {
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE)
+                                }
+                                is Settings.Subtitle.None -> {
+                                    player.trackSelectionParameters = player.trackSelectionParameters
+                                        .buildUpon()
+                                        .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                                        .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
+                                        .build()
+                                    settingsView.hide()
+                                }
+                                is Settings.Subtitle.TextTrackInformation -> {
+                                    player.trackSelectionParameters = player.trackSelectionParameters
+                                        .buildUpon()
+                                        .setOverrideForType(
+                                            TrackSelectionOverride(
+                                                item.trackGroup.mediaTrackGroup,
+                                                listOf(item.trackIndex)
+                                            )
+                                        )
+                                        .setTrackTypeDisabled(item.trackGroup.type, false)
+                                        .build()
+                                    settingsView.hide()
+                                }
+                            }
+                        }
+
+                        is Settings.Subtitle.Style -> {
+                            when (item) {
+                                Settings.Subtitle.Style.ResetStyle -> {
+                                    UserPreferences.also {
+                                        it.captionTextSize = Settings.Subtitle.Style.TextSize.DEFAULT.value
+                                        it.captionStyle = Settings.Subtitle.Style.DEFAULT
+                                    }
+                                    subtitleView.also {
+                                        it.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
+                                        it.setStyle(UserPreferences.captionStyle)
+                                    }
+                                    settingsView.hide()
+                                }
+                                Settings.Subtitle.Style.FontColor -> {
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_FONT_COLOR)
+                                }
+                                Settings.Subtitle.Style.TextSize -> {
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_TEXT_SIZE)
+                                }
+                                Settings.Subtitle.Style.FontOpacity -> {
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_FONT_OPACITY)
+                                }
+                                Settings.Subtitle.Style.EdgeStyle -> {
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_EDGE_STYLE)
+                                }
+                                Settings.Subtitle.Style.BackgroundColor -> {
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_BACKGROUND_COLOR)
+                                }
+                                Settings.Subtitle.Style.BackgroundOpacity -> {
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_BACKGROUND_OPACITY)
+                                }
+                                Settings.Subtitle.Style.WindowColor -> {
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_WINDOW_COLOR)
+                                }
+                                Settings.Subtitle.Style.WindowOpacity -> {
+                                    settingsView.displaySettings(Setting.CAPTION_STYLE_WINDOW_OPACITY)
+                                }
+                            }
+                        }
+
+                        is Settings.Subtitle.Style.FontColor -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor.setRgb(item.color),
+                                UserPreferences.captionStyle.backgroundColor,
+                                UserPreferences.captionStyle.windowColor,
+                                UserPreferences.captionStyle.edgeType,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.TextSize -> {
+                            UserPreferences.captionTextSize = item.value
+                            subtitleView.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.FontOpacity -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor.setAlpha(item.alpha),
+                                UserPreferences.captionStyle.backgroundColor,
+                                UserPreferences.captionStyle.windowColor,
+                                UserPreferences.captionStyle.edgeType,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.EdgeStyle -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor,
+                                UserPreferences.captionStyle.backgroundColor,
+                                UserPreferences.captionStyle.windowColor,
+                                item.type,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.BackgroundColor -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor,
+                                UserPreferences.captionStyle.backgroundColor.setRgb(item.color),
+                                UserPreferences.captionStyle.windowColor,
+                                UserPreferences.captionStyle.edgeType,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.BackgroundOpacity -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor,
+                                UserPreferences.captionStyle.backgroundColor.setAlpha(item.alpha),
+                                UserPreferences.captionStyle.windowColor,
+                                UserPreferences.captionStyle.edgeType,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.WindowColor -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor,
+                                UserPreferences.captionStyle.backgroundColor,
+                                UserPreferences.captionStyle.windowColor.setRgb(item.color),
+                                UserPreferences.captionStyle.edgeType,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Subtitle.Style.WindowOpacity -> {
+                            UserPreferences.captionStyle = CaptionStyleCompat(
+                                UserPreferences.captionStyle.foregroundColor,
+                                UserPreferences.captionStyle.backgroundColor,
+                                UserPreferences.captionStyle.windowColor.setAlpha(item.alpha),
+                                UserPreferences.captionStyle.edgeType,
+                                UserPreferences.captionStyle.edgeColor,
+                                null
+                            )
+                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.displaySettings(Setting.CAPTION_STYLE)
+                        }
+
+                        is Settings.Speed -> {
+                            player.playbackParameters = player.playbackParameters
+                                .withSpeed(item.value)
+                            settingsView.hide()
+                        }
+                    }
+                }
             }
 
             binding.ivSettingIcon.apply {
-                when (setting) {
-                    is Setting.Quality -> setImageDrawable(
-                        ContextCompat.getDrawable(context, R.drawable.ic_settings_quality)
-                    )
-                    is Setting.Subtitle -> setImageDrawable(
-                        ContextCompat.getDrawable(
-                            context,
-                            when (setting.selected) {
-                                is Subtitle.None -> R.drawable.ic_settings_subtitle_off
-                                is Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
-                            }
-                        )
-                    )
-                    is Setting.Speed -> setImageDrawable(
-                        ContextCompat.getDrawable(context, R.drawable.ic_settings_playback_speed)
-                    )
-                    else -> {}
+                when (item) {
+                    is Settings -> {
+                        when (item) {
+                            Settings.Quality -> setImageDrawable(
+                                ContextCompat.getDrawable(context, R.drawable.ic_settings_quality)
+                            )
+                            Settings.Subtitle -> setImageDrawable(
+                                ContextCompat.getDrawable(
+                                    context,
+                                    when (Settings.Subtitle.selected) {
+                                        Settings.Subtitle.Style,
+                                        is Settings.Subtitle.None -> R.drawable.ic_settings_subtitle_off
+                                        is Settings.Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
+                                    }
+                                )
+                            )
+                            Settings.Speed -> setImageDrawable(
+                                ContextCompat.getDrawable(
+                                    context,
+                                    R.drawable.ic_settings_playback_speed
+                                )
+                            )
+                        }
+                        visibility = View.VISIBLE
+                    }
+
+                    else -> {
+                        visibility = View.GONE
+                    }
                 }
-                visibility = View.VISIBLE
+            }
+
+            binding.vSettingColor.apply {
+                when (item) {
+                    is Settings.Subtitle.Style.FontColor -> {
+                        backgroundTintList = ColorStateList.valueOf(item.color)
+                        visibility = View.VISIBLE
+                    }
+
+                    is Settings.Subtitle.Style.BackgroundColor -> {
+                        backgroundTintList = ColorStateList.valueOf(item.color)
+                        visibility = View.VISIBLE
+                    }
+
+                    is Settings.Subtitle.Style.WindowColor -> {
+                        backgroundTintList = ColorStateList.valueOf(item.color)
+                        visibility = View.VISIBLE
+                    }
+
+                    else -> {
+                        visibility = View.GONE
+                    }
+                }
             }
 
             binding.tvSettingMainText.apply {
-                text = when (setting) {
-                    is Setting.Quality -> context.getString(R.string.player_settings_quality_label)
-                    is Setting.Subtitle -> context.getString(R.string.player_settings_subtitles_label)
-                    is Setting.Speed -> context.getString(R.string.player_settings_speed_label)
+                text = when (item) {
+                    is Settings -> when (item) {
+                        Settings.Quality -> context.getString(R.string.player_settings_quality_label)
+                        Settings.Subtitle -> context.getString(R.string.player_settings_subtitles_label)
+                        Settings.Speed -> context.getString(R.string.player_settings_speed_label)
+                    }
+
+                    is Settings.Quality -> when (item) {
+                        is Settings.Quality.Auto -> when {
+                            item.isSelected -> when (val track = item.currentTrack) {
+                                null -> context.getString(R.string.player_settings_quality_auto)
+                                else -> context.getString(
+                                    R.string.player_settings_quality_auto_selected,
+                                    track.height
+                                )
+                            }
+
+                            else -> context.getString(R.string.player_settings_quality_auto)
+                        }
+                        is Settings.Quality.VideoTrackInformation -> context.getString(
+                            R.string.player_settings_quality,
+                            item.height
+                        )
+                    }
+
+                    is Settings.Subtitle -> when (item) {
+                        Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_label)
+                        is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
+                        is Settings.Subtitle.TextTrackInformation -> item.name
+                    }
+
+                    is Settings.Subtitle.Style -> when (item) {
+                        Settings.Subtitle.Style.ResetStyle -> context.getString(R.string.player_settings_caption_style_reset_style_label)
+                        Settings.Subtitle.Style.FontColor -> context.getString(R.string.player_settings_caption_style_font_color_label)
+                        Settings.Subtitle.Style.TextSize -> context.getString(R.string.player_settings_caption_style_text_size_label)
+                        Settings.Subtitle.Style.FontOpacity -> context.getString(R.string.player_settings_caption_style_font_opacity_label)
+                        Settings.Subtitle.Style.EdgeStyle -> context.getString(R.string.player_settings_caption_style_edge_style_label)
+                        Settings.Subtitle.Style.BackgroundColor -> context.getString(R.string.player_settings_caption_style_background_color_label)
+                        Settings.Subtitle.Style.BackgroundOpacity -> context.getString(R.string.player_settings_caption_style_background_opacity_label)
+                        Settings.Subtitle.Style.WindowColor -> context.getString(R.string.player_settings_caption_style_window_color_label)
+                        Settings.Subtitle.Style.WindowOpacity -> context.getString(R.string.player_settings_caption_style_window_opacity_label)
+                    }
+
+                    is Settings.Subtitle.Style.FontColor -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.TextSize -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.FontOpacity -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.EdgeStyle -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.BackgroundColor -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.BackgroundOpacity -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.WindowColor -> context.getString(item.stringId)
+
+                    is Settings.Subtitle.Style.WindowOpacity -> context.getString(item.stringId)
+
+                    is Settings.Speed -> context.getString(item.stringId)
+
                     else -> ""
                 }
             }
 
             binding.tvSettingSubText.apply {
-                text = when (setting) {
-                    is Setting.Quality -> when (val selected = setting.selected) {
-                        is Quality.Auto -> when (val track = selected.currentTrack) {
-                            null -> context.getString(R.string.player_settings_quality_auto)
-                            else -> context.getString(
-                                R.string.player_settings_quality_auto_selected,
-                                track.height
+                text = when (item) {
+                    is Settings -> when (item) {
+                        Settings.Quality -> when (val selected = Settings.Quality.selected) {
+                            is Settings.Quality.Auto -> when (val track = selected.currentTrack) {
+                                null -> context.getString(R.string.player_settings_quality_auto)
+                                else -> context.getString(
+                                    R.string.player_settings_quality_auto_selected,
+                                    track.height
+                                )
+                            }
+                            is Settings.Quality.VideoTrackInformation -> context.getString(
+                                R.string.player_settings_quality,
+                                selected.height
                             )
                         }
-                        is Quality.VideoTrackInformation -> context.getString(
-                            R.string.player_settings_quality,
-                            selected.height
-                        )
+                        Settings.Subtitle -> when (val selected = Settings.Subtitle.selected) {
+                            Settings.Subtitle.Style,
+                            is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
+                            is Settings.Subtitle.TextTrackInformation -> selected.name
+                        }
+                        Settings.Speed -> context.getString(Settings.Speed.selected.stringId)
                     }
-                    is Setting.Subtitle -> when (val selected = setting.selected) {
-                        is Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
-                        is Subtitle.TextTrackInformation -> selected.name
+
+                    is Settings.Subtitle -> when (item) {
+                        Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_sub_label)
+                        else -> ""
                     }
-                    is Setting.Speed -> context.getString(setting.selected.stringId)
+
+                    is Settings.Subtitle.Style -> when (item) {
+                        Settings.Subtitle.Style.ResetStyle -> ""
+                        Settings.Subtitle.Style.FontColor -> context.getString(Settings.Subtitle.Style.FontColor.selected.stringId)
+                        Settings.Subtitle.Style.TextSize -> context.getString(Settings.Subtitle.Style.TextSize.selected.stringId)
+                        Settings.Subtitle.Style.FontOpacity -> context.getString(Settings.Subtitle.Style.FontOpacity.selected.stringId)
+                        Settings.Subtitle.Style.EdgeStyle -> context.getString(Settings.Subtitle.Style.EdgeStyle.selected.stringId)
+                        Settings.Subtitle.Style.BackgroundColor -> context.getString(Settings.Subtitle.Style.BackgroundColor.selected.stringId)
+                        Settings.Subtitle.Style.BackgroundOpacity -> context.getString(Settings.Subtitle.Style.BackgroundOpacity.selected.stringId)
+                        Settings.Subtitle.Style.WindowColor -> context.getString(Settings.Subtitle.Style.WindowColor.selected.stringId)
+                        Settings.Subtitle.Style.WindowOpacity -> context.getString(Settings.Subtitle.Style.WindowOpacity.selected.stringId)
+                    }
+
                     else -> ""
                 }
                 visibility = when {
@@ -316,195 +588,614 @@ class PlayerSettingsView @JvmOverloads constructor(
                 }
             }
 
-            binding.ivSettingCheck.apply {
-                setColorFilter(Color.parseColor("#808080"))
-                setImageDrawable(
-                    ContextCompat.getDrawable(context, R.drawable.ic_setting_arrow_right)
-                )
-                visibility = View.VISIBLE
+            binding.ivSettingIsSelected.apply {
+                visibility = when (item) {
+                    is Settings.Quality -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle -> when (item) {
+                        Settings.Subtitle.Style -> View.GONE
+                        is Settings.Subtitle.None -> when {
+                            item.isSelected -> View.VISIBLE
+                            else -> View.GONE
+                        }
+                        is Settings.Subtitle.TextTrackInformation -> when {
+                            item.isSelected -> View.VISIBLE
+                            else -> View.GONE
+                        }
+                    }
+
+                    is Settings.Subtitle.Style.FontColor -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.TextSize -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.FontOpacity -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.EdgeStyle -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.BackgroundColor -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.BackgroundOpacity -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.WindowColor -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style.WindowOpacity -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Speed -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    else -> View.GONE
+                }
+            }
+
+            binding.ivSettingEnter.apply {
+                visibility = when (item) {
+                    is Settings -> View.VISIBLE
+
+                    is Settings.Subtitle -> when (item) {
+                        Settings.Subtitle.Style -> View.VISIBLE
+                        is Settings.Subtitle.None -> View.GONE
+                        is Settings.Subtitle.TextTrackInformation -> View.GONE
+                    }
+
+                    is Settings.Subtitle.Style -> when (item) {
+                        Settings.Subtitle.Style.ResetStyle -> View.GONE
+                        else -> View.VISIBLE
+                    }
+
+                    else -> View.GONE
+                }
             }
         }
+    }
 
-        fun displayQualitySetting(quality: Quality) {
-            binding.root.setOnClickListener {
-                playerSettingsView.player?.let { player ->
-                    when (quality) {
-                        is Quality.Auto -> {
-                            player.trackSelectionParameters = player.trackSelectionParameters
-                                .buildUpon()
-                                .setMaxVideoBitrate(Int.MAX_VALUE)
-                                .setForceHighestSupportedBitrate(false)
-                                .build()
-                        }
-                        is Quality.VideoTrackInformation -> {
-                            player.trackSelectionParameters = player.trackSelectionParameters
-                                .buildUpon()
-                                .setMaxVideoBitrate(quality.bitrate)
-                                .setForceHighestSupportedBitrate(true)
-                                .build()
-                        }
-                    }
-                }
-                playerSettingsView.hide()
-            }
+    private interface Item
 
-            binding.ivSettingIcon.visibility = View.GONE
+    sealed class Settings : Item {
 
-            binding.tvSettingMainText.apply {
+        companion object {
+            val list = listOf(
+                Quality,
+                Subtitle,
+                Speed,
+            )
+        }
 
-                text = when (quality) {
-                    is Quality.Auto -> when {
-                        quality.isSelected -> when (val track = quality.currentTrack) {
-                            null -> context.getString(R.string.player_settings_quality_auto)
-                            else -> context.getString(
-                                R.string.player_settings_quality_auto_selected,
-                                track.height
-                            )
-                        }
-                        else -> context.getString(R.string.player_settings_quality_auto)
-                    }
-                    is Quality.VideoTrackInformation -> context.getString(
-                        R.string.player_settings_quality,
-                        quality.height
+        sealed class Quality : Item {
+
+            companion object : Settings() {
+                val list = mutableListOf<Quality>()
+
+                val selected: Quality
+                    get() = list.find { it.isSelected } ?: Auto
+
+                fun init(player: ExoPlayer, resources: Resources) {
+                    list.clear()
+                    list.add(Auto)
+                    list.addAll(
+                        player.currentTracks.groups
+                            .filter { it.type == C.TRACK_TYPE_VIDEO }
+                            .flatMap { trackGroup ->
+                                trackGroup.trackFormats
+                                    .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
+                                    .distinctBy { it.width to it.height }
+                                    .map { trackFormat ->
+                                        VideoTrackInformation(
+                                            name = DefaultTrackNameProvider(resources)
+                                                .getTrackName(trackFormat),
+                                            width = trackFormat.width,
+                                            height = trackFormat.height,
+                                            bitrate = trackFormat.bitrate,
+
+                                            player = player,
+                                        )
+                                    }
+                            }
+                            .sortedByDescending { it.height }
                     )
                 }
             }
 
-            binding.tvSettingSubText.visibility = View.GONE
+            abstract val isSelected: Boolean
 
-            binding.ivSettingCheck.visibility = when {
-                quality.isSelected -> View.VISIBLE
-                else -> View.GONE
+            object Auto : Quality() {
+                val currentTrack: VideoTrackInformation?
+                    get() = list
+                        .filterIsInstance<VideoTrackInformation>()
+                        .find { it.isCurrentlyPlayed }
+                override val isSelected: Boolean
+                    get() = list
+                        .filterIsInstance<VideoTrackInformation>()
+                        .none { it.isSelected }
+            }
+
+            class VideoTrackInformation(
+                val name: String,
+                val width: Int,
+                val height: Int,
+                val bitrate: Int,
+
+                val player: ExoPlayer,
+            ) : Quality() {
+                val isCurrentlyPlayed: Boolean
+                    get() = player.videoFormat?.let { it.bitrate == bitrate } ?: false
+                override val isSelected: Boolean
+                    get() = player.trackSelectionParameters.maxVideoBitrate == bitrate
             }
         }
 
-        fun displaySubtitleSetting(subtitle: Subtitle) {
-            binding.root.setOnClickListener {
-                playerSettingsView.player?.let { player ->
-                    when (subtitle) {
-                        is Subtitle.None -> {
-                            player.trackSelectionParameters = player.trackSelectionParameters
-                                .buildUpon()
-                                .clearOverridesOfType(C.TRACK_TYPE_TEXT)
-                                .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
-                                .build()
+        sealed class Subtitle : Item {
+
+            companion object : Settings() {
+                val list = mutableListOf<Subtitle>()
+
+                val selected: Subtitle
+                    get() = list.find {
+                        when (it) {
+                            is None -> it.isSelected
+                            is TextTrackInformation -> it.isSelected
+                            else -> false
                         }
-                        is Subtitle.TextTrackInformation -> {
-                            player.trackSelectionParameters = player.trackSelectionParameters
-                                .buildUpon()
-                                .setOverrideForType(
-                                    TrackSelectionOverride(
-                                        subtitle.trackGroup.mediaTrackGroup,
-                                        listOf(subtitle.trackIndex)
-                                    )
-                                )
-                                .setTrackTypeDisabled(subtitle.trackGroup.type, false)
-                                .build()
-                        }
+                    } ?: None
+
+                fun init(player: ExoPlayer, resources: Resources) {
+                    list.clear()
+                    list.add(Style)
+                    list.add(None)
+                    list.addAll(
+                        player.currentTracks.groups
+                            .filter { it.type == C.TRACK_TYPE_TEXT }
+                            .flatMap { trackGroup ->
+                                trackGroup.trackFormats
+                                    .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
+                                    .filter { it.label != null }
+                                    .mapIndexed { trackIndex, trackFormat ->
+                                        TextTrackInformation(
+                                            name = DefaultTrackNameProvider(resources)
+                                                .getTrackName(trackFormat),
+
+                                            trackGroup = trackGroup,
+                                            trackIndex = trackIndex,
+                                        )
+                                    }
+                            }
+                            .sortedBy { it.name }
+                    )
+                }
+            }
+
+            sealed class Style : Item {
+
+                companion object : Subtitle() {
+                    val DEFAULT = CaptionStyleCompat(
+                        Color.WHITE,
+                        Color.BLACK.setAlpha(128),
+                        Color.TRANSPARENT,
+                        CaptionStyleCompat.EDGE_TYPE_NONE,
+                        Color.BLACK,
+                        null
+                    )
+
+                    val list = listOf(
+                        ResetStyle,
+                        FontColor,
+                        TextSize,
+                        FontOpacity,
+                        EdgeStyle,
+                        BackgroundColor,
+                        BackgroundOpacity,
+                        WindowColor,
+                        WindowOpacity,
+                    )
+                }
+
+                object ResetStyle : Style()
+
+                class FontColor(
+                    val stringId: Int,
+                    val color: Int,
+                ) : Item {
+                    val isSelected: Boolean
+                        get() = color == UserPreferences.captionStyle.foregroundColor.getRgb()
+
+                    companion object : Style() {
+                        private val DEFAULT = FontColor(
+                            R.string.player_settings_caption_style_font_color_white,
+                            Color.WHITE
+                        )
+
+                        val list = listOf(
+                            DEFAULT,
+                            FontColor(
+                                R.string.player_settings_caption_style_font_color_yellow,
+                                Color.YELLOW
+                            ),
+                            FontColor(
+                                R.string.player_settings_caption_style_font_color_green,
+                                Color.GREEN
+                            ),
+                            FontColor(
+                                R.string.player_settings_caption_style_font_color_cyan,
+                                Color.CYAN
+                            ),
+                            FontColor(
+                                R.string.player_settings_caption_style_font_color_blue,
+                                Color.BLUE
+                            ),
+                            FontColor(
+                                R.string.player_settings_caption_style_font_color_magenta,
+                                Color.MAGENTA
+                            ),
+                            FontColor(
+                                R.string.player_settings_caption_style_font_color_red,
+                                Color.RED
+                            ),
+                            FontColor(
+                                R.string.player_settings_caption_style_font_color_black,
+                                Color.BLACK
+                            ),
+                        )
+
+                        val selected: FontColor
+                            get() = list.find { it.isSelected } ?: DEFAULT
                     }
-
                 }
-                playerSettingsView.hide()
-            }
 
-            binding.ivSettingIcon.visibility = View.GONE
+                class TextSize(
+                    val stringId: Int,
+                    val value: Float,
+                ) : Item {
+                    val isSelected: Boolean
+                        get() = value == UserPreferences.captionTextSize
 
-            binding.tvSettingMainText.apply {
-                text = when (subtitle) {
-                    is Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
-                    is Subtitle.TextTrackInformation -> subtitle.name
+                    companion object : Style() {
+                        val DEFAULT = TextSize(R.string.player_settings_caption_style_text_size_1, 1F)
+
+                        val list = listOf(
+                            TextSize(R.string.player_settings_caption_style_text_size_0_5, 0.5F),
+                            TextSize(R.string.player_settings_caption_style_text_size_0_75, 0.75F),
+                            DEFAULT,
+                            TextSize(R.string.player_settings_caption_style_text_size_2, 2F),
+                            TextSize(R.string.player_settings_caption_style_text_size_3, 3F),
+                        )
+
+                        val selected: TextSize
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class FontOpacity(
+                    val stringId: Int,
+                    private val value: Float,
+                ) : Item {
+                    val alpha: Int
+                        get() = (value * 255).roundToInt()
+
+                    val isSelected: Boolean
+                        get() = alpha == UserPreferences.captionStyle.foregroundColor.getAlpha()
+
+                    companion object : Style() {
+                        private val DEFAULT = FontOpacity(
+                            R.string.player_settings_caption_style_font_opacity_1,
+                            1F
+                        )
+
+                        val list = listOf(
+                            FontOpacity(
+                                R.string.player_settings_caption_style_font_opacity_0_5,
+                                0.5F
+                            ),
+                            FontOpacity(
+                                R.string.player_settings_caption_style_font_opacity_0_75,
+                                0.75F
+                            ),
+                            DEFAULT,
+                        )
+
+                        val selected: FontOpacity
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class EdgeStyle(
+                    val stringId: Int,
+                    val type: Int,
+                ) : Item {
+                    val isSelected: Boolean
+                        get() = type == UserPreferences.captionStyle.edgeType
+
+                    companion object : Style() {
+                        private val DEFAULT = EdgeStyle(
+                            R.string.player_settings_caption_style_edge_style_none,
+                            CaptionStyleCompat.EDGE_TYPE_NONE
+                        )
+
+                        val list = listOf(
+                            DEFAULT,
+                            EdgeStyle(
+                                R.string.player_settings_caption_style_edge_style_raised,
+                                CaptionStyleCompat.EDGE_TYPE_RAISED
+                            ),
+                            EdgeStyle(
+                                R.string.player_settings_caption_style_edge_style_depressed,
+                                CaptionStyleCompat.EDGE_TYPE_DEPRESSED
+                            ),
+                            EdgeStyle(
+                                R.string.player_settings_caption_style_edge_style_outline,
+                                CaptionStyleCompat.EDGE_TYPE_OUTLINE
+                            ),
+                            EdgeStyle(
+                                R.string.player_settings_caption_style_edge_style_drop_shadow,
+                                CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW
+                            ),
+                        )
+
+                        val selected: EdgeStyle
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class BackgroundColor(
+                    val stringId: Int,
+                    val color: Int,
+                ) : Item {
+                    val isSelected: Boolean
+                        get() = color == UserPreferences.captionStyle.backgroundColor.getRgb()
+
+                    companion object : Style() {
+                        private val DEFAULT = BackgroundColor(
+                            R.string.player_settings_caption_style_background_color_black,
+                            Color.BLACK
+                        )
+
+                        val list = listOf(
+                            DEFAULT,
+                            BackgroundColor(
+                                R.string.player_settings_caption_style_background_color_yellow,
+                                Color.YELLOW
+                            ),
+                            BackgroundColor(
+                                R.string.player_settings_caption_style_background_color_green,
+                                Color.GREEN
+                            ),
+                            BackgroundColor(
+                                R.string.player_settings_caption_style_background_color_cyan,
+                                Color.CYAN
+                            ),
+                            BackgroundColor(
+                                R.string.player_settings_caption_style_background_color_blue,
+                                Color.BLUE
+                            ),
+                            BackgroundColor(
+                                R.string.player_settings_caption_style_background_color_magenta,
+                                Color.MAGENTA
+                            ),
+                            BackgroundColor(
+                                R.string.player_settings_caption_style_background_color_red,
+                                Color.RED
+                            ),
+                            BackgroundColor(
+                                R.string.player_settings_caption_style_background_color_white,
+                                Color.WHITE
+                            ),
+                        )
+
+                        val selected: BackgroundColor
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class BackgroundOpacity(
+                    val stringId: Int,
+                    private val value: Float,
+                ) : Item {
+                    val alpha: Int
+                        get() = (value * 255).roundToInt()
+
+                    val isSelected: Boolean
+                        get() = alpha == UserPreferences.captionStyle.backgroundColor.getAlpha()
+
+                    companion object : Style() {
+                        private val DEFAULT = BackgroundOpacity(
+                            R.string.player_settings_caption_style_background_opacity_0_5,
+                            0.5F
+                        )
+
+                        val list = listOf(
+                            BackgroundOpacity(
+                                R.string.player_settings_caption_style_background_opacity_0,
+                                0F
+                            ),
+                            BackgroundOpacity(
+                                R.string.player_settings_caption_style_background_opacity_0_25,
+                                0.25F
+                            ),
+                            DEFAULT,
+                            BackgroundOpacity(
+                                R.string.player_settings_caption_style_background_opacity_0_75,
+                                0.75F
+                            ),
+                            BackgroundOpacity(
+                                R.string.player_settings_caption_style_background_opacity_1,
+                                1F
+                            ),
+                        )
+
+                        val selected: BackgroundOpacity
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class WindowColor(
+                    val stringId: Int,
+                    val color: Int,
+                ) : Item {
+                    val isSelected: Boolean
+                        get() = color == UserPreferences.captionStyle.windowColor.getRgb()
+
+                    companion object : Style() {
+                        private val DEFAULT = WindowColor(
+                            R.string.player_settings_caption_style_window_color_black,
+                            Color.BLACK
+                        )
+
+                        val list = listOf(
+                            DEFAULT,
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_yellow,
+                                Color.YELLOW
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_green,
+                                Color.GREEN
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_cyan,
+                                Color.CYAN
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_blue,
+                                Color.BLUE
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_magenta,
+                                Color.MAGENTA
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_red,
+                                Color.RED
+                            ),
+                            WindowColor(
+                                R.string.player_settings_caption_style_window_color_white,
+                                Color.WHITE
+                            ),
+                        )
+
+                        val selected: WindowColor
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
+                }
+
+                class WindowOpacity(
+                    val stringId: Int,
+                    private val value: Float,
+                ) : Item {
+                    val alpha: Int
+                        get() = (value * 255).roundToInt()
+
+                    val isSelected: Boolean
+                        get() = alpha == UserPreferences.captionStyle.windowColor.getAlpha()
+
+                    companion object : Style() {
+                        private val DEFAULT = WindowOpacity(
+                            R.string.player_settings_caption_style_window_opacity_0,
+                            0F
+                        )
+
+                        val list = listOf(
+                            DEFAULT,
+                            WindowOpacity(
+                                R.string.player_settings_caption_style_window_opacity_0_25,
+                                0.25F
+                            ),
+                            WindowOpacity(
+                                R.string.player_settings_caption_style_window_opacity_0_5,
+                                0.5F
+                            ),
+                            WindowOpacity(
+                                R.string.player_settings_caption_style_window_opacity_0_75,
+                                0.75F
+                            ),
+                            WindowOpacity(
+                                R.string.player_settings_caption_style_window_opacity_1,
+                                1F
+                            ),
+                        )
+
+                        val selected: WindowOpacity
+                            get() = list.find { it.isSelected } ?: DEFAULT
+                    }
                 }
             }
 
-            binding.tvSettingSubText.visibility = View.GONE
+            object None : Subtitle() {
+                val isSelected: Boolean
+                    get() = list
+                        .filterIsInstance<TextTrackInformation>()
+                        .none { it.isSelected }
+            }
 
-            binding.ivSettingCheck.visibility = when {
-                subtitle.isSelected -> View.VISIBLE
-                else -> View.GONE
+            class TextTrackInformation(
+                val name: String,
+
+                val trackGroup: Tracks.Group,
+                val trackIndex: Int,
+            ) : Subtitle() {
+                val isSelected: Boolean
+                    get() = trackGroup.isTrackSelected(trackIndex)
             }
         }
 
-        fun displaySpeedSetting(playbackSpeed: PlaybackSpeed) {
-            binding.root.setOnClickListener {
-                playerSettingsView.player?.let { player ->
-                    player.playbackParameters = player.playbackParameters
-                        .withSpeed(playbackSpeed.speed)
+        class Speed(
+            val stringId: Int,
+            val value: Float,
+        ) : Item {
+            var isSelected: Boolean = false
+
+            companion object : Settings() {
+                private val DEFAULT = Speed(R.string.player_settings_speed_1, 1F)
+
+                val list = listOf(
+                    Speed(R.string.player_settings_speed_0_25, 0.25F),
+                    Speed(R.string.player_settings_speed_0_5, 0.5F),
+                    Speed(R.string.player_settings_speed_0_75, 0.75F),
+                    DEFAULT,
+                    Speed(R.string.player_settings_speed_1_25, 1.25F),
+                    Speed(R.string.player_settings_speed_1_5, 1.5F),
+                    Speed(R.string.player_settings_speed_1_75, 1.75F),
+                    Speed(R.string.player_settings_speed_2, 2F),
+                )
+
+                val selected: Speed
+                    get() = list.find { it.isSelected }
+                        ?: list.find { it.value == 1F }
+                        ?: DEFAULT
+
+                fun refresh(player: ExoPlayer) {
+                    list.forEach { it.isSelected = false }
+                    list.findClosest(player.playbackParameters.speed) { it.value }?.let {
+                        it.isSelected = true
+                    }
                 }
-                playerSettingsView.hide()
-            }
-
-            binding.ivSettingIcon.visibility = View.GONE
-
-            binding.tvSettingMainText.apply {
-                text = context.getString(playbackSpeed.stringId)
-            }
-
-            binding.tvSettingSubText.visibility = View.GONE
-
-            binding.ivSettingCheck.visibility = when {
-                playbackSpeed.isSelected -> View.VISIBLE
-                else -> View.GONE
             }
         }
-    }
-
-
-    private sealed class Quality {
-
-        abstract val isSelected: Boolean
-
-        object Auto : Quality() {
-            val currentTrack: VideoTrackInformation?
-                get() = Setting.Quality.list
-                    .filterIsInstance<VideoTrackInformation>()
-                    .find { it.isCurrentlyPlayed }
-            override val isSelected: Boolean
-                get() = Setting.Quality.list
-                    .filterIsInstance<VideoTrackInformation>()
-                    .none { it.isSelected }
-        }
-
-        class VideoTrackInformation(
-            val name: String,
-            val width: Int,
-            val height: Int,
-            val bitrate: Int,
-
-            val player: ExoPlayer,
-        ) : Quality() {
-            val isCurrentlyPlayed: Boolean
-                get() = player.videoFormat?.let { it.bitrate == bitrate } ?: false
-            override val isSelected: Boolean
-                get() = player.trackSelectionParameters.maxVideoBitrate == bitrate
-        }
-    }
-
-    private sealed class Subtitle {
-
-        abstract val isSelected: Boolean
-
-        object None : Subtitle() {
-            override val isSelected: Boolean
-                get() = Setting.Subtitle.list
-                    .filterIsInstance<TextTrackInformation>()
-                    .none { it.isSelected }
-        }
-
-        class TextTrackInformation(
-            val name: String,
-
-            val trackGroup: Tracks.Group,
-            val trackIndex: Int,
-        ) : Subtitle() {
-            override val isSelected: Boolean
-                get() = trackGroup.isTrackSelected(trackIndex)
-        }
-    }
-
-    class PlaybackSpeed(
-        val stringId: Int,
-        val speed: Float,
-    ) {
-        var isSelected: Boolean = false
     }
 }
