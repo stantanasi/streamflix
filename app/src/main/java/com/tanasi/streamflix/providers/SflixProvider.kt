@@ -7,6 +7,7 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.*
 import com.tanasi.streamflix.utils.retry
+import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
@@ -17,6 +18,7 @@ import java.lang.Integer.min
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
+import java.util.concurrent.TimeUnit
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -782,6 +784,11 @@ object SflixProvider : Provider {
 
         companion object {
             fun build(): SflixService {
+                val client = OkHttpClient.Builder()
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .build()
+
                 val retrofit = Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(JsoupConverterFactory.create())
@@ -795,6 +802,7 @@ object SflixProvider : Provider {
                                 .create()
                         )
                     )
+                    .client(client)
                     .build()
 
                 return retrofit.create(SflixService::class.java)
