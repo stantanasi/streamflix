@@ -83,7 +83,7 @@ class HomeFragment : Fragment() {
         appAdapter.items.apply {
             clear()
 
-            categories.find { it.name == "Featured" }?.let { category ->
+            categories.find { it.name == Category.FEATURED }?.let { category ->
                 category.itemType = AppAdapter.Type.CATEGORY_SWIPER
                 add(category)
             }
@@ -139,7 +139,7 @@ class HomeFragment : Fragment() {
             }
 
             categories
-                .filter { it.name != "Featured" && it.list.isNotEmpty() }
+                .filter { it.name != Category.FEATURED && it.list.isNotEmpty() }
                 .onEach { category ->
                     category.list.onEach { show ->
                         when (show) {

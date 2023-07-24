@@ -39,7 +39,7 @@ object SflixProvider : Provider {
 
         categories.add(
             Category(
-                name = "Featured",
+                name = Category.FEATURED,
                 list = document.select("div.swiper-wrapper > div.swiper-slide").map {
                     val id = it.selectFirst("a")
                         ?.attr("href")?.substringAfterLast("-") ?: ""

@@ -32,7 +32,7 @@ object AllMoviesForYouProvider : Provider {
 
         categories.add(
             Category(
-                name = "Featured",
+                name = Category.FEATURED,
                 list = document.select("div.MovieListSldCn article.TPost.A").map {
                     val id = it.selectFirst("a")?.attr("href")
                         ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
