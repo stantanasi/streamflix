@@ -2,7 +2,13 @@ package com.tanasi.streamflix.providers
 
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.fragments.player.PlayerFragment
-import com.tanasi.streamflix.models.*
+import com.tanasi.streamflix.models.Category
+import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.models.Genre
+import com.tanasi.streamflix.models.Movie
+import com.tanasi.streamflix.models.People
+import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.models.Video
 
 interface Provider {
 

@@ -28,7 +28,7 @@ class PlayerViewModel(
     }
 
 
-    fun getVideo(
+    private fun getVideo(
         videoType: PlayerFragment.VideoType,
         id: String,
     ) = viewModelScope.launch(Dispatchers.IO) {
