@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController

@@ -19,7 +19,8 @@ import com.google.android.exoplayer2.Tracks
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.activities.main.MainActivity
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 import kotlin.math.abs
 
 fun String.toCalendar(): Calendar? {
@@ -120,7 +121,12 @@ inline fun <reified T : ViewGroup.LayoutParams> View.layoutParams(block: T.() ->
     if (layoutParams is T) block(layoutParams as T)
 }
 
-fun View.margin(left: Float? = null, top: Float? = null, right: Float? = null, bottom: Float? = null) {
+fun View.margin(
+    left: Float? = null,
+    top: Float? = null,
+    right: Float? = null,
+    bottom: Float? = null
+) {
     layoutParams<ViewGroup.MarginLayoutParams> {
         left?.run { leftMargin = dpToPx(this) }
         top?.run { topMargin = dpToPx(this) }
