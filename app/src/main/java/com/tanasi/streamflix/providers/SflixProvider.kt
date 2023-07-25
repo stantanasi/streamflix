@@ -735,7 +735,7 @@ object SflixProvider : Provider {
             val sources = when (response) {
                 is SflixService.Sources -> response
                 is SflixService.Sources.Encrypted -> response.decrypt(
-                    secret = service.getSourceEncryptedKey().text()
+                    enikey = service.getSourceEncryptedKey()
                 )
             }
 
@@ -869,7 +869,7 @@ object SflixProvider : Provider {
         ): SourcesResponse
 
         @GET("https://raw.githubusercontent.com/enimax-anime/key/e4/key.txt")
-        suspend fun getSourceEncryptedKey(): Document
+        suspend fun getSourceEncryptedKey(): List<List<Int>>
 
 
         data class Link(
@@ -910,7 +910,27 @@ object SflixProvider : Provider {
                 val tracks: List<Track> = listOf(),
                 val server: Int? = null,
             ) : SourcesResponse() {
-                fun decrypt(secret: String): Sources {
+                fun decrypt(enikey: List<List<Int>>): Sources {
+                    fun extract(
+                        encryptedSources: String,
+                        key: List<List<Int>>
+                    ): Pair<String, String> {
+                        var extractedSources = ""
+                        var extractedKey = ""
+
+                        for (i in encryptedSources.indices) {
+                            val currentKey = key.firstOrNull { i < it[1] } ?: key[0]
+
+                            if (i in currentKey[0] until currentKey[1]) {
+                                extractedKey += encryptedSources[i]
+                            } else {
+                                extractedSources += encryptedSources[i]
+                            }
+                        }
+
+                        return extractedSources to extractedKey
+                    }
+
                     fun decryptSourceUrl(decryptionKey: ByteArray, sourceUrl: String): String {
                         val cipherData = Base64.decode(sourceUrl, Base64.DEFAULT)
                         val encrypted = cipherData.copyOfRange(16, cipherData.size)
@@ -940,12 +960,14 @@ object SflixProvider : Provider {
                         return currentKey
                     }
 
+                    val (extractedSources, extractedKey) = extract(sources, enikey)
+
                     val decrypted = decryptSourceUrl(
                         generateKey(
-                            Base64.decode(sources, Base64.DEFAULT).copyOfRange(8, 16),
-                            secret.toByteArray(),
+                            Base64.decode(extractedSources, Base64.DEFAULT).copyOfRange(8, 16),
+                            extractedKey.toByteArray(),
                         ),
-                        sources,
+                        extractedSources,
                     )
 
                     return Sources(
