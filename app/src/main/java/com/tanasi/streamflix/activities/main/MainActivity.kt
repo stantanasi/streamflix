@@ -144,4 +144,9 @@ class MainActivity : FragmentActivity() {
             }
         })
     }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkUpdate()
+    }
 }
