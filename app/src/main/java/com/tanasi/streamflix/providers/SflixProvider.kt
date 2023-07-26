@@ -47,55 +47,49 @@ object SflixProvider : Provider {
                         ?.text() ?: ""
                     val overview = it.selectFirst("p.sc-desc")
                         ?.text() ?: ""
+                    val info = it.select("div.sc-detail > div.scd-item").toInfo()
                     val poster = it.selectFirst("img.film-poster-img")
                         ?.attr("src")
                     val banner = it.selectFirst("div.slide-photo img")
                         ?.attr("src")
 
-                    when {
-                        it.isMovie() -> {
-                            val info = it.select("div.sc-detail > div.scd-item").toInfo()
+                    if (it.isMovie()) {
+                        Movie(
+                            id = id,
+                            title = title,
+                            overview = overview,
+                            released = info.released,
+                            quality = info.quality,
+                            rating = info.rating,
+                            poster = poster,
+                            banner = banner,
+                        )
+                    } else {
+                        TvShow(
+                            id = id,
+                            title = title,
+                            overview = overview,
+                            quality = info.quality,
+                            rating = info.rating,
+                            poster = poster,
+                            banner = banner,
 
-                            Movie(
-                                id = id,
-                                title = title,
-                                overview = overview,
-                                released = info.released,
-                                quality = info.quality,
-                                rating = info.rating,
-                                poster = poster,
-                                banner = banner,
-                            )
-                        }
-                        else -> {
-                            val info = it.select("div.sc-detail > div.scd-item").toInfo()
+                            seasons = info.lastEpisode?.let { lastEpisode ->
+                                listOf(
+                                    Season(
+                                        id = "",
+                                        number = lastEpisode.season,
 
-                            TvShow(
-                                id = id,
-                                title = title,
-                                overview = overview,
-                                quality = info.quality,
-                                rating = info.rating,
-                                poster = poster,
-                                banner = banner,
-
-                                seasons = info.lastEpisode?.let { lastEpisode ->
-                                    listOf(
-                                        Season(
-                                            id = "",
-                                            number = lastEpisode.season,
-
-                                            episodes = listOf(
-                                                Episode(
-                                                    id = "",
-                                                    number = lastEpisode.episode,
-                                                )
+                                        episodes = listOf(
+                                            Episode(
+                                                id = "",
+                                                number = lastEpisode.episode,
                                             )
                                         )
                                     )
-                                } ?: listOf(),
-                            )
-                        }
+                                )
+                            } ?: listOf(),
+                        )
                     }
                 },
             )
@@ -248,49 +242,44 @@ object SflixProvider : Provider {
                 ?.attr("href")?.substringAfterLast("-") ?: ""
             val title = it.selectFirst("h2.film-name")
                 ?.text() ?: ""
+            val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
             val poster = it.selectFirst("div.film-poster > img.film-poster-img")
                 ?.attr("data-src")
 
-            when {
-                it.isMovie() -> {
-                    val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+            if (it.isMovie()) {
+                Movie(
+                    id = id,
+                    title = title,
+                    released = info.released,
+                    quality = info.quality,
+                    rating = info.rating,
+                    poster = poster,
+                )
+            }
+            else {
+                TvShow(
+                    id = id,
+                    title = title,
+                    quality = info.quality,
+                    rating = info.rating,
+                    poster = poster,
 
-                    Movie(
-                        id = id,
-                        title = title,
-                        released = info.released,
-                        quality = info.quality,
-                        rating = info.rating,
-                        poster = poster,
-                    )
-                }
-                else -> {
-                    val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                    seasons = info.lastEpisode?.let { lastEpisode ->
+                        listOf(
+                            Season(
+                                id = "",
+                                number = lastEpisode.season,
 
-                    TvShow(
-                        id = id,
-                        title = title,
-                        quality = info.quality,
-                        rating = info.rating,
-                        poster = poster,
-
-                        seasons = info.lastEpisode?.let { lastEpisode ->
-                            listOf(
-                                Season(
-                                    id = "",
-                                    number = lastEpisode.season,
-
-                                    episodes = listOf(
-                                        Episode(
-                                            id = "",
-                                            number = lastEpisode.episode,
-                                        )
+                                episodes = listOf(
+                                    Episode(
+                                        id = "",
+                                        number = lastEpisode.episode,
                                     )
                                 )
                             )
-                        } ?: listOf(),
-                    )
-                }
+                        )
+                    } ?: listOf(),
+                )
             }
         }
 
@@ -400,52 +389,47 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             recommendations = document.select("div.film_related div.flw-item").map {
-                when {
-                    it.isMovie() -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
 
-                        Movie(
-                            id = it.selectFirst("a")
-                                ?.attr("href")?.substringAfterLast("-") ?: "",
-                            title = it.selectFirst("h3.film-name")
-                                ?.text() ?: "",
-                            released = info.released,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
-                                ?.attr("data-src"),
-                        )
-                    }
-                    else -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                if (it.isMovie()) {
+                    Movie(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringAfterLast("-") ?: "",
+                        title = it.selectFirst("h3.film-name")
+                            ?.text() ?: "",
+                        released = info.released,
+                        quality = info.quality,
+                        rating = info.rating,
+                        poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                            ?.attr("data-src"),
+                    )
+                } else {
+                    TvShow(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringAfterLast("-") ?: "",
+                        title = it.selectFirst("h3.film-name")
+                            ?.text() ?: "",
+                        quality = info.quality,
+                        rating = info.rating,
+                        poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                            ?.attr("data-src"),
 
-                        TvShow(
-                            id = it.selectFirst("a")
-                                ?.attr("href")?.substringAfterLast("-") ?: "",
-                            title = it.selectFirst("h3.film-name")
-                                ?.text() ?: "",
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
-                                ?.attr("data-src"),
+                        seasons = info.lastEpisode?.let { lastEpisode ->
+                            listOf(
+                                Season(
+                                    id = "",
+                                    number = lastEpisode.season,
 
-                            seasons = info.lastEpisode?.let { lastEpisode ->
-                                listOf(
-                                    Season(
-                                        id = "",
-                                        number = lastEpisode.season,
-
-                                        episodes = listOf(
-                                            Episode(
-                                                id = "",
-                                                number = lastEpisode.episode,
-                                            )
+                                    episodes = listOf(
+                                        Episode(
+                                            id = "",
+                                            number = lastEpisode.episode,
                                         )
                                     )
                                 )
-                            } ?: listOf(),
-                        )
-                    }
+                            )
+                        } ?: listOf(),
+                    )
                 }
             },
         )
@@ -506,52 +490,47 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             recommendations = document.select("div.film_related div.flw-item").map {
-                when {
-                    it.isMovie() -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
 
-                        Movie(
-                            id = it.selectFirst("a")
-                                ?.attr("href")?.substringAfterLast("-") ?: "",
-                            title = it.selectFirst("h3.film-name")
-                                ?.text() ?: "",
-                            released = info.released,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
-                                ?.attr("data-src"),
-                        )
-                    }
-                    else -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                if (it.isMovie()) {
+                    Movie(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringAfterLast("-") ?: "",
+                        title = it.selectFirst("h3.film-name")
+                            ?.text() ?: "",
+                        released = info.released,
+                        quality = info.quality,
+                        rating = info.rating,
+                        poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                            ?.attr("data-src"),
+                    )
+                } else {
+                    TvShow(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringAfterLast("-") ?: "",
+                        title = it.selectFirst("h3.film-name")
+                            ?.text() ?: "",
+                        quality = info.quality,
+                        rating = info.rating,
+                        poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                            ?.attr("data-src"),
 
-                        TvShow(
-                            id = it.selectFirst("a")
-                                ?.attr("href")?.substringAfterLast("-") ?: "",
-                            title = it.selectFirst("h3.film-name")
-                                ?.text() ?: "",
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
-                                ?.attr("data-src"),
+                        seasons = info.lastEpisode?.let { lastEpisode ->
+                            listOf(
+                                Season(
+                                    id = "",
+                                    number = lastEpisode.season,
 
-                            seasons = info.lastEpisode?.let { lastEpisode ->
-                                listOf(
-                                    Season(
-                                        id = "",
-                                        number = lastEpisode.season,
-
-                                        episodes = listOf(
-                                            Episode(
-                                                id = "",
-                                                number = lastEpisode.episode,
-                                            )
+                                    episodes = listOf(
+                                        Episode(
+                                            id = "",
+                                            number = lastEpisode.episode,
                                         )
                                     )
                                 )
-                            } ?: listOf(),
-                        )
-                    }
+                            )
+                        } ?: listOf(),
+                    )
                 }
             },
         )
@@ -593,49 +572,43 @@ object SflixProvider : Provider {
                     ?.attr("href")?.substringAfterLast("-") ?: ""
                 val showTitle = it.selectFirst("h2.film-name")
                     ?.text() ?: ""
+                val showInfo = it.select("div.film-detail > div.fd-infor > span").toInfo()
                 val showPoster = it.selectFirst("div.film-poster > img.film-poster-img")
                     ?.attr("data-src")
 
-                when {
-                    it.isMovie() -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                if (it.isMovie()) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        released = showInfo.released,
+                        quality = showInfo.quality,
+                        rating = showInfo.rating,
+                        poster = showPoster,
+                    )
+                } else {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        quality = showInfo.quality,
+                        rating = showInfo.rating,
+                        poster = showPoster,
 
-                        Movie(
-                            id = showId,
-                            title = showTitle,
-                            released = info.released,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = showPoster,
-                        )
-                    }
-                    else -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                        seasons = showInfo.lastEpisode?.let { lastEpisode ->
+                            listOf(
+                                Season(
+                                    id = "",
+                                    number = lastEpisode.season,
 
-                        TvShow(
-                            id = showId,
-                            title = showTitle,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = showPoster,
-
-                            seasons = info.lastEpisode?.let { lastEpisode ->
-                                listOf(
-                                    Season(
-                                        id = "",
-                                        number = lastEpisode.season,
-
-                                        episodes = listOf(
-                                            Episode(
-                                                id = "",
-                                                number = lastEpisode.episode,
-                                            )
+                                    episodes = listOf(
+                                        Episode(
+                                            id = "",
+                                            number = lastEpisode.episode,
                                         )
                                     )
                                 )
-                            } ?: listOf(),
-                        )
-                    }
+                            )
+                        } ?: listOf(),
+                    )
                 }
             }
         )
@@ -657,49 +630,43 @@ object SflixProvider : Provider {
                     ?.attr("href")?.substringAfterLast("-") ?: ""
                 val showTitle = it.selectFirst("h2.film-name")
                     ?.text() ?: ""
+                val showInfo = it.select("div.film-detail > div.fd-infor > span").toInfo()
                 val showPoster = it.selectFirst("div.film-poster > img.film-poster-img")
                     ?.attr("data-src")
 
-                when {
-                    it.isMovie() -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                if (it.isMovie()) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        released = showInfo.released,
+                        quality = showInfo.quality,
+                        rating = showInfo.rating,
+                        poster = showPoster,
+                    )
+                } else {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        quality = showInfo.quality,
+                        rating = showInfo.rating,
+                        poster = showPoster,
 
-                        Movie(
-                            id = showId,
-                            title = showTitle,
-                            released = info.released,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = showPoster,
-                        )
-                    }
-                    else -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                        seasons = showInfo.lastEpisode?.let { lastEpisode ->
+                            listOf(
+                                Season(
+                                    id = "",
+                                    number = lastEpisode.season,
 
-                        TvShow(
-                            id = showId,
-                            title = showTitle,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = showPoster,
-
-                            seasons = info.lastEpisode?.let { lastEpisode ->
-                                listOf(
-                                    Season(
-                                        id = "",
-                                        number = lastEpisode.season,
-
-                                        episodes = listOf(
-                                            Episode(
-                                                id = "",
-                                                number = lastEpisode.episode,
-                                            )
+                                    episodes = listOf(
+                                        Episode(
+                                            id = "",
+                                            number = lastEpisode.episode,
                                         )
                                     )
                                 )
-                            } ?: listOf(),
-                        )
-                    }
+                            )
+                        } ?: listOf(),
+                    )
                 }
             },
         )
