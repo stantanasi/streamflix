@@ -599,7 +599,7 @@ object AllMoviesForYouProvider : Provider {
         return tvShow
     }
 
-    override suspend fun getSeasonEpisodes(seasonId: String): List<Episode> {
+    override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
         val document = service.getSeasonEpisodes(seasonId)
 
         val episodes = document.select("section.SeasonBx tr.Viewed").map {

@@ -31,7 +31,7 @@ interface Provider {
 
     suspend fun getTvShow(id: String): TvShow
 
-    suspend fun getSeasonEpisodes(seasonId: String): List<Episode>
+    suspend fun getEpisodesBySeason(seasonId: String): List<Episode>
 
 
     suspend fun getGenre(id: String): Genre
