@@ -16,6 +16,7 @@ import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
@@ -321,7 +322,85 @@ object AniwatchProvider : Provider {
 
 
     override suspend fun getMovie(id: String): Movie {
-        TODO("Not yet implemented")
+        val document = service.getMovie(id)
+
+        val movie = Movie(
+            id = id,
+            title = document.selectFirst("div.anisc-detail h2.film-name")
+                ?.text() ?: "",
+            overview = document.selectFirst("div.anisc-detail div.film-description  > .text")
+                ?.text() ?: "",
+            released = document.select("div.anisc-info div.item")
+                .find { it.selectFirst("span.item-head")?.text() == "Aired:" }
+                ?.selectFirst("span.name")?.text()?.substringBefore(" to"),
+            runtime = document.select("div.anisc-info div.item")
+                .find { it.selectFirst("span.item-head")?.text() == "Duration:" }
+                ?.selectFirst("span.name")?.text()?.let {
+                    val hours = it.substringBefore("h").toIntOrNull() ?: 0
+                    val minutes = it.substringAfter("h ").substringBefore("m").toIntOrNull() ?: 0
+                    hours * 60 + minutes
+                },
+            youtubeTrailerId = document.select("section.block_area-promotions div.item")
+                .firstOrNull { it.attr("data-src").contains("youtube") }
+                ?.attr("data-src")?.substringAfterLast("/"),
+            rating = document.select("div.anisc-info div.item")
+                .find { it.selectFirst("span.item-head")?.text() == "MAL Score:" }
+                ?.selectFirst("span.name")?.text()?.toDoubleOrNull(),
+            poster = document.selectFirst("div.anisc-poster img")
+                ?.attr("src"),
+
+            genres = document.select("div.anisc-info div.item")
+                .find { it.selectFirst("span.item-head")?.text() == "Genres:" }
+                ?.select("a")?.map {
+                    Genre(
+                        id = it.attr("href").substringAfter("/genre/"),
+                        name = it.text(),
+                    )
+                } ?: listOf(),
+            cast = document.select("div.block-actors-content div.bac-item").map {
+                People(
+                    id = it.selectFirst("div.rtl a")
+                        ?.attr("href")?.substringAfterLast("/") ?: "",
+                    name = it.selectFirst("div.rtl h4.pi-name")
+                        ?.text() ?: "",
+                    image = it.selectFirst("div.rtl img")
+                        ?.attr("data-src"),
+                )
+            }.filter { it.name.isNotEmpty() },
+            recommendations = document.select("section.block_area_category")
+                .find { it.selectFirst("h2.cat-heading")?.text() == "Recommended for you" }
+                ?.select("div.flw-item")?.map {
+                    val showId = it.selectFirst("a")
+                        ?.attr("href")?.substringAfterLast("/") ?: ""
+                    val showTitle = it.selectFirst("h3.film-name")
+                        ?.text() ?: ""
+                    val showRuntime = it.selectFirst("div.fd-infor span.fdi-duration")
+                        ?.text()?.substringBefore("m")?.toIntOrNull()
+                    val showPoster = it.selectFirst("img")
+                        ?.attr("data-src")
+
+                    val isMovie = it.selectFirst("div.fd-infor > span.fdi-item")
+                        ?.text() == "Movie"
+
+                    if (isMovie) {
+                        Movie(
+                            id = showId,
+                            title = showTitle,
+                            runtime = showRuntime,
+                            poster = showPoster,
+                        )
+                    } else {
+                        TvShow(
+                            id = showId,
+                            title = showTitle,
+                            runtime = showRuntime,
+                            poster = showPoster,
+                        )
+                    }
+                } ?: listOf(),
+        )
+
+        return movie
     }
 
 
@@ -381,5 +460,9 @@ object AniwatchProvider : Provider {
 
         @GET("tv")
         suspend fun getTvSeries(): Document
+
+
+        @GET("{id}")
+        suspend fun getMovie(@Path("id") id: String): Document
     }
 }
