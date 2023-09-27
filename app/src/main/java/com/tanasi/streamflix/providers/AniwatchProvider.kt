@@ -2,6 +2,7 @@ package com.tanasi.streamflix.providers
 
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
@@ -11,6 +12,7 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.retry
 import okhttp3.OkHttpClient
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -605,7 +607,37 @@ object AniwatchProvider : Provider {
 
 
     override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
-        TODO("Not yet implemented")
+        val episodeId = when (videoType) {
+            is PlayerFragment.VideoType.Movie -> {
+                val response = service.getTvShowEpisodes(tvShowId = id.substringAfterLast("-"))
+
+                Jsoup.parse(response.html).select("div.ss-list > a[href].ssl-item.ep-item")
+                    .firstOrNull()
+                    ?.let {
+                        it.selectFirst("a")
+                            ?.attr("href")?.substringAfterLast("=")
+                    } ?: ""
+            }
+            is PlayerFragment.VideoType.Episode -> id
+        }
+
+        val servers = Jsoup.parse(service.getServers(episodeId).html)
+            .select("div.server-item[data-type][data-id]").map {
+                object {
+                    val id = it.attr("data-id")
+                    val name = it.text().trim()
+                }
+            }
+
+        if (servers.isEmpty()) throw Exception("No links found")
+
+        val video = retry(servers.size) { attempt ->
+            val link = service.getLink(servers.getOrNull(attempt - 1)?.id ?: "")
+
+            Extractor.extract(link.link)
+        }
+
+        return video
     }
 
 
@@ -662,11 +694,26 @@ object AniwatchProvider : Provider {
         suspend fun getPeople(@Path("id") id: String): Document
 
 
+        @GET("ajax/v2/episode/servers")
+        suspend fun getServers(@Query("episodeId") episodeId: String): Response
+
+        @GET("ajax/v2/episode/sources")
+        suspend fun getLink(@Query("id") id: String): Link
+
+
         data class Response(
             val status: Boolean,
             val html: String,
             val totalItems: Int? = null,
             val continueWatch: Boolean? = null,
+        )
+
+        data class Link(
+            val type: String = "",
+            val link: String = "",
+            val sources: List<String> = listOf(),
+            val tracks: List<String> = listOf(),
+            val title: String = "",
         )
     }
 }
