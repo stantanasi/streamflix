@@ -16,6 +16,7 @@ import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 object AniwatchProvider : Provider {
@@ -208,7 +209,55 @@ object AniwatchProvider : Provider {
     }
 
     override suspend fun search(query: String): List<AppAdapter.Item> {
-        TODO("Not yet implemented")
+        if (query.isEmpty()) {
+            val document = service.getHome()
+
+            val genres = document.select("div#sidebar_subs_genre a.nav-link")
+                .map {
+                    Genre(
+                        id = it.attr("href")
+                            .substringAfterLast("/"),
+                        name = it.text(),
+                    )
+                }
+                .sortedBy { it.name }
+
+            return genres
+        }
+
+        val document = service.search(query.replace(" ", "+"))
+
+        val results = document.select("div.flw-item").map {
+            val id = it.selectFirst("a")
+                ?.attr("href")?.substringAfterLast("/") ?: ""
+            val title = it.selectFirst("h3.film-name")
+                ?.text() ?: ""
+            val runtime = it.selectFirst("span.fdi-duration")
+                ?.text()?.removeSuffix("m")?.toIntOrNull()
+            val poster = it.selectFirst("img.film-poster-img")
+                ?.attr("data-src")
+
+            val isMovie = it.selectFirst("div.fd-infor > span.fdi-item")
+                ?.text() == "Movie"
+
+            if (isMovie) {
+                Movie(
+                    id = id,
+                    title = title,
+                    runtime = runtime,
+                    poster = poster,
+                )
+            } else {
+                TvShow(
+                    id = id,
+                    title = title,
+                    runtime = runtime,
+                    poster = poster,
+                )
+            }
+        }
+
+        return results
     }
 
     override suspend fun getMovies(): List<Movie> {
@@ -272,5 +321,8 @@ object AniwatchProvider : Provider {
 
         @GET("home")
         suspend fun getHome(): Document
+
+        @GET("search")
+        suspend fun search(@Query("keyword", encoded = true) keyword: String): Document
     }
 }
