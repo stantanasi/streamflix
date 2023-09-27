@@ -2,6 +2,7 @@ package com.tanasi.streamflix.providers
 
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.*
 import com.tanasi.streamflix.utils.JsUnpacker
@@ -822,40 +823,13 @@ object AllMoviesForYouProvider : Provider {
                     service.getLink(src)
                         .selectFirst("body iframe")
                         ?.attr("src")
-                        ?.replace("streamhub.to/d/", "streamhub.to/e/")
                 } else {
                     src
                 }
             }
 
         val video = retry(links.size) { attempt ->
-            val link = service.getSource(links.getOrNull(attempt - 1) ?: "")
-
-            val packedJS = Regex("(eval\\(function\\(p,a,c,k,e,d\\)(.|\\n)*?)</script>")
-                .find(link.toString())?.let { it.groupValues[1] }
-                ?: throw Exception("No sources found")
-
-            val unPacked = JsUnpacker(packedJS).unpack()
-                ?: throw Exception("No sources found")
-
-            val sources = Regex("src:\"(.*?)\"").findAll(
-                Regex("\\{sources:\\[(.*?)]")
-                    .find(unPacked)?.let { it.groupValues[1] }
-                    ?: throw Exception("No sources found")
-            ).map { it.groupValues[1] }.toList()
-
-            Video(
-                sources = sources,
-                subtitles = link.select("video > track")
-                    .map {
-                        Video.Subtitle(
-                            label = it.attr("label"),
-                            file = it.attr("src"),
-                        )
-                    }
-                    .filter { it.label != "Upload SRT" }
-                    .sortedBy { it.label }
-            )
+            Extractor.extract(links.getOrNull(attempt - 1) ?: "")
         }
 
         return video
