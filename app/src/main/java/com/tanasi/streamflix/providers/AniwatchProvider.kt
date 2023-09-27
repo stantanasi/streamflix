@@ -282,7 +282,41 @@ object AniwatchProvider : Provider {
     }
 
     override suspend fun getTvShows(): List<TvShow> {
-        TODO("Not yet implemented")
+        val document = service.getTvSeries()
+
+        val tvShows = document.select("div.flw-item").map {
+            TvShow(
+                id = it.selectFirst("a")
+                    ?.attr("href")?.substringAfterLast("/") ?: "",
+                title = it.selectFirst("h3.film-name")
+                    ?.text() ?: "",
+                overview = it.selectFirst("div.description")
+                    ?.text() ?: "",
+                runtime = it.selectFirst("div.fd-infor span.fdi-duration")
+                    ?.text()?.removeSuffix("m")?.toIntOrNull(),
+                poster = it.selectFirst("img.film-poster-img")
+                    ?.attr("data-src"),
+
+                seasons = it.selectFirst("div.tick-sub")
+                    ?.text()?.toIntOrNull()?.let { lastEpisode ->
+                        listOf(
+                            Season(
+                                id = "",
+                                number = 0,
+
+                                episodes = listOf(
+                                    Episode(
+                                        id = "",
+                                        number = lastEpisode,
+                                    )
+                                )
+                            )
+                        )
+                    } ?: listOf(),
+            )
+        }
+
+        return tvShows
     }
 
 
@@ -344,5 +378,8 @@ object AniwatchProvider : Provider {
 
         @GET("movie")
         suspend fun getMovies(): Document
+
+        @GET("tv")
+        suspend fun getTvSeries(): Document
     }
 }
