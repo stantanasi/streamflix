@@ -22,12 +22,12 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-class Rabbitstream : Extractor() {
+open class Rabbitstream : Extractor() {
 
     override val name = "Rabbitstream"
     override val mainUrl = "https://rabbitstream.net"
-    private val embed = "ajax/embed-4"
-    private val key = "https://raw.githubusercontent.com/enimax-anime/key/e4/key.txt"
+    protected open val embed = "ajax/embed-4"
+    protected open val key = "https://raw.githubusercontent.com/enimax-anime/key/e4/key.txt"
 
     override suspend fun extract(link: String): Video {
         val service = Service.build(mainUrl)
@@ -59,6 +59,15 @@ class Rabbitstream : Extractor() {
         )
 
         return video
+    }
+
+
+    class Megacloud : Rabbitstream() {
+
+        override val name = "Megacloud"
+        override val mainUrl = "https://megacloud.tv"
+        override val embed = "embed-2/ajax/e-1"
+        override val key = "https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt"
     }
 
 
