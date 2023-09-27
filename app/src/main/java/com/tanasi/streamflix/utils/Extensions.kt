@@ -27,6 +27,7 @@ fun String.toCalendar(): Calendar? {
     val patterns = listOf(
         SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH),
         SimpleDateFormat("yyyy", Locale.ENGLISH),
+        SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH),
     )
     patterns.forEach { sdf ->
         try {
