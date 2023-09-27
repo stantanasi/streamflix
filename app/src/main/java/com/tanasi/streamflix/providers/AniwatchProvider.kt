@@ -560,7 +560,47 @@ object AniwatchProvider : Provider {
 
 
     override suspend fun getPeople(id: String): People {
-        TODO("Not yet implemented")
+        val document = service.getPeople(id)
+
+        val people = People(
+            id = id,
+            name = document.selectFirst("h4.name")
+                ?.text() ?: "",
+            image = document.selectFirst("div.avatar img")
+                ?.attr("src"),
+
+            filmography = document.select("div.bac-item").map {
+                val showId = it.selectFirst("div.anime-info a")
+                    ?.attr("href")?.substringAfterLast("/") ?: ""
+                val showTitle = it.selectFirst("div.anime-info h4.pi-name")
+                    ?.text() ?: ""
+                val showReleased = it.selectFirst("div.anime-info div.pi-detail span.pi-cast")
+                    ?.text()?.substringAfterLast(", ")
+                val showPoster = it.selectFirst("div.anime-info img")
+                    ?.attr("src")
+
+                val isMovie = it.selectFirst("div.anime-info div.pi-detail span.pi-cast")
+                    ?.text()?.substringBefore(", ") == "Movie"
+
+                if (isMovie) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        released = showReleased,
+                        poster = showPoster,
+                    )
+                } else {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        released = showReleased,
+                        poster = showPoster,
+                    )
+                }
+            }
+        )
+
+        return people
     }
 
 
@@ -616,6 +656,10 @@ object AniwatchProvider : Provider {
 
         @GET("genre/{id}")
         suspend fun getGenre(@Path("id") id: String): Document
+
+
+        @GET("people/{id}")
+        suspend fun getPeople(@Path("id") id: String): Document
 
 
         data class Response(
