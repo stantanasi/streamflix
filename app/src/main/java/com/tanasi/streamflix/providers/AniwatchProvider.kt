@@ -12,6 +12,7 @@ import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import okhttp3.OkHttpClient
+import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -494,7 +495,20 @@ object AniwatchProvider : Provider {
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
-        TODO("Not yet implemented")
+        val response = service.getTvShowEpisodes(tvShowId = seasonId)
+
+        val episodes = Jsoup.parse(response.html).select("div.ss-list > a[href].ssl-item.ep-item").map {
+            Episode(
+                id = it.selectFirst("a")
+                    ?.attr("href")?.substringAfterLast("=") ?: "",
+                number = it.selectFirst("div.ssli-order")
+                    ?.text()?.toIntOrNull() ?: 0,
+                title = it.selectFirst("div.ep-name")
+                    ?.text() ?: "",
+            )
+        }
+
+        return episodes
     }
 
 
@@ -553,5 +567,16 @@ object AniwatchProvider : Provider {
 
         @GET("{id}")
         suspend fun getTvShow(@Path("id") id: String): Document
+
+        @GET("ajax/v2/episode/list/{id}")
+        suspend fun getTvShowEpisodes(@Path("id") tvShowId: String): Response
+
+
+        data class Response(
+            val status: Boolean,
+            val html: String,
+            val totalItems: Int? = null,
+            val continueWatch: Boolean? = null,
+        )
     }
 }
