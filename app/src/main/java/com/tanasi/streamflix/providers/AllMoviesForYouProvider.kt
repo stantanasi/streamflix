@@ -20,8 +20,8 @@ import java.util.concurrent.TimeUnit
 object AllMoviesForYouProvider : Provider {
 
     override val name = "AllMoviesForYou"
-    override val logo = "https://i0.wp.com/allmoviesforyou.net/wp-content/uploads/2021/04/cropped-cropped-allmoviesforyou-logo-header-HD.png?w=800&ssl=1"
-    override val url = "https://allmoviesforyou.net/"
+    override val logo = "https://anymovie.cc/wp-content/uploads/2023/08/AM-LOGO-1.png"
+    override val url = "https://anymovie.cc/"
 
     private val service = AllMoviesForYouService.build()
 
