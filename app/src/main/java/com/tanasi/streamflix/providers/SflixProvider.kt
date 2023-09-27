@@ -1,9 +1,9 @@
 package com.tanasi.streamflix.providers
 
-import android.util.Base64
 import com.google.gson.*
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.*
 import com.tanasi.streamflix.utils.retry
@@ -15,13 +15,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import java.lang.Integer.min
-import java.lang.reflect.Type
-import java.nio.charset.StandardCharsets
-import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
-import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 object SflixProvider : Provider {
 
@@ -691,33 +685,7 @@ object SflixProvider : Provider {
         val video = retry(min(servers.size, 2)) { attempt ->
             val link = service.getLink(servers.getOrNull(attempt - 1)?.id ?: "")
 
-            val response = service.getSources(
-                url = link.link
-                    .substringBeforeLast("/")
-                    .replace("/embed", "/ajax/embed")
-                    .plus("/getSources"),
-                id = link.link.substringAfterLast("/").substringBefore("?"),
-            )
-
-            val sources = when (response) {
-                is SflixService.Sources -> response
-                is SflixService.Sources.Encrypted -> response.decrypt(
-                    enikey = service.getSourceEncryptedKey()
-                )
-            }
-
-            Video(
-                sources = sources.sources.map { it.file },
-                subtitles = sources.tracks
-                    .filter { it.kind == "captions" }
-                    .map {
-                        Video.Subtitle(
-                            label = it.label,
-                            file = it.file,
-                            default = it.default,
-                        )
-                    }
-            )
+            Extractor.extract(link.link)
         }
 
         return video
@@ -759,16 +727,7 @@ object SflixProvider : Provider {
                 val retrofit = Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(JsoupConverterFactory.create())
-                    .addConverterFactory(
-                        GsonConverterFactory.create(
-                            GsonBuilder()
-                                .registerTypeAdapter(
-                                    SourcesResponse::class.java,
-                                    SourcesResponse.Deserializer(),
-                                )
-                                .create()
-                        )
-                    )
+                    .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
                     .build()
 
@@ -821,23 +780,6 @@ object SflixProvider : Provider {
         @GET("ajax/get_link/{id}")
         suspend fun getLink(@Path("id") id: String): Link
 
-        @GET
-        @Headers(
-            "Accept: */*",
-            "Accept-Language: en-US,en;q=0.5",
-            "Connection: keep-alive",
-            "referer: https://sflix.to",
-            "TE: trailers",
-            "X-Requested-With: XMLHttpRequest",
-        )
-        suspend fun getSources(
-            @Url url: String,
-            @Query("id") id: String,
-        ): SourcesResponse
-
-        @GET("https://raw.githubusercontent.com/enimax-anime/key/e4/key.txt")
-        suspend fun getSourceEncryptedKey(): List<List<Int>>
-
 
         data class Link(
             val type: String = "",
@@ -846,115 +788,5 @@ object SflixProvider : Provider {
             val tracks: List<String> = listOf(),
             val title: String = "",
         )
-
-        sealed class SourcesResponse {
-            class Deserializer : JsonDeserializer<SourcesResponse> {
-                override fun deserialize(
-                    json: JsonElement?,
-                    typeOfT: Type?,
-                    context: JsonDeserializationContext?
-                ): SourcesResponse {
-                    val jsonObject = json?.asJsonObject ?: JsonObject()
-
-                    return when (jsonObject.get("sources")?.isJsonArray ?: false) {
-                        true -> Gson().fromJson(json, Sources::class.java)
-                        false -> Gson().fromJson(json, Sources.Encrypted::class.java)
-                    }
-                }
-            }
-        }
-
-        data class Sources(
-            val sources: List<Source> = listOf(),
-            val sourcesBackup: List<Source> = listOf(),
-            val tracks: List<Track> = listOf(),
-            val server: Int? = null,
-        ) : SourcesResponse() {
-
-            data class Encrypted(
-                val sources: String,
-                val sourcesBackup: String? = null,
-                val tracks: List<Track> = listOf(),
-                val server: Int? = null,
-            ) : SourcesResponse() {
-                fun decrypt(enikey: List<List<Int>>): Sources {
-                    fun extract(
-                        encryptedSources: String,
-                        key: List<List<Int>>
-                    ): Pair<String, String> {
-                        var extractedSources = ""
-                        var extractedKey = ""
-
-                        for (i in encryptedSources.indices) {
-                            val currentKey = key.firstOrNull { i < it[1] } ?: key[0]
-
-                            if (i in currentKey[0] until currentKey[1]) {
-                                extractedKey += encryptedSources[i]
-                            } else {
-                                extractedSources += encryptedSources[i]
-                            }
-                        }
-
-                        return extractedSources to extractedKey
-                    }
-
-                    fun decryptSourceUrl(decryptionKey: ByteArray, sourceUrl: String): String {
-                        val cipherData = Base64.decode(sourceUrl, Base64.DEFAULT)
-                        val encrypted = cipherData.copyOfRange(16, cipherData.size)
-                        val aesCBC = Cipher.getInstance("AES/CBC/PKCS5Padding")!!
-
-                        aesCBC.init(
-                            Cipher.DECRYPT_MODE,
-                            SecretKeySpec(
-                                decryptionKey.copyOfRange(0, 32),
-                                "AES"
-                            ),
-                            IvParameterSpec(decryptionKey.copyOfRange(32, decryptionKey.size))
-                        )
-                        val decryptedData = aesCBC.doFinal(encrypted)
-                        return String(decryptedData, StandardCharsets.UTF_8)
-                    }
-
-                    fun generateKey(salt: ByteArray, secret: ByteArray): ByteArray {
-                        fun md5(input: ByteArray) = MessageDigest.getInstance("MD5").digest(input)
-
-                        var key = md5(secret + salt)
-                        var currentKey = key
-                        while (currentKey.size < 48) {
-                            key = md5(key + secret + salt)
-                            currentKey += key
-                        }
-                        return currentKey
-                    }
-
-                    val (extractedSources, extractedKey) = extract(sources, enikey)
-
-                    val decrypted = decryptSourceUrl(
-                        generateKey(
-                            Base64.decode(extractedSources, Base64.DEFAULT).copyOfRange(8, 16),
-                            extractedKey.toByteArray(),
-                        ),
-                        extractedSources,
-                    )
-
-                    return Sources(
-                        sources = Gson().fromJson(decrypted, Array<Source>::class.java).toList(),
-                        tracks = tracks
-                    )
-                }
-            }
-
-            data class Source(
-                val file: String = "",
-                val type: String = "",
-            )
-
-            data class Track(
-                val file: String = "",
-                val label: String = "",
-                val kind: String = "",
-                val default: Boolean = false,
-            )
-        }
     }
 }
