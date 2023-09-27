@@ -513,7 +513,49 @@ object AniwatchProvider : Provider {
 
 
     override suspend fun getGenre(id: String): Genre {
-        TODO("Not yet implemented")
+        val document = service.getGenre(id)
+
+        val genre = Genre(
+            id = id,
+            name = document.selectFirst("h2.cat-heading")
+                ?.text() ?: "",
+
+            shows = document.select("div.flw-item").map {
+                val showId = it.selectFirst("a")
+                    ?.attr("href")?.substringAfterLast("/") ?: ""
+                val showTitle =  it.selectFirst("h3.film-name")
+                    ?.text() ?: ""
+                val showOverview = it.selectFirst("div.description")
+                    ?.text() ?: ""
+                val showRuntime = it.selectFirst("div.fd-infor span.fdi-duration")
+                    ?.text()?.substringBefore("m")?.toIntOrNull()
+                val showPoster = it.selectFirst("img")
+                    ?.attr("data-src")
+
+                val isMovie = it.selectFirst("div.fd-infor > span.fdi-item")
+                    ?.text() == "Movie"
+
+                if (isMovie) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        overview = showOverview,
+                        runtime = showRuntime,
+                        poster = showPoster,
+                    )
+                } else {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        overview = showOverview,
+                        runtime = showRuntime,
+                        poster = showPoster,
+                    )
+                }
+            }
+        )
+
+        return genre
     }
 
 
@@ -570,6 +612,10 @@ object AniwatchProvider : Provider {
 
         @GET("ajax/v2/episode/list/{id}")
         suspend fun getTvShowEpisodes(@Path("id") tvShowId: String): Response
+
+
+        @GET("genre/{id}")
+        suspend fun getGenre(@Path("id") id: String): Document
 
 
         data class Response(
