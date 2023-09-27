@@ -5,7 +5,7 @@ import com.tanasi.streamflix.adapters.AppAdapter
 class People(
     val id: String,
     val name: String,
-    val image: String = "",
+    val image: String? = null,
 
     val filmography: List<Show> = listOf(),
 ) : AppAdapter.Item {
