@@ -49,9 +49,15 @@ class EpisodeViewHolder(
                     SeasonFragmentDirections.actionSeasonToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
-                        subtitle = context.getString(
-                            R.string.player_subtitle_tv_show,
-                            episode.season?.number ?: 0,
+                        subtitle = episode.season?.let { season ->
+                            context.getString(
+                                R.string.player_subtitle_tv_show,
+                                season.number,
+                                episode.number,
+                                episode.title
+                            )
+                        } ?: context.getString(
+                            R.string.player_subtitle_tv_show_episode_only,
                             episode.number,
                             episode.title
                         ),
@@ -193,9 +199,15 @@ class EpisodeViewHolder(
 
         binding.tvEpisodeTvShowTitle.text = episode.tvShow?.title ?: ""
 
-        binding.tvEpisodeInfo.text = context.getString(
-            R.string.episode_item_info,
-            episode.season?.number ?: 0,
+        binding.tvEpisodeInfo.text = episode.season?.let { season ->
+            context.getString(
+                R.string.episode_item_info,
+                season.number,
+                episode.number,
+                episode.title
+            )
+        } ?: context.getString(
+            R.string.episode_item_info_episode_only,
             episode.number,
             episode.title
         )
