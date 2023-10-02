@@ -275,7 +275,7 @@ class TvShowViewHolder(
         binding.hgvTvShowSeasons.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.seasons.reversed())
+                items.addAll(tvShow.seasons)
             }
             setItemSpacing(80)
         }
