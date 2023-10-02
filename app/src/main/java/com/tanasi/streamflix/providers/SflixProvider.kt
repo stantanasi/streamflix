@@ -699,7 +699,7 @@ object SflixProvider : Provider {
         object {
             val rating = it.find { s -> s.matches("^\\d(?:\\.\\d)?\$".toRegex()) }?.toDoubleOrNull()
 
-            val quality = it.find { s -> s in listOf("HD", "SD", "CAM", "TS") }
+            val quality = it.find { s -> s in listOf("HD", "SD", "CAM", "TS", "HDRip") }
 
             val released = it.find { s -> s.matches("\\d{4}".toRegex()) }
 
