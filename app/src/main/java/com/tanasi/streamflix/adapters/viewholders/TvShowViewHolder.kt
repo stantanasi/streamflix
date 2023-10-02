@@ -118,11 +118,18 @@ class TvShowViewHolder(
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
-                context.getString(
-                    R.string.tv_show_item_season_number_episode_number,
-                    season.number,
-                    episode.number
-                )
+                if (season.number != 0) {
+                    context.getString(
+                        R.string.tv_show_item_season_number_episode_number,
+                        season.number,
+                        episode.number
+                    )
+                } else {
+                    context.getString(
+                        R.string.tv_show_item_episode_number,
+                        episode.number
+                    )
+                }
             }
         } ?: context.getString(R.string.tv_show_item_type)
 
@@ -175,11 +182,18 @@ class TvShowViewHolder(
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
-                context.getString(
-                    R.string.tv_show_item_season_number_episode_number,
-                    season.number,
-                    episode.number
-                )
+                if (season.number != 0) {
+                    context.getString(
+                        R.string.tv_show_item_season_number_episode_number,
+                        season.number,
+                        episode.number
+                    )
+                } else {
+                    context.getString(
+                        R.string.tv_show_item_episode_number,
+                        episode.number
+                    )
+                }
             }
         } ?: context.getString(R.string.tv_show_item_type)
 

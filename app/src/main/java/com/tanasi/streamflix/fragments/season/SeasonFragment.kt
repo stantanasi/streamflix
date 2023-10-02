@@ -75,18 +75,20 @@ class SeasonFragment : Fragment() {
     private fun displaySeason(episodes: List<Episode>) {
         appAdapter.items.apply {
             clear()
-            addAll(episodes.onEach {
-                it.tvShow = TvShow(
+            addAll(episodes.onEach { episode ->
+                episode.tvShow = TvShow(
                     id = args.tvShowId,
                     title = args.tvShowTitle,
                     poster = args.tvShowPoster,
                     banner = args.tvShowBanner,
                 )
-                it.season = Season(
-                    id = args.seasonId,
-                    number = args.seasonNumber,
-                    title = args.seasonTitle,
-                )
+                episode.season = args.seasonNumber.takeIf { it != 0 }?.let {
+                    Season(
+                        id = args.seasonId,
+                        number = args.seasonNumber,
+                        title = args.seasonTitle,
+                    )
+                }
             })
         }
         appAdapter.notifyDataSetChanged()
