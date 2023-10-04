@@ -77,6 +77,8 @@ class HomeFragment : Fragment() {
             adapter = appAdapter
             setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
         }
+
+        binding.root.requestFocus()
     }
 
     private fun displayHome(categories: List<Category>) {

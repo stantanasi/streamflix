@@ -66,6 +66,8 @@ class TvShowsFragment : Fragment() {
                 requireContext().resources.getDimension(R.dimen.tv_shows_spacing).toInt()
             )
         }
+
+        binding.root.requestFocus()
     }
 
     private fun displayTvShows(tvShows: List<TvShow>) {

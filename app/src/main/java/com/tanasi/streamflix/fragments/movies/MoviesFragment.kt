@@ -64,6 +64,8 @@ class MoviesFragment : Fragment() {
             adapter = appAdapter
             setItemSpacing(requireContext().resources.getDimension(R.dimen.movies_spacing).toInt())
         }
+
+        binding.root.requestFocus()
     }
 
     private fun displayMovies(movies: List<Movie>) {

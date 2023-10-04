@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.activities.main
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -43,6 +44,10 @@ class MainActivity : FragmentActivity() {
         }
 
         binding.navMain.setupWithNavController(navController)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            binding.navMainFragment.isFocusedByDefault = true
+        }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.navMain.headerView?.apply {
