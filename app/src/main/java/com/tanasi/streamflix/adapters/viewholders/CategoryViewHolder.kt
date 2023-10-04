@@ -125,12 +125,10 @@ class CategoryViewHolder(
             setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> fragment.updateBackground(
-                            when (selected) {
-                                is Movie -> selected.banner
-                                is TvShow -> selected.banner
-                            }
-                        )
+                        is HomeFragment -> when (selected) {
+                            is Movie -> fragment.updateBackground(selected.banner)
+                            is TvShow -> fragment.updateBackground(selected.banner)
+                        }
                     }
                 }
             }
@@ -142,8 +140,7 @@ class CategoryViewHolder(
                                 (category.selectedIndex + 1) % category.list.size
 
                             when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                                is HomeFragment -> when (val it =
-                                    category.list[category.selectedIndex]) {
+                                is HomeFragment -> when (val it = category.list[category.selectedIndex]) {
                                     is Movie -> fragment.updateBackground(it.banner)
                                     is TvShow -> fragment.updateBackground(it.banner)
                                 }

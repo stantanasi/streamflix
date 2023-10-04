@@ -85,10 +85,12 @@ class HomeFragment : Fragment() {
         appAdapter.items.apply {
             clear()
 
-            categories.find { it.name == Category.FEATURED }?.let { category ->
-                category.itemType = AppAdapter.Type.CATEGORY_SWIPER
-                add(category)
-            }
+            categories
+                .find { it.name == Category.FEATURED }
+                ?.let { category ->
+                    category.itemType = AppAdapter.Type.CATEGORY_SWIPER
+                    add(category)
+                }
 
             Category(
                 name = getString(R.string.home_continue_watching),

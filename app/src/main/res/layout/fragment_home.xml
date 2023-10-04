@@ -32,7 +32,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/item_category" />
+        tools:itemCount="1"
+        tools:listitem="@layout/content_category_swiper" />
 
     <include
         android:id="@+id/is_loading"

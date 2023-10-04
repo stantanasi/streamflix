@@ -34,9 +34,9 @@ class MainActivity : FragmentActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navController = (supportFragmentManager
-            .findFragmentById(binding.navMainFragment.id) as NavHostFragment)
-            .navController
+        val navHostFragment = this.supportFragmentManager
+            .findFragmentById(R.id.nav_main_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
 
         UserPreferences.setup(this)
         UserPreferences.currentProvider?.let {
