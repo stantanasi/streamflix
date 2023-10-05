@@ -5,7 +5,6 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.*
-import com.tanasi.streamflix.utils.JsUnpacker
 import com.tanasi.streamflix.utils.retry
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
@@ -17,9 +16,9 @@ import retrofit2.http.Query
 import retrofit2.http.Url
 import java.util.concurrent.TimeUnit
 
-object AllMoviesForYouProvider : Provider {
+object AnyMovie : Provider {
 
-    override val name = "AllMoviesForYou"
+    override val name = "AnyMovie"
     override val logo = "https://anymovie.cc/wp-content/uploads/2023/08/AM-LOGO-1.png"
     override val url = "https://anymovie.cc/"
 
