@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace 'com.tanasi.streamflix'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.tanasi.streamflix"
         minSdk 23
-        targetSdk 33
+        targetSdk 34
         versionCode 9
         versionName "1.3.4"
     }
