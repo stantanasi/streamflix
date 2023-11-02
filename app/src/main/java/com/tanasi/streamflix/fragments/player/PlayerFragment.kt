@@ -153,7 +153,15 @@ class PlayerFragment : Fragment() {
 
 
     private fun initializeVideo() {
-        player = ExoPlayer.Builder(requireContext()).build()
+        player = ExoPlayer.Builder(requireContext()).build().also { player ->
+            player.setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(C.USAGE_MEDIA)
+                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                    .build(),
+                true,
+            )
+        }
 
         mediaSession = MediaSessionCompat(requireContext(), "Player").apply {
             isActive = true
@@ -192,14 +200,6 @@ class PlayerFragment : Fragment() {
     }
 
     private fun displayVideo(video: Video) {
-        player.setAudioAttributes(
-            AudioAttributes.Builder()
-                .setUsage(C.USAGE_MEDIA)
-                .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-                .build(),
-            true,
-        )
-
         player.setMediaItem(
             MediaItem.Builder()
                 .setUri(Uri.parse(video.sources.firstOrNull() ?: ""))
