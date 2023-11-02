@@ -82,7 +82,7 @@ class PlayerSettingsView @JvmOverloads constructor(
     private val windowOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowOpacity.list)
     private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
 
-    fun onBackPressed() {
+    fun onBackPressed(): Boolean {
         when (currentSettings) {
             Setting.MAIN -> hide()
             Setting.QUALITY,
@@ -98,6 +98,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.CAPTION_STYLE_WINDOW_COLOR,
             Setting.CAPTION_STYLE_WINDOW_OPACITY -> displaySettings(Setting.CAPTION_STYLE)
         }
+        return true
     }
 
     override fun focusSearch(focused: View, direction: Int): View {

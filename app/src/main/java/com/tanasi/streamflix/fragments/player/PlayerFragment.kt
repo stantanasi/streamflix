@@ -142,7 +142,6 @@ class PlayerFragment : Fragment() {
     fun onBackPressed(): Boolean = when {
         binding.settings.isVisible -> {
             binding.settings.onBackPressed()
-            true
         }
         binding.pvPlayer.isControllerVisible -> {
             binding.pvPlayer.hideController()
