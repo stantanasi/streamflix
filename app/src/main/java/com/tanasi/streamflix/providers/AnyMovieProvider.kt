@@ -16,7 +16,7 @@ import retrofit2.http.Query
 import retrofit2.http.Url
 import java.util.concurrent.TimeUnit
 
-object AnyMovie : Provider {
+object AnyMovieProvider : Provider {
 
     override val name = "AnyMovie"
     override val logo = "https://anymovie.cc/wp-content/uploads/2023/08/AM-LOGO-1.png"

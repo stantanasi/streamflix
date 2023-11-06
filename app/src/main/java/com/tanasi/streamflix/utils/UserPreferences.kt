@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import com.tanasi.streamflix.BuildConfig
-import com.tanasi.streamflix.providers.AnyMovie
+import com.tanasi.streamflix.providers.AnyMovieProvider
 import com.tanasi.streamflix.providers.AniwatchProvider
 import com.tanasi.streamflix.providers.Provider
 import com.tanasi.streamflix.providers.SflixProvider
@@ -24,7 +24,7 @@ object UserPreferences {
 
     val providers = listOf(
         SflixProvider,
-        AnyMovie,
+        AnyMovieProvider,
         AniwatchProvider,
     )
 
