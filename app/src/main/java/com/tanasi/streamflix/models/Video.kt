@@ -11,4 +11,10 @@ class Video(
         val file: String,
         val default: Boolean = false,
     )
+
+    class Server(
+        val id: String,
+        val name: String,
+        val src: String = "",
+    )
 }
