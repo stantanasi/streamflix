@@ -5,7 +5,6 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.*
-import com.tanasi.streamflix.utils.retry
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -809,29 +808,38 @@ object AnyMovieProvider : Provider {
     }
 
 
-    override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
+    override suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server> {
         val document = when (videoType) {
             is PlayerFragment.VideoType.Movie -> service.getMovie(id)
             is PlayerFragment.VideoType.Episode -> service.getEpisode(id)
         }
 
-        val links = document.select("body iframe")
-            .map { it.attr("src") }
-            .mapNotNull { src ->
-                if (src.contains("trembed")) {
-                    service.getLink(src)
-                        .selectFirst("body iframe")
-                        ?.attr("src")
-                } else {
-                    src
-                }
-            }
-
-        val video = retry(links.size) { attempt ->
-            Extractor.extract(links.getOrNull(attempt - 1) ?: "")
+        val servers = document.select("ul.optnslst button").map {
+            val nmopt = it.selectFirst("span")?.text() ?: ""
+            Video.Server(
+                id = it.attr("data-id"),
+                name = it.select("span")[1]?.text() ?: "",
+                src = document.selectFirst("div#VideoOption${nmopt}")
+                    ?.selectFirst("iframe")
+                    ?.attr("src")
+                    ?: "",
+            )
         }
 
-        return video
+        return servers
+    }
+
+    override suspend fun getVideo(server: Video.Server): Video {
+        val link = if (server.src.contains("trembed")) {
+            service.getLink(server.src)
+                .selectFirst("body iframe")
+                ?.attr("src")
+                ?: ""
+        } else {
+            server.src
+        }
+
+        return Extractor.extract(link)
     }
 
 
