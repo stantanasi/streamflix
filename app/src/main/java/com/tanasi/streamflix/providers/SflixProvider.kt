@@ -6,7 +6,6 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.*
-import com.tanasi.streamflix.utils.retry
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -14,7 +13,6 @@ import org.jsoup.select.Elements
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
-import java.lang.Integer.min
 import java.util.concurrent.TimeUnit
 
 object SflixProvider : Provider {
@@ -668,27 +666,27 @@ object SflixProvider : Provider {
         return people
     }
 
-
-    override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
+    override suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server> {
         val servers = when (videoType) {
             is PlayerFragment.VideoType.Movie -> service.getMovieServers(id)
             is PlayerFragment.VideoType.Episode -> service.getEpisodeServers(id)
-        }.select("a").map {
-            object {
-                val id = it.attr("data-id")
-                val name = it.selectFirst("span")?.text()?.trim() ?: ""
+        }.select("a")
+            .map {
+                Video.Server(
+                    id = it.attr("data-id"),
+                    name = it.selectFirst("span")?.text()?.trim() ?: "",
+                )
             }
-        }
 
         if (servers.isEmpty()) throw Exception("No links found")
 
-        val video = retry(min(servers.size, 2)) { attempt ->
-            val link = service.getLink(servers.getOrNull(attempt - 1)?.id ?: "")
+        return servers
+    }
 
-            Extractor.extract(link.link)
-        }
+    override suspend fun getVideo(server: Video.Server): Video {
+        val link = service.getLink(server.id)
 
-        return video
+        return Extractor.extract(link.link)
     }
 
 
