@@ -32,7 +32,6 @@ import com.tanasi.streamflix.utils.setRgb
 import com.tanasi.streamflix.utils.trackFormats
 import kotlin.math.roundToInt
 
-
 class PlayerSettingsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -83,13 +82,15 @@ class PlayerSettingsView @JvmOverloads constructor(
     private val windowColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowColor.list)
     private val windowOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowOpacity.list)
     private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
+    private val serversAdapter = SettingsAdapter(this, Settings.Server.list)
 
     fun onBackPressed(): Boolean {
         when (currentSettings) {
             Setting.MAIN -> hide()
             Setting.QUALITY,
             Setting.SUBTITLES,
-            Setting.SPEED -> displaySettings(Setting.MAIN)
+            Setting.SPEED,
+            Setting.SERVERS-> displaySettings(Setting.MAIN)
             Setting.CAPTION_STYLE -> displaySettings(Setting.SUBTITLES)
             Setting.CAPTION_STYLE_FONT_COLOR,
             Setting.CAPTION_STYLE_TEXT_SIZE,
@@ -135,6 +136,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 Setting.CAPTION_STYLE_WINDOW_COLOR -> context.getString(R.string.player_settings_caption_style_window_color_title)
                 Setting.CAPTION_STYLE_WINDOW_OPACITY -> context.getString(R.string.player_settings_caption_style_window_opacity_title)
                 Setting.SPEED -> context.getString(R.string.player_settings_speed_title)
+                Setting.SERVERS -> context.getString(R.string.player_settings_servers_title)
             }
         }
 
@@ -152,6 +154,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.CAPTION_STYLE_WINDOW_COLOR -> windowColorAdapter
             Setting.CAPTION_STYLE_WINDOW_OPACITY -> windowOpacityAdapter
             Setting.SPEED -> speedAdapter
+            Setting.SERVERS -> serversAdapter
         }
         binding.rvSettings.requestFocus()
     }
@@ -179,7 +182,8 @@ class PlayerSettingsView @JvmOverloads constructor(
         CAPTION_STYLE_BACKGROUND_OPACITY,
         CAPTION_STYLE_WINDOW_COLOR,
         CAPTION_STYLE_WINDOW_OPACITY,
-        SPEED
+        SPEED,
+        SERVERS,
     }
 
 
@@ -226,6 +230,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 Settings.Quality -> settingsView.displaySettings(Setting.QUALITY)
                                 Settings.Subtitle -> settingsView.displaySettings(Setting.SUBTITLES)
                                 Settings.Speed -> settingsView.displaySettings(Setting.SPEED)
+                                Settings.Server -> settingsView.displaySettings(Setting.SERVERS)
                             }
                         }
 
@@ -421,6 +426,11 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 .withSpeed(item.value)
                             settingsView.hide()
                         }
+
+                        is Settings.Server -> {
+                            settingsView.onServerSelected?.invoke(item)
+                            settingsView.hide()
+                        }
                     }
                 }
             }
@@ -446,6 +456,13 @@ class PlayerSettingsView @JvmOverloads constructor(
                                 ContextCompat.getDrawable(
                                     context,
                                     R.drawable.ic_settings_playback_speed
+                                )
+                            )
+
+                            Settings.Server -> setImageDrawable(
+                                ContextCompat.getDrawable(
+                                    context,
+                                    R.drawable.ic_settings_servers
                                 )
                             )
                         }
@@ -487,6 +504,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                         Settings.Quality -> context.getString(R.string.player_settings_quality_label)
                         Settings.Subtitle -> context.getString(R.string.player_settings_subtitles_label)
                         Settings.Speed -> context.getString(R.string.player_settings_speed_label)
+                        Settings.Server -> context.getString(R.string.player_settings_servers_label)
                     }
 
                     is Settings.Quality -> when (item) {
@@ -543,6 +561,8 @@ class PlayerSettingsView @JvmOverloads constructor(
 
                     is Settings.Speed -> context.getString(item.stringId)
 
+                    is Settings.Server -> item.name
+
                     else -> ""
                 }
             }
@@ -569,6 +589,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                             is Settings.Subtitle.TextTrackInformation -> selected.name
                         }
                         Settings.Speed -> context.getString(Settings.Speed.selected.stringId)
+                        Settings.Server -> Settings.Server.selected?.name ?: ""
                     }
 
                     is Settings.Subtitle -> when (item) {
@@ -656,6 +677,11 @@ class PlayerSettingsView @JvmOverloads constructor(
                     }
 
                     is Settings.Speed -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Server -> when {
                         item.isSelected -> View.VISIBLE
                         else -> View.GONE
                     }
