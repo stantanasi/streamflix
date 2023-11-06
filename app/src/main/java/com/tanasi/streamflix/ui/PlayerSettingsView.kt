@@ -1198,5 +1198,22 @@ class PlayerSettingsView @JvmOverloads constructor(
                 }
             }
         }
+
+        class Server(
+            val id: String,
+            val name: String,
+        ) : Item {
+            var isSelected: Boolean = false
+
+            companion object : Settings() {
+                val list = mutableListOf<Server>()
+
+                val selected: Server?
+                    get() = list.find { it.isSelected }
+
+                fun init(player: ExoPlayer) {
+                }
+            }
+        }
     }
 }
