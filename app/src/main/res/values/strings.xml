@@ -136,4 +136,6 @@
     <string name="player_settings_speed_1_5">× 1.5</string>
     <string name="player_settings_speed_1_75">× 1.75</string>
     <string name="player_settings_speed_2">× 2</string>
+    <string name="player_settings_servers_title">Servers</string>
+    <string name="player_settings_servers_label">Servers</string>
 </resources>
