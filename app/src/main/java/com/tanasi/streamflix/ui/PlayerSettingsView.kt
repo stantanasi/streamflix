@@ -66,6 +66,8 @@ class PlayerSettingsView @JvmOverloads constructor(
         }
     var subtitleView: SubtitleView? = null
 
+    private var onServerSelected: ((Settings.Server) -> Unit)? = null
+
     private var currentSettings = Setting.MAIN
 
     private val settingsAdapter = SettingsAdapter(this, Settings.list)
@@ -156,6 +158,11 @@ class PlayerSettingsView @JvmOverloads constructor(
 
     fun hide() {
         this.visibility = View.GONE
+    }
+
+
+    fun setOnServerSelected(onServerSelected: (server: Settings.Server) -> Unit) {
+        this.onServerSelected = onServerSelected
     }
 
 
