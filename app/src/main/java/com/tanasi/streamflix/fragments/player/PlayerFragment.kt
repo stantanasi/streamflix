@@ -226,6 +226,8 @@ class PlayerFragment : Fragment() {
     }
 
     private fun displayVideo(video: Video, server: Video.Server) {
+        val currentPosition = player.currentPosition
+
         player.setMediaItem(
             MediaItem.Builder()
                 .setUri(Uri.parse(video.sources.firstOrNull() ?: ""))
@@ -324,17 +326,21 @@ class PlayerFragment : Fragment() {
             }
         })
 
-        val lastPlaybackPositionMillis = requireContext().contentResolver.query(
-            TvContractCompat.WatchNextPrograms.CONTENT_URI,
-            WatchNextProgram.PROJECTION,
-            null,
-            null,
-            null
-        )?.map { WatchNextProgram.fromCursor(it) }
-            ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
-            ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
+        if (currentPosition == 0L) {
+            val lastPlaybackPositionMillis = requireContext().contentResolver.query(
+                TvContractCompat.WatchNextPrograms.CONTENT_URI,
+                WatchNextProgram.PROJECTION,
+                null,
+                null,
+                null
+            )?.map { WatchNextProgram.fromCursor(it) }
+                ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
+                ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
 
-        player.seekTo(lastPlaybackPositionMillis ?: 0)
+            player.seekTo(lastPlaybackPositionMillis ?: 0)
+        } else {
+            player.seekTo(currentPosition)
+        }
 
         player.prepare()
         player.play()
