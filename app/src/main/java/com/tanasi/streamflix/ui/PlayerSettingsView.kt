@@ -51,6 +51,13 @@ class PlayerSettingsView @JvmOverloads constructor(
         set(value) {
             if (field === value) return
 
+            value?.let {
+                Settings.Server.init(it)
+                Settings.Quality.init(it, resources)
+                Settings.Subtitle.init(it, resources)
+                Settings.Speed.refresh(it)
+            }
+
             value?.addListener(object : Player.Listener {
                 override fun onEvents(player: Player, events: Player.Events) {
                     if (events.contains(Player.EVENT_PLAYLIST_METADATA_CHANGED)) {
@@ -68,7 +75,6 @@ class PlayerSettingsView @JvmOverloads constructor(
                     }
                 }
             })
-            value?.let { Settings.Speed.refresh(it) }
 
             field = value
         }
