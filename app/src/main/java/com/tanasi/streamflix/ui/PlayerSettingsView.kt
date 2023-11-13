@@ -22,11 +22,14 @@ import com.google.android.exoplayer2.ui.SubtitleView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
+import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.findClosest
 import com.tanasi.streamflix.utils.getAlpha
 import com.tanasi.streamflix.utils.getRgb
 import com.tanasi.streamflix.utils.margin
+import com.tanasi.streamflix.utils.mediaServerId
+import com.tanasi.streamflix.utils.mediaServers
 import com.tanasi.streamflix.utils.setAlpha
 import com.tanasi.streamflix.utils.setRgb
 import com.tanasi.streamflix.utils.trackFormats
@@ -50,6 +53,12 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             value?.addListener(object : Player.Listener {
                 override fun onEvents(player: Player, events: Player.Events) {
+                    if (events.contains(Player.EVENT_PLAYLIST_METADATA_CHANGED)) {
+                        Settings.Server.init(value)
+                    }
+                    if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
+                        Settings.Server.refresh(value)
+                    }
                     if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
                         Settings.Quality.init(value, resources)
                         Settings.Subtitle.init(value, resources)
@@ -720,6 +729,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 Quality,
                 Subtitle,
                 Speed,
+                Server,
             )
         }
 
@@ -1245,6 +1255,21 @@ class PlayerSettingsView @JvmOverloads constructor(
                     get() = list.find { it.isSelected }
 
                 fun init(player: ExoPlayer) {
+                    list.clear()
+                    list.addAll(player.playlistMetadata.mediaServers.map {
+                        Server(
+                            id = it.id,
+                            name = it.name,
+                        )
+                    })
+
+                    list.firstOrNull()?.isSelected = true
+                }
+
+                fun refresh(player: ExoPlayer) {
+                    list.forEach {
+                        it.isSelected = (it.id == player.mediaMetadata.mediaServerId)
+                    }
                 }
             }
         }
