@@ -20,6 +20,7 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
+import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -32,8 +33,11 @@ import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ContentExoControllerBinding
 import com.tanasi.streamflix.databinding.FragmentPlayerBinding
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.map
+import com.tanasi.streamflix.utils.setMediaServerId
+import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration.Companion.minutes
@@ -111,17 +115,40 @@ class PlayerFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                PlayerViewModel.State.Loading -> {}
-                is PlayerViewModel.State.SuccessLoading -> {
-                    displayVideo(state.video)
+                PlayerViewModel.State.LoadingServers -> {}
+                is PlayerViewModel.State.SuccessLoadingServers -> {
+                    player.playlistMetadata = MediaMetadata.Builder()
+                        .setTitle(state.toString())
+                        .setMediaServers(state.servers.map {
+                            MediaServer(
+                                id = it.id,
+                                name = it.name,
+                            )
+                        })
+                        .build()
+                    binding.settings.setOnServerSelected { server ->
+                        viewModel.getVideo(state.servers.find { server.id == it.id }!!)
+                    }
                 }
-                is PlayerViewModel.State.FailedLoading -> {
+                is PlayerViewModel.State.FailedLoadingServers -> {
                     Toast.makeText(
                         requireContext(),
                         state.error.message ?: "",
                         Toast.LENGTH_LONG
                     ).show()
                     findNavController().navigateUp()
+                }
+
+                PlayerViewModel.State.LoadingVideo -> {}
+                is PlayerViewModel.State.SuccessLoadingVideo -> {
+                    displayVideo(state.video, state.server)
+                }
+                is PlayerViewModel.State.FailedLoadingVideo -> {
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message ?: "",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
         }
@@ -198,7 +225,7 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    private fun displayVideo(video: Video) {
+    private fun displayVideo(video: Video, server: Video.Server) {
         player.setMediaItem(
             MediaItem.Builder()
                 .setUri(Uri.parse(video.sources.firstOrNull() ?: ""))
@@ -208,6 +235,11 @@ class PlayerFragment : Fragment() {
                         .setLabel(it.label)
                         .build()
                 })
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setMediaServerId(server.id)
+                        .build()
+                )
                 .build()
         )
 
