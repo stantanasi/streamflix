@@ -625,7 +625,7 @@ object AniwatchProvider : Provider {
             .map {
                 Video.Server(
                     id = it.attr("data-id"),
-                    name = it.text().trim(),
+                    name = "${it.text().trim()} - ${it.attr("data-type").uppercase()}",
                 )
             }
 
