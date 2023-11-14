@@ -27,7 +27,7 @@ open class Rabbitstream : Extractor() {
     override val name = "Rabbitstream"
     override val mainUrl = "https://rabbitstream.net"
     protected open val embed = "ajax/embed-4"
-    protected open val key = "https://raw.githubusercontent.com/enimax-anime/key/e4/key.txt"
+    protected open val key = "http://zoro-keys.freeddns.org/keys/e4/key.txt"
 
     override suspend fun extract(link: String): Video {
         val service = Service.build(mainUrl)
@@ -65,7 +65,7 @@ open class Rabbitstream : Extractor() {
         override val name = "Megacloud"
         override val mainUrl = "https://megacloud.tv"
         override val embed = "embed-2/ajax/e-1"
-        override val key = "https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt"
+        override val key = "http://zoro-keys.freeddns.org/keys/e6/key.txt"
     }
 
     class Dokicloud : Rabbitstream() {
