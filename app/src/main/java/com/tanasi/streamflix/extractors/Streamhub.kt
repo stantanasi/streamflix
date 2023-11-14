@@ -33,7 +33,7 @@ class Streamhub : Extractor() {
             .map { it.groupValues[1] }.toList()
 
         val video = Video(
-            sources = sources,
+            source = sources.firstOrNull() ?: "",
             subtitles = source.select("video > track")
                 .map {
                     Video.Subtitle(

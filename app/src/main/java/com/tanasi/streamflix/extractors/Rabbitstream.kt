@@ -46,14 +46,13 @@ open class Rabbitstream : Extractor() {
         }
 
         val video = Video(
-            sources = sources.sources.map { it.file },
+            source = sources.sources.map { it.file }.firstOrNull() ?: "",
             subtitles = sources.tracks
                 .filter { it.kind == "captions" }
                 .map {
                     Video.Subtitle(
                         label = it.label,
                         file = it.file,
-                        default = it.default,
                     )
                 }
         )

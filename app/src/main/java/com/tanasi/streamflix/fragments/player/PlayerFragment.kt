@@ -233,7 +233,7 @@ class PlayerFragment : Fragment() {
 
         player.setMediaItem(
             MediaItem.Builder()
-                .setUri(Uri.parse(video.sources.firstOrNull() ?: ""))
+                .setUri(Uri.parse(video.source))
                 .setSubtitleConfigurations(video.subtitles.map {
                     SubtitleConfiguration.Builder(Uri.parse(it.file))
                         .setMimeType(MimeTypes.TEXT_VTT)

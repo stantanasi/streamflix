@@ -57,7 +57,7 @@ class PlayerViewModel(
         try {
             val video = UserPreferences.currentProvider!!.getVideo(server)
 
-            if (video.sources.isEmpty()) throw Exception("No sources found")
+            if (video.source.isEmpty()) throw Exception("No source found")
 
             _state.postValue(State.SuccessLoadingVideo(video, server))
         } catch (e: Exception) {
