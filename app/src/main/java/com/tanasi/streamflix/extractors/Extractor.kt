@@ -14,6 +14,7 @@ abstract class Extractor {
         private val extractors = listOf(
             Rabbitstream(),
             Rabbitstream.Megacloud(),
+            Rabbitstream.Dokicloud(),
             Streamhub(),
         )
 

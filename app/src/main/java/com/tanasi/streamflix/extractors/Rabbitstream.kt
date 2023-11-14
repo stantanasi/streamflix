@@ -63,11 +63,15 @@ open class Rabbitstream : Extractor() {
 
 
     class Megacloud : Rabbitstream() {
-
         override val name = "Megacloud"
         override val mainUrl = "https://megacloud.tv"
         override val embed = "embed-2/ajax/e-1"
         override val key = "https://raw.githubusercontent.com/enimax-anime/key/e6/key.txt"
+    }
+
+    class Dokicloud : Rabbitstream() {
+        override val name = "Dokicloud"
+        override val mainUrl = "https://dokicloud.one"
     }
 
 
