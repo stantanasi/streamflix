@@ -12,7 +12,6 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.utils.retry
 import okhttp3.OkHttpClient
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -606,7 +605,7 @@ object AniwatchProvider : Provider {
     }
 
 
-    override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
+    override suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server> {
         val episodeId = when (videoType) {
             is PlayerFragment.VideoType.Movie -> {
                 val response = service.getTvShowEpisodes(tvShowId = id.substringAfterLast("-"))
@@ -622,22 +621,23 @@ object AniwatchProvider : Provider {
         }
 
         val servers = Jsoup.parse(service.getServers(episodeId).html)
-            .select("div.server-item[data-type][data-id]").map {
-                object {
-                    val id = it.attr("data-id")
-                    val name = it.text().trim()
-                }
+            .select("div.server-item[data-type][data-id]")
+            .map {
+                Video.Server(
+                    id = it.attr("data-id"),
+                    name = "${it.text().trim()} - ${it.attr("data-type").uppercase()}",
+                )
             }
 
         if (servers.isEmpty()) throw Exception("No links found")
 
-        val video = retry(servers.size) { attempt ->
-            val link = service.getLink(servers.getOrNull(attempt - 1)?.id ?: "")
+        return servers
+    }
 
-            Extractor.extract(link.link)
-        }
+    override suspend fun getVideo(server: Video.Server): Video {
+        val link = service.getLink(server.id)
 
-        return video
+        return Extractor.extract(link.link)
     }
 
 

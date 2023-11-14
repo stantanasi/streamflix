@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Color
+import android.os.Bundle
+import android.os.Parcelable
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +17,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.exoplayer2.Format
+import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.Tracks
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.activities.main.MainActivity
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -158,3 +162,36 @@ fun Int.setRgb(rgb: Int): Int = Color.argb(
     Color.green(rgb),
     Color.blue(rgb),
 )
+
+
+@Parcelize
+data class MediaServer(
+    val id: String,
+    val name: String,
+) : Parcelable
+
+private val MediaMetadata.Builder.extras: Bundle?
+    get() = this.javaClass.getDeclaredField("extras").let {
+        it.isAccessible = true
+        it.get(this) as Bundle?
+    }
+
+val MediaMetadata.mediaServerId: String?
+    get() = this.extras
+        ?.getString("mediaServerId")
+
+val MediaMetadata.mediaServers: List<MediaServer>
+    get() = this.extras
+        ?.getParcelableArray("mediaServers")
+        ?.map { it as MediaServer }
+        ?: listOf()
+
+fun MediaMetadata.Builder.setMediaServerId(mediaServerId: String) = this
+    .setExtras((this.extras ?: Bundle()).also { bundle ->
+        bundle.putString("mediaServerId", mediaServerId)
+    })
+
+fun MediaMetadata.Builder.setMediaServers(mediaServers: List<MediaServer>) = this
+    .setExtras((this.extras ?: Bundle()).also { bundle ->
+        bundle.putParcelableArray("mediaServers", mediaServers.toTypedArray())
+    })

@@ -40,5 +40,7 @@ interface Provider {
     suspend fun getPeople(id: String): People
 
 
-    suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video
+    suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server>
+
+    suspend fun getVideo(server: Video.Server): Video
 }
