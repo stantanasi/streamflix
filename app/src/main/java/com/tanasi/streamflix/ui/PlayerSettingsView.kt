@@ -237,6 +237,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 when (item) {
                     Settings.Subtitle.Style,
                     Settings.Subtitle.Style.ResetStyle -> margin(bottom = 16F)
+                    else -> margin(bottom = 0F)
                 }
                 setOnClickListener {
                     when (item) {
