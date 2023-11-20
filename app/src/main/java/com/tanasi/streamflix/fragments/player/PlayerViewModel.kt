@@ -14,34 +14,54 @@ class PlayerViewModel(
     id: String,
 ) : ViewModel() {
 
-    private val _state = MutableLiveData<State>(State.Loading)
+    private val _state = MutableLiveData<State>(State.LoadingServers)
     val state: LiveData<State> = _state
 
     sealed class State {
-        object Loading : State()
-        data class SuccessLoading(val video: Video) : State()
-        data class FailedLoading(val error: Exception) : State()
+        object LoadingServers : State()
+        data class SuccessLoadingServers(val servers: List<Video.Server>) : State()
+        data class FailedLoadingServers(val error: Exception) : State()
+
+        object LoadingVideo : State()
+        data class SuccessLoadingVideo(val video: Video, val server: Video.Server) : State()
+        data class FailedLoadingVideo(val error: Exception) : State()
     }
 
     init {
-        getVideo(videoType, id)
+        getServers(videoType, id)
     }
 
 
-    fun getVideo(
+    private fun getServers(
         videoType: PlayerFragment.VideoType,
         id: String,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        _state.postValue(State.Loading)
+        _state.postValue(State.LoadingServers)
 
         try {
-            val video = UserPreferences.currentProvider!!.getVideo(id, videoType)
+            val servers = UserPreferences.currentProvider!!.getServers(id, videoType)
 
-            if (video.sources.isEmpty()) throw Exception("No links found")
+            if (servers.isEmpty()) throw Exception("No servers found")
 
-            _state.postValue(State.SuccessLoading(video))
+            _state.postValue(State.SuccessLoadingServers(servers))
+
+            getVideo(servers.first())
         } catch (e: Exception) {
-            _state.postValue(State.FailedLoading(e))
+            _state.postValue(State.FailedLoadingServers(e))
+        }
+    }
+
+    fun getVideo(server: Video.Server) = viewModelScope.launch(Dispatchers.IO) {
+        _state.postValue(State.LoadingVideo)
+
+        try {
+            val video = UserPreferences.currentProvider!!.getVideo(server)
+
+            if (video.source.isEmpty()) throw Exception("No source found")
+
+            _state.postValue(State.SuccessLoadingVideo(video, server))
+        } catch (e: Exception) {
+            _state.postValue(State.FailedLoadingVideo(e))
         }
     }
 }

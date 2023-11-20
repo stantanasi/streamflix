@@ -26,7 +26,7 @@ body:
     attributes:
       label: App version
       description: What version of our app are you running?
-      placeholder: 1.3.3
+      placeholder: Latest
     validations:
       required: false
   - type: input

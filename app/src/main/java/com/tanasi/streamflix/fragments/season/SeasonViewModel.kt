@@ -29,7 +29,7 @@ class SeasonViewModel(seasonId: String) : ViewModel() {
         _state.postValue(State.LoadingEpisodes)
 
         try {
-            val episodes = UserPreferences.currentProvider!!.getSeasonEpisodes(seasonId)
+            val episodes = UserPreferences.currentProvider!!.getEpisodesBySeason(seasonId)
 
             _state.postValue(State.SuccessLoadingEpisodes(episodes))
         } catch (e: Exception) {

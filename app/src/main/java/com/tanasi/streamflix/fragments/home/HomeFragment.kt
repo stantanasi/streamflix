@@ -81,16 +81,20 @@ class HomeFragment : Fragment() {
             adapter = appAdapter
             setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
         }
+
+        binding.root.requestFocus()
     }
 
     private fun displayHome(categories: List<Category>) {
         appAdapter.items.apply {
             clear()
 
-            categories.find { it.name == "Featured" }?.let { category ->
-                category.itemType = AppAdapter.Type.CATEGORY_SWIPER
-                add(category)
-            }
+            categories
+                .find { it.name == Category.FEATURED }
+                ?.let { category ->
+                    category.itemType = AppAdapter.Type.CATEGORY_SWIPER
+                    add(category)
+                }
 
             Category(
                 name = getString(R.string.home_continue_watching),
@@ -143,7 +147,7 @@ class HomeFragment : Fragment() {
             }
 
             categories
-                .filter { it.name != "Featured" && it.list.isNotEmpty() }
+                .filter { it.name != Category.FEATURED && it.list.isNotEmpty() }
                 .onEach { category ->
                     category.list.onEach { show ->
                         when (show) {

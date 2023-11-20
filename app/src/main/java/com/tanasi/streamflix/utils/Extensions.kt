@@ -3,7 +3,12 @@ package com.tanasi.streamflix.utils
 import android.app.Activity
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Color
+import android.os.Bundle
+import android.os.Parcelable
+import android.util.TypedValue
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -12,9 +17,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.media3.common.Format
+import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Tracks
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.activities.main.MainActivity
+import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -24,6 +31,7 @@ fun String.toCalendar(): Calendar? {
     val patterns = listOf(
         SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH),
         SimpleDateFormat("yyyy", Locale.ENGLISH),
+        SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH),
     )
     patterns.forEach { sdf ->
         try {
@@ -109,3 +117,81 @@ inline fun <reified T : ViewModel> Fragment.viewModelsFactory(crossinline viewMo
         }
     }
 }
+
+fun View.dpToPx(dp: Float): Int = context.dpToPx(dp)
+
+fun Context.dpToPx(dp: Float): Int = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, resources.displayMetrics).toInt()
+
+inline fun <reified T : ViewGroup.LayoutParams> View.layoutParams(block: T.() -> Unit) {
+    if (layoutParams is T) block(layoutParams as T)
+}
+
+fun View.margin(
+    left: Float? = null,
+    top: Float? = null,
+    right: Float? = null,
+    bottom: Float? = null
+) {
+    layoutParams<ViewGroup.MarginLayoutParams> {
+        left?.run { leftMargin = dpToPx(this) }
+        top?.run { topMargin = dpToPx(this) }
+        right?.run { rightMargin = dpToPx(this) }
+        bottom?.run { bottomMargin = dpToPx(this) }
+    }
+}
+
+
+fun Int.getAlpha(): Int = Color.alpha(this)
+
+fun Int.setAlpha(alpha: Int): Int = Color.argb(
+    alpha,
+    Color.red(this),
+    Color.green(this),
+    Color.blue(this),
+)
+
+fun Int.getRgb(): Int = Color.rgb(
+    Color.red(this),
+    Color.green(this),
+    Color.blue(this)
+)
+
+fun Int.setRgb(rgb: Int): Int = Color.argb(
+    Color.alpha(this),
+    Color.red(rgb),
+    Color.green(rgb),
+    Color.blue(rgb),
+)
+
+
+@Parcelize
+data class MediaServer(
+    val id: String,
+    val name: String,
+) : Parcelable
+
+private val MediaMetadata.Builder.extras: Bundle?
+    get() = this.javaClass.getDeclaredField("extras").let {
+        it.isAccessible = true
+        it.get(this) as Bundle?
+    }
+
+val MediaMetadata.mediaServerId: String?
+    get() = this.extras
+        ?.getString("mediaServerId")
+
+val MediaMetadata.mediaServers: List<MediaServer>
+    get() = this.extras
+        ?.getParcelableArray("mediaServers")
+        ?.map { it as MediaServer }
+        ?: listOf()
+
+fun MediaMetadata.Builder.setMediaServerId(mediaServerId: String) = this
+    .setExtras((this.extras ?: Bundle()).also { bundle ->
+        bundle.putString("mediaServerId", mediaServerId)
+    })
+
+fun MediaMetadata.Builder.setMediaServers(mediaServers: List<MediaServer>) = this
+    .setExtras((this.extras ?: Bundle()).also { bundle ->
+        bundle.putParcelableArray("mediaServers", mediaServers.toTypedArray())
+    })

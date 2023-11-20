@@ -6,6 +6,7 @@ import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.tvprovider.media.tv.TvContractCompat
@@ -43,7 +44,7 @@ import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.toActivity
 
-@SuppressLint("RestrictedApi")
+@UnstableApi @SuppressLint("RestrictedApi")
 class MovieViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
@@ -179,7 +180,7 @@ class MovieViewHolder(
 
         binding.tvMovieTitle.text = movie.title
     }
-    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+
     private fun displayItemContinueWatching(binding: ItemMovieContinueWatchingBinding) {
         binding.root.apply {
             setOnClickListener {
@@ -243,7 +244,6 @@ class MovieViewHolder(
         binding.tvMovieTitle.text = movie.title
     }
 
-    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun displayMovie(binding: ContentMovieBinding) {
         binding.ivMoviePoster.run {
             Glide.with(context)
@@ -290,6 +290,14 @@ class MovieViewHolder(
             }
             visibility = when {
                 text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvMovieGenres.apply {
+            text = movie.genres.joinToString(", ") { it.name }
+            visibility = when {
+                movie.genres.isEmpty() -> View.GONE
                 else -> View.VISIBLE
             }
         }

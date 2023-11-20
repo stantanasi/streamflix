@@ -3,6 +3,7 @@ package com.tanasi.streamflix.adapters.viewholders
 import android.annotation.SuppressLint
 import android.view.View
 import android.view.animation.AnimationUtils
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.tvprovider.media.tv.TvContractCompat
@@ -22,7 +23,7 @@ import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.toActivity
 
-@SuppressLint("RestrictedApi")
+@UnstableApi @SuppressLint("RestrictedApi")
 class EpisodeViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
@@ -41,7 +42,6 @@ class EpisodeViewHolder(
         }
     }
 
-    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     private fun displayItem(binding: ItemEpisodeBinding) {
         binding.root.apply {
             setOnClickListener {
@@ -49,9 +49,15 @@ class EpisodeViewHolder(
                     SeasonFragmentDirections.actionSeasonToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
-                        subtitle = context.getString(
-                            R.string.player_subtitle_tv_show,
-                            episode.season?.number ?: 0,
+                        subtitle = episode.season?.let { season ->
+                            context.getString(
+                                R.string.player_subtitle_tv_show,
+                                season.number,
+                                episode.number,
+                                episode.title
+                            )
+                        } ?: context.getString(
+                            R.string.player_subtitle_tv_show_episode_only,
                             episode.number,
                             episode.title
                         ),
@@ -119,7 +125,7 @@ class EpisodeViewHolder(
 
         binding.tvEpisodeTitle.text = episode.title
     }
-    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+
     private fun displayContinueWatchingItem(binding: ItemEpisodeContinueWatchingBinding) {
         binding.root.apply {
             setOnClickListener {
@@ -193,9 +199,15 @@ class EpisodeViewHolder(
 
         binding.tvEpisodeTvShowTitle.text = episode.tvShow?.title ?: ""
 
-        binding.tvEpisodeInfo.text = context.getString(
-            R.string.episode_item_info,
-            episode.season?.number ?: 0,
+        binding.tvEpisodeInfo.text = episode.season?.let { season ->
+            context.getString(
+                R.string.episode_item_info,
+                season.number,
+                episode.number,
+                episode.title
+            )
+        } ?: context.getString(
+            R.string.episode_item_info_episode_only,
             episode.number,
             episode.title
         )

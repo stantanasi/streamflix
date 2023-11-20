@@ -1,7 +1,6 @@
 package com.tanasi.streamflix.fragments.player
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -20,6 +19,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaItem.SubtitleConfiguration
 import androidx.media3.common.Player
 import androidx.media3.common.AudioAttributes
+import androidx.media3.common.MediaMetadata
 import androidx.media3.session.MediaSession
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
@@ -27,12 +27,16 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.CaptionStyleCompat
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
+import androidx.media3.ui.SubtitleView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ContentExoControllerBinding
 import com.tanasi.streamflix.databinding.FragmentPlayerBinding
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.map
+import com.tanasi.streamflix.utils.setMediaServerId
+import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration.Companion.minutes
@@ -109,17 +113,43 @@ class PlayerFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                PlayerViewModel.State.Loading -> {}
-                is PlayerViewModel.State.SuccessLoading -> {
-                    displayVideo(state.video)
+                PlayerViewModel.State.LoadingServers -> {}
+                is PlayerViewModel.State.SuccessLoadingServers -> {
+                    player.playlistMetadata = MediaMetadata.Builder()
+                        .setTitle(state.toString())
+                        .setMediaServers(state.servers.map {
+                            MediaServer(
+                                id = it.id,
+                                name = it.name,
+                            )
+                        })
+                        .build()
+                    binding.settings.setOnServerSelected { server ->
+                        viewModel.getVideo(state.servers.find { server.id == it.id }!!)
+                    }
                 }
-                is PlayerViewModel.State.FailedLoading -> {
+                is PlayerViewModel.State.FailedLoadingServers -> {
                     Toast.makeText(
                         requireContext(),
                         state.error.message ?: "",
                         Toast.LENGTH_LONG
                     ).show()
                     findNavController().navigateUp()
+                }
+
+                PlayerViewModel.State.LoadingVideo -> {}
+                is PlayerViewModel.State.SuccessLoadingVideo -> {
+                    displayVideo(state.video, state.server)
+                }
+                is PlayerViewModel.State.FailedLoadingVideo -> {
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message ?: "",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    if (player.currentMediaItem == null) {
+                        binding.pvPlayer.controller.exoSettings.requestFocus()
+                    }
                 }
             }
         }
@@ -140,7 +170,6 @@ class PlayerFragment : Fragment() {
     fun onBackPressed(): Boolean = when {
         binding.settings.isVisible -> {
             binding.settings.onBackPressed()
-            true
         }
         binding.pvPlayer.isControllerVisible -> {
             binding.pvPlayer.hideController()
@@ -151,23 +180,26 @@ class PlayerFragment : Fragment() {
 
 
     private fun initializeVideo() {
-        player = ExoPlayer.Builder(requireContext()).build()
-        mediaSession = MediaSession.Builder(requireContext(), player)
-            .build()
+        player = ExoPlayer.Builder(requireContext()).build().also { player ->
+            player.setAudioAttributes(
+                AudioAttributes.Builder()
+                    .setUsage(C.USAGE_MEDIA)
+                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                    .build(),
+                true,
+            )
+
+            mediaSession = MediaSession.Builder(requireContext(), player)
+                .build()
+        }
+
         binding.pvPlayer.player = player
         binding.settings.player = player
+        binding.settings.subtitleView = binding.pvPlayer.subtitleView
 
         binding.pvPlayer.subtitleView?.apply {
-            setStyle(
-                CaptionStyleCompat(
-                    Color.WHITE,
-                    Color.argb(128, 0, 0, 0),
-                    Color.TRANSPARENT,
-                    CaptionStyleCompat.EDGE_TYPE_NONE,
-                    Color.WHITE,
-                    null
-                )
-            )
+            setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
+            setStyle(UserPreferences.captionStyle)
         }
 
         binding.pvPlayer.controller.tvExoTitle.text = args.title
@@ -181,23 +213,23 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    private fun displayVideo(video: Video) {
-        player.setAudioAttributes(
-            AudioAttributes.Builder()
-                .setUsage(C.USAGE_MEDIA)
-                .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-                .build(),
-            true,
-        )
+    private fun displayVideo(video: Video, server: Video.Server) {
+        val currentPosition = player.currentPosition
+
         player.setMediaItem(
             MediaItem.Builder()
-                .setUri(Uri.parse(video.sources.firstOrNull() ?: ""))
+                .setUri(Uri.parse(video.source))
                 .setSubtitleConfigurations(video.subtitles.map {
                     SubtitleConfiguration.Builder(Uri.parse(it.file))
                         .setMimeType(MimeTypes.TEXT_VTT)
                         .setLabel(it.label)
                         .build()
                 })
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setMediaServerId(server.id)
+                        .build()
+                )
                 .build()
         )
 
@@ -282,17 +314,21 @@ class PlayerFragment : Fragment() {
             }
         })
 
-        val lastPlaybackPositionMillis = requireContext().contentResolver.query(
-            TvContractCompat.WatchNextPrograms.CONTENT_URI,
-            WatchNextProgram.PROJECTION,
-            null,
-            null,
-            null
-        )?.map { WatchNextProgram.fromCursor(it) }
-            ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
-            ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
+        if (currentPosition == 0L) {
+            val lastPlaybackPositionMillis = requireContext().contentResolver.query(
+                TvContractCompat.WatchNextPrograms.CONTENT_URI,
+                WatchNextProgram.PROJECTION,
+                null,
+                null,
+                null
+            )?.map { WatchNextProgram.fromCursor(it) }
+                ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
+                ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
 
-        player.seekTo(lastPlaybackPositionMillis ?: 0)
+            player.seekTo(lastPlaybackPositionMillis ?: 0)
+        } else {
+            player.seekTo(currentPosition)
+        }
 
         player.prepare()
         player.play()

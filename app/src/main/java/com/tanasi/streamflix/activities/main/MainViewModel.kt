@@ -29,12 +29,8 @@ class MainViewModel : ViewModel() {
         data class FailedUpdate(val error: Exception) : State()
     }
 
-    init {
-        checkUpdate()
-    }
 
-
-    private fun checkUpdate() = viewModelScope.launch(Dispatchers.IO) {
+    fun checkUpdate() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.CheckingUpdate)
 
         try {

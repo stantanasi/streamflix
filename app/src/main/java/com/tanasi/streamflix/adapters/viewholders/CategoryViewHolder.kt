@@ -61,9 +61,26 @@ class CategoryViewHolder(
             is TvShow -> selected.title
         }
 
-        binding.tvSwiperRating.text = when (selected) {
-            is Movie -> selected.rating?.let { String.format("%.1f", it) } ?: "N/A"
-            is TvShow -> selected.rating?.let { String.format("%.1f", it) } ?: "N/A"
+        binding.tvSwiperTvShowLastEpisode.apply {
+            text = when (selected) {
+                is TvShow -> selected.seasons.lastOrNull()?.let { season ->
+                    season.episodes.lastOrNull()?.let { episode ->
+                        if (season.number != 0) {
+                            context.getString(
+                                R.string.tv_show_item_season_number_episode_number,
+                                season.number,
+                                episode.number
+                            )
+                        } else {
+                            context.getString(
+                                R.string.tv_show_item_episode_number,
+                                episode.number
+                            )
+                        }
+                    }
+                } ?: context.getString(R.string.tv_show_item_type)
+                else -> context.getString(R.string.movie_item_type)
+            }
         }
 
         binding.tvSwiperQuality.apply {
@@ -88,18 +105,10 @@ class CategoryViewHolder(
             }
         }
 
-        binding.tvSwiperTvShowLastEpisode.apply {
+        binding.tvSwiperRating.apply {
             text = when (selected) {
-                is TvShow -> selected.seasons.lastOrNull()?.let { season ->
-                    season.episodes.lastOrNull()?.let { episode ->
-                        context.getString(
-                            R.string.tv_show_item_season_number_episode_number,
-                            season.number,
-                            episode.number
-                        )
-                    }
-                } ?: context.getString(R.string.tv_show_item_type)
-                else -> context.getString(R.string.movie_item_type)
+                is Movie -> selected.rating?.let { String.format("%.1f", it) }
+                is TvShow -> selected.rating?.let { String.format("%.1f", it) }
             }
             visibility = when {
                 text.isNullOrEmpty() -> View.GONE
@@ -116,12 +125,10 @@ class CategoryViewHolder(
             setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> fragment.updateBackground(
-                            when (selected) {
-                                is Movie -> selected.banner
-                                is TvShow -> selected.banner
-                            }
-                        )
+                        is HomeFragment -> when (selected) {
+                            is Movie -> fragment.updateBackground(selected.banner)
+                            is TvShow -> fragment.updateBackground(selected.banner)
+                        }
                     }
                 }
             }
@@ -133,8 +140,7 @@ class CategoryViewHolder(
                                 (category.selectedIndex + 1) % category.list.size
 
                             when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                                is HomeFragment -> when (val it =
-                                    category.list[category.selectedIndex]) {
+                                is HomeFragment -> when (val it = category.list[category.selectedIndex]) {
                                     is Movie -> fragment.updateBackground(it.banner)
                                     is TvShow -> fragment.updateBackground(it.banner)
                                 }

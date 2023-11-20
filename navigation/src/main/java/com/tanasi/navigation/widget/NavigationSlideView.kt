@@ -29,7 +29,7 @@ class NavigationSlideView @JvmOverloads constructor(
     private val presenter = NavigationSlidePresenter()
     private val menuInflater: MenuInflater = SupportMenuInflater(context)
 
-    var isOpen = false
+    var isOpen = true
 
     private var selectedListener: ((item: MenuItem) -> Boolean)? = null
     private var reselectedListener: ((item: MenuItem) -> Boolean)? = null

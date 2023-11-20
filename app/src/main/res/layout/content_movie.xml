@@ -92,15 +92,30 @@
         app:constraint_referenced_ids="tv_movie_rating,tv_movie_quality,tv_movie_released,tv_movie_runtime" />
 
     <TextView
+        android:id="@+id/tv_movie_genres"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="70dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
+        app:layout_constraintTop_toBottomOf="@id/barrier1"
+        app:layout_goneMarginStart="70dp"
+        tools:text="Genres" />
+
+    <TextView
         android:id="@+id/tv_movie_overview"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="70dp"
+        android:ellipsize="end"
+        android:maxLines="10"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
-        app:layout_constraintTop_toBottomOf="@id/barrier1"
+        app:layout_constraintTop_toBottomOf="@id/tv_movie_genres"
         app:layout_goneMarginStart="70dp"
         tools:text="Overview" />
 

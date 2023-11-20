@@ -9,6 +9,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
@@ -19,6 +20,7 @@ import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.retry
+import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
@@ -33,6 +35,7 @@ import java.lang.Integer.min
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
+import java.util.concurrent.TimeUnit
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -53,7 +56,7 @@ object SflixProvider : Provider {
 
         categories.add(
             Category(
-                name = "Featured",
+                name = Category.FEATURED,
                 list = document.select("div.swiper-wrapper > div.swiper-slide").map {
                     val id = it.selectFirst("a")
                         ?.attr("href")?.substringAfterLast("-") ?: ""
@@ -61,55 +64,49 @@ object SflixProvider : Provider {
                         ?.text() ?: ""
                     val overview = it.selectFirst("p.sc-desc")
                         ?.text() ?: ""
+                    val info = it.select("div.sc-detail > div.scd-item").toInfo()
                     val poster = it.selectFirst("img.film-poster-img")
                         ?.attr("src")
                     val banner = it.selectFirst("div.slide-photo img")
                         ?.attr("src")
 
-                    when {
-                        it.isMovie() -> {
-                            val info = it.select("div.sc-detail > div.scd-item").toInfo()
+                    if (it.isMovie()) {
+                        Movie(
+                            id = id,
+                            title = title,
+                            overview = overview,
+                            released = info.released,
+                            quality = info.quality,
+                            rating = info.rating,
+                            poster = poster,
+                            banner = banner,
+                        )
+                    } else {
+                        TvShow(
+                            id = id,
+                            title = title,
+                            overview = overview,
+                            quality = info.quality,
+                            rating = info.rating,
+                            poster = poster,
+                            banner = banner,
 
-                            Movie(
-                                id = id,
-                                title = title,
-                                overview = overview,
-                                released = info.released,
-                                quality = info.quality,
-                                rating = info.rating,
-                                poster = poster,
-                                banner = banner,
-                            )
-                        }
-                        else -> {
-                            val info = it.select("div.sc-detail > div.scd-item").toInfo()
+                            seasons = info.lastEpisode?.let { lastEpisode ->
+                                listOf(
+                                    Season(
+                                        id = "",
+                                        number = lastEpisode.season,
 
-                            TvShow(
-                                id = id,
-                                title = title,
-                                overview = overview,
-                                quality = info.quality,
-                                rating = info.rating,
-                                poster = poster,
-                                banner = banner,
-
-                                seasons = info.lastEpisode?.let { lastEpisode ->
-                                    listOf(
-                                        Season(
-                                            id = "",
-                                            number = lastEpisode.season,
-
-                                            episodes = listOf(
-                                                Episode(
-                                                    id = "",
-                                                    number = lastEpisode.episode,
-                                                )
+                                        episodes = listOf(
+                                            Episode(
+                                                id = "",
+                                                number = lastEpisode.episode,
                                             )
                                         )
                                     )
-                                } ?: listOf(),
-                            )
-                        }
+                                )
+                            } ?: listOf(),
+                        )
                     }
                 },
             )
@@ -262,49 +259,44 @@ object SflixProvider : Provider {
                 ?.attr("href")?.substringAfterLast("-") ?: ""
             val title = it.selectFirst("h2.film-name")
                 ?.text() ?: ""
+            val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
             val poster = it.selectFirst("div.film-poster > img.film-poster-img")
                 ?.attr("data-src")
 
-            when {
-                it.isMovie() -> {
-                    val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+            if (it.isMovie()) {
+                Movie(
+                    id = id,
+                    title = title,
+                    released = info.released,
+                    quality = info.quality,
+                    rating = info.rating,
+                    poster = poster,
+                )
+            }
+            else {
+                TvShow(
+                    id = id,
+                    title = title,
+                    quality = info.quality,
+                    rating = info.rating,
+                    poster = poster,
 
-                    Movie(
-                        id = id,
-                        title = title,
-                        released = info.released,
-                        quality = info.quality,
-                        rating = info.rating,
-                        poster = poster,
-                    )
-                }
-                else -> {
-                    val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                    seasons = info.lastEpisode?.let { lastEpisode ->
+                        listOf(
+                            Season(
+                                id = "",
+                                number = lastEpisode.season,
 
-                    TvShow(
-                        id = id,
-                        title = title,
-                        quality = info.quality,
-                        rating = info.rating,
-                        poster = poster,
-
-                        seasons = info.lastEpisode?.let { lastEpisode ->
-                            listOf(
-                                Season(
-                                    id = "",
-                                    number = lastEpisode.season,
-
-                                    episodes = listOf(
-                                        Episode(
-                                            id = "",
-                                            number = lastEpisode.episode,
-                                        )
+                                episodes = listOf(
+                                    Episode(
+                                        id = "",
+                                        number = lastEpisode.episode,
                                     )
                                 )
                             )
-                        } ?: listOf(),
-                    )
-                }
+                        )
+                    } ?: listOf(),
+                )
             }
         }
 
@@ -414,52 +406,47 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             recommendations = document.select("div.film_related div.flw-item").map {
-                when {
-                    it.isMovie() -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
 
-                        Movie(
-                            id = it.selectFirst("a")
-                                ?.attr("href")?.substringAfterLast("-") ?: "",
-                            title = it.selectFirst("h3.film-name")
-                                ?.text() ?: "",
-                            released = info.released,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
-                                ?.attr("data-src"),
-                        )
-                    }
-                    else -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                if (it.isMovie()) {
+                    Movie(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringAfterLast("-") ?: "",
+                        title = it.selectFirst("h3.film-name")
+                            ?.text() ?: "",
+                        released = info.released,
+                        quality = info.quality,
+                        rating = info.rating,
+                        poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                            ?.attr("data-src"),
+                    )
+                } else {
+                    TvShow(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringAfterLast("-") ?: "",
+                        title = it.selectFirst("h3.film-name")
+                            ?.text() ?: "",
+                        quality = info.quality,
+                        rating = info.rating,
+                        poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                            ?.attr("data-src"),
 
-                        TvShow(
-                            id = it.selectFirst("a")
-                                ?.attr("href")?.substringAfterLast("-") ?: "",
-                            title = it.selectFirst("h3.film-name")
-                                ?.text() ?: "",
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
-                                ?.attr("data-src"),
+                        seasons = info.lastEpisode?.let { lastEpisode ->
+                            listOf(
+                                Season(
+                                    id = "",
+                                    number = lastEpisode.season,
 
-                            seasons = info.lastEpisode?.let { lastEpisode ->
-                                listOf(
-                                    Season(
-                                        id = "",
-                                        number = lastEpisode.season,
-
-                                        episodes = listOf(
-                                            Episode(
-                                                id = "",
-                                                number = lastEpisode.episode,
-                                            )
+                                    episodes = listOf(
+                                        Episode(
+                                            id = "",
+                                            number = lastEpisode.episode,
                                         )
                                     )
                                 )
-                            } ?: listOf(),
-                        )
-                    }
+                            )
+                        } ?: listOf(),
+                    )
                 }
             },
         )
@@ -520,52 +507,47 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             recommendations = document.select("div.film_related div.flw-item").map {
-                when {
-                    it.isMovie() -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
 
-                        Movie(
-                            id = it.selectFirst("a")
-                                ?.attr("href")?.substringAfterLast("-") ?: "",
-                            title = it.selectFirst("h3.film-name")
-                                ?.text() ?: "",
-                            released = info.released,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
-                                ?.attr("data-src"),
-                        )
-                    }
-                    else -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                if (it.isMovie()) {
+                    Movie(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringAfterLast("-") ?: "",
+                        title = it.selectFirst("h3.film-name")
+                            ?.text() ?: "",
+                        released = info.released,
+                        quality = info.quality,
+                        rating = info.rating,
+                        poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                            ?.attr("data-src"),
+                    )
+                } else {
+                    TvShow(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringAfterLast("-") ?: "",
+                        title = it.selectFirst("h3.film-name")
+                            ?.text() ?: "",
+                        quality = info.quality,
+                        rating = info.rating,
+                        poster = it.selectFirst("div.film-poster > img.film-poster-img")
+                            ?.attr("data-src"),
 
-                        TvShow(
-                            id = it.selectFirst("a")
-                                ?.attr("href")?.substringAfterLast("-") ?: "",
-                            title = it.selectFirst("h3.film-name")
-                                ?.text() ?: "",
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = it.selectFirst("div.film-poster > img.film-poster-img")
-                                ?.attr("data-src"),
+                        seasons = info.lastEpisode?.let { lastEpisode ->
+                            listOf(
+                                Season(
+                                    id = "",
+                                    number = lastEpisode.season,
 
-                            seasons = info.lastEpisode?.let { lastEpisode ->
-                                listOf(
-                                    Season(
-                                        id = "",
-                                        number = lastEpisode.season,
-
-                                        episodes = listOf(
-                                            Episode(
-                                                id = "",
-                                                number = lastEpisode.episode,
-                                            )
+                                    episodes = listOf(
+                                        Episode(
+                                            id = "",
+                                            number = lastEpisode.episode,
                                         )
                                     )
                                 )
-                            } ?: listOf(),
-                        )
-                    }
+                            )
+                        } ?: listOf(),
+                    )
                 }
             },
         )
@@ -573,7 +555,7 @@ object SflixProvider : Provider {
         return tvShow
     }
 
-    override suspend fun getSeasonEpisodes(seasonId: String): List<Episode> {
+    override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
         val document = service.getSeasonEpisodes(seasonId)
 
         val episodes = document.select("div.flw-item.film_single-item.episode-item.eps-item")
@@ -607,49 +589,43 @@ object SflixProvider : Provider {
                     ?.attr("href")?.substringAfterLast("-") ?: ""
                 val showTitle = it.selectFirst("h2.film-name")
                     ?.text() ?: ""
+                val showInfo = it.select("div.film-detail > div.fd-infor > span").toInfo()
                 val showPoster = it.selectFirst("div.film-poster > img.film-poster-img")
                     ?.attr("data-src")
 
-                when {
-                    it.isMovie() -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                if (it.isMovie()) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        released = showInfo.released,
+                        quality = showInfo.quality,
+                        rating = showInfo.rating,
+                        poster = showPoster,
+                    )
+                } else {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        quality = showInfo.quality,
+                        rating = showInfo.rating,
+                        poster = showPoster,
 
-                        Movie(
-                            id = showId,
-                            title = showTitle,
-                            released = info.released,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = showPoster,
-                        )
-                    }
-                    else -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                        seasons = showInfo.lastEpisode?.let { lastEpisode ->
+                            listOf(
+                                Season(
+                                    id = "",
+                                    number = lastEpisode.season,
 
-                        TvShow(
-                            id = showId,
-                            title = showTitle,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = showPoster,
-
-                            seasons = info.lastEpisode?.let { lastEpisode ->
-                                listOf(
-                                    Season(
-                                        id = "",
-                                        number = lastEpisode.season,
-
-                                        episodes = listOf(
-                                            Episode(
-                                                id = "",
-                                                number = lastEpisode.episode,
-                                            )
+                                    episodes = listOf(
+                                        Episode(
+                                            id = "",
+                                            number = lastEpisode.episode,
                                         )
                                     )
                                 )
-                            } ?: listOf(),
-                        )
-                    }
+                            )
+                        } ?: listOf(),
+                    )
                 }
             }
         )
@@ -671,49 +647,43 @@ object SflixProvider : Provider {
                     ?.attr("href")?.substringAfterLast("-") ?: ""
                 val showTitle = it.selectFirst("h2.film-name")
                     ?.text() ?: ""
+                val showInfo = it.select("div.film-detail > div.fd-infor > span").toInfo()
                 val showPoster = it.selectFirst("div.film-poster > img.film-poster-img")
                     ?.attr("data-src")
 
-                when {
-                    it.isMovie() -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                if (it.isMovie()) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        released = showInfo.released,
+                        quality = showInfo.quality,
+                        rating = showInfo.rating,
+                        poster = showPoster,
+                    )
+                } else {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        quality = showInfo.quality,
+                        rating = showInfo.rating,
+                        poster = showPoster,
 
-                        Movie(
-                            id = showId,
-                            title = showTitle,
-                            released = info.released,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = showPoster,
-                        )
-                    }
-                    else -> {
-                        val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
+                        seasons = showInfo.lastEpisode?.let { lastEpisode ->
+                            listOf(
+                                Season(
+                                    id = "",
+                                    number = lastEpisode.season,
 
-                        TvShow(
-                            id = showId,
-                            title = showTitle,
-                            quality = info.quality,
-                            rating = info.rating,
-                            poster = showPoster,
-
-                            seasons = info.lastEpisode?.let { lastEpisode ->
-                                listOf(
-                                    Season(
-                                        id = "",
-                                        number = lastEpisode.season,
-
-                                        episodes = listOf(
-                                            Episode(
-                                                id = "",
-                                                number = lastEpisode.episode,
-                                            )
+                                    episodes = listOf(
+                                        Episode(
+                                            id = "",
+                                            number = lastEpisode.episode,
                                         )
                                     )
                                 )
-                            } ?: listOf(),
-                        )
-                    }
+                            )
+                        } ?: listOf(),
+                    )
                 }
             },
         )
@@ -721,53 +691,27 @@ object SflixProvider : Provider {
         return people
     }
 
-
-    override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
+    override suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server> {
         val servers = when (videoType) {
             is PlayerFragment.VideoType.Movie -> service.getMovieServers(id)
             is PlayerFragment.VideoType.Episode -> service.getEpisodeServers(id)
-        }.select("a").map {
-            object {
-                val id = it.attr("data-id")
-                val name = it.selectFirst("span")?.text()?.trim() ?: ""
-            }
-        }
-
-        if (servers.isEmpty()) throw Exception("No links found")
-
-        val video = retry(min(servers.size, 2)) { attempt ->
-            val link = service.getLink(servers.getOrNull(attempt - 1)?.id ?: "")
-
-            val response = service.getSources(
-                url = link.link
-                    .substringBeforeLast("/")
-                    .replace("/embed", "/ajax/embed")
-                    .plus("/getSources"),
-                id = link.link.substringAfterLast("/").substringBefore("?"),
-            )
-
-            val sources = when (response) {
-                is SflixService.Sources -> response
-                is SflixService.Sources.Encrypted -> response.decrypt(
-                    secret = service.getSourceEncryptedKey().text()
+        }.select("a")
+            .map {
+                Video.Server(
+                    id = it.attr("data-id"),
+                    name = it.selectFirst("span")?.text()?.trim() ?: "",
                 )
             }
 
-            Video(
-                sources = sources.sources.map { it.file },
-                subtitles = sources.tracks
-                    .filter { it.kind == "captions" }
-                    .map {
-                        Video.Subtitle(
-                            label = it.label,
-                            file = it.file,
-                            default = it.default,
-                        )
-                    }
-            )
-        }
+        if (servers.isEmpty()) throw Exception("No links found")
 
-        return video
+        return servers
+    }
+
+    override suspend fun getVideo(server: Video.Server): Video {
+        val link = service.getLink(server.id)
+
+        return Extractor.extract(link.link)
     }
 
 
@@ -778,7 +722,7 @@ object SflixProvider : Provider {
         object {
             val rating = it.find { s -> s.matches("^\\d(?:\\.\\d)?\$".toRegex()) }?.toDoubleOrNull()
 
-            val quality = it.find { s -> s in listOf("HD", "SD", "CAM", "TS") }
+            val quality = it.find { s -> s in listOf("HD", "SD", "CAM", "TS", "HDRip") }
 
             val released = it.find { s -> s.matches("\\d{4}".toRegex()) }
 
@@ -798,19 +742,16 @@ object SflixProvider : Provider {
 
         companion object {
             fun build(): SflixService {
+                val client = OkHttpClient.Builder()
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .build()
+
                 val retrofit = Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(JsoupConverterFactory.create())
-                    .addConverterFactory(
-                        GsonConverterFactory.create(
-                            GsonBuilder()
-                                .registerTypeAdapter(
-                                    SourcesResponse::class.java,
-                                    SourcesResponse.Deserializer(),
-                                )
-                                .create()
-                        )
-                    )
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(client)
                     .build()
 
                 return retrofit.create(SflixService::class.java)
@@ -862,23 +803,6 @@ object SflixProvider : Provider {
         @GET("ajax/get_link/{id}")
         suspend fun getLink(@Path("id") id: String): Link
 
-        @GET
-        @Headers(
-            "Accept: */*",
-            "Accept-Language: en-US,en;q=0.5",
-            "Connection: keep-alive",
-            "referer: https://sflix.to",
-            "TE: trailers",
-            "X-Requested-With: XMLHttpRequest",
-        )
-        suspend fun getSources(
-            @Url url: String,
-            @Query("id") id: String,
-        ): SourcesResponse
-
-        @GET("https://raw.githubusercontent.com/enimax-anime/key/e4/key.txt")
-        suspend fun getSourceEncryptedKey(): Document
-
 
         data class Link(
             val type: String = "",
@@ -887,93 +811,5 @@ object SflixProvider : Provider {
             val tracks: List<String> = listOf(),
             val title: String = "",
         )
-
-        sealed class SourcesResponse {
-            class Deserializer : JsonDeserializer<SourcesResponse> {
-                override fun deserialize(
-                    json: JsonElement?,
-                    typeOfT: Type?,
-                    context: JsonDeserializationContext?
-                ): SourcesResponse {
-                    val jsonObject = json?.asJsonObject ?: JsonObject()
-
-                    return when (jsonObject.get("sources")?.isJsonArray ?: false) {
-                        true -> Gson().fromJson(json, Sources::class.java)
-                        false -> Gson().fromJson(json, Sources.Encrypted::class.java)
-                    }
-                }
-            }
-        }
-
-        data class Sources(
-            val sources: List<Source> = listOf(),
-            val sourcesBackup: List<Source> = listOf(),
-            val tracks: List<Track> = listOf(),
-            val server: Int? = null,
-        ) : SourcesResponse() {
-
-            data class Encrypted(
-                val sources: String,
-                val sourcesBackup: String? = null,
-                val tracks: List<Track> = listOf(),
-                val server: Int? = null,
-            ) : SourcesResponse() {
-                fun decrypt(secret: String): Sources {
-                    fun decryptSourceUrl(decryptionKey: ByteArray, sourceUrl: String): String {
-                        val cipherData = Base64.decode(sourceUrl, Base64.DEFAULT)
-                        val encrypted = cipherData.copyOfRange(16, cipherData.size)
-                        val aesCBC = Cipher.getInstance("AES/CBC/PKCS5Padding")!!
-
-                        aesCBC.init(
-                            Cipher.DECRYPT_MODE,
-                            SecretKeySpec(
-                                decryptionKey.copyOfRange(0, 32),
-                                "AES"
-                            ),
-                            IvParameterSpec(decryptionKey.copyOfRange(32, decryptionKey.size))
-                        )
-                        val decryptedData = aesCBC.doFinal(encrypted)
-                        return String(decryptedData, StandardCharsets.UTF_8)
-                    }
-
-                    fun generateKey(salt: ByteArray, secret: ByteArray): ByteArray {
-                        fun md5(input: ByteArray) = MessageDigest.getInstance("MD5").digest(input)
-
-                        var key = md5(secret + salt)
-                        var currentKey = key
-                        while (currentKey.size < 48) {
-                            key = md5(key + secret + salt)
-                            currentKey += key
-                        }
-                        return currentKey
-                    }
-
-                    val decrypted = decryptSourceUrl(
-                        generateKey(
-                            Base64.decode(sources, Base64.DEFAULT).copyOfRange(8, 16),
-                            secret.toByteArray(),
-                        ),
-                        sources,
-                    )
-
-                    return Sources(
-                        sources = Gson().fromJson(decrypted, Array<Source>::class.java).toList(),
-                        tracks = tracks
-                    )
-                }
-            }
-
-            data class Source(
-                val file: String = "",
-                val type: String = "",
-            )
-
-            data class Track(
-                val file: String = "",
-                val label: String = "",
-                val kind: String = "",
-                val default: Boolean = false,
-            )
-        }
     }
 }

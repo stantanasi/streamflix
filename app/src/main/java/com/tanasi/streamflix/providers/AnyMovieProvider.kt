@@ -2,17 +2,9 @@ package com.tanasi.streamflix.providers
 
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
-import com.tanasi.streamflix.models.Category
-import com.tanasi.streamflix.models.Episode
-import com.tanasi.streamflix.models.Genre
-import com.tanasi.streamflix.models.Movie
-import com.tanasi.streamflix.models.People
-import com.tanasi.streamflix.models.Season
-import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.utils.JsUnpacker
-import com.tanasi.streamflix.utils.retry
+import com.tanasi.streamflix.models.*
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -23,11 +15,11 @@ import retrofit2.http.Query
 import retrofit2.http.Url
 import java.util.concurrent.TimeUnit
 
-object AllMoviesForYouProvider : Provider {
+object AnyMovieProvider : Provider {
 
-    override val name = "AllMoviesForYou"
-    override val logo = "https://i0.wp.com/allmoviesforyou.net/wp-content/uploads/2021/04/cropped-cropped-allmoviesforyou-logo-header-HD.png?w=800&ssl=1"
-    override val url = "https://allmoviesforyou.net/"
+    override val name = "AnyMovie"
+    override val logo = "https://anymovie.cc/wp-content/uploads/2023/08/AM-LOGO-1.png"
+    override val url = "https://anymovie.cc/"
 
     private val service = AllMoviesForYouService.build()
 
@@ -39,7 +31,7 @@ object AllMoviesForYouProvider : Provider {
 
         categories.add(
             Category(
-                name = "Featured",
+                name = Category.FEATURED,
                 list = document.select("div.MovieListSldCn article.TPost.A").map {
                     val id = it.selectFirst("a")?.attr("href")
                         ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
@@ -606,7 +598,7 @@ object AllMoviesForYouProvider : Provider {
         return tvShow
     }
 
-    override suspend fun getSeasonEpisodes(seasonId: String): List<Episode> {
+    override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
         val document = service.getSeasonEpisodes(seasonId)
 
         val episodes = document.select("section.SeasonBx tr.Viewed").map {
@@ -816,56 +808,38 @@ object AllMoviesForYouProvider : Provider {
     }
 
 
-    override suspend fun getVideo(id: String, videoType: PlayerFragment.VideoType): Video {
+    override suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server> {
         val document = when (videoType) {
             is PlayerFragment.VideoType.Movie -> service.getMovie(id)
             is PlayerFragment.VideoType.Episode -> service.getEpisode(id)
         }
 
-        val links = document.select("body iframe")
-            .map { it.attr("src") }
-            .mapNotNull { src ->
-                if (src.contains("trembed")) {
-                    service.getLink(src)
-                        .selectFirst("body iframe")
-                        ?.attr("src")
-                        ?.replace("streamhub.to/d/", "streamhub.to/e/")
-                } else {
-                    src
-                }
-            }
-
-        val video = retry(links.size) { attempt ->
-            val link = service.getSource(links.getOrNull(attempt - 1) ?: "")
-
-            val packedJS = Regex("(eval\\(function\\(p,a,c,k,e,d\\)(.|\\n)*?)</script>")
-                .find(link.toString())?.let { it.groupValues[1] }
-                ?: throw Exception("No sources found")
-
-            val unPacked = JsUnpacker(packedJS).unpack()
-                ?: throw Exception("No sources found")
-
-            val sources = Regex("src:\"(.*?)\"").findAll(
-                Regex("\\{sources:\\[(.*?)]")
-                    .find(unPacked)?.let { it.groupValues[1] }
-                    ?: throw Exception("No sources found")
-            ).map { it.groupValues[1] }.toList()
-
-            Video(
-                sources = sources,
-                subtitles = link.select("video > track")
-                    .map {
-                        Video.Subtitle(
-                            label = it.attr("label"),
-                            file = it.attr("src"),
-                        )
-                    }
-                    .filter { it.label != "Upload SRT" }
-                    .sortedBy { it.label }
+        val servers = document.select("ul.optnslst button").map {
+            val nmopt = it.selectFirst("span")?.text() ?: ""
+            Video.Server(
+                id = it.attr("data-id"),
+                name = it.select("span")[1]?.text() ?: "",
+                src = document.selectFirst("div#VideoOption${nmopt}")
+                    ?.selectFirst("iframe")
+                    ?.attr("src")
+                    ?: "",
             )
         }
 
-        return video
+        return servers
+    }
+
+    override suspend fun getVideo(server: Video.Server): Video {
+        val link = if (server.src.contains("trembed")) {
+            service.getLink(server.src)
+                .selectFirst("body iframe")
+                ?.attr("src")
+                ?: ""
+        } else {
+            server.src
+        }
+
+        return Extractor.extract(link)
     }
 
 

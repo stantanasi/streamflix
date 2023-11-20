@@ -118,11 +118,18 @@ class TvShowViewHolder(
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
-                context.getString(
-                    R.string.tv_show_item_season_number_episode_number,
-                    season.number,
-                    episode.number
-                )
+                if (season.number != 0) {
+                    context.getString(
+                        R.string.tv_show_item_season_number_episode_number,
+                        season.number,
+                        episode.number
+                    )
+                } else {
+                    context.getString(
+                        R.string.tv_show_item_episode_number,
+                        episode.number
+                    )
+                }
             }
         } ?: context.getString(R.string.tv_show_item_type)
 
@@ -175,11 +182,18 @@ class TvShowViewHolder(
 
         binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
             season.episodes.lastOrNull()?.let { episode ->
-                context.getString(
-                    R.string.tv_show_item_season_number_episode_number,
-                    season.number,
-                    episode.number
-                )
+                if (season.number != 0) {
+                    context.getString(
+                        R.string.tv_show_item_season_number_episode_number,
+                        season.number,
+                        episode.number
+                    )
+                } else {
+                    context.getString(
+                        R.string.tv_show_item_episode_number,
+                        episode.number
+                    )
+                }
             }
         } ?: context.getString(R.string.tv_show_item_type)
 
@@ -237,6 +251,14 @@ class TvShowViewHolder(
             }
         }
 
+        binding.tvTvShowGenres.apply {
+            text = tvShow.genres.joinToString(", ") { it.name }
+            visibility = when {
+                tvShow.genres.isEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
         binding.tvTvShowOverview.text = tvShow.overview
 
         binding.btnTvShowTrailer.setOnClickListener {
@@ -253,7 +275,7 @@ class TvShowViewHolder(
         binding.hgvTvShowSeasons.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.seasons.reversed())
+                items.addAll(tvShow.seasons)
             }
             setItemSpacing(80)
         }

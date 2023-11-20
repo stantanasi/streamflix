@@ -3,13 +3,7 @@ package com.tanasi.streamflix.models
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.utils.toCalendar
 
-sealed class Show : AppAdapter.Item {
-
-    enum class Type {
-        Movie,
-        TvShow;
-    }
-}
+sealed class Show : AppAdapter.Item
 
 class Movie(
     val id: String,

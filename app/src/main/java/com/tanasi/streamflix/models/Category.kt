@@ -12,4 +12,9 @@ class Category(
 
 
     override var itemType = AppAdapter.Type.CATEGORY_ITEM
+
+
+    companion object {
+        const val FEATURED = "Featured"
+    }
 }

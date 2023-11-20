@@ -12,16 +12,28 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v1
+
       - name: Setup JDK environment
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
+
       - name: Make Gradle executable
         run: chmod +x ./gradlew
-      - name: Build with Gradle
-        run: ./gradlew build
+
       - name: Build APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Sign APK
+        id: sign_apk
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.KEYSTORE }}
+          alias: ${{ secrets.SIGNING_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -30,12 +42,13 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
+
       - name: Upload Release APK
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: app/build/outputs/apk/debug/app-debug.apk
+          asset_path: ${{ steps.sign_apk.outputs.signedReleaseFile }}
           asset_name: ${{ github.event.repository.name }}-${{  github.ref_name }}.apk
           asset_content_type: application/zip

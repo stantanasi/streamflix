@@ -86,6 +86,8 @@ class SearchFragment : Fragment() {
             adapter = appAdapter
             setItemSpacing(requireContext().resources.getDimension(R.dimen.search_spacing).toInt())
         }
+
+        binding.root.requestFocus()
     }
 
     private fun displaySearch(list: List<AppAdapter.Item>) {

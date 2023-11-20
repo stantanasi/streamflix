@@ -1,11 +1,13 @@
 package com.tanasi.streamflix.activities.main
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController
@@ -18,6 +20,7 @@ import com.tanasi.streamflix.ui.UpdateDialog
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.getCurrentFragment
 
+@UnstableApi
 class MainActivity : FragmentActivity() {
 
     private var _binding: ActivityMainBinding? = null
@@ -33,9 +36,9 @@ class MainActivity : FragmentActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navController = (supportFragmentManager
-            .findFragmentById(binding.navMainFragment.id) as NavHostFragment)
-            .navController
+        val navHostFragment = this.supportFragmentManager
+            .findFragmentById(R.id.nav_main_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
 
         UserPreferences.setup(this)
         UserPreferences.currentProvider?.let {
@@ -43,6 +46,10 @@ class MainActivity : FragmentActivity() {
         }
 
         binding.navMain.setupWithNavController(navController)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            binding.navMainFragment.isFocusedByDefault = true
+        }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.navMain.headerView?.apply {
@@ -115,8 +122,7 @@ class MainActivity : FragmentActivity() {
         }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-            override fun  handleOnBackPressed() {
+            override fun handleOnBackPressed() {
                 when (navController.currentDestination?.id) {
                     R.id.home -> when {
                         binding.navMain.hasFocus() -> finish()
@@ -143,5 +149,10 @@ class MainActivity : FragmentActivity() {
                 }
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.checkUpdate()
     }
 }
