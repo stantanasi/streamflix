@@ -4,7 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Parcelable
 import android.view.ViewGroup
-import androidx.appcompat.view.menu.*
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuItemImpl
+import androidx.appcompat.view.menu.MenuPresenter
+import androidx.appcompat.view.menu.MenuView
+import androidx.appcompat.view.menu.SubMenuBuilder
 
 @SuppressLint("RestrictedApi")
 class NavigationSlidePresenter : MenuPresenter {

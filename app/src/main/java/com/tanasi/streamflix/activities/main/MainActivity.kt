@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController
@@ -19,6 +20,7 @@ import com.tanasi.streamflix.ui.UpdateDialog
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.getCurrentFragment
 
+@UnstableApi
 class MainActivity : FragmentActivity() {
 
     private var _binding: ActivityMainBinding? = null

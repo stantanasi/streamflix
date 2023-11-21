@@ -2,7 +2,8 @@ package com.tanasi.streamflix.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.google.android.exoplayer2.ui.CaptionStyleCompat
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.ui.CaptionStyleCompat
 import com.tanasi.streamflix.BuildConfig
 import com.tanasi.streamflix.providers.AnyMovieProvider
 import com.tanasi.streamflix.providers.AniwatchProvider
@@ -10,6 +11,7 @@ import com.tanasi.streamflix.providers.Provider
 import com.tanasi.streamflix.providers.SflixProvider
 import com.tanasi.streamflix.ui.PlayerSettingsView
 
+@UnstableApi
 object UserPreferences {
 
     private lateinit var prefs: SharedPreferences

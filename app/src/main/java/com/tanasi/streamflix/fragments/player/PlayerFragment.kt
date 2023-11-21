@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.media.MediaDescriptionCompat
-import android.support.v4.media.session.MediaSessionCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,19 +14,20 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.tvprovider.media.tv.TvContractCompat
 import androidx.tvprovider.media.tv.WatchNextProgram
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.MediaItem.SubtitleConfiguration
-import com.google.android.exoplayer2.MediaMetadata
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
-import com.google.android.exoplayer2.ui.StyledPlayerControlView
-import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.google.android.exoplayer2.ui.SubtitleView
-import com.google.android.exoplayer2.util.MimeTypes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaItem.SubtitleConfiguration
+import androidx.media3.common.Player
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.MediaMetadata
+import androidx.media3.session.MediaSession
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.CaptionStyleCompat
+import androidx.media3.ui.PlayerControlView
+import androidx.media3.ui.PlayerView
+import androidx.media3.ui.SubtitleView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ContentExoControllerBinding
 import com.tanasi.streamflix.databinding.FragmentPlayerBinding
@@ -43,7 +42,7 @@ import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@SuppressLint("RestrictedApi")
+@UnstableApi @SuppressLint("RestrictedApi")
 class PlayerFragment : Fragment() {
 
     sealed class VideoType : Parcelable {
@@ -83,13 +82,12 @@ class PlayerFragment : Fragment() {
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
 
-    private val StyledPlayerView.controller
+    private val PlayerView.controller
         get() = ContentExoControllerBinding.bind(this.findViewById(R.id.cl_exo_controller))
-
-    private val StyledPlayerView.isControllerVisible
+    private val PlayerView.isControllerVisible
         get() = this.javaClass.getDeclaredField("controller").let {
             it.isAccessible = true
-            val controller = it.get(this) as StyledPlayerControlView
+            val controller = it.get(this) as PlayerControlView
             controller.isVisible
         }
 
@@ -97,7 +95,7 @@ class PlayerFragment : Fragment() {
     private val viewModel by viewModelsFactory { PlayerViewModel(args.videoType, args.id) }
 
     private lateinit var player: ExoPlayer
-    private lateinit var mediaSession: MediaSessionCompat
+    private lateinit var mediaSession: MediaSession
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -190,23 +188,10 @@ class PlayerFragment : Fragment() {
                     .build(),
                 true,
             )
+
+            mediaSession = MediaSession.Builder(requireContext(), player)
+                .build()
         }
-
-        mediaSession = MediaSessionCompat(requireContext(), "Player").apply {
-            isActive = true
-
-            MediaSessionConnector(this).also {
-                it.setPlayer(player)
-                it.setQueueNavigator(object : TimelineQueueNavigator(this) {
-                    override fun getMediaDescription(player: Player, windowIndex: Int) =
-                        MediaDescriptionCompat.Builder()
-                            .setTitle(args.title)
-                            .setSubtitle(args.subtitle)
-                            .build()
-                })
-            }
-        }
-
 
         binding.pvPlayer.player = player
         binding.settings.player = player
