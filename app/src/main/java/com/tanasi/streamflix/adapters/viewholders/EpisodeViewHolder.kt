@@ -42,6 +42,7 @@ class EpisodeViewHolder(
         }
     }
 
+
     private fun displayItem(binding: ItemEpisodeBinding) {
         binding.root.apply {
             setOnClickListener {

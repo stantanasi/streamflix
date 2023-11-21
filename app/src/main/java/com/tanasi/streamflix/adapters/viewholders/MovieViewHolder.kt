@@ -244,6 +244,7 @@ class MovieViewHolder(
         binding.tvMovieTitle.text = movie.title
     }
 
+
     private fun displayMovie(binding: ContentMovieBinding) {
         binding.ivMoviePoster.run {
             Glide.with(context)

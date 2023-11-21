@@ -41,7 +41,6 @@ import com.tanasi.streamflix.models.Provider
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 
-
 class AppAdapter(
     val items: MutableList<Item> = mutableListOf()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
