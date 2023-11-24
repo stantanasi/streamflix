@@ -235,7 +235,7 @@ object SflixProvider : Provider {
         return categories
     }
 
-    override suspend fun search(query: String): List<AppAdapter.Item> {
+    override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
         if (query.isEmpty()) {
             val document = service.getHome()
 
@@ -252,7 +252,7 @@ object SflixProvider : Provider {
             return genres
         }
 
-        val document = service.search(query.replace(" ", "-"))
+        val document = service.search(query.replace(" ", "-"), page)
 
         val results = document.select("div.flw-item").map {
             val id = it.selectFirst("a")
@@ -303,8 +303,8 @@ object SflixProvider : Provider {
         return results
     }
 
-    override suspend fun getMovies(): List<Movie> {
-        val document = service.getMovies()
+    override suspend fun getMovies(page: Int): List<Movie> {
+        val document = service.getMovies(page)
 
         val movies = document.select("div.flw-item").map {
             val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
@@ -325,8 +325,8 @@ object SflixProvider : Provider {
         return movies
     }
 
-    override suspend fun getTvShows(): List<TvShow> {
-        val document = service.getTvShows()
+    override suspend fun getTvShows(page: Int): List<TvShow> {
+        val document = service.getTvShows(page)
 
         val tvShows = document.select("div.flw-item").map {
             val info = it.select("div.film-detail > div.fd-infor > span").toInfo()
@@ -576,8 +576,8 @@ object SflixProvider : Provider {
     }
 
 
-    override suspend fun getGenre(id: String): Genre {
-        val document = service.getGenre(id)
+    override suspend fun getGenre(id: String, page: Int): Genre {
+        val document = service.getGenre(id, page)
 
         val genre = Genre(
             id = id,
@@ -634,8 +634,8 @@ object SflixProvider : Provider {
     }
 
 
-    override suspend fun getPeople(id: String): People {
-        val document = service.getPeople(id)
+    override suspend fun getPeople(id: String, page: Int): People {
+        val document = service.getPeople(id, page)
 
         val people = People(
             id = id,
@@ -763,13 +763,13 @@ object SflixProvider : Provider {
         suspend fun getHome(): Document
 
         @GET("search/{query}")
-        suspend fun search(@Path("query") query: String): Document
+        suspend fun search(@Path("query") query: String, @Query("page") page: Int): Document
 
         @GET("movie")
-        suspend fun getMovies(): Document
+        suspend fun getMovies(@Query("page") page: Int): Document
 
         @GET("tv-show")
-        suspend fun getTvShows(): Document
+        suspend fun getTvShows(@Query("page") page: Int): Document
 
 
         @GET("movie/free-{id}")
@@ -793,11 +793,11 @@ object SflixProvider : Provider {
 
 
         @GET("genre/{id}")
-        suspend fun getGenre(@Path("id") id: String): Document
+        suspend fun getGenre(@Path("id") id: String, @Query("page") page: Int): Document
 
 
         @GET("cast/{id}")
-        suspend fun getPeople(@Path("id") id: String): Document
+        suspend fun getPeople(@Path("id") id: String, @Query("page") page: Int): Document
 
 
         @GET("ajax/get_link/{id}")

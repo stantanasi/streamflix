@@ -250,7 +250,7 @@ object AnyMovieProvider : Provider {
         return categories
     }
 
-    override suspend fun search(query: String): List<AppAdapter.Item> {
+    override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
         if (query.isEmpty()) {
             val document = service.getHome()
 
@@ -268,7 +268,7 @@ object AnyMovieProvider : Provider {
             return genres
         }
 
-        val document = service.search(query)
+        val document = service.search(page, query)
 
         val results = document.select("ul.MovieList article.TPost.B").map {
             val id = it.selectFirst("a")?.attr("href")
@@ -346,8 +346,8 @@ object AnyMovieProvider : Provider {
         return results
     }
 
-    override suspend fun getMovies(): List<Movie> {
-        val document = service.getMovies()
+    override suspend fun getMovies(page: Int): List<Movie> {
+        val document = service.getMovies(page)
 
         val movies = document.select("ul.MovieList article.TPost.B").map {
             Movie(
@@ -395,8 +395,8 @@ object AnyMovieProvider : Provider {
         return movies
     }
 
-    override suspend fun getTvShows(): List<TvShow> {
-        val document = service.getTvShows()
+    override suspend fun getTvShows(page: Int): List<TvShow> {
+        val document = service.getTvShows(page)
 
         val tvShows = document.select("ul.MovieList article.TPost.B").map {
             TvShow(
@@ -620,8 +620,8 @@ object AnyMovieProvider : Provider {
     }
 
 
-    override suspend fun getGenre(id: String): Genre {
-        val document = service.getGenre(id)
+    override suspend fun getGenre(id: String, page: Int): Genre {
+        val document = service.getGenre(id, page)
 
         val genre = Genre(
             id = id,
@@ -707,9 +707,9 @@ object AnyMovieProvider : Provider {
     }
 
 
-    override suspend fun getPeople(id: String): People {
-        val cast = service.getCast(id)
-        val castTv = service.getCastTv(id)
+    override suspend fun getPeople(id: String, page: Int): People {
+        val cast = service.getCast(id, page)
+        val castTv = service.getCastTv(id, page)
 
         val people = People(
             id = id,
@@ -886,14 +886,14 @@ object AnyMovieProvider : Provider {
         @GET(".")
         suspend fun getHome(): Document
 
-        @GET(".")
-        suspend fun search(@Query("s") query: String): Document
+        @GET("page/{page}")
+        suspend fun search(@Path("page") page: Int, @Query("s") query: String): Document
 
-        @GET("movies")
-        suspend fun getMovies(): Document
+        @GET("movies/page/{page}")
+        suspend fun getMovies(@Path("page") page: Int): Document
 
-        @GET("shows")
-        suspend fun getTvShows(): Document
+        @GET("shows/page/{page}")
+        suspend fun getTvShows(@Path("page") page: Int): Document
 
 
         @GET("movies/{slug}")
@@ -910,15 +910,15 @@ object AnyMovieProvider : Provider {
         suspend fun getEpisode(@Path("id") id: String): Document
 
 
-        @GET("category/{id}")
-        suspend fun getGenre(@Path("id") id: String): Document
+        @GET("category/{id}/page/{page}")
+        suspend fun getGenre(@Path("id") id: String, @Path("page") page: Int): Document
 
 
-        @GET("cast/{slug}")
-        suspend fun getCast(@Path("slug") slug: String): Document
+        @GET("cast/{slug}/page/{page}")
+        suspend fun getCast(@Path("slug") slug: String, @Path("page") page: Int): Document
 
-        @GET("cast_tv/{slug}")
-        suspend fun getCastTv(@Path("slug") slug: String): Document
+        @GET("cast_tv/{slug}/page/{page}")
+        suspend fun getCastTv(@Path("slug") slug: String, @Path("page") page: Int): Document
 
 
         @GET
