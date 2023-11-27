@@ -14,6 +14,8 @@ class MoviesViewModel : ViewModel() {
     private val _state = MutableLiveData<State>(State.Loading)
     val state: LiveData<State> = _state
 
+    private var page = 1
+
     sealed class State {
         object Loading : State()
         data class SuccessLoading(val movies: List<Movie>) : State()
@@ -29,7 +31,7 @@ class MoviesViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val movies = UserPreferences.currentProvider!!.getMovies()
+            val movies = UserPreferences.currentProvider!!.getMovies(page)
 
             _state.postValue(State.SuccessLoading(movies))
         } catch (e: Exception) {

@@ -14,6 +14,8 @@ class GenreViewModel(id: String) : ViewModel() {
     private val _state = MutableLiveData<State>(State.Loading)
     val state: LiveData<State> = _state
 
+    private var page = 1
+
     sealed class State {
         object Loading : State()
         data class SuccessLoading(val genre: Genre) : State()
@@ -29,7 +31,7 @@ class GenreViewModel(id: String) : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val genre = UserPreferences.currentProvider!!.getGenre(id)
+            val genre = UserPreferences.currentProvider!!.getGenre(id, page)
 
             _state.postValue(State.SuccessLoading(genre))
         } catch (e: Exception) {

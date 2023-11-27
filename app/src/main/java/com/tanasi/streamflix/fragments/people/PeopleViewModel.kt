@@ -14,6 +14,8 @@ class PeopleViewModel(id: String) : ViewModel() {
     private val _state = MutableLiveData<State>(State.Loading)
     val state: LiveData<State> = _state
 
+    private var page = 1
+
     sealed class State {
         object Loading : State()
         data class SuccessLoading(val people: People) : State()
@@ -29,7 +31,7 @@ class PeopleViewModel(id: String) : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val people = UserPreferences.currentProvider!!.getPeople(id)
+            val people = UserPreferences.currentProvider!!.getPeople(id, page)
 
             _state.postValue(State.SuccessLoading(people))
         } catch (e: Exception) {

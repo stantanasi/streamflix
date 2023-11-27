@@ -14,6 +14,8 @@ class TvShowsViewModel : ViewModel() {
     private val _state = MutableLiveData<State>(State.Loading)
     val state: LiveData<State> = _state
 
+    private var page = 1
+
     sealed class State {
         object Loading : State()
         data class SuccessLoading(val tvShows: List<TvShow>) : State()
@@ -29,7 +31,7 @@ class TvShowsViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val tvShows = UserPreferences.currentProvider!!.getTvShows()
+            val tvShows = UserPreferences.currentProvider!!.getTvShows(page)
 
             _state.postValue(State.SuccessLoading(tvShows))
         } catch (e: Exception) {

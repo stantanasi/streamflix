@@ -15,6 +15,7 @@ class SearchViewModel : ViewModel() {
     val state: LiveData<State> = _state
 
     var query = ""
+    private var page = 1
 
     sealed class State {
         object Searching : State()
@@ -31,7 +32,7 @@ class SearchViewModel : ViewModel() {
         _state.postValue(State.Searching)
 
         try {
-            val results = UserPreferences.currentProvider!!.search(query)
+            val results = UserPreferences.currentProvider!!.search(query, page)
 
             _state.postValue(State.SuccessSearching(results))
                 .run { this@SearchViewModel.query = query }

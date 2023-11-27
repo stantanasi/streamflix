@@ -19,11 +19,11 @@ interface Provider {
 
     suspend fun getHome(): List<Category>
 
-    suspend fun search(query: String, page: Int = 1): List<AppAdapter.Item>
+    suspend fun search(query: String, page: Int): List<AppAdapter.Item>
 
-    suspend fun getMovies(page: Int = 1): List<Movie>
+    suspend fun getMovies(page: Int): List<Movie>
 
-    suspend fun getTvShows(page: Int = 1): List<TvShow>
+    suspend fun getTvShows(page: Int): List<TvShow>
 
 
     suspend fun getMovie(id: String): Movie
@@ -34,10 +34,10 @@ interface Provider {
     suspend fun getEpisodesBySeason(seasonId: String): List<Episode>
 
 
-    suspend fun getGenre(id: String, page: Int = 1): Genre
+    suspend fun getGenre(id: String, page: Int): Genre
 
 
-    suspend fun getPeople(id: String, page: Int = 1): People
+    suspend fun getPeople(id: String, page: Int): People
 
 
     suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server>
