@@ -42,8 +42,10 @@ class SearchFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 SearchViewModel.State.Searching -> binding.isLoading.root.visibility = View.VISIBLE
+                SearchViewModel.State.SearchingMore -> appAdapter.isLoading = true
                 is SearchViewModel.State.SuccessSearching -> {
-                    displaySearch(state.results)
+                    displaySearch(state.results, state.hasMore)
+                    appAdapter.isLoading = false
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is SearchViewModel.State.FailedSearching -> {
@@ -90,7 +92,7 @@ class SearchFragment : Fragment() {
         binding.root.requestFocus()
     }
 
-    private fun displaySearch(list: List<AppAdapter.Item>) {
+    private fun displaySearch(list: List<AppAdapter.Item>, hasMore: Boolean) {
         binding.vgvSearch.apply {
             setNumColumns(
                 if (viewModel.query == "") 5
@@ -98,16 +100,18 @@ class SearchFragment : Fragment() {
             )
         }
 
-        appAdapter.items.apply {
-            clear()
-            addAll(list.onEach {
-                when (it) {
-                    is Genre -> it.itemType = AppAdapter.Type.GENRE_GRID_ITEM
-                    is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
-                    is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
-                }
-            })
+        appAdapter.submitList(list.onEach {
+            when (it) {
+                is Genre -> it.itemType = AppAdapter.Type.GENRE_GRID_ITEM
+                is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
+                is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
+            }
+        })
+
+        if (hasMore) {
+            appAdapter.setOnLoadMoreListener { viewModel.loadMore() }
+        } else {
+            appAdapter.setOnLoadMoreListener(null)
         }
-        appAdapter.notifyDataSetChanged()
     }
 }

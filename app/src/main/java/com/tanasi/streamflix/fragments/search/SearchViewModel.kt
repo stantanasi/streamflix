@@ -19,7 +19,8 @@ class SearchViewModel : ViewModel() {
 
     sealed class State {
         object Searching : State()
-        data class SuccessSearching(val results: List<AppAdapter.Item>) : State()
+        object SearchingMore : State()
+        data class SuccessSearching(val results: List<AppAdapter.Item>, val hasMore: Boolean) : State()
         data class FailedSearching(val error: Exception) : State()
     }
 
@@ -34,10 +35,30 @@ class SearchViewModel : ViewModel() {
         try {
             val results = UserPreferences.currentProvider!!.search(query, page)
 
-            _state.postValue(State.SuccessSearching(results))
+            _state.postValue(State.SuccessSearching(results, true))
                 .run { this@SearchViewModel.query = query }
         } catch (e: Exception) {
             _state.postValue(State.FailedSearching(e))
+        }
+    }
+
+    fun loadMore() = viewModelScope.launch(Dispatchers.IO) {
+        val currentState = state.value
+        if (currentState is State.SuccessSearching) {
+            _state.postValue(State.SearchingMore)
+
+            try {
+                val results = UserPreferences.currentProvider!!.search(query, page + 1)
+
+                _state.postValue(
+                    State.SuccessSearching(
+                        results = currentState.results + results,
+                        hasMore = results.isNotEmpty(),
+                    )
+                ).run { page += 1 }
+            } catch (e: Exception) {
+                _state.postValue(State.FailedSearching(e))
+            }
         }
     }
 }
