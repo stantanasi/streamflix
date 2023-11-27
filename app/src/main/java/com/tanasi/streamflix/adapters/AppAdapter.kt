@@ -81,6 +81,9 @@ class AppAdapter(
         TV_SHOW_RECOMMENDATIONS,
     }
 
+    var isLoading = false
+    private var onLoadMoreListener: (() -> Unit)? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (Type.values()[viewType]) {
             Type.CATEGORY_ITEM -> CategoryViewHolder(
@@ -236,6 +239,11 @@ class AppAdapter(
         }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (position >= itemCount - 5 && !isLoading) {
+            onLoadMoreListener?.invoke()
+            isLoading = true
+        }
+
         when (holder) {
             is CategoryViewHolder -> holder.bind(items[position] as Category)
             is EpisodeViewHolder -> holder.bind(items[position] as Episode)
@@ -251,4 +259,9 @@ class AppAdapter(
     override fun getItemCount(): Int = items.size
 
     override fun getItemViewType(position: Int): Int = items[position].itemType.ordinal
+
+
+    fun setOnLoadMoreListener(onLoadMoreListener: (() -> Unit)?) {
+        this.onLoadMoreListener = onLoadMoreListener
+    }
 }
