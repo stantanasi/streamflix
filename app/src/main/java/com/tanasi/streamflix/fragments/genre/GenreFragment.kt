@@ -42,8 +42,10 @@ class GenreFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 GenreViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                GenreViewModel.State.LoadingMore -> appAdapter.isLoading = true
                 is GenreViewModel.State.SuccessLoading -> {
-                    displayGenre(state.genre)
+                    displayGenre(state.genre, state.hasMore)
+                    appAdapter.isLoading = false
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is GenreViewModel.State.FailedLoading -> {
@@ -72,16 +74,18 @@ class GenreFragment : Fragment() {
         }
     }
 
-    private fun displayGenre(genre: Genre) {
-        appAdapter.items.apply {
-            clear()
-            addAll(genre.shows.onEach {
-                when (it) {
-                    is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
-                    is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
-                }
-            })
+    private fun displayGenre(genre: Genre, hasMore: Boolean) {
+        appAdapter.submitList(genre.shows.onEach {
+            when (it) {
+                is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
+                is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
+            }
+        })
+
+        if (hasMore) {
+            appAdapter.setOnLoadMoreListener { viewModel.loadMoreGenreShows() }
+        } else {
+            appAdapter.setOnLoadMoreListener(null)
         }
-        appAdapter.notifyDataSetChanged()
     }
 }
