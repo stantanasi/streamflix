@@ -35,8 +35,8 @@ class SearchViewModel : ViewModel() {
         try {
             val results = UserPreferences.currentProvider!!.search(query, page)
 
+            this@SearchViewModel.query = query
             _state.postValue(State.SuccessSearching(results, true))
-                .run { this@SearchViewModel.query = query }
         } catch (e: Exception) {
             _state.postValue(State.FailedSearching(e))
         }
