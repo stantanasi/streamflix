@@ -608,6 +608,12 @@ object AniwatchProvider : Provider {
                         poster = showPoster,
                     )
                 }
+            }.distinctBy {
+                when (it) {
+                    is Movie -> it.id
+                    is TvShow -> it.id
+                    else -> it
+                }
             }
         )
 
