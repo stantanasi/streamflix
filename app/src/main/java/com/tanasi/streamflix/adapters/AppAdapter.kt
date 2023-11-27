@@ -15,7 +15,6 @@ import com.tanasi.streamflix.databinding.ContentCategorySwiperBinding
 import com.tanasi.streamflix.databinding.ContentMovieBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
-import com.tanasi.streamflix.databinding.ContentPeopleBinding
 import com.tanasi.streamflix.databinding.ContentTvShowBinding
 import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
@@ -68,8 +67,6 @@ class AppAdapter(
         MOVIE_RECOMMENDATIONS,
 
         PEOPLE_ITEM,
-
-        PEOPLE,
 
         PROVIDER,
 
@@ -171,14 +168,6 @@ class AppAdapter(
 
             Type.PEOPLE_ITEM -> PeopleViewHolder(
                 ItemPeopleBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false,
-                )
-            )
-
-            Type.PEOPLE -> PeopleViewHolder(
-                ContentPeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
