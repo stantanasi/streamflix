@@ -108,7 +108,7 @@ class SearchFragment : Fragment() {
             }
         })
 
-        if (hasMore) {
+        if (hasMore && viewModel.query != "") {
             appAdapter.setOnLoadMoreListener { viewModel.loadMore() }
         } else {
             appAdapter.setOnLoadMoreListener(null)
