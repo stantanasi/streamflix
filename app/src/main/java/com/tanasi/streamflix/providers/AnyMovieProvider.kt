@@ -935,7 +935,7 @@ object AnyMovieProvider : Provider {
         @GET("movies/page/{page}")
         suspend fun getMovies(@Path("page") page: Int): Document
 
-        @GET("shows/page/{page}")
+        @GET("series/page/{page}")
         suspend fun getTvShows(@Path("page") page: Int): Document
 
 
