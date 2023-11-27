@@ -2,6 +2,7 @@ package com.tanasi.streamflix.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.adapters.viewholders.CategoryViewHolder
 import com.tanasi.streamflix.adapters.viewholders.EpisodeViewHolder
@@ -275,6 +276,27 @@ class AppAdapter(
 
     override fun getItemViewType(position: Int): Int = items.getOrNull(position)?.itemType?.ordinal
         ?: Type.LOADING.ordinal
+
+
+    fun submitList(list: List<Item>) {
+        val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize() = items.size
+
+            override fun getNewListSize() = list.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return items[oldItemPosition] === list[newItemPosition]
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return items[oldItemPosition] == list[newItemPosition]
+            }
+        })
+
+        items.clear()
+        items.addAll(list)
+        result.dispatchUpdatesTo(this)
+    }
 
 
     fun setOnLoadMoreListener(onLoadMoreListener: (() -> Unit)?) {
