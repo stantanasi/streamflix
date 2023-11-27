@@ -966,8 +966,5 @@ object AnyMovieProvider : Provider {
 
         @GET
         suspend fun getLink(@Url url: String): Document
-
-        @GET
-        suspend fun getSource(@Url url: String): Document
     }
 }

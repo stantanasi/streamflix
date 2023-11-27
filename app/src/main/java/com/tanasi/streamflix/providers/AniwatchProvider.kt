@@ -60,8 +60,8 @@ object AniwatchProvider : Provider {
 
                     if (isMovie) {
                         Movie(
-                            id =id,
-                            title=title,
+                            id = id,
+                            title = title,
                             overview = overview,
                             runtime = runtime,
                             quality = quality,
@@ -69,8 +69,8 @@ object AniwatchProvider : Provider {
                         )
                     } else {
                         TvShow(
-                            id =id,
-                            title=title,
+                            id = id,
+                            title = title,
                             overview = overview,
                             runtime = runtime,
                             quality = quality,
@@ -524,7 +524,7 @@ object AniwatchProvider : Provider {
             shows = document.select("div.flw-item").map {
                 val showId = it.selectFirst("a")
                     ?.attr("href")?.substringAfterLast("/") ?: ""
-                val showTitle =  it.selectFirst("h3.film-name")
+                val showTitle = it.selectFirst("h3.film-name")
                     ?.text() ?: ""
                 val showOverview = it.selectFirst("div.description")
                     ?.text() ?: ""
