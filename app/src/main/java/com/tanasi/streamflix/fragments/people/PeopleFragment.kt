@@ -43,8 +43,10 @@ class PeopleFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 PeopleViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                PeopleViewModel.State.LoadingMore -> appAdapter.isLoading = true
                 is PeopleViewModel.State.SuccessLoading -> {
-                    displayPeople(state.people)
+                    displayPeople(state.people, state.hasMore)
+                    appAdapter.isLoading = false
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is PeopleViewModel.State.FailedLoading -> {
@@ -71,7 +73,7 @@ class PeopleFragment : Fragment() {
         }
     }
 
-    private fun displayPeople(people: People) {
+    private fun displayPeople(people: People, hasMore: Boolean) {
         binding.tvPeopleName.text = people.name
 
         binding.ivPeopleImage.apply {
@@ -83,15 +85,17 @@ class PeopleFragment : Fragment() {
                 .into(this)
         }
 
-        appAdapter.items.apply {
-            clear()
-            addAll(people.filmography.onEach {
-                when (it) {
-                    is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
-                    is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
-                }
-            })
+        appAdapter.submitList(people.filmography.onEach {
+            when (it) {
+                is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
+                is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
+            }
+        })
+
+        if (hasMore) {
+            appAdapter.setOnLoadMoreListener { viewModel.loadMorePeopleFilmography() }
+        } else {
+            appAdapter.setOnLoadMoreListener(null)
         }
-        appAdapter.notifyDataSetChanged()
     }
 }
