@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.adapters.viewholders.CategoryViewHolder
 import com.tanasi.streamflix.adapters.viewholders.EpisodeViewHolder
 import com.tanasi.streamflix.adapters.viewholders.GenreViewHolder
+import com.tanasi.streamflix.adapters.viewholders.LoadingViewHolder
 import com.tanasi.streamflix.adapters.viewholders.MovieViewHolder
 import com.tanasi.streamflix.adapters.viewholders.PeopleViewHolder
 import com.tanasi.streamflix.adapters.viewholders.ProviderViewHolder
@@ -23,6 +24,7 @@ import com.tanasi.streamflix.databinding.ItemCategoryBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingBinding
 import com.tanasi.streamflix.databinding.ItemGenreGridBinding
+import com.tanasi.streamflix.databinding.ItemLoadingBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
 import com.tanasi.streamflix.databinding.ItemMovieContinueWatchingBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
@@ -57,6 +59,8 @@ class AppAdapter(
         EPISODE_CONTINUE_WATCHING_ITEM,
 
         GENRE_GRID_ITEM,
+
+        LOADING,
 
         MOVIE_ITEM,
         MOVIE_GRID_ITEM,
@@ -119,6 +123,14 @@ class AppAdapter(
 
             Type.GENRE_GRID_ITEM -> GenreViewHolder(
                 ItemGenreGridBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.LOADING -> LoadingViewHolder(
+                ItemLoadingBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -256,12 +268,19 @@ class AppAdapter(
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = items.size + when {
+        onLoadMoreListener != null -> 1
+        else -> 0
+    }
 
-    override fun getItemViewType(position: Int): Int = items[position].itemType.ordinal
+    override fun getItemViewType(position: Int): Int = items.getOrNull(position)?.itemType?.ordinal
+        ?: Type.LOADING.ordinal
 
 
     fun setOnLoadMoreListener(onLoadMoreListener: (() -> Unit)?) {
         this.onLoadMoreListener = onLoadMoreListener
+        if (onLoadMoreListener == null) {
+            notifyItemRemoved(items.size)
+        }
     }
 }
