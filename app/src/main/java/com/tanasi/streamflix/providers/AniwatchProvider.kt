@@ -561,7 +561,17 @@ object AniwatchProvider : Provider {
 
 
     override suspend fun getPeople(id: String, page: Int): People {
-        val document = service.getPeople(id, page)
+        val document = service.getPeople(id)
+
+        if (page > 1) {
+            return People(
+                id = id,
+                name = document.selectFirst("h4.name")
+                    ?.text() ?: "",
+                image = document.selectFirst("div.avatar img")
+                    ?.attr("src"),
+            )
+        }
 
         val people = People(
             id = id,
@@ -694,7 +704,7 @@ object AniwatchProvider : Provider {
 
 
         @GET("people/{id}")
-        suspend fun getPeople(@Path("id") id: String, @Query("page") page: Int): Document
+        suspend fun getPeople(@Path("id") id: String): Document
 
 
         @GET("ajax/v2/episode/servers")
