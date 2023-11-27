@@ -211,7 +211,7 @@ object AniwatchProvider : Provider {
         return categories
     }
 
-    override suspend fun search(query: String): List<AppAdapter.Item> {
+    override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
         if (query.isEmpty()) {
             val document = service.getHome()
 
@@ -228,7 +228,7 @@ object AniwatchProvider : Provider {
             return genres
         }
 
-        val document = service.search(query.replace(" ", "+"))
+        val document = service.search(query.replace(" ", "+"), page)
 
         val results = document.select("div.flw-item").map {
             val id = it.selectFirst("a")
@@ -263,8 +263,8 @@ object AniwatchProvider : Provider {
         return results
     }
 
-    override suspend fun getMovies(): List<Movie> {
-        val document = service.getMovies()
+    override suspend fun getMovies(page: Int): List<Movie> {
+        val document = service.getMovies(page)
 
         val movies = document.select("div.flw-item").map {
             Movie(
@@ -284,8 +284,8 @@ object AniwatchProvider : Provider {
         return movies
     }
 
-    override suspend fun getTvShows(): List<TvShow> {
-        val document = service.getTvSeries()
+    override suspend fun getTvShows(page: Int): List<TvShow> {
+        val document = service.getTvSeries(page)
 
         val tvShows = document.select("div.flw-item").map {
             TvShow(
@@ -513,8 +513,8 @@ object AniwatchProvider : Provider {
     }
 
 
-    override suspend fun getGenre(id: String): Genre {
-        val document = service.getGenre(id)
+    override suspend fun getGenre(id: String, page: Int): Genre {
+        val document = service.getGenre(id, page)
 
         val genre = Genre(
             id = id,
@@ -560,8 +560,18 @@ object AniwatchProvider : Provider {
     }
 
 
-    override suspend fun getPeople(id: String): People {
+    override suspend fun getPeople(id: String, page: Int): People {
         val document = service.getPeople(id)
+
+        if (page > 1) {
+            return People(
+                id = id,
+                name = document.selectFirst("h4.name")
+                    ?.text() ?: "",
+                image = document.selectFirst("div.avatar img")
+                    ?.attr("src"),
+            )
+        }
 
         val people = People(
             id = id,
@@ -666,13 +676,16 @@ object AniwatchProvider : Provider {
         suspend fun getHome(): Document
 
         @GET("search")
-        suspend fun search(@Query("keyword", encoded = true) keyword: String): Document
+        suspend fun search(
+            @Query("keyword", encoded = true) keyword: String,
+            @Query("page") page: Int
+        ): Document
 
         @GET("movie")
-        suspend fun getMovies(): Document
+        suspend fun getMovies(@Query("page") page: Int): Document
 
         @GET("tv")
-        suspend fun getTvSeries(): Document
+        suspend fun getTvSeries(@Query("page") page: Int): Document
 
 
         @GET("{id}")
@@ -687,7 +700,7 @@ object AniwatchProvider : Provider {
 
 
         @GET("genre/{id}")
-        suspend fun getGenre(@Path("id") id: String): Document
+        suspend fun getGenre(@Path("id") id: String, @Query("page") page: Int): Document
 
 
         @GET("people/{id}")

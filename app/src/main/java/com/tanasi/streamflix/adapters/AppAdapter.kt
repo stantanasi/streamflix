@@ -2,10 +2,12 @@ package com.tanasi.streamflix.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.adapters.viewholders.CategoryViewHolder
 import com.tanasi.streamflix.adapters.viewholders.EpisodeViewHolder
 import com.tanasi.streamflix.adapters.viewholders.GenreViewHolder
+import com.tanasi.streamflix.adapters.viewholders.LoadingViewHolder
 import com.tanasi.streamflix.adapters.viewholders.MovieViewHolder
 import com.tanasi.streamflix.adapters.viewholders.PeopleViewHolder
 import com.tanasi.streamflix.adapters.viewholders.ProviderViewHolder
@@ -15,7 +17,6 @@ import com.tanasi.streamflix.databinding.ContentCategorySwiperBinding
 import com.tanasi.streamflix.databinding.ContentMovieBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
-import com.tanasi.streamflix.databinding.ContentPeopleBinding
 import com.tanasi.streamflix.databinding.ContentTvShowBinding
 import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
@@ -24,6 +25,7 @@ import com.tanasi.streamflix.databinding.ItemCategoryBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingBinding
 import com.tanasi.streamflix.databinding.ItemGenreGridBinding
+import com.tanasi.streamflix.databinding.ItemLoadingBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
 import com.tanasi.streamflix.databinding.ItemMovieContinueWatchingBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
@@ -59,6 +61,8 @@ class AppAdapter(
 
         GENRE_GRID_ITEM,
 
+        LOADING,
+
         MOVIE_ITEM,
         MOVIE_GRID_ITEM,
         MOVIE_CONTINUE_WATCHING_ITEM,
@@ -68,8 +72,6 @@ class AppAdapter(
         MOVIE_RECOMMENDATIONS,
 
         PEOPLE_ITEM,
-
-        PEOPLE,
 
         PROVIDER,
 
@@ -83,6 +85,9 @@ class AppAdapter(
         TV_SHOW_CASTS,
         TV_SHOW_RECOMMENDATIONS,
     }
+
+    var isLoading = false
+    private var onLoadMoreListener: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (Type.values()[viewType]) {
@@ -119,6 +124,14 @@ class AppAdapter(
 
             Type.GENRE_GRID_ITEM -> GenreViewHolder(
                 ItemGenreGridBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+
+            Type.LOADING -> LoadingViewHolder(
+                ItemLoadingBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -171,14 +184,6 @@ class AppAdapter(
 
             Type.PEOPLE_ITEM -> PeopleViewHolder(
                 ItemPeopleBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false,
-                )
-            )
-
-            Type.PEOPLE -> PeopleViewHolder(
-                ContentPeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -247,6 +252,11 @@ class AppAdapter(
         }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        if (position >= itemCount - 5 && !isLoading) {
+            onLoadMoreListener?.invoke()
+            isLoading = true
+        }
+
         when (holder) {
             is CategoryViewHolder -> holder.bind(items[position] as Category)
             is EpisodeViewHolder -> holder.bind(items[position] as Episode)
@@ -259,7 +269,40 @@ class AppAdapter(
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = items.size + when {
+        onLoadMoreListener != null -> 1
+        else -> 0
+    }
 
-    override fun getItemViewType(position: Int): Int = items[position].itemType.ordinal
+    override fun getItemViewType(position: Int): Int = items.getOrNull(position)?.itemType?.ordinal
+        ?: Type.LOADING.ordinal
+
+
+    fun submitList(list: List<Item>) {
+        val result = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+            override fun getOldListSize() = items.size
+
+            override fun getNewListSize() = list.size
+
+            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return items[oldItemPosition] === list[newItemPosition]
+            }
+
+            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+                return items[oldItemPosition] == list[newItemPosition]
+            }
+        })
+
+        items.clear()
+        items.addAll(list)
+        result.dispatchUpdatesTo(this)
+    }
+
+
+    fun setOnLoadMoreListener(onLoadMoreListener: (() -> Unit)?) {
+        this.onLoadMoreListener = onLoadMoreListener
+        if (onLoadMoreListener == null) {
+            notifyItemRemoved(items.size)
+        }
+    }
 }

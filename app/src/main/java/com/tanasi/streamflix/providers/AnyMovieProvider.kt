@@ -8,6 +8,7 @@ import com.tanasi.streamflix.models.*
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -250,7 +251,7 @@ object AnyMovieProvider : Provider {
         return categories
     }
 
-    override suspend fun search(query: String): List<AppAdapter.Item> {
+    override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
         if (query.isEmpty()) {
             val document = service.getHome()
 
@@ -268,9 +269,16 @@ object AnyMovieProvider : Provider {
             return genres
         }
 
-        val document = service.search(query)
+        val document = try {
+            service.search(page, query)
+        } catch (e: HttpException) {
+            when (e.code()) {
+                404 -> null
+                else -> throw e
+            }
+        }
 
-        val results = document.select("ul.MovieList article.TPost.B").map {
+        val results = document?.select("ul.MovieList article.TPost.B")?.map {
             val id = it.selectFirst("a")?.attr("href")
                 ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
             val title = it.selectFirst("h2.Title")
@@ -341,15 +349,22 @@ object AnyMovieProvider : Provider {
                     )
                 }
             }
-        }
+        } ?: listOf()
 
         return results
     }
 
-    override suspend fun getMovies(): List<Movie> {
-        val document = service.getMovies()
+    override suspend fun getMovies(page: Int): List<Movie> {
+        val document = try {
+            service.getMovies(page)
+        } catch (e: HttpException) {
+            when (e.code()) {
+                404 -> null
+                else -> throw e
+            }
+        }
 
-        val movies = document.select("ul.MovieList article.TPost.B").map {
+        val movies = document?.select("ul.MovieList article.TPost.B")?.map {
             Movie(
                 id = it.selectFirst("a")?.attr("href")
                     ?.substringBeforeLast("/")?.substringAfterLast("/") ?: "",
@@ -390,15 +405,22 @@ object AnyMovieProvider : Provider {
                     )
                 },
             )
-        }
+        } ?: listOf()
 
         return movies
     }
 
-    override suspend fun getTvShows(): List<TvShow> {
-        val document = service.getTvShows()
+    override suspend fun getTvShows(page: Int): List<TvShow> {
+        val document = try {
+            service.getTvShows(page)
+        } catch (e: HttpException) {
+            when (e.code()) {
+                404 -> null
+                else -> throw e
+            }
+        }
 
-        val tvShows = document.select("ul.MovieList article.TPost.B").map {
+        val tvShows = document?.select("ul.MovieList article.TPost.B")?.map {
             TvShow(
                 id = it.selectFirst("a")?.attr("href")
                     ?.substringBeforeLast("/")?.substringAfterLast("/") ?: "",
@@ -437,7 +459,7 @@ object AnyMovieProvider : Provider {
                     )
                 },
             )
-        }
+        } ?: listOf()
 
         return tvShows
     }
@@ -620,15 +642,22 @@ object AnyMovieProvider : Provider {
     }
 
 
-    override suspend fun getGenre(id: String): Genre {
-        val document = service.getGenre(id)
+    override suspend fun getGenre(id: String, page: Int): Genre {
+        val document = try {
+            service.getGenre(id, page)
+        } catch (e: HttpException) {
+            when (e.code()) {
+                404 -> null
+                else -> throw e
+            }
+        }
 
         val genre = Genre(
             id = id,
-            name = document.selectFirst("h2.Title")
+            name = document?.selectFirst("h2.Title")
                 ?.text() ?: "",
 
-            shows = document.select("ul.MovieList article.TPost.B").map {
+            shows = document?.select("ul.MovieList article.TPost.B")?.map {
                 val showId = it.selectFirst("a")?.attr("href")
                     ?.substringBeforeLast("/")?.substringAfterLast("/") ?: ""
                 val showTitle = it.selectFirst("h2.Title")
@@ -700,25 +729,39 @@ object AnyMovieProvider : Provider {
                         )
                     }
                 }
-            }
+            } ?: listOf()
         )
 
         return genre
     }
 
 
-    override suspend fun getPeople(id: String): People {
-        val cast = service.getCast(id)
-        val castTv = service.getCastTv(id)
+    override suspend fun getPeople(id: String, page: Int): People {
+        val cast = try {
+            service.getCast(id, page)
+        } catch (e: HttpException) {
+            when (e.code()) {
+                404 -> null
+                else -> throw e
+            }
+        }
+        val castTv = try {
+            service.getCastTv(id, page)
+        } catch (e: HttpException) {
+            when (e.code()) {
+                404 -> null
+                else -> throw e
+            }
+        }
 
         val people = People(
             id = id,
-            name = cast.selectFirst("h2.Title")
+            name = cast?.selectFirst("h2.Title")
                 ?.text() ?: "",
 
-            filmography = listOf(
-                cast.select("ul.MovieList article.TPost.B"),
-                castTv.select("ul.MovieList article.TPost.B"),
+            filmography = listOfNotNull(
+                cast?.select("ul.MovieList article.TPost.B"),
+                castTv?.select("ul.MovieList article.TPost.B"),
             )
                 .flatMap { elements ->
                     elements.map {
@@ -886,14 +929,14 @@ object AnyMovieProvider : Provider {
         @GET(".")
         suspend fun getHome(): Document
 
-        @GET(".")
-        suspend fun search(@Query("s") query: String): Document
+        @GET("page/{page}")
+        suspend fun search(@Path("page") page: Int, @Query("s") query: String): Document
 
-        @GET("movies")
-        suspend fun getMovies(): Document
+        @GET("movies/page/{page}")
+        suspend fun getMovies(@Path("page") page: Int): Document
 
-        @GET("shows")
-        suspend fun getTvShows(): Document
+        @GET("shows/page/{page}")
+        suspend fun getTvShows(@Path("page") page: Int): Document
 
 
         @GET("movies/{slug}")
@@ -910,15 +953,15 @@ object AnyMovieProvider : Provider {
         suspend fun getEpisode(@Path("id") id: String): Document
 
 
-        @GET("category/{id}")
-        suspend fun getGenre(@Path("id") id: String): Document
+        @GET("category/{id}/page/{page}")
+        suspend fun getGenre(@Path("id") id: String, @Path("page") page: Int): Document
 
 
-        @GET("cast/{slug}")
-        suspend fun getCast(@Path("slug") slug: String): Document
+        @GET("cast/{slug}/page/{page}")
+        suspend fun getCast(@Path("slug") slug: String, @Path("page") page: Int): Document
 
-        @GET("cast_tv/{slug}")
-        suspend fun getCastTv(@Path("slug") slug: String): Document
+        @GET("cast_tv/{slug}/page/{page}")
+        suspend fun getCastTv(@Path("slug") slug: String, @Path("page") page: Int): Document
 
 
         @GET

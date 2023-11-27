@@ -38,8 +38,10 @@ class TvShowsFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 TvShowsViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                TvShowsViewModel.State.LoadingMore -> appAdapter.isLoading = true
                 is TvShowsViewModel.State.SuccessLoading -> {
-                    displayTvShows(state.tvShows)
+                    displayTvShows(state.tvShows, state.hasMore)
+                    appAdapter.isLoading = false
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is TvShowsViewModel.State.FailedLoading -> {
@@ -70,13 +72,15 @@ class TvShowsFragment : Fragment() {
         binding.root.requestFocus()
     }
 
-    private fun displayTvShows(tvShows: List<TvShow>) {
-        appAdapter.items.apply {
-            clear()
-            addAll(tvShows.onEach {
-                it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
-            })
+    private fun displayTvShows(tvShows: List<TvShow>, hasMore: Boolean) {
+        appAdapter.submitList(tvShows.onEach {
+            it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
+        })
+
+        if (hasMore) {
+            appAdapter.setOnLoadMoreListener { viewModel.loadMoreTvShows() }
+        } else {
+            appAdapter.setOnLoadMoreListener(null)
         }
-        appAdapter.notifyDataSetChanged()
     }
 }

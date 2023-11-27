@@ -7,9 +7,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
+import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.databinding.FragmentPeopleBinding
+import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.People
+import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.viewModelsFactory
 
 class PeopleFragment : Fragment() {
@@ -39,8 +43,10 @@ class PeopleFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 PeopleViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                PeopleViewModel.State.LoadingMore -> appAdapter.isLoading = true
                 is PeopleViewModel.State.SuccessLoading -> {
-                    displayPeople(state.people)
+                    displayPeople(state.people, state.hasMore)
+                    appAdapter.isLoading = false
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is PeopleViewModel.State.FailedLoading -> {
@@ -61,17 +67,35 @@ class PeopleFragment : Fragment() {
 
 
     private fun initializePeople() {
-        binding.vgvPeople.apply {
+        binding.vgvPeopleFilmography.apply {
             adapter = appAdapter
-            setItemSpacing(80)
+            setItemSpacing(20)
         }
     }
 
-    private fun displayPeople(people: People) {
-        appAdapter.items.apply {
-            clear()
-            add(people.apply { itemType = AppAdapter.Type.PEOPLE })
+    private fun displayPeople(people: People, hasMore: Boolean) {
+        binding.tvPeopleName.text = people.name
+
+        binding.ivPeopleImage.apply {
+            clipToOutline = true
+            Glide.with(context)
+                .load(people.image)
+                .placeholder(R.drawable.ic_person_placeholder)
+                .centerCrop()
+                .into(this)
         }
-        appAdapter.notifyDataSetChanged()
+
+        appAdapter.submitList(people.filmography.onEach {
+            when (it) {
+                is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
+                is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_GRID_ITEM
+            }
+        })
+
+        if (hasMore) {
+            appAdapter.setOnLoadMoreListener { viewModel.loadMorePeopleFilmography() }
+        } else {
+            appAdapter.setOnLoadMoreListener(null)
+        }
     }
 }
