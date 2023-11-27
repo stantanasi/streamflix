@@ -5,7 +5,7 @@
   <br />
   An Android TV app to stream movies and TV shows for free, made with Android Studio, in Kotlin
   <br />
-  <a href="https://github.com/stantanasi/streamflix/releases">
+  <a href="https://github.com/stantanasi/streamflix/releases/latest">
     <strong>Download app »</strong>
   </a>
   <br />
