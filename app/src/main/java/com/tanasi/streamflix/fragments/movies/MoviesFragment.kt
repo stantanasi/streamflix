@@ -38,8 +38,10 @@ class MoviesFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 MoviesViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                MoviesViewModel.State.LoadingMore -> appAdapter.isLoading = true
                 is MoviesViewModel.State.SuccessLoading -> {
-                    displayMovies(state.movies)
+                    displayMovies(state.movies, state.hasMore)
+                    appAdapter.isLoading = false
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is MoviesViewModel.State.FailedLoading -> {
@@ -68,13 +70,15 @@ class MoviesFragment : Fragment() {
         binding.root.requestFocus()
     }
 
-    private fun displayMovies(movies: List<Movie>) {
-        appAdapter.items.apply {
-            clear()
-            addAll(movies.onEach {
-                it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
-            })
+    private fun displayMovies(movies: List<Movie>, hasMore: Boolean) {
+        appAdapter.submitList(movies.onEach {
+            it.itemType = AppAdapter.Type.MOVIE_GRID_ITEM
+        })
+
+        if (hasMore) {
+            appAdapter.setOnLoadMoreListener { viewModel.loadMoreMovies() }
+        } else {
+            appAdapter.setOnLoadMoreListener(null)
         }
-        appAdapter.notifyDataSetChanged()
     }
 }

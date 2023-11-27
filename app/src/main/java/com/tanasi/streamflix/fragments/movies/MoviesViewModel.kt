@@ -18,7 +18,8 @@ class MoviesViewModel : ViewModel() {
 
     sealed class State {
         object Loading : State()
-        data class SuccessLoading(val movies: List<Movie>) : State()
+        object LoadingMore : State()
+        data class SuccessLoading(val movies: List<Movie>, val hasMore: Boolean) : State()
         data class FailedLoading(val error: Exception) : State()
     }
 
@@ -33,9 +34,29 @@ class MoviesViewModel : ViewModel() {
         try {
             val movies = UserPreferences.currentProvider!!.getMovies(page)
 
-            _state.postValue(State.SuccessLoading(movies))
+            _state.postValue(State.SuccessLoading(movies, true))
         } catch (e: Exception) {
             _state.postValue(State.FailedLoading(e))
+        }
+    }
+
+    fun loadMoreMovies() = viewModelScope.launch(Dispatchers.IO) {
+        val currentState = state.value
+        if (currentState is State.SuccessLoading) {
+            _state.postValue(State.LoadingMore)
+
+            try {
+                val movies = UserPreferences.currentProvider!!.getMovies(page + 1)
+
+                _state.postValue(
+                    State.SuccessLoading(
+                        movies = currentState.movies + movies,
+                        hasMore = movies.isNotEmpty(),
+                    )
+                ).run { page += 1 }
+            } catch (e: Exception) {
+                _state.postValue(State.FailedLoading(e))
+            }
         }
     }
 }
