@@ -32,7 +32,9 @@ class PeopleViewModel(private val id: String) : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val people = UserPreferences.currentProvider!!.getPeople(id, page)
+            val people = UserPreferences.currentProvider!!.getPeople(id)
+
+            page = 1
 
             _state.postValue(State.SuccessLoading(people, true))
         } catch (e: Exception) {
@@ -48,6 +50,8 @@ class PeopleViewModel(private val id: String) : ViewModel() {
             try {
                 val people = UserPreferences.currentProvider!!.getPeople(id, page + 1)
 
+                page += 1
+
                 _state.postValue(
                     State.SuccessLoading(
                         people = People(
@@ -58,7 +62,7 @@ class PeopleViewModel(private val id: String) : ViewModel() {
                         ),
                         hasMore = people.filmography.isNotEmpty(),
                     )
-                ).run { page += 1 }
+                )
             } catch (e: Exception) {
                 _state.postValue(State.FailedLoading(e))
             }

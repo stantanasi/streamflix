@@ -32,7 +32,9 @@ class TvShowsViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val tvShows = UserPreferences.currentProvider!!.getTvShows(page)
+            val tvShows = UserPreferences.currentProvider!!.getTvShows()
+
+            page = 1
 
             _state.postValue(State.SuccessLoading(tvShows, true))
         } catch (e: Exception) {
@@ -48,12 +50,14 @@ class TvShowsViewModel : ViewModel() {
             try {
                 val tvShows = UserPreferences.currentProvider!!.getTvShows(page + 1)
 
+                page += 1
+
                 _state.postValue(
                     State.SuccessLoading(
                         tvShows = currentState.tvShows + tvShows,
                         hasMore = tvShows.isNotEmpty(),
                     )
-                ).run { page += 1 }
+                )
             } catch (e: Exception) {
                 _state.postValue(State.FailedLoading(e))
             }

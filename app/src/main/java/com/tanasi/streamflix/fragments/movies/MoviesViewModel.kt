@@ -32,7 +32,9 @@ class MoviesViewModel : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val movies = UserPreferences.currentProvider!!.getMovies(page)
+            val movies = UserPreferences.currentProvider!!.getMovies()
+
+            page = 1
 
             _state.postValue(State.SuccessLoading(movies, true))
         } catch (e: Exception) {
@@ -48,12 +50,14 @@ class MoviesViewModel : ViewModel() {
             try {
                 val movies = UserPreferences.currentProvider!!.getMovies(page + 1)
 
+                page += 1
+
                 _state.postValue(
                     State.SuccessLoading(
                         movies = currentState.movies + movies,
                         hasMore = movies.isNotEmpty(),
                     )
-                ).run { page += 1 }
+                )
             } catch (e: Exception) {
                 _state.postValue(State.FailedLoading(e))
             }

@@ -33,9 +33,11 @@ class SearchViewModel : ViewModel() {
         _state.postValue(State.Searching)
 
         try {
-            val results = UserPreferences.currentProvider!!.search(query, page)
+            val results = UserPreferences.currentProvider!!.search(query)
 
             this@SearchViewModel.query = query
+            page = 1
+
             _state.postValue(State.SuccessSearching(results, true))
         } catch (e: Exception) {
             _state.postValue(State.FailedSearching(e))
@@ -50,12 +52,14 @@ class SearchViewModel : ViewModel() {
             try {
                 val results = UserPreferences.currentProvider!!.search(query, page + 1)
 
+                page += 1
+
                 _state.postValue(
                     State.SuccessSearching(
                         results = currentState.results + results,
                         hasMore = results.isNotEmpty(),
                     )
-                ).run { page += 1 }
+                )
             } catch (e: Exception) {
                 _state.postValue(State.FailedSearching(e))
             }

@@ -32,7 +32,9 @@ class GenreViewModel(private val id: String) : ViewModel() {
         _state.postValue(State.Loading)
 
         try {
-            val genre = UserPreferences.currentProvider!!.getGenre(id, page)
+            val genre = UserPreferences.currentProvider!!.getGenre(id)
+
+            page = 1
 
             _state.postValue(State.SuccessLoading(genre, true))
         } catch (e: Exception) {
@@ -48,6 +50,8 @@ class GenreViewModel(private val id: String) : ViewModel() {
             try {
                 val genre = UserPreferences.currentProvider!!.getGenre(id, page + 1)
 
+                page += 1
+
                 _state.postValue(
                     State.SuccessLoading(
                         genre = Genre(
@@ -58,7 +62,7 @@ class GenreViewModel(private val id: String) : ViewModel() {
                         ),
                         hasMore = genre.shows.isNotEmpty(),
                     )
-                ).run { page += 1 }
+                )
             } catch (e: Exception) {
                 _state.postValue(State.FailedLoading(e))
             }
