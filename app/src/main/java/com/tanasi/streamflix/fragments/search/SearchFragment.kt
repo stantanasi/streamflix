@@ -23,7 +23,7 @@ class SearchFragment : Fragment() {
 
     private val viewModel by viewModels<SearchViewModel>()
 
-    private val appAdapter = AppAdapter()
+    private var appAdapter = AppAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,7 +41,12 @@ class SearchFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                SearchViewModel.State.Searching -> binding.isLoading.root.visibility = View.VISIBLE
+                SearchViewModel.State.Searching -> {
+                    binding.isLoading.root.visibility = View.VISIBLE
+                    binding.vgvSearch.adapter = AppAdapter().also {
+                        appAdapter = it
+                    }
+                }
                 SearchViewModel.State.SearchingMore -> appAdapter.isLoading = true
                 is SearchViewModel.State.SuccessSearching -> {
                     displaySearch(state.results, state.hasMore)
