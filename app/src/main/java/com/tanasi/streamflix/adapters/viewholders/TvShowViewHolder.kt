@@ -75,11 +75,6 @@ class TvShowViewHolder(
                             id = tvShow.id
                         )
                     )
-                    is PeopleFragment -> findNavController().navigate(
-                        PeopleFragmentDirections.actionPeopleToTvShow(
-                            id = tvShow.id
-                        )
-                    )
                     is TvShowFragment -> findNavController().navigate(
                         TvShowFragmentDirections.actionTvShowToTvShow(
                             id = tvShow.id
@@ -142,6 +137,11 @@ class TvShowViewHolder(
                 when (context.toActivity()?.getCurrentFragment()) {
                     is GenreFragment -> findNavController().navigate(
                         GenreFragmentDirections.actionGenreToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                    is PeopleFragment -> findNavController().navigate(
+                        PeopleFragmentDirections.actionPeopleToTvShow(
                             id = tvShow.id
                         )
                     )

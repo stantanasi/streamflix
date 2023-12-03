@@ -83,11 +83,6 @@ class MovieViewHolder(
                             id = movie.id
                         )
                     )
-                    is PeopleFragment -> findNavController().navigate(
-                        PeopleFragmentDirections.actionPeopleToMovie(
-                            id = movie.id
-                        )
-                    )
                     is TvShowFragment -> findNavController().navigate(
                         TvShowFragmentDirections.actionTvShowToMovie(
                             id = movie.id
@@ -141,6 +136,11 @@ class MovieViewHolder(
                     )
                     is MoviesFragment -> findNavController().navigate(
                         MoviesFragmentDirections.actionMoviesToMovie(
+                            id = movie.id
+                        )
+                    )
+                    is PeopleFragment -> findNavController().navigate(
+                        PeopleFragmentDirections.actionPeopleToMovie(
                             id = movie.id
                         )
                     )
