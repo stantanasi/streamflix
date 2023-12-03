@@ -30,6 +30,12 @@ class CategoryViewHolder(
     private val context = itemView.context
     private lateinit var category: Category
 
+    val childRecyclerView: RecyclerView?
+        get() = when (_binding) {
+            is ItemCategoryBinding -> _binding.hgvCategory
+            else -> null
+        }
+
     fun bind(category: Category) {
         this.category = category
 

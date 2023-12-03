@@ -57,6 +57,7 @@ class MovieFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        appAdapter.onSaveInstanceState(binding.vgvMovie)
         _binding = null
     }
 

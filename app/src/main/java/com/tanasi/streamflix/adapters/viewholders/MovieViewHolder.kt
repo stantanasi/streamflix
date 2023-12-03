@@ -54,6 +54,13 @@ class MovieViewHolder(
     private val context = itemView.context
     private lateinit var movie: Movie
 
+    val childRecyclerView: RecyclerView?
+        get() = when (_binding) {
+            is ContentMovieCastsBinding -> _binding.hgvMovieCasts
+            is ContentMovieRecommendationsBinding -> _binding.hgvMovieRecommendations
+            else -> null
+        }
+
     fun bind(movie: Movie) {
         this.movie = movie
 

@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.adapters
 
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -85,6 +86,8 @@ class AppAdapter(
         TV_SHOW_CASTS,
         TV_SHOW_RECOMMENDATIONS,
     }
+
+    private val states = mutableMapOf<Int, Parcelable?>()
 
     var isLoading = false
     private var onLoadMoreListener: (() -> Unit)? = null
@@ -267,6 +270,15 @@ class AppAdapter(
             is SeasonViewHolder -> holder.bind(items[position] as Season)
             is TvShowViewHolder -> holder.bind(items[position] as TvShow)
         }
+
+        val state = states[holder.layoutPosition]
+        if (state != null) {
+            when (holder) {
+                is CategoryViewHolder -> holder.childRecyclerView?.layoutManager?.onRestoreInstanceState(state)
+                is MovieViewHolder -> holder.childRecyclerView?.layoutManager?.onRestoreInstanceState(state)
+                is TvShowViewHolder -> holder.childRecyclerView?.layoutManager?.onRestoreInstanceState(state)
+            }
+        }
     }
 
     override fun getItemCount(): Int = items.size + when {
@@ -276,6 +288,30 @@ class AppAdapter(
 
     override fun getItemViewType(position: Int): Int = items.getOrNull(position)?.itemType?.ordinal
         ?: Type.LOADING.ordinal
+
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        super.onViewRecycled(holder)
+
+        states[holder.layoutPosition] = when (holder) {
+            is CategoryViewHolder -> holder.childRecyclerView?.layoutManager?.onSaveInstanceState()
+            is MovieViewHolder -> holder.childRecyclerView?.layoutManager?.onSaveInstanceState()
+            is TvShowViewHolder -> holder.childRecyclerView?.layoutManager?.onSaveInstanceState()
+            else -> null
+        }
+    }
+
+    fun onSaveInstanceState(recyclerView: RecyclerView) {
+        for (position in items.indices) {
+            val holder = recyclerView.findViewHolderForAdapterPosition(position) ?: continue
+
+            states[position] = when (holder) {
+                is CategoryViewHolder -> holder.childRecyclerView?.layoutManager?.onSaveInstanceState()
+                is MovieViewHolder -> holder.childRecyclerView?.layoutManager?.onSaveInstanceState()
+                is TvShowViewHolder -> holder.childRecyclerView?.layoutManager?.onSaveInstanceState()
+                else -> null
+            }
+        }
+    }
 
 
     fun submitList(list: List<Item>) {

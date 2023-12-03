@@ -57,6 +57,7 @@ class TvShowFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        appAdapter.onSaveInstanceState(binding.vgvTvShow)
         _binding = null
     }
 

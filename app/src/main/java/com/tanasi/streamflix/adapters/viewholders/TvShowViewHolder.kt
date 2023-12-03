@@ -46,6 +46,14 @@ class TvShowViewHolder(
     private val context = itemView.context
     private lateinit var tvShow: TvShow
 
+    val childRecyclerView: RecyclerView?
+        get() = when (_binding) {
+            is ContentTvShowSeasonsBinding -> _binding.hgvTvShowSeasons
+            is ContentTvShowCastsBinding -> _binding.hgvTvShowCasts
+            is ContentTvShowRecommendationsBinding -> _binding.hgvTvShowRecommendations
+            else -> null
+        }
+
     fun bind(tvShow: TvShow) {
         this.tvShow = tvShow
 
