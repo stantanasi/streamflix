@@ -56,14 +56,25 @@
         tools:text="yyyy"
         tools:visibility="visible" />
 
+    <ImageView
+        android:id="@+id/iv_swiper_rating_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="25dp"
+        android:src="@drawable/ic_star"
+        android:tint="#C0C0C0"
+        app:layout_constraintBottom_toBottomOf="@id/tv_swiper_rating"
+        app:layout_constraintStart_toEndOf="@id/tv_swiper_released"
+        app:layout_constraintTop_toTopOf="@id/tv_swiper_rating"
+        tools:ignore="ContentDescription,UseAppTint" />
+
     <TextView
         android:id="@+id/tv_swiper_rating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="25dp"
         android:layout_marginTop="10dp"
         app:layout_constraintBottom_toTopOf="@id/barrier1"
-        app:layout_constraintStart_toEndOf="@id/tv_swiper_released"
+        app:layout_constraintStart_toEndOf="@id/iv_swiper_rating_icon"
         app:layout_constraintTop_toBottomOf="@id/tv_swiper_title"
         tools:text="#.#" />
 

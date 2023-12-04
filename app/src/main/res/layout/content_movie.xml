@@ -34,16 +34,26 @@
         app:layout_goneMarginStart="70dp"
         tools:text="Title" />
 
+    <ImageView
+        android:id="@+id/iv_movie_rating_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="40dp"
+        android:src="@drawable/ic_star"
+        android:tint="#C0C0C0"
+        app:layout_constraintBottom_toBottomOf="@id/tv_movie_rating"
+        app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
+        app:layout_constraintTop_toTopOf="@id/tv_movie_rating"
+        tools:ignore="ContentDescription,UseAppTint" />
+
     <TextView
         android:id="@+id/tv_movie_rating"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
         android:layout_marginTop="15dp"
         app:layout_constraintBottom_toTopOf="@id/barrier1"
-        app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
+        app:layout_constraintStart_toEndOf="@id/iv_movie_rating_icon"
         app:layout_constraintTop_toBottomOf="@id/tv_movie_title"
-        app:layout_goneMarginStart="70dp"
         tools:text="#.#" />
 
     <TextView
