@@ -122,6 +122,8 @@ class CategoryViewHolder(
             }
         }
 
+        binding.ivSwiperRatingIcon.visibility = binding.tvSwiperRating.visibility
+
         binding.tvSwiperOverview.text = when (selected) {
             is Movie -> selected.overview
             is TvShow -> selected.overview
