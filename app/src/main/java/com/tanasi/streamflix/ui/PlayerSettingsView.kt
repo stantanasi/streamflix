@@ -10,16 +10,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import androidx.media3.common.C
 import androidx.media3.common.Player
-import androidx.media3.common.Tracks
 import androidx.media3.common.TrackSelectionOverride
+import androidx.media3.common.Tracks
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.CaptionStyleCompat
 import androidx.media3.ui.DefaultTrackNameProvider
 import androidx.media3.ui.SubtitleView
+import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
@@ -106,7 +106,7 @@ class PlayerSettingsView @JvmOverloads constructor(
             Setting.QUALITY,
             Setting.SUBTITLES,
             Setting.SPEED,
-            Setting.SERVERS-> displaySettings(Setting.MAIN)
+            Setting.SERVERS -> displaySettings(Setting.MAIN)
             Setting.CAPTION_STYLE -> displaySettings(Setting.SUBTITLES)
             Setting.CAPTION_STYLE_FONT_COLOR,
             Setting.CAPTION_STYLE_TEXT_SIZE,

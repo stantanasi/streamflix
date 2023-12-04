@@ -10,24 +10,23 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaItem.SubtitleConfiguration
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.MediaSession
+import androidx.media3.ui.PlayerControlView
+import androidx.media3.ui.PlayerView
+import androidx.media3.ui.SubtitleView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.tvprovider.media.tv.TvContractCompat
 import androidx.tvprovider.media.tv.WatchNextProgram
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaItem.SubtitleConfiguration
-import androidx.media3.common.Player
-import androidx.media3.common.AudioAttributes
-import androidx.media3.common.MediaMetadata
-import androidx.media3.session.MediaSession
-import androidx.media3.common.MimeTypes
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.ui.CaptionStyleCompat
-import androidx.media3.ui.PlayerControlView
-import androidx.media3.ui.PlayerView
-import androidx.media3.ui.SubtitleView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ContentExoControllerBinding
 import com.tanasi.streamflix.databinding.FragmentPlayerBinding
@@ -42,7 +41,8 @@ import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@UnstableApi @SuppressLint("RestrictedApi")
+@UnstableApi
+@SuppressLint("RestrictedApi")
 class PlayerFragment : Fragment() {
 
     sealed class VideoType : Parcelable {

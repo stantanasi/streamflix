@@ -1,12 +1,5 @@
 package com.tanasi.streamflix.providers
 
-import android.util.Base64
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
@@ -19,7 +12,6 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.utils.retry
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -27,18 +19,9 @@ import org.jsoup.select.Elements
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.http.Url
-import java.lang.Integer.min
-import java.lang.reflect.Type
-import java.nio.charset.StandardCharsets
-import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
-import javax.crypto.Cipher
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 object SflixProvider : Provider {
 
@@ -272,8 +255,7 @@ object SflixProvider : Provider {
                     rating = info.rating,
                     poster = poster,
                 )
-            }
-            else {
+            } else {
                 TvShow(
                     id = id,
                     title = title,
