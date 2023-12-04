@@ -44,7 +44,8 @@ import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.toActivity
 
-@UnstableApi @SuppressLint("RestrictedApi")
+@UnstableApi
+@SuppressLint("RestrictedApi")
 class MovieViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(

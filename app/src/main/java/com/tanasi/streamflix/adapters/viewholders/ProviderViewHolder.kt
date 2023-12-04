@@ -1,13 +1,11 @@
 package com.tanasi.streamflix.adapters.viewholders
 
 import android.content.Intent
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.activities.main.MainActivity
 import com.tanasi.streamflix.databinding.ItemProviderBinding
-import com.tanasi.streamflix.fragments.providers.ProvidersFragmentDirections
 import com.tanasi.streamflix.models.Provider
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.toActivity
