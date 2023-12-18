@@ -58,12 +58,13 @@
 
     <ImageView
         android:id="@+id/iv_swiper_rating_icon"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="25dp"
         android:src="@drawable/ic_star"
         android:tint="#C0C0C0"
         app:layout_constraintBottom_toBottomOf="@id/tv_swiper_rating"
+        app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toEndOf="@id/tv_swiper_released"
         app:layout_constraintTop_toTopOf="@id/tv_swiper_rating"
         tools:ignore="ContentDescription,UseAppTint" />
