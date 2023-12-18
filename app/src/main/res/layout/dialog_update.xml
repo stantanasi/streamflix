@@ -67,7 +67,7 @@
         android:layout_marginTop="26dp"
         android:src="@drawable/ic_update_arrow_right"
         android:tint="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="@id/barrier1"
+        app:layout_constraintBottom_toBottomOf="@id/tv_update_new_version"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_update_message"
@@ -102,12 +102,28 @@
         app:layout_constraintTop_toBottomOf="@id/tv_update_new_version_label"
         tools:text="2.15.1" />
 
+    <TextView
+        android:id="@+id/tv_update_release_notes"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:gravity="center"
+        android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_update_arrow"
+        app:layout_constraintTop_toBottomOf="@id/tv_update_new_version"
+        tools:text="- Bug fixes"
+        tools:visibility="visible" />
+
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="tv_update_current_version,tv_update_new_version" />
+        app:constraint_referenced_ids="tv_update_current_version,tv_update_new_version,tv_update_release_notes" />
 
     <ProgressBar
         android:id="@+id/pb_update_is_loading"
@@ -123,6 +139,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier1"
         tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/btn_update_release_notes"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:text="@string/update_release_notes"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pb_update_is_loading" />
 
     <Button
         android:id="@+id/btn_update_cancel"

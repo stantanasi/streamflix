@@ -5,6 +5,7 @@
     <string name="update_message">A new version of the app is available!</string>
     <string name="update_current_version_label">Current version</string>
     <string name="update_new_version_label">New version</string>
+    <string name="update_release_notes">Release notes</string>
     <string name="update_later">Maybe Later</string>
     <string name="update">Update</string>
 

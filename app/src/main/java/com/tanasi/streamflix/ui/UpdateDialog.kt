@@ -17,6 +17,10 @@ class UpdateDialog(context: Context) : Dialog(context) {
     var release: GitHub.Release? = null
         set(value) {
             binding.tvUpdateNewVersion.text = value?.tagName?.substringAfter("v") ?: "-"
+            binding.tvUpdateReleaseNotes.text = value?.body?.replace(
+                Regex("^- ([a-z0-9]+: )?(.*?)(#\\d+ )?\$", RegexOption.MULTILINE),
+                "- $2"
+            )
             field = value
         }
 
@@ -33,6 +37,10 @@ class UpdateDialog(context: Context) : Dialog(context) {
         setContentView(binding.root)
 
         binding.tvUpdateCurrentVersion.text = BuildConfig.VERSION_NAME
+
+        binding.btnUpdateReleaseNotes.setOnClickListener {
+            binding.tvUpdateReleaseNotes.isVisible = !binding.tvUpdateReleaseNotes.isVisible
+        }
 
         binding.btnUpdateCancel.setOnClickListener {
             hide()
