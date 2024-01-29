@@ -21,6 +21,8 @@
 
     <string name="home_swiper_watch_now">Watch Now</string>
     <string name="home_continue_watching">Continue Watching</string>
+    <string name="home_favorite_movies">Favorite movies</string>
+    <string name="home_favorite_tv_shows">Favorite TV shows</string>
 
     <string name="episode_item_info">S%d E%d • %s</string>
     <string name="episode_item_info_episode_only">E%d • %s</string>
