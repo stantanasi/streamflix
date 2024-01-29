@@ -20,7 +20,7 @@
         tools:text="Season #" />
 
     <androidx.leanback.widget.HorizontalGridView
-        android:id="@+id/vgv_episodes"
+        android:id="@+id/hgv_episodes"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="30dp"

@@ -66,7 +66,7 @@ class SeasonFragment : Fragment() {
     private fun initializeSeason() {
         binding.tvSeasonTitle.text = args.seasonTitle
 
-        binding.vgvEpisodes.apply {
+        binding.hgvEpisodes.apply {
             adapter = appAdapter
             setItemSpacing(resources.getDimension(R.dimen.season_episodes_spacing).toInt())
         }
