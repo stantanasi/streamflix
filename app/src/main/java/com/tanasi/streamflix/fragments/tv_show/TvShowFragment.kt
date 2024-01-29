@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentTvShowBinding
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.viewModelsFactory
@@ -20,6 +21,8 @@ class TvShowFragment : Fragment() {
 
     private val args by navArgs<TvShowFragmentArgs>()
     private val viewModel by viewModelsFactory { TvShowViewModel(args.id) }
+
+    private lateinit var database: AppDatabase
 
     private val appAdapter = AppAdapter()
 
@@ -34,6 +37,8 @@ class TvShowFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        database = AppDatabase.getInstance(requireContext())
 
         initializeTvShow()
 
@@ -70,6 +75,11 @@ class TvShowFragment : Fragment() {
     }
 
     private fun displayTvShow(tvShow: TvShow) {
+        database.tvShowDao().getTvShowById(tvShow.id)?.let {
+            tvShow.isFavorite = it.isFavorite
+        }
+        database.tvShowDao().insert(tvShow)
+
         Glide.with(requireContext())
             .load(tvShow.banner)
             .into(binding.ivTvShowBanner)
