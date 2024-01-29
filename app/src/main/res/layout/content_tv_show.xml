@@ -144,4 +144,22 @@
         app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview"
         app:layout_goneMarginStart="70dp" />
 
+    <ImageView
+        android:id="@+id/btn_tv_show_favorite"
+        style="@style/AppTheme.Widget.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:src="@drawable/ic_favorite_disable"
+        android:tint="@drawable/color_button_text"
+        app:layout_constraintBottom_toBottomOf="@id/btn_tv_show_trailer"
+        app:layout_constraintStart_toEndOf="@id/btn_tv_show_trailer"
+        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview"
+        tools:ignore="ContentDescription,UseAppTint" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
