@@ -74,20 +74,25 @@ class TvShowFragment : Fragment() {
             .load(tvShow.banner)
             .into(binding.ivTvShowBanner)
 
-        tvShow.seasons.onEach {
-            it.tvShow = tvShow
-        }
+        appAdapter.submitList(listOfNotNull(
+            tvShow.apply { itemType = AppAdapter.Type.TV_SHOW },
 
-        appAdapter.items.apply {
-            clear()
-            add(tvShow.apply { itemType = AppAdapter.Type.TV_SHOW })
-            if (tvShow.seasons.isNotEmpty())
-                add(tvShow.clone().apply { itemType = AppAdapter.Type.TV_SHOW_SEASONS })
-            if (tvShow.cast.isNotEmpty())
-                add(tvShow.clone().apply { itemType = AppAdapter.Type.TV_SHOW_CASTS })
-            if (tvShow.recommendations.isNotEmpty())
-                add(tvShow.clone().apply { itemType = AppAdapter.Type.TV_SHOW_RECOMMENDATIONS })
-        }
-        appAdapter.notifyDataSetChanged()
+            tvShow.takeIf { it.seasons.isNotEmpty() }
+                ?.clone()
+                ?.apply {
+                    seasons.onEach {
+                        it.tvShow = tvShow
+                    }
+                    itemType = AppAdapter.Type.TV_SHOW_SEASONS
+                },
+
+            tvShow.takeIf { it.cast.isNotEmpty() }
+                ?.clone()
+                ?.apply { itemType = AppAdapter.Type.TV_SHOW_CASTS },
+
+            tvShow.takeIf { it.recommendations.isNotEmpty() }
+                ?.clone()
+                ?.apply { itemType = AppAdapter.Type.TV_SHOW_RECOMMENDATIONS },
+        ))
     }
 }

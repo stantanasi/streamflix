@@ -87,15 +87,10 @@ class HomeFragment : Fragment() {
     }
 
     private fun displayHome(categories: List<Category>) {
-        appAdapter.items.apply {
-            clear()
-
+        appAdapter.submitList(listOfNotNull(
             categories
                 .find { it.name == Category.FEATURED }
-                ?.let { category ->
-                    category.itemType = AppAdapter.Type.CATEGORY_SWIPER
-                    add(category)
-                }
+                ?.also { it.itemType = AppAdapter.Type.CATEGORY_SWIPER },
 
             Category(
                 name = getString(R.string.home_continue_watching),
@@ -135,7 +130,7 @@ class HomeFragment : Fragment() {
                             else -> null
                         }
                     } ?: listOf()
-            ).takeIf { it.list.isNotEmpty() }?.let {
+            ).takeIf { it.list.isNotEmpty() }?.also {
                 it.list.onEach { show ->
                     when (show) {
                         is Movie -> show.itemType = AppAdapter.Type.MOVIE_CONTINUE_WATCHING_ITEM
@@ -144,23 +139,19 @@ class HomeFragment : Fragment() {
                 }
                 it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
                 it.itemType = AppAdapter.Type.CATEGORY_ITEM
-                add(it)
-            }
-
-            categories
-                .filter { it.name != Category.FEATURED && it.list.isNotEmpty() }
-                .onEach { category ->
-                    category.list.onEach { show ->
-                        when (show) {
-                            is Movie -> show.itemType = AppAdapter.Type.MOVIE_ITEM
-                            is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_ITEM
-                        }
+            },
+        ) + categories
+            .filter { it.name != Category.FEATURED && it.list.isNotEmpty() }
+            .onEach { category ->
+                category.list.onEach { show ->
+                    when (show) {
+                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_ITEM
+                        is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_ITEM
                     }
-                    category.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-                    category.itemType = AppAdapter.Type.CATEGORY_ITEM
-                    add(category)
                 }
-        }
-        appAdapter.notifyDataSetChanged()
+                category.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+                category.itemType = AppAdapter.Type.CATEGORY_ITEM
+            }
+        )
     }
 }

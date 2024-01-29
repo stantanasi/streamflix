@@ -72,11 +72,7 @@ class ProvidersFragment : Fragment() {
     }
 
     private fun displayProviders(providers: List<Provider>) {
-        appAdapter.items.apply {
-            clear()
-            addAll(providers)
-        }
-        appAdapter.notifyDataSetChanged()
+        appAdapter.submitList(providers)
 
         binding.rvProviders.requestFocus()
     }

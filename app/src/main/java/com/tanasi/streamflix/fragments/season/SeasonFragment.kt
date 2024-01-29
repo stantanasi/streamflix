@@ -73,24 +73,20 @@ class SeasonFragment : Fragment() {
     }
 
     private fun displaySeason(episodes: List<Episode>) {
-        appAdapter.items.apply {
-            clear()
-            addAll(episodes.onEach { episode ->
-                episode.tvShow = TvShow(
-                    id = args.tvShowId,
-                    title = args.tvShowTitle,
-                    poster = args.tvShowPoster,
-                    banner = args.tvShowBanner,
+        appAdapter.submitList(episodes.onEach { episode ->
+            episode.tvShow = TvShow(
+                id = args.tvShowId,
+                title = args.tvShowTitle,
+                poster = args.tvShowPoster,
+                banner = args.tvShowBanner,
+            )
+            episode.season = args.seasonNumber.takeIf { it != 0 }?.let {
+                Season(
+                    id = args.seasonId,
+                    number = args.seasonNumber,
+                    title = args.seasonTitle,
                 )
-                episode.season = args.seasonNumber.takeIf { it != 0 }?.let {
-                    Season(
-                        id = args.seasonId,
-                        number = args.seasonNumber,
-                        title = args.seasonTitle,
-                    )
-                }
-            })
-        }
-        appAdapter.notifyDataSetChanged()
+            }
+        })
     }
 }

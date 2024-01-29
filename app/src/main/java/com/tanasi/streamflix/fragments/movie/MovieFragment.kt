@@ -74,14 +74,16 @@ class MovieFragment : Fragment() {
             .load(movie.banner)
             .into(binding.ivMovieBanner)
 
-        appAdapter.items.apply {
-            clear()
-            add(movie.apply { itemType = AppAdapter.Type.MOVIE })
-            if (movie.cast.isNotEmpty())
-                add(movie.clone().apply { itemType = AppAdapter.Type.MOVIE_CASTS })
-            if (movie.recommendations.isNotEmpty())
-                add(movie.clone().apply { itemType = AppAdapter.Type.MOVIE_RECOMMENDATIONS })
-        }
-        appAdapter.notifyDataSetChanged()
+        appAdapter.submitList(listOfNotNull(
+            movie.apply { itemType = AppAdapter.Type.MOVIE },
+
+            movie.takeIf { it.cast.isNotEmpty() }
+                ?.clone()
+                ?.apply { itemType = AppAdapter.Type.MOVIE_CASTS },
+
+            movie.takeIf { it.recommendations.isNotEmpty() }
+                ?.clone()
+                ?.apply { itemType = AppAdapter.Type.MOVIE_RECOMMENDATIONS },
+        ))
     }
 }
