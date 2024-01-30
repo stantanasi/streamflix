@@ -6,6 +6,7 @@ import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +16,7 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentMovieBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
@@ -53,6 +55,7 @@ class MovieViewHolder(
 ) {
 
     private val context = itemView.context
+    private val database = AppDatabase.getInstance(context)
     private lateinit var movie: Movie
 
     val childRecyclerView: RecyclerView?
@@ -357,6 +360,29 @@ class MovieViewHolder(
                     Intent.ACTION_VIEW,
                     Uri.parse("https://www.youtube.com/watch?v=${movie.youtubeTrailerId}")
                 )
+            )
+        }
+
+        binding.btnMovieFavorite.apply {
+            fun Boolean.drawable() = when (this) {
+                true -> R.drawable.ic_favorite_enable
+                false -> R.drawable.ic_favorite_disable
+            }
+
+            setOnClickListener {
+                database.movieDao().updateFavorite(
+                    id = movie.id,
+                    isFavorite = !movie.isFavorite
+                )
+                movie.isFavorite = movie.isFavorite.not()
+
+                setImageDrawable(
+                    ContextCompat.getDrawable(context, movie.isFavorite.drawable())
+                )
+            }
+
+            setImageDrawable(
+                ContextCompat.getDrawable(context, movie.isFavorite.drawable())
             )
         }
     }

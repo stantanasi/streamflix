@@ -5,12 +5,14 @@ import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentTvShowBinding
 import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
@@ -44,6 +46,7 @@ class TvShowViewHolder(
 ) {
 
     private val context = itemView.context
+    private val database = AppDatabase.getInstance(context)
     private lateinit var tvShow: TvShow
 
     val childRecyclerView: RecyclerView?
@@ -275,6 +278,29 @@ class TvShowViewHolder(
                     Intent.ACTION_VIEW,
                     Uri.parse("https://www.youtube.com/watch?v=${tvShow.youtubeTrailerId}")
                 )
+            )
+        }
+
+        binding.btnTvShowFavorite.apply {
+            fun Boolean.drawable() = when (this) {
+                true -> R.drawable.ic_favorite_enable
+                false -> R.drawable.ic_favorite_disable
+            }
+
+            setOnClickListener {
+                database.tvShowDao().updateFavorite(
+                    id = tvShow.id,
+                    isFavorite = !tvShow.isFavorite
+                )
+                tvShow.isFavorite = tvShow.isFavorite.not()
+
+                setImageDrawable(
+                    ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
+                )
+            }
+
+            setImageDrawable(
+                ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
             )
         }
     }
