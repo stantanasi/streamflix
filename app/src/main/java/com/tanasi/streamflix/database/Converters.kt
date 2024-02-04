@@ -8,12 +8,12 @@ import java.util.Calendar
 class Converters {
 
     @TypeConverter
-    fun calendarToString(value: Calendar?): String? {
+    fun fromCalendar(value: Calendar?): String? {
         return value?.format("yyyy-MM-dd'T'HH:mm'Z'")
     }
 
     @TypeConverter
-    fun stringToCalendar(value: String?): Calendar? {
+    fun toCalendar(value: String?): Calendar? {
         return value?.toCalendar()
     }
 }
