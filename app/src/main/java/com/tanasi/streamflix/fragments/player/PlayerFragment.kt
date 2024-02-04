@@ -28,6 +28,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.tvprovider.media.tv.TvContractCompat
 import androidx.tvprovider.media.tv.WatchNextProgram
 import com.tanasi.streamflix.R
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentExoControllerBinding
 import com.tanasi.streamflix.databinding.FragmentPlayerBinding
 import com.tanasi.streamflix.models.Video
@@ -94,6 +95,8 @@ class PlayerFragment : Fragment() {
     private val args by navArgs<PlayerFragmentArgs>()
     private val viewModel by viewModelsFactory { PlayerViewModel(args.videoType, args.id) }
 
+    private lateinit var database: AppDatabase
+
     private lateinit var player: ExoPlayer
     private lateinit var mediaSession: MediaSession
 
@@ -108,6 +111,8 @@ class PlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        database = AppDatabase.getInstance(requireContext())
 
         initializeVideo()
 
@@ -302,13 +307,26 @@ class PlayerFragment : Fragment() {
                                 )
                             }
                         }
-                        player.hasFinished() && program != null -> {
-                            requireContext().contentResolver.delete(
-                                TvContractCompat.buildWatchNextProgramUri(program.id),
-                                null,
-                                null,
-                            )
+                        player.hasFinished() -> {
+                            if (program != null) {
+                                requireContext().contentResolver.delete(
+                                    TvContractCompat.buildWatchNextProgramUri(program.id),
+                                    null,
+                                    null,
+                                )
+                            }
                         }
+                    }
+
+                    when (val videoType = args.videoType as VideoType) {
+                        is VideoType.Movie -> database.movieDao().updateWatched(
+                            id = videoType.id,
+                            isWatched = player.hasFinished()
+                        )
+                        is VideoType.Episode -> database.episodeDao().updateWatched(
+                            id = videoType.id,
+                            isWatched = player.hasFinished()
+                        )
                     }
                 }
             }
