@@ -14,6 +14,7 @@ class Episode(
     var title: String = "",
     released: String? = null,
     var poster: String? = null,
+    var isWatched: Boolean = false,
 
     var tvShow: TvShow? = null,
     var season: Season? = null,

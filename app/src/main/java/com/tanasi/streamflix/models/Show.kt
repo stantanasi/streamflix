@@ -22,6 +22,7 @@ class Movie(
     var poster: String? = null,
     var banner: String? = null,
     var isFavorite: Boolean = false,
+    var isWatched: Boolean = false,
 
     @Ignore
     val genres: List<Genre> = listOf(),
