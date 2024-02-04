@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.tanasi.streamflix.database.dao.MovieDao
 import com.tanasi.streamflix.database.dao.TvShowDao
+import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
@@ -14,6 +15,7 @@ import com.tanasi.streamflix.utils.UserPreferences
 
 @Database(
     entities = [
+        Episode::class,
         Movie::class,
         Season::class,
         TvShow::class,

@@ -1,21 +1,29 @@
 package com.tanasi.streamflix.models
 
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.utils.toCalendar
 
+@Entity("episodes")
 class Episode(
-    val id: String,
-    val number: Int,
-    val title: String = "",
+    @PrimaryKey
+    var id: String,
+    var number: Int,
+    var title: String = "",
     released: String? = null,
-    val poster: String? = null,
+    var poster: String? = null,
 
     var tvShow: TvShow? = null,
     var season: Season? = null,
 ) : AppAdapter.Item {
 
-    val released = released?.toCalendar()
+    constructor() : this("", 0)
+
+    var released = released?.toCalendar()
 
 
+    @Ignore
     override var itemType = AppAdapter.Type.EPISODE_ITEM
 }
