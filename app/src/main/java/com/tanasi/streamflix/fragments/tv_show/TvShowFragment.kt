@@ -93,6 +93,7 @@ class TvShowFragment : Fragment() {
                     seasons.onEach {
                         it.tvShow = tvShow
                     }
+                    database.seasonDao().insertAll(seasons)
                     itemType = AppAdapter.Type.TV_SHOW_SEASONS
                 },
 
