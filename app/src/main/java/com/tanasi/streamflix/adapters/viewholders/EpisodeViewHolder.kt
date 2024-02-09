@@ -112,10 +112,12 @@ class EpisodeViewHolder(
 
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                episode.isWatched -> 100
                 else -> 0
             }
             visibility = when {
                 program != null -> View.VISIBLE
+                episode.isWatched -> View.VISIBLE
                 else -> View.GONE
             }
         }
