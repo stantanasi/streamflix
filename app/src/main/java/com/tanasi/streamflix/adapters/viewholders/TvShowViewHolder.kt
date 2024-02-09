@@ -10,8 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import androidx.tvprovider.media.tv.TvContractCompat
-import androidx.tvprovider.media.tv.WatchNextProgram
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
@@ -40,10 +38,9 @@ import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragment
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
-import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.toActivity
 
 @UnstableApi @SuppressLint("RestrictedApi")
@@ -348,14 +345,7 @@ class TvShowViewHolder(
 
         binding.pbTvShowProgressEpisode.apply {
             val program = episode?.let {
-                context.contentResolver.query(
-                    TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                    WatchNextProgram.PROJECTION,
-                    null,
-                    null,
-                    null,
-                )?.map { WatchNextProgram.fromCursor(it) }
-                    ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
+                WatchNextUtils.getProgram(context, episode.id)
             }
 
             progress = when {

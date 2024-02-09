@@ -34,6 +34,7 @@ import com.tanasi.streamflix.databinding.FragmentPlayerBinding
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
@@ -243,14 +244,7 @@ class PlayerFragment : Fragment() {
                 binding.pvPlayer.keepScreenOn = isPlaying
 
                 if (!isPlaying) {
-                    val program = requireContext().contentResolver.query(
-                        TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                        WatchNextProgram.PROJECTION,
-                        null,
-                        null,
-                        null
-                    )?.map { WatchNextProgram.fromCursor(it) }
-                        ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
+                    val program = WatchNextUtils.getProgram(requireContext(), args.id)
 
                     when {
                         player.hasStarted() -> {
@@ -289,31 +283,25 @@ class PlayerFragment : Fragment() {
                                     }
                                 }
 
-                                requireContext().contentResolver.insert(
-                                    TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                                    builder.build().toContentValues(),
+                                WatchNextUtils.insert(
+                                    requireContext(),
+                                    builder.build()
                                 )
                             } else {
-                                val builder = WatchNextProgram.Builder(program)
-                                    .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
-                                    .setLastPlaybackPositionMillis(player.currentPosition.toInt())
-                                    .setDurationMillis(player.duration.toInt())
-
-                                requireContext().contentResolver.update(
-                                    TvContractCompat.buildWatchNextProgramUri(program.id),
-                                    builder.build().toContentValues(),
-                                    null,
-                                    null,
+                                WatchNextUtils.updateProgram(
+                                    requireContext(),
+                                    program.id,
+                                    WatchNextProgram.Builder(program)
+                                        .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
+                                        .setLastPlaybackPositionMillis(player.currentPosition.toInt())
+                                        .setDurationMillis(player.duration.toInt())
+                                        .build()
                                 )
                             }
                         }
                         player.hasFinished() -> {
                             if (program != null) {
-                                requireContext().contentResolver.delete(
-                                    TvContractCompat.buildWatchNextProgramUri(program.id),
-                                    null,
-                                    null,
-                                )
+                                WatchNextUtils.deleteProgramById(requireContext(), program.id)
                             }
                         }
                     }

@@ -6,8 +6,6 @@ import android.view.animation.AnimationUtils
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import androidx.tvprovider.media.tv.TvContractCompat
-import androidx.tvprovider.media.tv.WatchNextProgram
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
@@ -18,9 +16,8 @@ import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.fragments.season.SeasonFragmentDirections
 import com.tanasi.streamflix.models.Episode
-import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.getCurrentFragment
-import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.toActivity
 
 @UnstableApi
@@ -45,6 +42,8 @@ class EpisodeViewHolder(
 
 
     private fun displayItem(binding: ItemEpisodeBinding) {
+        val program = WatchNextUtils.getProgram(context, episode.id)
+
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -101,15 +100,6 @@ class EpisodeViewHolder(
         }
 
         binding.pbEpisodeProgress.apply {
-            val program = context.contentResolver.query(
-                TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                WatchNextProgram.PROJECTION,
-                null,
-                null,
-                null,
-            )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
-
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
                 episode.isWatched -> 100
@@ -131,6 +121,8 @@ class EpisodeViewHolder(
     }
 
     private fun displayContinueWatchingItem(binding: ItemEpisodeContinueWatchingBinding) {
+        val program = WatchNextUtils.getProgram(context, episode.id)
+
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -182,15 +174,6 @@ class EpisodeViewHolder(
         }
 
         binding.pbEpisodeProgress.apply {
-            val program = context.contentResolver.query(
-                TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                WatchNextProgram.PROJECTION,
-                null,
-                null,
-                null,
-            )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
-
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
                 else -> 0

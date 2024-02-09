@@ -10,8 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import androidx.tvprovider.media.tv.TvContractCompat
-import androidx.tvprovider.media.tv.WatchNextProgram
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
@@ -40,10 +38,9 @@ import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
-import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.toActivity
 
 @UnstableApi
@@ -193,6 +190,8 @@ class MovieViewHolder(
     }
 
     private fun displayItemContinueWatching(binding: ItemMovieContinueWatchingBinding) {
+        val program = WatchNextUtils.getProgram(context, movie.id)
+
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -231,15 +230,6 @@ class MovieViewHolder(
             .into(binding.ivMoviePoster)
 
         binding.pbMovieProgress.apply {
-            val program = context.contentResolver.query(
-                TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                WatchNextProgram.PROJECTION,
-                null,
-                null,
-                null,
-            )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == movie.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
-
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
                 else -> 0
@@ -257,6 +247,8 @@ class MovieViewHolder(
 
 
     private fun displayMovie(binding: ContentMovieBinding) {
+        val program = WatchNextUtils.getProgram(context, movie.id)
+
         binding.ivMoviePoster.run {
             Glide.with(context)
                 .load(movie.poster)
@@ -335,15 +327,6 @@ class MovieViewHolder(
         }
 
         binding.pbMovieProgress.apply {
-            val program = context.contentResolver.query(
-                TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                WatchNextProgram.PROJECTION,
-                null,
-                null,
-                null,
-            )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == movie.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
-
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
                 else -> 0
