@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.tanasi.streamflix.database.dao.EpisodeDao
 import com.tanasi.streamflix.database.dao.MovieDao
 import com.tanasi.streamflix.database.dao.SeasonDao
 import com.tanasi.streamflix.database.dao.TvShowDao
@@ -31,6 +32,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tvShowDao(): TvShowDao
 
     abstract fun seasonDao(): SeasonDao
+
+    abstract fun episodeDao(): EpisodeDao
 
     companion object {
 
