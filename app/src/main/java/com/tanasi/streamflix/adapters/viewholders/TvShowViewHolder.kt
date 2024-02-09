@@ -1,13 +1,17 @@
 package com.tanasi.streamflix.adapters.viewholders
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import androidx.tvprovider.media.tv.TvContractCompat
+import androidx.tvprovider.media.tv.WatchNextProgram
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
@@ -27,6 +31,7 @@ import com.tanasi.streamflix.fragments.movie.MovieFragment
 import com.tanasi.streamflix.fragments.movie.MovieFragmentDirections
 import com.tanasi.streamflix.fragments.people.PeopleFragment
 import com.tanasi.streamflix.fragments.people.PeopleFragmentDirections
+import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.fragments.search.SearchFragment
 import com.tanasi.streamflix.fragments.search.SearchFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
@@ -35,10 +40,13 @@ import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragment
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
+import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.toActivity
 
+@UnstableApi @SuppressLint("RestrictedApi")
 class TvShowViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(
@@ -271,6 +279,94 @@ class TvShowViewHolder(
         }
 
         binding.tvTvShowOverview.text = tvShow.overview
+
+        val episodes = database.episodeDao().getEpisodesByTvShowId(tvShow.id)
+        val episode = episodes.indexOfLast { it.isWatched }
+            .takeIf { it != -1 && it + 1 < episodes.size }
+            ?.let { episodes.getOrNull(it + 1) }
+            ?: episodes.firstOrNull()
+        val season = episode?.season?.let { database.seasonDao().getSeason(it.id) }
+
+        binding.btnTvShowWatchEpisode.apply {
+            setOnClickListener {
+                if (episode == null) return@setOnClickListener
+
+                findNavController().navigate(
+                    TvShowFragmentDirections.actionTvShowToPlayer(
+                        id = episode.id,
+                        title = tvShow.title,
+                        subtitle = when (season) {
+                            null -> context.getString(
+                                R.string.player_subtitle_tv_show_episode_only,
+                                episode.number,
+                                episode.title
+                            )
+                            else -> context.getString(
+                                R.string.player_subtitle_tv_show,
+                                season.number,
+                                episode.number,
+                                episode.title
+                            )
+                        },
+                        videoType = PlayerFragment.VideoType.Episode(
+                            id = episode.id,
+                            number = episode.number,
+                            title = episode.title,
+                            poster = episode.poster,
+                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                                id = tvShow.id,
+                                title = tvShow.title,
+                                poster = tvShow.poster,
+                                banner = tvShow.banner,
+                            ),
+                            season = PlayerFragment.VideoType.Episode.Season(
+                                number = season?.number ?: 0,
+                                title = season?.title ?: "",
+                            ),
+                        ),
+                    )
+                )
+            }
+
+            text = when {
+                episode == null -> ""
+                season == null -> context.getString(
+                    R.string.tv_show_watch_episode,
+                    episode.number
+                )
+                else -> context.getString(
+                    R.string.tv_show_watch_season_episode,
+                    season.number,
+                    episode.number
+                )
+            }
+            visibility = when {
+                episode != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+
+        binding.pbTvShowProgressEpisode.apply {
+            val program = episode?.let {
+                context.contentResolver.query(
+                    TvContractCompat.WatchNextPrograms.CONTENT_URI,
+                    WatchNextProgram.PROJECTION,
+                    null,
+                    null,
+                    null,
+                )?.map { WatchNextProgram.fromCursor(it) }
+                    ?.find { it.contentId == episode.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
+            }
+
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
 
         binding.btnTvShowTrailer.setOnClickListener {
             context.startActivity(
