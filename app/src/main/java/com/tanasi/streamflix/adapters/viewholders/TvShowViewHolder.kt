@@ -362,7 +362,7 @@ class TvShowViewHolder(
             context.startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("https://www.youtube.com/watch?v=${tvShow.youtubeTrailerId}")
+                    Uri.parse(tvShow.trailer)
                 )
             )
         }

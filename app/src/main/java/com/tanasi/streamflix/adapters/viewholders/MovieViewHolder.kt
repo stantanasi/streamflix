@@ -341,7 +341,7 @@ class MovieViewHolder(
             context.startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("https://www.youtube.com/watch?v=${movie.youtubeTrailerId}")
+                    Uri.parse(movie.trailer)
                 )
             )
         }

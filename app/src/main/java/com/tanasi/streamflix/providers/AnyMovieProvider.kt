@@ -478,8 +478,9 @@ object AnyMovieProvider : Provider {
                 ?.text(),
             runtime = document.selectFirst("span.Time")
                 ?.text()?.toMinutes(),
-            youtubeTrailerId = Regex("\"trailer\":\".*?src=\\\\\"(.*?)\\\\\"").find(document.toString())
-                ?.groupValues?.get(1)?.replace("\\\\", "")?.substringAfterLast("/"),
+            trailer = Regex("\"trailer\":\".*?src=\\\\\"(.*?)\\\\\"").find(document.toString())
+                ?.groupValues?.get(1)?.replace("\\\\", "")?.substringAfterLast("/")
+                ?.let { "https://www.youtube.com/watch?v=${it}" },
             quality = document.selectFirst("span.Qlty")
                 ?.text(),
             rating = document.selectFirst("div.Vote > div.post-ratings > span")
@@ -552,8 +553,9 @@ object AnyMovieProvider : Provider {
                 ?.text(),
             runtime = document.selectFirst("span.Time")
                 ?.text()?.toMinutes(),
-            youtubeTrailerId = Regex("\"trailer\":\".*?src=\\\\\"(.*?)\\\\\"").find(document.toString())
-                ?.groupValues?.get(1)?.replace("\\\\", "")?.substringAfterLast("/"),
+            trailer = Regex("\"trailer\":\".*?src=\\\\\"(.*?)\\\\\"").find(document.toString())
+                ?.groupValues?.get(1)?.replace("\\\\", "")?.substringAfterLast("/")
+                ?.let { "https://www.youtube.com/watch?v=${it}" },
             rating = document.selectFirst("div.Vote > div.post-ratings > span")?.text()
                 ?.toDoubleOrNull(),
             banner = document.selectFirst("div.Image img")

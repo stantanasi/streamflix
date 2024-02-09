@@ -342,9 +342,10 @@ object AniwatchProvider : Provider {
                     val minutes = it.substringAfter("h ").substringBefore("m").toIntOrNull() ?: 0
                     hours * 60 + minutes
                 },
-            youtubeTrailerId = document.select("section.block_area-promotions div.item")
+            trailer = document.select("section.block_area-promotions div.item")
                 .firstOrNull { it.attr("data-src").contains("youtube") }
-                ?.attr("data-src")?.substringAfterLast("/"),
+                ?.attr("data-src")?.substringAfterLast("/")
+                ?.let { "https://www.youtube.com/watch?v=${it}" },
             rating = document.select("div.anisc-info div.item")
                 .find { it.selectFirst("span.item-head")?.text() == "MAL Score:" }
                 ?.selectFirst("span.name")?.text()?.toDoubleOrNull(),
@@ -425,9 +426,10 @@ object AniwatchProvider : Provider {
                     val minutes = it.substringAfter("h ").substringBefore("m").toIntOrNull() ?: 0
                     hours * 60 + minutes
                 },
-            youtubeTrailerId = document.select("section.block_area-promotions div.item")
+            trailer = document.select("section.block_area-promotions div.item")
                 .firstOrNull { it.attr("data-src").contains("youtube") }
-                ?.attr("data-src")?.substringAfterLast("/"),
+                ?.attr("data-src")?.substringAfterLast("/")
+                ?.let { "https://www.youtube.com/watch?v=${it}" },
             rating = document.select("div.anisc-info div.item")
                 .find { it.selectFirst("span.item-head")?.text() == "MAL Score:" }
                 ?.selectFirst("span.name")?.text()?.toDoubleOrNull(),
