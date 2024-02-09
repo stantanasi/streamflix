@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.tvprovider.media.tv.TvContractCompat
-import androidx.tvprovider.media.tv.WatchNextProgram
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
@@ -20,8 +19,7 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.utils.UserPreferences
-import com.tanasi.streamflix.utils.map
+import com.tanasi.streamflix.utils.WatchNextUtils
 
 @SuppressLint("RestrictedApi")
 class HomeFragment : Fragment() {
@@ -99,16 +97,9 @@ class HomeFragment : Fragment() {
 
             Category(
                 name = getString(R.string.home_continue_watching),
-                list = requireContext().contentResolver.query(
-                    TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                    WatchNextProgram.PROJECTION,
-                    null,
-                    null,
-                    null
-                )?.map { WatchNextProgram.fromCursor(it) }
-                    ?.filter { it.internalProviderId == UserPreferences.currentProvider!!.name }
-                    ?.sortedBy { it.lastEngagementTimeUtcMillis }?.reversed()
-                    ?.mapNotNull {
+                list = WatchNextUtils.programs(requireContext())
+                    .sortedByDescending { it.lastEngagementTimeUtcMillis }
+                    .mapNotNull {
                         when (it.type) {
                             TvContractCompat.PreviewPrograms.TYPE_MOVIE -> Movie(
                                 id = it.contentId ?: "",
