@@ -101,5 +101,13 @@ class SeasonFragment : Fragment() {
         })
 
         database.episodeDao().insertAll(episodes)
+
+        episodes.indexOfLast { it.isWatched }
+            .takeIf { it != -1 && it + 1 < episodes.size }
+            ?.let {
+                binding.hgvEpisodes.post {
+                    binding.hgvEpisodes.scrollToPosition(it + 1)
+                }
+            }
     }
 }
