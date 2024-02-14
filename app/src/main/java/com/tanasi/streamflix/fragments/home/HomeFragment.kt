@@ -125,7 +125,7 @@ class HomeFragment : Fragment() {
                             )
                             else -> null
                         }
-                    } ?: listOf()
+                    }
             ).takeIf { it.list.isNotEmpty() }?.also {
                 it.list.onEach { show ->
                     when (show) {
