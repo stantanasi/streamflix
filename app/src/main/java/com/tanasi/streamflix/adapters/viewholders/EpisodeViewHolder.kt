@@ -16,6 +16,7 @@ import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.fragments.season.SeasonFragmentDirections
 import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.ui.WatchNextOptionsDialog
 import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
@@ -148,6 +149,22 @@ class EpisodeViewHolder(
                         ),
                     )
                 )
+            }
+            setOnLongClickListener {
+                if (program == null) return@setOnLongClickListener true
+
+                WatchNextOptionsDialog(context).also {
+                    it.program = program
+                    it.setOnProgramClearListener { _ ->
+                        WatchNextUtils.deleteProgramById(context, program.id)
+                        when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                            is HomeFragment -> fragment.refresh()
+                        }
+                        it.hide()
+                    }
+                    it.show()
+                }
+                true
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {
