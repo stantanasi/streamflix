@@ -80,6 +80,13 @@ class HomeFragment : Fragment() {
             .into(binding.ivHomeBackground)
     }
 
+    fun refresh() {
+        when (val state = viewModel.state.value) {
+            is HomeViewModel.State.SuccessLoading -> displayHome(state.categories)
+            else -> {}
+        }
+    }
+
     private fun initializeHome() {
         binding.vgvHome.apply {
             adapter = appAdapter
