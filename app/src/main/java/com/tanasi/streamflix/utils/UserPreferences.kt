@@ -63,6 +63,12 @@ object UserPreferences {
             Key.CAPTION_STYLE_EDGE_COLOR.setInt(value.edgeColor)
         }
 
+    var qualityHeight: Int?
+        get() = Key.QUALITY_HEIGHT.getInt()
+        set(value) {
+            Key.QUALITY_HEIGHT.setInt(value)
+        }
+
 
     private enum class Key {
         CURRENT_PROVIDER,
@@ -71,7 +77,8 @@ object UserPreferences {
         CAPTION_STYLE_BACKGROUND_COLOR,
         CAPTION_STYLE_WINDOW_COLOR,
         CAPTION_STYLE_EDGE_TYPE,
-        CAPTION_STYLE_EDGE_COLOR;
+        CAPTION_STYLE_EDGE_COLOR,
+        QUALITY_HEIGHT;
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)

@@ -259,6 +259,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         .setMaxVideoBitrate(Int.MAX_VALUE)
                                         .setForceHighestSupportedBitrate(false)
                                         .build()
+                                    UserPreferences.qualityHeight = null
                                     settingsView.hide()
                                 }
                                 is Settings.Quality.VideoTrackInformation -> {
@@ -267,6 +268,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         .setMaxVideoBitrate(item.bitrate)
                                         .setForceHighestSupportedBitrate(true)
                                         .build()
+                                    UserPreferences.qualityHeight = item.height
                                     settingsView.hide()
                                 }
                             }
@@ -773,6 +775,16 @@ class PlayerSettingsView @JvmOverloads constructor(
                             }
                             .sortedByDescending { it.height }
                     )
+
+                    list.filterIsInstance<VideoTrackInformation>()
+                        .find { it.height == UserPreferences.qualityHeight }
+                        ?.let {
+                            player.trackSelectionParameters = player.trackSelectionParameters
+                                .buildUpon()
+                                .setMaxVideoBitrate(it.bitrate)
+                                .setForceHighestSupportedBitrate(true)
+                                .build()
+                        }
                 }
             }
 
