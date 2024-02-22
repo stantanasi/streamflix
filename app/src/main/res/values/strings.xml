@@ -21,6 +21,11 @@
 
     <string name="home_swiper_watch_now">Watch Now</string>
     <string name="home_continue_watching">Continue Watching</string>
+    <string name="home_favorite_movies">Favorite movies</string>
+    <string name="home_favorite_tv_shows">Favorite TV shows</string>
+
+    <string name="option_clear_program">Remove</string>
+    <string name="option_cancel">Cancel</string>
 
     <string name="episode_item_info">S%d E%d • %s</string>
     <string name="episode_item_info_episode_only">E%d • %s</string>
@@ -31,6 +36,8 @@
 
     <string name="tv_show_runtime_hours_minutes">%d h %d min</string>
     <string name="tv_show_runtime_minutes">%d min</string>
+    <string name="tv_show_watch_season_episode">Watch S%d E%d</string>
+    <string name="tv_show_watch_episode">Watch E%d</string>
     <string name="tv_show_trailer">Trailer</string>
     <string name="tv_show_seasons">Seasons</string>
     <string name="tv_show_casts">Casts</string>

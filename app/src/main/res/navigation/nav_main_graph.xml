@@ -79,6 +79,9 @@
         <action
             android:id="@+id/action_tv_show_to_tv_show"
             app:destination="@id/tv_show" />
+        <action
+            android:id="@+id/action_tv_show_to_player"
+            app:destination="@id/player" />
     </fragment>
     <fragment
         android:id="@+id/search"

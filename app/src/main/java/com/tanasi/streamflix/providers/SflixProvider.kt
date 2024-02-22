@@ -360,8 +360,9 @@ object SflixProvider : Provider {
             runtime = document.select("div.elements > .row > div > .row-line")
                 .find { it?.select(".type")?.text()?.contains("Duration") ?: false }
                 ?.ownText()?.removeSuffix("min")?.trim()?.toIntOrNull(),
-            youtubeTrailerId = document.selectFirst("iframe#iframe-trailer")
-                ?.attr("data-src")?.substringAfterLast("/"),
+            trailer = document.selectFirst("iframe#iframe-trailer")
+                ?.attr("data-src")?.substringAfterLast("/")
+                ?.let { "https://www.youtube.com/watch?v=${it}" },
             quality = document.selectFirst(".fs-item > .quality")
                 ?.text()?.trim(),
             rating = document.selectFirst(".fs-item > .imdb")
@@ -452,8 +453,9 @@ object SflixProvider : Provider {
             runtime = document.select("div.elements > .row > div > .row-line")
                 .find { it?.select(".type")?.text()?.contains("Duration") ?: false }
                 ?.ownText()?.removeSuffix("min")?.trim()?.toIntOrNull(),
-            youtubeTrailerId = document.selectFirst("iframe#iframe-trailer")
-                ?.attr("data-src")?.substringAfterLast("/"),
+            trailer = document.selectFirst("iframe#iframe-trailer")
+                ?.attr("data-src")?.substringAfterLast("/")
+                ?.let { "https://www.youtube.com/watch?v=${it}" },
             quality = document.selectFirst(".fs-item > .quality")
                 ?.text()?.trim(),
             rating = document.selectFirst(".fs-item > .imdb")

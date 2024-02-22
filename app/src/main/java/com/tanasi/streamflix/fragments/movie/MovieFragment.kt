@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentMovieBinding
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.utils.viewModelsFactory
@@ -20,6 +21,8 @@ class MovieFragment : Fragment() {
 
     private val args by navArgs<MovieFragmentArgs>()
     private val viewModel by viewModelsFactory { MovieViewModel(args.id) }
+
+    private lateinit var database: AppDatabase
 
     private val appAdapter = AppAdapter()
 
@@ -34,6 +37,8 @@ class MovieFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        database = AppDatabase.getInstance(requireContext())
 
         initializeMovie()
 
@@ -70,6 +75,12 @@ class MovieFragment : Fragment() {
     }
 
     private fun displayMovie(movie: Movie) {
+        database.movieDao().getMovie(movie.id)?.let {
+            movie.isFavorite = it.isFavorite
+            movie.isWatched = it.isWatched
+        }
+        database.movieDao().insert(movie)
+
         Glide.with(requireContext())
             .load(movie.banner)
             .into(binding.ivMovieBanner)

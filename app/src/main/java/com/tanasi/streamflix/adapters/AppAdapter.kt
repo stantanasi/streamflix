@@ -329,6 +329,22 @@ class AppAdapter(
             }
         })
 
+        if (items.size < list.size) {
+            for (newItemPosition in list.indices.reversed()) {
+                val oldItemPosition = result.convertNewPositionToOld(newItemPosition)
+                    .takeIf { it != -1 } ?: continue
+
+                states[newItemPosition] = states[oldItemPosition]
+            }
+        } else if (items.size > list.size) {
+            for (oldItemPosition in items.indices) {
+                val newItemPosition = result.convertOldPositionToNew(oldItemPosition)
+                    .takeIf { it != -1 } ?: continue
+
+                states[newItemPosition] = states[oldItemPosition]
+            }
+        }
+
         items.clear()
         items.addAll(list)
         result.dispatchUpdatesTo(this)

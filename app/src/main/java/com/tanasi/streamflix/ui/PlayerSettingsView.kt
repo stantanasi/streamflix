@@ -259,6 +259,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         .setMaxVideoBitrate(Int.MAX_VALUE)
                                         .setForceHighestSupportedBitrate(false)
                                         .build()
+                                    UserPreferences.qualityHeight = null
                                     settingsView.hide()
                                 }
                                 is Settings.Quality.VideoTrackInformation -> {
@@ -267,6 +268,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         .setMaxVideoBitrate(item.bitrate)
                                         .setForceHighestSupportedBitrate(true)
                                         .build()
+                                    UserPreferences.qualityHeight = item.height
                                     settingsView.hide()
                                 }
                             }
@@ -283,6 +285,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         .clearOverridesOfType(C.TRACK_TYPE_TEXT)
                                         .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
                                         .build()
+                                    UserPreferences.subtitleName = null
                                     settingsView.hide()
                                 }
                                 is Settings.Subtitle.TextTrackInformation -> {
@@ -296,6 +299,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         )
                                         .setTrackTypeDisabled(item.trackGroup.type, false)
                                         .build()
+                                    UserPreferences.subtitleName = item.name
                                     settingsView.hide()
                                 }
                             }
@@ -773,6 +777,16 @@ class PlayerSettingsView @JvmOverloads constructor(
                             }
                             .sortedByDescending { it.height }
                     )
+
+                    list.filterIsInstance<VideoTrackInformation>()
+                        .find { it.height == UserPreferences.qualityHeight }
+                        ?.let {
+                            player.trackSelectionParameters = player.trackSelectionParameters
+                                .buildUpon()
+                                .setMaxVideoBitrate(it.bitrate)
+                                .setForceHighestSupportedBitrate(true)
+                                .build()
+                        }
                 }
             }
 
@@ -841,6 +855,21 @@ class PlayerSettingsView @JvmOverloads constructor(
                             }
                             .sortedBy { it.name }
                     )
+
+                    list.filterIsInstance<TextTrackInformation>()
+                        .find { it.name == UserPreferences.subtitleName }
+                        ?.let {
+                            player.trackSelectionParameters = player.trackSelectionParameters
+                                .buildUpon()
+                                .setOverrideForType(
+                                    TrackSelectionOverride(
+                                        it.trackGroup.mediaTrackGroup,
+                                        listOf(it.trackIndex)
+                                    )
+                                )
+                                .setTrackTypeDisabled(it.trackGroup.type, false)
+                                .build()
+                        }
                 }
             }
 

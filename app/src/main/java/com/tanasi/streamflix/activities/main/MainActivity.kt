@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController
 import com.tanasi.streamflix.NavMainGraphDirections
 import com.tanasi.streamflix.R
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ActivityMainBinding
 import com.tanasi.streamflix.databinding.ContentHeaderMenuMainBinding
 import com.tanasi.streamflix.fragments.player.PlayerFragment
@@ -41,6 +42,7 @@ class MainActivity : FragmentActivity() {
         val navController = navHostFragment.navController
 
         UserPreferences.setup(this)
+        AppDatabase.setup(this)
         UserPreferences.currentProvider?.let {
             navController.navigate(R.id.home)
         }

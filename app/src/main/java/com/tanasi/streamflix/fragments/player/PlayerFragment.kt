@@ -28,11 +28,13 @@ import androidx.navigation.fragment.navArgs
 import androidx.tvprovider.media.tv.TvContractCompat
 import androidx.tvprovider.media.tv.WatchNextProgram
 import com.tanasi.streamflix.R
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentExoControllerBinding
 import com.tanasi.streamflix.databinding.FragmentPlayerBinding
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
@@ -94,6 +96,8 @@ class PlayerFragment : Fragment() {
     private val args by navArgs<PlayerFragmentArgs>()
     private val viewModel by viewModelsFactory { PlayerViewModel(args.videoType, args.id) }
 
+    private lateinit var database: AppDatabase
+
     private lateinit var player: ExoPlayer
     private lateinit var mediaSession: MediaSession
 
@@ -108,6 +112,8 @@ class PlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        database = AppDatabase.getInstance(requireContext())
 
         initializeVideo()
 
@@ -238,14 +244,7 @@ class PlayerFragment : Fragment() {
                 binding.pvPlayer.keepScreenOn = isPlaying
 
                 if (!isPlaying) {
-                    val program = requireContext().contentResolver.query(
-                        TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                        WatchNextProgram.PROJECTION,
-                        null,
-                        null,
-                        null
-                    )?.map { WatchNextProgram.fromCursor(it) }
-                        ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
+                    val program = WatchNextUtils.getProgram(requireContext(), args.id)
 
                     when {
                         player.hasStarted() -> {
@@ -284,31 +283,38 @@ class PlayerFragment : Fragment() {
                                     }
                                 }
 
-                                requireContext().contentResolver.insert(
-                                    TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                                    builder.build().toContentValues(),
+                                WatchNextUtils.insert(
+                                    requireContext(),
+                                    builder.build()
                                 )
                             } else {
-                                val builder = WatchNextProgram.Builder(program)
-                                    .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
-                                    .setLastPlaybackPositionMillis(player.currentPosition.toInt())
-                                    .setDurationMillis(player.duration.toInt())
-
-                                requireContext().contentResolver.update(
-                                    TvContractCompat.buildWatchNextProgramUri(program.id),
-                                    builder.build().toContentValues(),
-                                    null,
-                                    null,
+                                WatchNextUtils.updateProgram(
+                                    requireContext(),
+                                    program.id,
+                                    WatchNextProgram.Builder(program)
+                                        .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
+                                        .setLastPlaybackPositionMillis(player.currentPosition.toInt())
+                                        .setDurationMillis(player.duration.toInt())
+                                        .build()
                                 )
                             }
                         }
-                        player.hasFinished() && program != null -> {
-                            requireContext().contentResolver.delete(
-                                TvContractCompat.buildWatchNextProgramUri(program.id),
-                                null,
-                                null,
-                            )
+                        player.hasFinished() -> {
+                            if (program != null) {
+                                WatchNextUtils.deleteProgramById(requireContext(), program.id)
+                            }
                         }
+                    }
+
+                    when (val videoType = args.videoType as VideoType) {
+                        is VideoType.Movie -> database.movieDao().updateWatched(
+                            id = videoType.id,
+                            isWatched = player.hasFinished()
+                        )
+                        is VideoType.Episode -> database.episodeDao().updateWatched(
+                            id = videoType.id,
+                            isWatched = player.hasFinished()
+                        )
                     }
                 }
             }

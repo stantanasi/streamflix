@@ -6,15 +6,15 @@ import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import androidx.tvprovider.media.tv.TvContractCompat
-import androidx.tvprovider.media.tv.WatchNextProgram
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentMovieBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
@@ -38,10 +38,10 @@ import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.ui.WatchNextOptionsDialog
+import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
-import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.toActivity
 
 @UnstableApi
@@ -53,6 +53,7 @@ class MovieViewHolder(
 ) {
 
     private val context = itemView.context
+    private val database = AppDatabase.getInstance(context)
     private lateinit var movie: Movie
 
     val childRecyclerView: RecyclerView?
@@ -190,6 +191,8 @@ class MovieViewHolder(
     }
 
     private fun displayItemContinueWatching(binding: ItemMovieContinueWatchingBinding) {
+        val program = WatchNextUtils.getProgram(context, movie.id)
+
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -205,6 +208,22 @@ class MovieViewHolder(
                         ),
                     )
                 )
+            }
+            setOnLongClickListener {
+                if (program == null) return@setOnLongClickListener true
+
+                WatchNextOptionsDialog(context).also {
+                    it.program = program
+                    it.setOnProgramClearListener { _ ->
+                        WatchNextUtils.deleteProgramById(context, program.id)
+                        when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                            is HomeFragment -> fragment.refresh()
+                        }
+                        it.hide()
+                    }
+                    it.show()
+                }
+                true
             }
             setOnFocusChangeListener { _, hasFocus ->
                 val animation = when {
@@ -228,15 +247,6 @@ class MovieViewHolder(
             .into(binding.ivMoviePoster)
 
         binding.pbMovieProgress.apply {
-            val program = context.contentResolver.query(
-                TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                WatchNextProgram.PROJECTION,
-                null,
-                null,
-                null,
-            )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == movie.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
-
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
                 else -> 0
@@ -254,6 +264,8 @@ class MovieViewHolder(
 
 
     private fun displayMovie(binding: ContentMovieBinding) {
+        val program = WatchNextUtils.getProgram(context, movie.id)
+
         binding.ivMoviePoster.run {
             Glide.with(context)
                 .load(movie.poster)
@@ -332,15 +344,6 @@ class MovieViewHolder(
         }
 
         binding.pbMovieProgress.apply {
-            val program = context.contentResolver.query(
-                TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                WatchNextProgram.PROJECTION,
-                null,
-                null,
-                null,
-            )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == movie.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
-
             progress = when {
                 program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
                 else -> 0
@@ -355,8 +358,31 @@ class MovieViewHolder(
             context.startActivity(
                 Intent(
                     Intent.ACTION_VIEW,
-                    Uri.parse("https://www.youtube.com/watch?v=${movie.youtubeTrailerId}")
+                    Uri.parse(movie.trailer)
                 )
+            )
+        }
+
+        binding.btnMovieFavorite.apply {
+            fun Boolean.drawable() = when (this) {
+                true -> R.drawable.ic_favorite_enable
+                false -> R.drawable.ic_favorite_disable
+            }
+
+            setOnClickListener {
+                database.movieDao().updateFavorite(
+                    id = movie.id,
+                    isFavorite = !movie.isFavorite
+                )
+                movie.isFavorite = movie.isFavorite.not()
+
+                setImageDrawable(
+                    ContextCompat.getDrawable(context, movie.isFavorite.drawable())
+                )
+            }
+
+            setImageDrawable(
+                ContextCompat.getDrawable(context, movie.isFavorite.drawable())
             )
         }
     }

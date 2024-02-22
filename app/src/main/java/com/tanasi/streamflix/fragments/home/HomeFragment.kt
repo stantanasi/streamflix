@@ -9,18 +9,17 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.tvprovider.media.tv.TvContractCompat
-import androidx.tvprovider.media.tv.WatchNextProgram
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentHomeBinding
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.utils.UserPreferences
-import com.tanasi.streamflix.utils.map
+import com.tanasi.streamflix.utils.WatchNextUtils
 
 @SuppressLint("RestrictedApi")
 class HomeFragment : Fragment() {
@@ -29,6 +28,8 @@ class HomeFragment : Fragment() {
     val binding get() = _binding!!
 
     private val viewModel by viewModels<HomeViewModel>()
+
+    private lateinit var database: AppDatabase
 
     private val appAdapter = AppAdapter()
 
@@ -43,6 +44,8 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        database = AppDatabase.getInstance(requireContext())
 
         initializeHome()
 
@@ -77,6 +80,13 @@ class HomeFragment : Fragment() {
             .into(binding.ivHomeBackground)
     }
 
+    fun refresh() {
+        when (val state = viewModel.state.value) {
+            is HomeViewModel.State.SuccessLoading -> displayHome(state.categories)
+            else -> {}
+        }
+    }
+
     private fun initializeHome() {
         binding.vgvHome.apply {
             adapter = appAdapter
@@ -94,16 +104,9 @@ class HomeFragment : Fragment() {
 
             Category(
                 name = getString(R.string.home_continue_watching),
-                list = requireContext().contentResolver.query(
-                    TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                    WatchNextProgram.PROJECTION,
-                    null,
-                    null,
-                    null
-                )?.map { WatchNextProgram.fromCursor(it) }
-                    ?.filter { it.internalProviderId == UserPreferences.currentProvider!!.name }
-                    ?.sortedBy { it.lastEngagementTimeUtcMillis }?.reversed()
-                    ?.mapNotNull {
+                list = WatchNextUtils.programs(requireContext())
+                    .sortedByDescending { it.lastEngagementTimeUtcMillis }
+                    .mapNotNull {
                         when (it.type) {
                             TvContractCompat.PreviewPrograms.TYPE_MOVIE -> Movie(
                                 id = it.contentId ?: "",
@@ -129,12 +132,42 @@ class HomeFragment : Fragment() {
                             )
                             else -> null
                         }
-                    } ?: listOf()
+                    }
             ).takeIf { it.list.isNotEmpty() }?.also {
                 it.list.onEach { show ->
                     when (show) {
                         is Movie -> show.itemType = AppAdapter.Type.MOVIE_CONTINUE_WATCHING_ITEM
                         is Episode -> show.itemType = AppAdapter.Type.EPISODE_CONTINUE_WATCHING_ITEM
+                    }
+                }
+                it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+                it.itemType = AppAdapter.Type.CATEGORY_ITEM
+            },
+
+            Category(
+                name = getString(R.string.home_favorite_movies),
+                list = database.movieDao().getFavoriteMovies()
+                    .reversed(),
+            ).takeIf { it.list.isNotEmpty() }?.also {
+                it.list.onEach { show ->
+                    when (show) {
+                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_ITEM
+                        is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_ITEM
+                    }
+                }
+                it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+                it.itemType = AppAdapter.Type.CATEGORY_ITEM
+            },
+
+            Category(
+                name = getString(R.string.home_favorite_tv_shows),
+                list = database.tvShowDao().getFavoriteTvShows()
+                    .reversed(),
+            ).takeIf { it.list.isNotEmpty() }?.also {
+                it.list.onEach { show ->
+                    when (show) {
+                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_ITEM
+                        is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_ITEM
                     }
                 }
                 it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()

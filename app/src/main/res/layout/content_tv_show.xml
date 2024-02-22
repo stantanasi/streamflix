@@ -131,7 +131,7 @@
         tools:text="Overview" />
 
     <TextView
-        android:id="@+id/btn_tv_show_trailer"
+        android:id="@+id/btn_tv_show_watch_episode"
         style="@style/AppTheme.Widget.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -139,9 +139,56 @@
         android:layout_marginTop="30dp"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:text="@string/tv_show_trailer"
+        android:text="@string/tv_show_watch_season_episode"
         app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
         app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview"
         app:layout_goneMarginStart="70dp" />
+
+    <ProgressBar
+        android:id="@+id/pb_tv_show_progress_episode"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="#CC646464"
+        android:progressTint="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="@id/btn_tv_show_watch_episode"
+        app:layout_constraintStart_toStartOf="@id/btn_tv_show_watch_episode"
+        app:layout_constraintTop_toBottomOf="@id/btn_tv_show_watch_episode"
+        tools:progress="80" />
+
+    <TextView
+        android:id="@+id/btn_tv_show_trailer"
+        style="@style/AppTheme.Widget.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="25dp"
+        android:layout_marginTop="30dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:text="@string/tv_show_trailer"
+        app:layout_constraintStart_toEndOf="@id/btn_tv_show_watch_episode"
+        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview"
+        app:layout_goneMarginStart="40dp" />
+
+    <ImageView
+        android:id="@+id/btn_tv_show_favorite"
+        style="@style/AppTheme.Widget.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:src="@drawable/ic_favorite_disable"
+        android:tint="@drawable/color_button_text"
+        app:layout_constraintBottom_toBottomOf="@id/btn_tv_show_trailer"
+        app:layout_constraintStart_toEndOf="@id/btn_tv_show_trailer"
+        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview"
+        tools:ignore="ContentDescription,UseAppTint" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
