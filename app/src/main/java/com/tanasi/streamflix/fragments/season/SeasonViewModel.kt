@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.season
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,6 +34,7 @@ class SeasonViewModel(seasonId: String) : ViewModel() {
 
             _state.postValue(State.SuccessLoadingEpisodes(episodes))
         } catch (e: Exception) {
+            Log.e("SeasonViewModel", "getSeasonEpisodes: ", e)
             _state.postValue(State.FailedLoadingEpisodes(e))
         }
     }

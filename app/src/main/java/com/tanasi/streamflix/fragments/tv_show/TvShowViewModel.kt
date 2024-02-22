@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.tv_show
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,6 +34,7 @@ class TvShowViewModel(id: String) : ViewModel() {
 
             _state.postValue(State.SuccessLoading(tvShow))
         } catch (e: Exception) {
+            Log.e("TvShowViewModel", "getTvShow: ", e)
             _state.postValue(State.FailedLoading(e))
         }
     }

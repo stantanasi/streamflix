@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,6 +34,7 @@ class HomeViewModel : ViewModel() {
 
             _state.postValue(State.SuccessLoading(categories))
         } catch (e: Exception) {
+            Log.e("HomeViewModel", "getHome: ", e)
             _state.postValue(State.FailedLoading(e))
         }
     }

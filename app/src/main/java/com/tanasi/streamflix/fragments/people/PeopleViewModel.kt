@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.people
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,6 +39,7 @@ class PeopleViewModel(private val id: String) : ViewModel() {
 
             _state.postValue(State.SuccessLoading(people, true))
         } catch (e: Exception) {
+            Log.e("PeopleViewModel", "getPeople: ", e)
             _state.postValue(State.FailedLoading(e))
         }
     }
@@ -64,6 +66,7 @@ class PeopleViewModel(private val id: String) : ViewModel() {
                     )
                 )
             } catch (e: Exception) {
+                Log.e("PeopleViewModel", "loadMorePeopleFilmography: ", e)
                 _state.postValue(State.FailedLoading(e))
             }
         }

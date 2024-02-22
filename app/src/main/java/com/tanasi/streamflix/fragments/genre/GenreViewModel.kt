@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.genre
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,6 +39,7 @@ class GenreViewModel(private val id: String) : ViewModel() {
 
             _state.postValue(State.SuccessLoading(genre, true))
         } catch (e: Exception) {
+            Log.e("GenreViewModel", "getGenre: ", e)
             _state.postValue(State.FailedLoading(e))
         }
     }
@@ -64,6 +66,7 @@ class GenreViewModel(private val id: String) : ViewModel() {
                     )
                 )
             } catch (e: Exception) {
+                Log.e("GenreViewModel", "loadMoreGenreShows: ", e)
                 _state.postValue(State.FailedLoading(e))
             }
         }

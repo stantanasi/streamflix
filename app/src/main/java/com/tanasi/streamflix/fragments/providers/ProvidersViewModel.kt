@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.providers
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -40,6 +41,7 @@ class ProvidersViewModel : ViewModel() {
 
             _state.postValue(State.SuccessLoading(providers))
         } catch (e: Exception) {
+            Log.e("ProvidersViewModel", "getProviders: ", e)
             _state.postValue(State.FailedLoading(e))
         }
     }

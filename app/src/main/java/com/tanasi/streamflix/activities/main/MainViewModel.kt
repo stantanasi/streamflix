@@ -2,6 +2,7 @@ package com.tanasi.streamflix.activities.main
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -38,6 +39,7 @@ class MainViewModel : ViewModel() {
 
             _state.postValue(State.SuccessCheckingUpdate(release))
         } catch (e: Exception) {
+            Log.e("MainViewModel", "checkUpdate: ", e)
             _state.postValue(State.FailedUpdate(e))
         }
     }
@@ -53,6 +55,7 @@ class MainViewModel : ViewModel() {
 
             _state.postValue(State.SuccessDownloadingUpdate(apk))
         } catch (e: Exception) {
+            Log.e("MainViewModel", "downloadUpdate: ", e)
             _state.postValue(State.FailedUpdate(e))
         }
     }
@@ -66,6 +69,7 @@ class MainViewModel : ViewModel() {
         try {
             InAppUpdater.installApk(context, Uri.fromFile(apk))
         } catch (e: Exception) {
+            Log.e("MainViewModel", "installUpdate: ", e)
             _state.postValue(State.FailedUpdate(e))
         }
     }

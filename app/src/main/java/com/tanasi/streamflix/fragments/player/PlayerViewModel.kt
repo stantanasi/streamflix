@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.player
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -47,6 +48,7 @@ class PlayerViewModel(
 
             getVideo(servers.first())
         } catch (e: Exception) {
+            Log.e("PlayerViewModel", "getServers: ", e)
             _state.postValue(State.FailedLoadingServers(e))
         }
     }
@@ -61,6 +63,7 @@ class PlayerViewModel(
 
             _state.postValue(State.SuccessLoadingVideo(video, server))
         } catch (e: Exception) {
+            Log.e("PlayerViewModel", "getVideo: ", e)
             _state.postValue(State.FailedLoadingVideo(e))
         }
     }

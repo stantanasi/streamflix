@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.movie
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -33,6 +34,7 @@ class MovieViewModel(id: String) : ViewModel() {
 
             _state.postValue(State.SuccessLoading(movie))
         } catch (e: Exception) {
+            Log.e("MovieViewModel", "getMovie: ", e)
             _state.postValue(State.FailedLoading(e))
         }
     }
