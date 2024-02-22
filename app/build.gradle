@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId "com.tanasi.streamflix"
-        minSdk 23
+        minSdk 21
         targetSdk 34
         versionCode 13
         versionName "1.4.1"
