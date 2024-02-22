@@ -285,6 +285,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         .clearOverridesOfType(C.TRACK_TYPE_TEXT)
                                         .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
                                         .build()
+                                    UserPreferences.subtitleName = null
                                     settingsView.hide()
                                 }
                                 is Settings.Subtitle.TextTrackInformation -> {
@@ -298,6 +299,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                                         )
                                         .setTrackTypeDisabled(item.trackGroup.type, false)
                                         .build()
+                                    UserPreferences.subtitleName = item.name
                                     settingsView.hide()
                                 }
                             }
@@ -853,6 +855,21 @@ class PlayerSettingsView @JvmOverloads constructor(
                             }
                             .sortedBy { it.name }
                     )
+
+                    list.filterIsInstance<TextTrackInformation>()
+                        .find { it.name == UserPreferences.subtitleName }
+                        ?.let {
+                            player.trackSelectionParameters = player.trackSelectionParameters
+                                .buildUpon()
+                                .setOverrideForType(
+                                    TrackSelectionOverride(
+                                        it.trackGroup.mediaTrackGroup,
+                                        listOf(it.trackIndex)
+                                    )
+                                )
+                                .setTrackTypeDisabled(it.trackGroup.type, false)
+                                .build()
+                        }
                 }
             }
 

@@ -69,6 +69,12 @@ object UserPreferences {
             Key.QUALITY_HEIGHT.setInt(value)
         }
 
+    var subtitleName: String?
+        get() = Key.SUBTITLE_NAME.getString()
+        set(value) {
+            Key.SUBTITLE_NAME.setString(value)
+        }
+
 
     private enum class Key {
         CURRENT_PROVIDER,
@@ -78,7 +84,8 @@ object UserPreferences {
         CAPTION_STYLE_WINDOW_COLOR,
         CAPTION_STYLE_EDGE_TYPE,
         CAPTION_STYLE_EDGE_COLOR,
-        QUALITY_HEIGHT;
+        QUALITY_HEIGHT,
+        SUBTITLE_NAME;
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)
