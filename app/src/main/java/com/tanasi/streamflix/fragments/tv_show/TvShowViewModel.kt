@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +21,19 @@ class TvShowViewModel(id: String) : ViewModel() {
         object Loading : State()
         data class SuccessLoading(val tvShow: TvShow) : State()
         data class FailedLoading(val error: Exception) : State()
+    }
+
+    private val _seasonState = MutableLiveData<SeasonState>(SeasonState.Loading)
+    val seasonState: LiveData<SeasonState> = _seasonState
+
+    sealed class SeasonState {
+        object Loading :  SeasonState()
+        data class SuccessLoading(
+            val tvShow: TvShow,
+            val season: Season,
+            val episodes: List<Episode>,
+        ) : SeasonState()
+        data class FailedLoading(val error: Exception) : SeasonState()
     }
 
     init {
@@ -36,6 +51,20 @@ class TvShowViewModel(id: String) : ViewModel() {
         } catch (e: Exception) {
             Log.e("TvShowViewModel", "getTvShow: ", e)
             _state.postValue(State.FailedLoading(e))
+        }
+    }
+
+    fun getFirstSeason(tvShow: TvShow) = viewModelScope.launch(Dispatchers.IO) {
+        _seasonState.postValue(SeasonState.Loading)
+
+        try {
+            val season = tvShow.seasons.firstOrNull() ?: return@launch
+            val episodes = UserPreferences.currentProvider!!.getEpisodesBySeason(season.id)
+
+            _seasonState.postValue(SeasonState.SuccessLoading(tvShow, season, episodes))
+        } catch (e: Exception) {
+            Log.e("TvShowViewModel", "getFirstSeason: ", e)
+            _seasonState.postValue(SeasonState.FailedLoading(e))
         }
     }
 }
