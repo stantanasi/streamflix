@@ -343,6 +343,13 @@ class TvShowViewHolder(
             }
         }
 
+        binding.pbTvShowWatchEpisodeLoading.apply {
+            visibility = when {
+                episode != null -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
         binding.pbTvShowProgressEpisode.apply {
             val program = episode?.let {
                 WatchNextUtils.getProgram(context, episode.id)

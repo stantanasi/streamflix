@@ -46,10 +46,39 @@ class TvShowFragment : Fragment() {
             when (state) {
                 TvShowViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
                 is TvShowViewModel.State.SuccessLoading -> {
+                    val episodes = database.episodeDao().getEpisodesByTvShowId(state.tvShow.id)
+                    if (episodes.isEmpty()) {
+                        viewModel.getFirstSeason(state.tvShow)
+                    }
+
                     displayTvShow(state.tvShow)
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is TvShowViewModel.State.FailedLoading -> {
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message ?: "",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+
+        viewModel.seasonState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                TvShowViewModel.SeasonState.Loading -> {}
+                is TvShowViewModel.SeasonState.SuccessLoading -> {
+                    val episodes = database.episodeDao().getEpisodesByTvShowId(state.tvShow.id)
+                    if (episodes.isEmpty()) {
+                        state.episodes.onEach { episode ->
+                            episode.tvShow = state.tvShow
+                            episode.season = state.season.takeIf { it.number != 0 }
+                        }
+                        database.episodeDao().insertAll(state.episodes)
+                        appAdapter.notifyItemChanged(0)
+                    }
+                }
+                is TvShowViewModel.SeasonState.FailedLoading -> {
                     Toast.makeText(
                         requireContext(),
                         state.error.message ?: "",
