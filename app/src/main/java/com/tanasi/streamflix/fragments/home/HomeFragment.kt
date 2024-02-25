@@ -81,6 +81,7 @@ class HomeFragment : Fragment() {
     }
 
     fun refresh() {
+        appAdapter.onSaveInstanceState(binding.vgvHome)
         when (val state = viewModel.state.value) {
             is HomeViewModel.State.SuccessLoading -> displayHome(state.categories)
             else -> {}
