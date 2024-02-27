@@ -29,7 +29,7 @@ class TvShowsViewModel : ViewModel() {
     }
 
 
-    private fun getTvShows() = viewModelScope.launch(Dispatchers.IO) {
+    fun getTvShows() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {
