@@ -311,10 +311,13 @@ class PlayerFragment : Fragment() {
                             id = videoType.id,
                             isWatched = player.hasFinished()
                         )
-                        is VideoType.Episode -> database.episodeDao().updateWatched(
-                            id = videoType.id,
-                            isWatched = player.hasFinished()
-                        )
+                        is VideoType.Episode -> {
+                            database.episodeDao().resetProgressionFromEpisode(videoType.id)
+                            database.episodeDao().updateWatched(
+                                id = videoType.id,
+                                isWatched = player.hasFinished()
+                            )
+                        }
                     }
                 }
             }
