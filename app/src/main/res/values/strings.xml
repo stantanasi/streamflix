@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Streamflix</string>
 
+    <string name="loading_error_title">An error occurred</string>
+    <string name="loading_error_retry">Retry</string>
+
     <string name="update_title">New Update Available</string>
     <string name="update_message">A new version of the app is available!</string>
     <string name="update_current_version_label">Current version</string>
