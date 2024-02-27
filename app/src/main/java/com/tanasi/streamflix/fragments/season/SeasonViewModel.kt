@@ -26,7 +26,7 @@ class SeasonViewModel(seasonId: String) : ViewModel() {
     }
 
 
-    private fun getSeasonEpisodes(seasonId: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getSeasonEpisodes(seasonId: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.LoadingEpisodes)
 
         try {
