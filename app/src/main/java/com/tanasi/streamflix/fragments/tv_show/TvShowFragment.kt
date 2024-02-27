@@ -44,7 +44,11 @@ class TvShowFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                TvShowViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                TvShowViewModel.State.Loading -> binding.isLoading.apply {
+                    root.visibility = View.VISIBLE
+                    pbIsLoading.visibility = View.VISIBLE
+                    gIsLoadingRetry.visibility = View.GONE
+                }
                 is TvShowViewModel.State.SuccessLoading -> {
                     val episodes = database.episodeDao().getEpisodesByTvShowId(state.tvShow.id)
                     state.tvShow.seasons.onEach { season ->
@@ -87,6 +91,14 @@ class TvShowFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    binding.isLoading.apply {
+                        pbIsLoading.visibility = View.GONE
+                        gIsLoadingRetry.visibility = View.VISIBLE
+                        btnIsLoadingRetry.setOnClickListener {
+                            viewModel.getTvShow(args.id)
+                        }
+                        btnIsLoadingRetry.requestFocus()
+                    }
                 }
             }
         }
