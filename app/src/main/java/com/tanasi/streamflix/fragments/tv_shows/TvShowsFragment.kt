@@ -37,11 +37,16 @@ class TvShowsFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                TvShowsViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                TvShowsViewModel.State.Loading -> binding.isLoading.apply {
+                    root.visibility = View.VISIBLE
+                    pbIsLoading.visibility = View.VISIBLE
+                    gIsLoadingRetry.visibility = View.GONE
+                }
                 TvShowsViewModel.State.LoadingMore -> appAdapter.isLoading = true
                 is TvShowsViewModel.State.SuccessLoading -> {
                     displayTvShows(state.tvShows, state.hasMore)
                     appAdapter.isLoading = false
+                    binding.vgvTvShows.visibility = View.VISIBLE
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is TvShowsViewModel.State.FailedLoading -> {
@@ -50,6 +55,18 @@ class TvShowsFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    if (appAdapter.isLoading) {
+                        appAdapter.isLoading = false
+                    } else {
+                        binding.isLoading.apply {
+                            pbIsLoading.visibility = View.GONE
+                            gIsLoadingRetry.visibility = View.VISIBLE
+                            btnIsLoadingRetry.setOnClickListener {
+                                viewModel.getTvShows()
+                            }
+                            binding.vgvTvShows.visibility = View.GONE
+                        }
+                    }
                 }
             }
         }

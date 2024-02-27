@@ -42,7 +42,11 @@ class SearchFragment : Fragment() {
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 SearchViewModel.State.Searching -> {
-                    binding.isLoading.root.visibility = View.VISIBLE
+                    binding.isLoading.apply {
+                        root.visibility = View.VISIBLE
+                        pbIsLoading.visibility = View.VISIBLE
+                        gIsLoadingRetry.visibility = View.GONE
+                    }
                     binding.vgvSearch.adapter = AppAdapter().also {
                         appAdapter = it
                     }
@@ -51,6 +55,8 @@ class SearchFragment : Fragment() {
                 is SearchViewModel.State.SuccessSearching -> {
                     displaySearch(state.results, state.hasMore)
                     appAdapter.isLoading = false
+                    binding.etSearch.nextFocusDownId = binding.vgvSearch.id
+                    binding.vgvSearch.visibility = View.VISIBLE
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is SearchViewModel.State.FailedSearching -> {
@@ -59,6 +65,20 @@ class SearchFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    if (appAdapter.isLoading) {
+                        appAdapter.isLoading = false
+                    } else {
+                        binding.isLoading.apply {
+                            pbIsLoading.visibility = View.GONE
+                            gIsLoadingRetry.visibility = View.VISIBLE
+                            btnIsLoadingRetry.setOnClickListener {
+                                viewModel.search(viewModel.query)
+                            }
+                            binding.vgvSearch.visibility = View.INVISIBLE
+                            binding.etSearch.nextFocusDownId = binding.isLoading.btnIsLoadingRetry.id
+                            binding.isLoading.btnIsLoadingRetry.nextFocusUpId = binding.etSearch.id
+                        }
+                    }
                 }
             }
         }

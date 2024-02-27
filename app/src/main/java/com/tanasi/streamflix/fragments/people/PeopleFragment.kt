@@ -42,7 +42,11 @@ class PeopleFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                PeopleViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                PeopleViewModel.State.Loading -> binding.isLoading.apply {
+                    root.visibility = View.VISIBLE
+                    pbIsLoading.visibility = View.VISIBLE
+                    gIsLoadingRetry.visibility = View.GONE
+                }
                 PeopleViewModel.State.LoadingMore -> appAdapter.isLoading = true
                 is PeopleViewModel.State.SuccessLoading -> {
                     displayPeople(state.people, state.hasMore)
@@ -55,6 +59,18 @@ class PeopleFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    if (appAdapter.isLoading) {
+                        appAdapter.isLoading = false
+                    } else {
+                        binding.isLoading.apply {
+                            pbIsLoading.visibility = View.GONE
+                            gIsLoadingRetry.visibility = View.VISIBLE
+                            btnIsLoadingRetry.setOnClickListener {
+                                viewModel.getPeople(args.id)
+                            }
+                            btnIsLoadingRetry.requestFocus()
+                        }
+                    }
                 }
             }
         }

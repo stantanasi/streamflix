@@ -5,17 +5,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#181818"
-    android:clickable="true"
-    android:focusable="true"
     android:visibility="visible"
     tools:visibility="gone">
 
     <ProgressBar
+        android:id="@+id/pb_is_loading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:indeterminateTint="#C6C6C6"
+        android:indeterminateTintMode="src_atop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_is_loading_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/loading_error_title"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toTopOf="@id/btn_is_loading_retry"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/btn_is_loading_retry"
+        style="@style/AppTheme.Widget.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:text="@string/loading_error_retry"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_is_loading_error" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/g_is_loading_retry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="tv_is_loading_error,btn_is_loading_retry"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

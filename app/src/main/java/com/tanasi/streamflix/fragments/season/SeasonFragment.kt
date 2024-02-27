@@ -46,7 +46,11 @@ class SeasonFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                SeasonViewModel.State.LoadingEpisodes -> binding.isLoading.root.visibility = View.VISIBLE
+                SeasonViewModel.State.LoadingEpisodes -> binding.isLoading.apply {
+                    root.visibility = View.VISIBLE
+                    pbIsLoading.visibility = View.VISIBLE
+                    gIsLoadingRetry.visibility = View.GONE
+                }
                 is SeasonViewModel.State.SuccessLoadingEpisodes -> {
                     displaySeason(state.episodes)
                     binding.isLoading.root.visibility = View.GONE
@@ -57,6 +61,14 @@ class SeasonFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    binding.isLoading.apply {
+                        pbIsLoading.visibility = View.GONE
+                        gIsLoadingRetry.visibility = View.VISIBLE
+                        btnIsLoadingRetry.setOnClickListener {
+                            viewModel.getSeasonEpisodes(args.seasonId)
+                        }
+                        btnIsLoadingRetry.requestFocus()
+                    }
                 }
             }
         }

@@ -26,7 +26,7 @@ class HomeViewModel : ViewModel() {
     }
 
 
-    private fun getHome() = viewModelScope.launch(Dispatchers.IO) {
+    fun getHome() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {

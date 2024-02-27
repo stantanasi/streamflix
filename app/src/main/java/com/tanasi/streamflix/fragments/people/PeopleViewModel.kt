@@ -29,7 +29,7 @@ class PeopleViewModel(private val id: String) : ViewModel() {
     }
 
 
-    private fun getPeople(id: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getPeople(id: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {

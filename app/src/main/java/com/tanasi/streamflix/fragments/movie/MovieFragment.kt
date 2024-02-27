@@ -44,7 +44,11 @@ class MovieFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                MovieViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                MovieViewModel.State.Loading -> binding.isLoading.apply {
+                    root.visibility = View.VISIBLE
+                    pbIsLoading.visibility = View.VISIBLE
+                    gIsLoadingRetry.visibility = View.GONE
+                }
                 is MovieViewModel.State.SuccessLoading -> {
                     displayMovie(state.movie)
                     binding.isLoading.root.visibility = View.GONE
@@ -55,6 +59,14 @@ class MovieFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    binding.isLoading.apply {
+                        pbIsLoading.visibility = View.GONE
+                        gIsLoadingRetry.visibility = View.VISIBLE
+                        btnIsLoadingRetry.setOnClickListener {
+                            viewModel.getMovie(args.id)
+                        }
+                        btnIsLoadingRetry.requestFocus()
+                    }
                 }
             }
         }

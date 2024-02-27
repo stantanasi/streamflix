@@ -26,7 +26,7 @@ class ProvidersViewModel : ViewModel() {
     }
 
 
-    private fun getProviders() = viewModelScope.launch(Dispatchers.IO) {
+    fun getProviders() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {

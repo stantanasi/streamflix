@@ -41,7 +41,11 @@ class GenreFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                GenreViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                GenreViewModel.State.Loading -> binding.isLoading.apply {
+                    root.visibility = View.VISIBLE
+                    pbIsLoading.visibility = View.VISIBLE
+                    gIsLoadingRetry.visibility = View.GONE
+                }
                 GenreViewModel.State.LoadingMore -> appAdapter.isLoading = true
                 is GenreViewModel.State.SuccessLoading -> {
                     displayGenre(state.genre, state.hasMore)
@@ -54,6 +58,18 @@ class GenreFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    if (appAdapter.isLoading) {
+                        appAdapter.isLoading = false
+                    } else {
+                        binding.isLoading.apply {
+                            pbIsLoading.visibility = View.GONE
+                            gIsLoadingRetry.visibility = View.VISIBLE
+                            btnIsLoadingRetry.setOnClickListener {
+                                viewModel.getGenre(args.id)
+                            }
+                            btnIsLoadingRetry.requestFocus()
+                        }
+                    }
                 }
             }
         }

@@ -26,7 +26,7 @@ class MovieViewModel(id: String) : ViewModel() {
     }
 
 
-    private fun getMovie(id: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getMovie(id: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {

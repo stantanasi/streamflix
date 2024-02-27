@@ -41,7 +41,7 @@ class TvShowViewModel(id: String) : ViewModel() {
     }
 
 
-    private fun getTvShow(id: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getTvShow(id: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {
