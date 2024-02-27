@@ -105,10 +105,8 @@ class SeasonFragment : Fragment() {
         episodes.indexOfLast { it.isWatched }
             .takeIf { it != -1 && it + 1 < episodes.size }
             ?.let {
-                binding.hgvEpisodes.post {
-                    if (binding.hgvEpisodes.selectedPosition < it + 1) {
-                        binding.hgvEpisodes.scrollToPosition(it + 1)
-                    }
+                if (binding.hgvEpisodes.selectedPosition < it + 1) {
+                    binding.hgvEpisodes.scrollToPosition(it + 1)
                 }
             }
     }
