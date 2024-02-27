@@ -29,7 +29,7 @@ class MoviesViewModel : ViewModel() {
     }
 
 
-    private fun getMovies() = viewModelScope.launch(Dispatchers.IO) {
+    fun getMovies() = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {

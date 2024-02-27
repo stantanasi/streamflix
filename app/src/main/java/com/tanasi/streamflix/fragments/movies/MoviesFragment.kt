@@ -37,11 +37,16 @@ class MoviesFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                MoviesViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                MoviesViewModel.State.Loading -> binding.isLoading.apply {
+                    root.visibility = View.VISIBLE
+                    pbIsLoading.visibility = View.VISIBLE
+                    gIsLoadingRetry.visibility = View.GONE
+                }
                 MoviesViewModel.State.LoadingMore -> appAdapter.isLoading = true
                 is MoviesViewModel.State.SuccessLoading -> {
                     displayMovies(state.movies, state.hasMore)
                     appAdapter.isLoading = false
+                    binding.vgvMovies.visibility = View.VISIBLE
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is MoviesViewModel.State.FailedLoading -> {
@@ -50,6 +55,18 @@ class MoviesFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    if (appAdapter.isLoading) {
+                        appAdapter.isLoading = false
+                    } else {
+                        binding.isLoading.apply {
+                            pbIsLoading.visibility = View.GONE
+                            gIsLoadingRetry.visibility = View.VISIBLE
+                            btnIsLoadingRetry.setOnClickListener {
+                                viewModel.getMovies()
+                            }
+                            binding.vgvMovies.visibility = View.GONE
+                        }
+                    }
                 }
             }
         }
