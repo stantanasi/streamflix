@@ -51,9 +51,14 @@ class HomeFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                HomeViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                HomeViewModel.State.Loading -> binding.isLoading.apply {
+                    root.visibility = View.VISIBLE
+                    pbIsLoading.visibility = View.VISIBLE
+                    gIsLoadingRetry.visibility = View.GONE
+                }
                 is HomeViewModel.State.SuccessLoading -> {
                     displayHome(state.categories)
+                    binding.vgvHome.visibility = View.VISIBLE
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is HomeViewModel.State.FailedLoading -> {
@@ -62,6 +67,14 @@ class HomeFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    binding.isLoading.apply {
+                        pbIsLoading.visibility = View.GONE
+                        gIsLoadingRetry.visibility = View.VISIBLE
+                        btnIsLoadingRetry.setOnClickListener {
+                            viewModel.getHome()
+                        }
+                        binding.vgvHome.visibility = View.GONE
+                    }
                 }
             }
         }
