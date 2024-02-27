@@ -29,7 +29,7 @@ class GenreViewModel(private val id: String) : ViewModel() {
     }
 
 
-    private fun getGenre(id: String) = viewModelScope.launch(Dispatchers.IO) {
+    fun getGenre(id: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.Loading)
 
         try {
