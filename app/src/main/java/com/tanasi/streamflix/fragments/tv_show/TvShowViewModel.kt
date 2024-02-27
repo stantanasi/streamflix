@@ -54,11 +54,10 @@ class TvShowViewModel(id: String) : ViewModel() {
         }
     }
 
-    fun getFirstSeason(tvShow: TvShow) = viewModelScope.launch(Dispatchers.IO) {
+    fun getSeason(tvShow: TvShow, season: Season) = viewModelScope.launch(Dispatchers.IO) {
         _seasonState.postValue(SeasonState.Loading)
 
         try {
-            val season = tvShow.seasons.firstOrNull() ?: return@launch
             val episodes = UserPreferences.currentProvider!!.getEpisodesBySeason(season.id)
 
             _seasonState.postValue(SeasonState.SuccessLoading(tvShow, season, episodes))

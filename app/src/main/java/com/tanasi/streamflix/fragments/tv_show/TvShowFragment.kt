@@ -47,8 +47,35 @@ class TvShowFragment : Fragment() {
                 TvShowViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
                 is TvShowViewModel.State.SuccessLoading -> {
                     val episodes = database.episodeDao().getEpisodesByTvShowId(state.tvShow.id)
+                    state.tvShow.seasons.onEach { season ->
+                        season.episodes = episodes.filter { it.season?.id == season.id }
+                    }
+
                     if (episodes.isEmpty()) {
-                        viewModel.getFirstSeason(state.tvShow)
+                        state.tvShow.seasons.firstOrNull()?.let {
+                            viewModel.getSeason(state.tvShow, it)
+                        }
+                    } else {
+                        val season = state.tvShow.seasons.let { seasons ->
+                            seasons
+                                .lastOrNull { season ->
+                                    season.episodes.lastOrNull()?.isWatched == true ||
+                                            season.episodes.any { it.isWatched }
+                                }?.let { season ->
+                                    if (season.episodes.lastOrNull()?.isWatched == true) {
+                                        val next = seasons.getOrNull(seasons.indexOf(season) + 1)
+                                        next ?: season
+                                    } else season
+                                }
+                                ?: seasons.firstOrNull { season ->
+                                    season.episodes.isEmpty() ||
+                                            season.episodes.lastOrNull()?.isWatched == false
+                                }
+                        }
+
+                        if (season != null && (season.episodes.isEmpty() || state.tvShow.seasons.lastOrNull() == season)) {
+                            viewModel.getSeason(state.tvShow, season)
+                        }
                     }
 
                     displayTvShow(state.tvShow)
@@ -69,14 +96,15 @@ class TvShowFragment : Fragment() {
                 TvShowViewModel.SeasonState.Loading -> {}
                 is TvShowViewModel.SeasonState.SuccessLoading -> {
                     val episodes = database.episodeDao().getEpisodesByTvShowId(state.tvShow.id)
-                    if (episodes.isEmpty()) {
-                        state.episodes.onEach { episode ->
-                            episode.tvShow = state.tvShow
-                            episode.season = state.season.takeIf { it.number != 0 }
-                        }
-                        database.episodeDao().insertAll(state.episodes)
-                        appAdapter.notifyItemChanged(0)
+                    state.episodes.onEach { episode ->
+                        episode.isWatched = episodes.find { it.id == episode.id }?.isWatched
+                            ?: false
+
+                        episode.tvShow = state.tvShow
+                        episode.season = state.season.takeIf { it.number != 0 }
                     }
+                    database.episodeDao().insertAll(state.episodes)
+                    appAdapter.notifyItemChanged(0)
                 }
                 is TvShowViewModel.SeasonState.FailedLoading -> {
                     Toast.makeText(
