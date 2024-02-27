@@ -45,6 +45,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toEndOf="@id/iv_movie_poster"
         app:layout_constraintTop_toTopOf="@id/tv_movie_rating"
+        app:layout_goneMarginStart="70dp"
         tools:ignore="ContentDescription,UseAppTint" />
 
     <TextView

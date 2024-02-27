@@ -45,6 +45,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
         app:layout_constraintTop_toTopOf="@id/tv_tv_show_rating"
+        app:layout_goneMarginStart="70dp"
         tools:ignore="ContentDescription,UseAppTint" />
 
     <TextView
@@ -157,7 +158,8 @@
         android:minWidth="100dp"
         app:layout_constraintBottom_toBottomOf="@id/btn_tv_show_favorite"
         app:layout_constraintStart_toEndOf="@id/iv_tv_show_poster"
-        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview" />
+        app:layout_constraintTop_toBottomOf="@id/tv_tv_show_overview"
+        app:layout_goneMarginStart="70dp" />
 
     <ProgressBar
         android:id="@+id/pb_tv_show_progress_episode"
