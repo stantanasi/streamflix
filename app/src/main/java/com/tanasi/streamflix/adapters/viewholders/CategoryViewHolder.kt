@@ -1,9 +1,12 @@
 package com.tanasi.streamflix.adapters.viewholders
 
+import android.os.Handler
+import android.os.Looper
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.core.os.postDelayed
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -61,6 +64,20 @@ class CategoryViewHolder(
 
     private fun displaySwiper(binding: ContentCategorySwiperBinding) {
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
+
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed(8_000) {
+            category.selectedIndex = (category.selectedIndex + 1) % category.list.size
+            if (binding.btnSwiperWatchNow.hasFocus()) {
+                when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                    is HomeFragment -> when (val it = category.list[category.selectedIndex]) {
+                        is Movie -> fragment.updateBackground(it.banner)
+                        is TvShow -> fragment.updateBackground(it.banner)
+                    }
+                }
+            }
+            bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
+        }
 
         binding.tvSwiperTitle.text = when (selected) {
             is Movie -> selected.title
@@ -144,9 +161,8 @@ class CategoryViewHolder(
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     when (event.keyCode) {
                         KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                            category.selectedIndex =
-                                (category.selectedIndex + 1) % category.list.size
-
+                            handler.removeCallbacksAndMessages(null)
+                            category.selectedIndex = (category.selectedIndex + 1) % category.list.size
                             when (val fragment = context.toActivity()?.getCurrentFragment()) {
                                 is HomeFragment -> when (val it = category.list[category.selectedIndex]) {
                                     is Movie -> fragment.updateBackground(it.banner)
