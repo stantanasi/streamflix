@@ -38,9 +38,14 @@ class ProvidersFragment : Fragment() {
 
         viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
-                ProvidersViewModel.State.Loading -> binding.isLoading.root.visibility = View.VISIBLE
+                ProvidersViewModel.State.Loading -> binding.isLoading.apply {
+                    root.visibility = View.VISIBLE
+                    pbIsLoading.visibility = View.VISIBLE
+                    gIsLoadingRetry.visibility = View.GONE
+                }
                 is ProvidersViewModel.State.SuccessLoading -> {
                     displayProviders(state.providers)
+                    binding.rvProviders.visibility = View.VISIBLE
                     binding.isLoading.root.visibility = View.GONE
                 }
                 is ProvidersViewModel.State.FailedLoading -> {
@@ -49,6 +54,14 @@ class ProvidersFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_SHORT
                     ).show()
+                    binding.isLoading.apply {
+                        pbIsLoading.visibility = View.GONE
+                        gIsLoadingRetry.visibility = View.VISIBLE
+                        btnIsLoadingRetry.setOnClickListener {
+                            viewModel.getProviders()
+                        }
+                        binding.rvProviders.visibility = View.GONE
+                    }
                 }
             }
         }
