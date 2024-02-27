@@ -36,7 +36,9 @@ import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragment
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragmentDirections
+import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
+import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.format
@@ -277,12 +279,37 @@ class TvShowViewHolder(
 
         binding.tvTvShowOverview.text = tvShow.overview
 
-        val episodes = database.episodeDao().getEpisodesByTvShowId(tvShow.id)
-        val episode = episodes.indexOfLast { it.isWatched }
-            .takeIf { it != -1 && it + 1 < episodes.size }
-            ?.let { episodes.getOrNull(it + 1) }
-            ?: episodes.firstOrNull()
-        val season = episode?.season?.let { database.seasonDao().getSeason(it.id) }
+        val episode = WatchNextUtils.programs(context)
+            .sortedByDescending { it.lastEngagementTimeUtcMillis }
+            .find { it.seriesId == tvShow.id }
+            ?.let {
+                Episode(
+                    id = it.contentId,
+                    number = it.episodeNumber?.toIntOrNull() ?: 0,
+                    title = it.episodeTitle ?: "",
+
+                    tvShow = TvShow(
+                        id = it.seriesId ?: "",
+                        title = it.title ?: "",
+                        poster = it.posterArtUri?.toString(),
+                    ),
+                    season = Season(
+                        id = "",
+                        number = it.seasonNumber?.toIntOrNull() ?: 0,
+                        title = it.seasonTitle ?: "",
+                    ),
+                )
+            }
+            ?: database.episodeDao().getEpisodesByTvShowId(tvShow.id)
+                .let { episodes ->
+                    episodes.indexOfLast { it.isWatched }
+                        .takeIf { it != -1 && it + 1 < episodes.size }
+                        ?.let { episodes.getOrNull(it + 1) }
+                        ?: episodes.firstOrNull()
+                }
+                ?.also { episode ->
+                    episode.season = episode.season?.let { database.seasonDao().getSeason(it.id) }
+                }
 
         binding.btnTvShowWatchEpisode.apply {
             setOnClickListener {
@@ -292,7 +319,7 @@ class TvShowViewHolder(
                     TvShowFragmentDirections.actionTvShowToPlayer(
                         id = episode.id,
                         title = tvShow.title,
-                        subtitle = when (season) {
+                        subtitle = when (val season = episode.season) {
                             null -> context.getString(
                                 R.string.player_subtitle_tv_show_episode_only,
                                 episode.number,
@@ -317,26 +344,27 @@ class TvShowViewHolder(
                                 banner = tvShow.banner,
                             ),
                             season = PlayerFragment.VideoType.Episode.Season(
-                                number = season?.number ?: 0,
-                                title = season?.title ?: "",
+                                number = episode.season?.number ?: 0,
+                                title = episode.season?.title ?: "",
                             ),
                         ),
                     )
                 )
             }
 
-            text = when {
-                episode == null -> ""
-                season == null -> context.getString(
-                    R.string.tv_show_watch_episode,
-                    episode.number
-                )
-                else -> context.getString(
-                    R.string.tv_show_watch_season_episode,
-                    season.number,
-                    episode.number
-                )
-            }
+            text = if (episode != null) {
+                when (val season = episode.season) {
+                    null -> context.getString(
+                        R.string.tv_show_watch_episode,
+                        episode.number
+                    )
+                    else -> context.getString(
+                        R.string.tv_show_watch_season_episode,
+                        season.number,
+                        episode.number
+                    )
+                }
+            } else ""
             visibility = when {
                 episode != null -> View.VISIBLE
                 else -> View.GONE
