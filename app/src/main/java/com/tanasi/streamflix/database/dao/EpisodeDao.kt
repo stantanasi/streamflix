@@ -15,6 +15,12 @@ interface EpisodeDao {
     @Query("SELECT * FROM episodes WHERE season = :seasonId ORDER BY season, number")
     fun getEpisodesBySeasonId(seasonId: String): List<Episode>
 
+    @Query("SELECT * FROM episodes WHERE id = :id")
+    fun getEpisode(id: String): Episode?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(episode: Episode)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(episodes: List<Episode>)
 
