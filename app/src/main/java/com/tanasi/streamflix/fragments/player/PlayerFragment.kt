@@ -247,7 +247,7 @@ class PlayerFragment : Fragment() {
                     val program = WatchNextUtils.getProgram(requireContext(), args.id)
 
                     when {
-                        player.hasStarted() -> {
+                        player.hasStarted() && !player.hasFinished() -> {
                             if (program == null) {
                                 val builder = WatchNextProgram.Builder()
                                     .setTitle(args.title)
@@ -346,7 +346,6 @@ class PlayerFragment : Fragment() {
 
     private fun ExoPlayer.hasStarted(): Boolean {
         return (this.currentPosition > (this.duration * 0.03) || this.currentPosition > 2.minutes.inWholeMilliseconds)
-                && !this.hasFinished()
     }
 
     private fun ExoPlayer.hasFinished(): Boolean {

@@ -166,7 +166,6 @@ class MovieViewHolder(
                         )
                     )
                 }
-
             }
             setOnLongClickListener {
                 ShowOptionsDialog(context).also {
@@ -379,7 +378,7 @@ class MovieViewHolder(
                     id = movie.id,
                     isFavorite = !movie.isFavorite
                 )
-                movie.isFavorite = movie.isFavorite.not()
+                movie.isFavorite = !movie.isFavorite
 
                 setImageDrawable(
                     ContextCompat.getDrawable(context, movie.isFavorite.drawable())

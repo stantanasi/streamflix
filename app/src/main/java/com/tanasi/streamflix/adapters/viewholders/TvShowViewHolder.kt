@@ -428,7 +428,7 @@ class TvShowViewHolder(
                     id = tvShow.id,
                     isFavorite = !tvShow.isFavorite
                 )
-                tvShow.isFavorite = tvShow.isFavorite.not()
+                tvShow.isFavorite = !tvShow.isFavorite
 
                 setImageDrawable(
                     ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
