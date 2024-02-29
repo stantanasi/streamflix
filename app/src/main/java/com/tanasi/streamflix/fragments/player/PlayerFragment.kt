@@ -306,17 +306,21 @@ class PlayerFragment : Fragment() {
                         }
                     }
 
-                    when (val videoType = args.videoType as VideoType) {
-                        is VideoType.Movie -> database.movieDao().updateWatched(
-                            id = videoType.id,
-                            isWatched = player.hasFinished()
-                        )
-                        is VideoType.Episode -> {
-                            database.episodeDao().resetProgressionFromEpisode(videoType.id)
-                            database.episodeDao().updateWatched(
+                    if (player.hasStarted()) {
+                        when (val videoType = args.videoType as VideoType) {
+                            is VideoType.Movie -> database.movieDao().updateWatched(
                                 id = videoType.id,
                                 isWatched = player.hasFinished()
                             )
+                            is VideoType.Episode -> {
+                                if (player.hasFinished()) {
+                                    database.episodeDao().resetProgressionFromEpisode(videoType.id)
+                                }
+                                database.episodeDao().updateWatched(
+                                    id = videoType.id,
+                                    isWatched = player.hasFinished()
+                                )
+                            }
                         }
                     }
                 }
