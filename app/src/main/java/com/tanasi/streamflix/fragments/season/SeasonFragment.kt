@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.season
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +15,10 @@ import com.tanasi.streamflix.databinding.FragmentSeasonBinding
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.viewModelsFactory
 
+@SuppressLint("RestrictedApi")
 class SeasonFragment : Fragment() {
 
     private var _binding: FragmentSeasonBinding? = null
@@ -119,12 +122,21 @@ class SeasonFragment : Fragment() {
 
         database.episodeDao().insertAll(episodes)
 
-        episodes.indexOfLast { it.isWatched }
-            .takeIf { it != -1 && it + 1 < episodes.size }
-            ?.let {
-                if (binding.hgvEpisodes.selectedPosition < it + 1) {
-                    binding.hgvEpisodes.scrollToPosition(it + 1)
+        val episodeIndex = WatchNextUtils.programs(requireContext())
+            .filter { it.seriesId == args.tvShowId }
+            .sortedByDescending { it.lastEngagementTimeUtcMillis }
+            .let { programs ->
+                val program = programs.find { program ->
+                    episodes.any { it.id == program.contentId }
                 }
+                episodes.indexOfFirst { it.id == program?.contentId }.takeIf { it != -1 }
             }
+            ?: episodes.indexOfLast { it.isWatched }
+                .takeIf { it != -1 && it + 1 < episodes.size }
+                ?.let { it + 1 }
+
+        if (episodeIndex != null) {
+            binding.hgvEpisodes.scrollToPosition(episodeIndex)
+        }
     }
 }
