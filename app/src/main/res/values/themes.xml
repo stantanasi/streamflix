@@ -1,6 +1,9 @@
 <resources>
 
-    <style name="AppTheme" parent="@style/Theme.Leanback" />
+    <style name="AppTheme" parent="Theme.AppCompat">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 
     <style name="AppTheme.SplashScreen" parent="AppTheme">
         <item name="android:windowBackground">@drawable/bg_splash_screen</item>
