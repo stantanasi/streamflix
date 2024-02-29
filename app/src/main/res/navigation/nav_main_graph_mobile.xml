@@ -17,4 +17,19 @@
     <action
         android:id="@+id/action_global_providers"
         app:destination="@id/providers" />
+    <fragment
+        android:id="@+id/home"
+        android:name="com.tanasi.streamflix.fragments.home.HomeMobileFragment"
+        android:label="fragment_home_mobile"
+        tools:layout="@layout/fragment_home_mobile">
+        <action
+            android:id="@+id/action_home_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_home_to_tv_show"
+            app:destination="@id/tv_show" />
+        <action
+            android:id="@+id/action_home_to_player"
+            app:destination="@id/player" />
+    </fragment>
 </navigation>
