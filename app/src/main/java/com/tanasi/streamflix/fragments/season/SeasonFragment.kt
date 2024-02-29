@@ -80,6 +80,11 @@ class SeasonFragment : Fragment() {
     }
 
 
+    fun refresh(episode: Episode) {
+        appAdapter.notifyItemChanged(appAdapter.items.indexOf(episode))
+    }
+
+
     private fun initializeSeason() {
         binding.tvSeasonTitle.text = args.seasonTitle
 
