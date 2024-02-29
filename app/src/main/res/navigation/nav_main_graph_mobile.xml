@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/nav_main_graph_mobile">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main_graph_mobile"
+    app:startDestination="@id/providers">
 
+    <fragment
+        android:id="@+id/providers"
+        android:name="com.tanasi.streamflix.fragments.providers.ProvidersMobileFragment"
+        android:label="fragment_providers_mobile"
+        tools:layout="@layout/fragment_providers_mobile">
+        <action
+            android:id="@+id/action_providers_to_home"
+            app:destination="@id/home" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_providers"
+        app:destination="@id/providers" />
 </navigation>
