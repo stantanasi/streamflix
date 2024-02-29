@@ -249,5 +249,50 @@ class ShowOptionsDialog(context: Context) : Dialog(context) {
     }
 
     private fun displayTvShow(tvShow: TvShow) {
+        val saved = database.tvShowDao().getTvShowById(tvShow.id)?.also {
+            tvShow.isFavorite = it.isFavorite
+        }
+
+        Glide.with(context)
+            .load(tvShow.poster)
+            .fitCenter()
+            .into(binding.ivOptionsShowPoster)
+
+        binding.tvOptionsShowTitle.text = tvShow.title
+
+        binding.tvShowSubtitle.text = tvShow.released?.format("yyyy")
+
+
+        binding.btnOptionEpisodeOpenTvShow.visibility = View.GONE
+
+        binding.btnOptionShowFavorite.apply {
+            setOnClickListener {
+                saved?.let {
+                    database.tvShowDao().updateFavorite(
+                        id = tvShow.id,
+                        isFavorite = !tvShow.isFavorite
+                    )
+                    tvShow.isFavorite = !tvShow.isFavorite
+                } ?: let {
+                    tvShow.isFavorite = !tvShow.isFavorite
+                    database.tvShowDao().insert(tvShow)
+                }
+
+                when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                    is HomeFragment -> fragment.refresh()
+                }
+                hide()
+            }
+
+            text = when {
+                tvShow.isFavorite -> context.getString(R.string.option_show_unfavorite)
+                else -> context.getString(R.string.option_show_favorite)
+            }
+            visibility = View.VISIBLE
+        }
+
+        binding.btnOptionShowWatched.visibility = View.GONE
+
+        binding.btnOptionProgramClear.visibility = View.GONE
     }
 }
