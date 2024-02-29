@@ -160,4 +160,19 @@
             android:id="@+id/action_genre_to_tv_show"
             app:destination="@id/tv_show" />
     </fragment>
+    <fragment
+        android:id="@+id/people"
+        android:name="com.tanasi.streamflix.fragments.people.PeopleMobileFragment"
+        android:label="fragment_people_mobile"
+        tools:layout="@layout/fragment_people_mobile">
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_people_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_people_to_tv_show"
+            app:destination="@id/tv_show" />
+    </fragment>
 </navigation>
