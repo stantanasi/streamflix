@@ -5,7 +5,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.tanasi.streamflix.R
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ActivityMainMobileBinding
+import com.tanasi.streamflix.utils.UserPreferences
 
 class MainMobileActivity : FragmentActivity() {
 
@@ -21,6 +23,12 @@ class MainMobileActivity : FragmentActivity() {
         val navHostFragment = this.supportFragmentManager
             .findFragmentById(binding.navMainFragment.id) as NavHostFragment
         val navController = navHostFragment.navController
+
+        UserPreferences.setup(this)
+        AppDatabase.setup(this)
+        UserPreferences.currentProvider?.let {
+            navController.navigate(R.id.home)
+        }
 
         binding.bnvMain.setupWithNavController(navController)
     }
