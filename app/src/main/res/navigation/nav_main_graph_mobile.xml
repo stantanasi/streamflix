@@ -47,4 +47,13 @@
             android:id="@+id/action_search_to_genre"
             app:destination="@id/genre" />
     </fragment>
+    <fragment
+        android:id="@+id/movies"
+        android:name="com.tanasi.streamflix.fragments.movies.MoviesMobileFragment"
+        android:label="fragment_movies_mobile"
+        tools:layout="@layout/fragment_movies_mobile">
+        <action
+            android:id="@+id/action_movies_to_movie"
+            app:destination="@id/movie" />
+    </fragment>
 </navigation>
