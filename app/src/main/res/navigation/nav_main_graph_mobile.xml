@@ -86,4 +86,28 @@
             android:id="@+id/action_movie_to_tv_show"
             app:destination="@id/tv_show" />
     </fragment>
+    <fragment
+        android:id="@+id/tv_show"
+        android:name="com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragment"
+        android:label="fragment_tv_show_mobile"
+        tools:layout="@layout/fragment_tv_show_mobile">
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_tv_show_to_season"
+            app:destination="@id/season" />
+        <action
+            android:id="@+id/action_tv_show_to_people"
+            app:destination="@id/people" />
+        <action
+            android:id="@+id/action_tv_show_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_tv_show_to_tv_show"
+            app:destination="@id/tv_show" />
+        <action
+            android:id="@+id/action_tv_show_to_player"
+            app:destination="@id/player" />
+    </fragment>
 </navigation>
