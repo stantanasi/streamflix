@@ -142,4 +142,22 @@
             android:name="seasonTitle"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/genre"
+        android:name="com.tanasi.streamflix.fragments.genre.GenreMobileFragment"
+        android:label="fragment_genre_mobile"
+        tools:layout="@layout/fragment_genre_mobile">
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <argument
+            android:name="name"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_genre_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_genre_to_tv_show"
+            app:destination="@id/tv_show" />
+    </fragment>
 </navigation>
