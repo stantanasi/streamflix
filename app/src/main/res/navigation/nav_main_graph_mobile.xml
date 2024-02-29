@@ -56,4 +56,13 @@
             android:id="@+id/action_movies_to_movie"
             app:destination="@id/movie" />
     </fragment>
+    <fragment
+        android:id="@+id/tv_shows"
+        android:name="com.tanasi.streamflix.fragments.tv_shows.TvShowsMobileFragment"
+        android:label="fragment_tv_shows_mobile"
+        tools:layout="@layout/fragment_tv_shows_mobile">
+        <action
+            android:id="@+id/action_tv_shows_to_tv_show"
+            app:destination="@id/tv_show" />
+    </fragment>
 </navigation>
