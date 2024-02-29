@@ -1,11 +1,9 @@
 package com.tanasi.streamflix.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.tvprovider.media.tv.TvContractCompat
 import androidx.tvprovider.media.tv.WatchNextProgram
 
-@SuppressLint("RestrictedApi")
 object WatchNextUtils {
 
     fun programs(context: Context): List<WatchNextProgram> {

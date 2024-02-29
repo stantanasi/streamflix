@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.ui
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.view.Gravity
@@ -23,7 +22,6 @@ import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
 
-@SuppressLint("RestrictedApi")
 class ShowOptionsDialog(context: Context) : Dialog(context) {
 
     private val binding = DialogShowOptionsBinding.inflate(LayoutInflater.from(context))

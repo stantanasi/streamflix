@@ -14,7 +14,6 @@ import androidx.media3.common.C
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.CaptionStyleCompat
 import androidx.media3.ui.DefaultTrackNameProvider
@@ -35,7 +34,6 @@ import com.tanasi.streamflix.utils.setRgb
 import com.tanasi.streamflix.utils.trackFormats
 import kotlin.math.roundToInt
 
-@UnstableApi
 class PlayerSettingsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

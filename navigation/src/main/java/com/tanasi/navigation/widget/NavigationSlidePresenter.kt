@@ -1,6 +1,5 @@
 package com.tanasi.navigation.widget
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Parcelable
 import android.view.ViewGroup
@@ -10,7 +9,6 @@ import androidx.appcompat.view.menu.MenuPresenter
 import androidx.appcompat.view.menu.MenuView
 import androidx.appcompat.view.menu.SubMenuBuilder
 
-@SuppressLint("RestrictedApi")
 class NavigationSlidePresenter : MenuPresenter {
 
     private lateinit var menu: MenuBuilder

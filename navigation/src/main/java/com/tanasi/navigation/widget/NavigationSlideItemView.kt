@@ -1,6 +1,5 @@
 package com.tanasi.navigation.widget
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION
@@ -18,7 +17,6 @@ import androidx.core.view.PointerIconCompat
 import androidx.core.view.ViewCompat
 import com.tanasi.navigation.R
 
-@SuppressLint("RestrictedApi")
 class NavigationSlideItemView(
     context: Context,
 ) : FrameLayout(context), ItemView {

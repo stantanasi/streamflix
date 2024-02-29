@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.fragments.home
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,7 +20,6 @@ import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.WatchNextUtils
 
-@SuppressLint("RestrictedApi")
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null

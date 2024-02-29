@@ -1,9 +1,7 @@
 package com.tanasi.streamflix.adapters.viewholders
 
-import android.annotation.SuppressLint
 import android.view.View
 import android.view.animation.AnimationUtils
-import androidx.media3.common.util.UnstableApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -21,8 +19,6 @@ import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
 
-@UnstableApi
-@SuppressLint("RestrictedApi")
 class EpisodeViewHolder(
     private val _binding: ViewBinding
 ) : RecyclerView.ViewHolder(

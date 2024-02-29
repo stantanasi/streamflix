@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.fragments.player
 
-import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -17,7 +16,6 @@ import androidx.media3.common.MediaItem.SubtitleConfiguration
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerControlView
@@ -43,8 +41,6 @@ import kotlinx.parcelize.Parcelize
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@UnstableApi
-@SuppressLint("RestrictedApi")
 class PlayerFragment : Fragment() {
 
     sealed class VideoType : Parcelable {

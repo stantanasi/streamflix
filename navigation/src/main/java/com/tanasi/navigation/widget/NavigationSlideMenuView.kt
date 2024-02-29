@@ -1,6 +1,5 @@
 package com.tanasi.navigation.widget
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.ShapeDrawable
 import android.view.MenuItem
@@ -13,7 +12,6 @@ import androidx.appcompat.view.menu.MenuView
 import androidx.core.view.forEachIndexed
 import kotlin.math.min
 
-@SuppressLint("RestrictedApi")
 class NavigationSlideMenuView(
     context: Context,
 ) : LinearLayout(context), MenuView {

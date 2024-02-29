@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.fragments.season
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +17,6 @@ import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.viewModelsFactory
 
-@SuppressLint("RestrictedApi")
 class SeasonFragment : Fragment() {
 
     private var _binding: FragmentSeasonBinding? = null

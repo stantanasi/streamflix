@@ -1,6 +1,5 @@
 package com.tanasi.navigation.widget
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
@@ -14,7 +13,6 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.core.content.res.getResourceIdOrThrow
 import com.tanasi.navigation.R
 
-@SuppressLint("RestrictedApi")
 class NavigationSlideView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
