@@ -19,6 +19,9 @@ interface EpisodeDao {
     fun getEpisode(id: String): Episode?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(episode: Episode)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(episodes: List<Episode>)
 
     @Query("UPDATE episodes SET isWatched = :isWatched WHERE id = :id")
