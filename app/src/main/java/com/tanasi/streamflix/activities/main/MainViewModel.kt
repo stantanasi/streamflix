@@ -19,13 +19,13 @@ class MainViewModel : ViewModel() {
     val state: LiveData<State> = _state
 
     sealed class State {
-        object CheckingUpdate : State()
+        data object CheckingUpdate : State()
         data class SuccessCheckingUpdate(val release: GitHub.Release?) : State()
 
-        object DownloadingUpdate : State()
+        data object DownloadingUpdate : State()
         data class SuccessDownloadingUpdate(val apk: File) : State()
 
-        object InstallingUpdate : State()
+        data object InstallingUpdate : State()
 
         data class FailedUpdate(val error: Exception) : State()
     }

@@ -19,11 +19,11 @@ class PlayerViewModel(
     val state: LiveData<State> = _state
 
     sealed class State {
-        object LoadingServers : State()
+        data object LoadingServers : State()
         data class SuccessLoadingServers(val servers: List<Video.Server>) : State()
         data class FailedLoadingServers(val error: Exception) : State()
 
-        object LoadingVideo : State()
+        data object LoadingVideo : State()
         data class SuccessLoadingVideo(val video: Video, val server: Video.Server) : State()
         data class FailedLoadingVideo(val error: Exception) : State()
     }

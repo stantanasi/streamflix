@@ -25,7 +25,7 @@ import com.tanasi.streamflix.utils.WatchNextUtils
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
-    val binding get() = _binding!!
+    private val binding get() = _binding!!
 
     private val viewModel by viewModels<HomeViewModel>()
 

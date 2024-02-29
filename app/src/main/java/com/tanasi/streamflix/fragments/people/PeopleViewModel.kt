@@ -18,8 +18,8 @@ class PeopleViewModel(private val id: String) : ViewModel() {
     private var page = 1
 
     sealed class State {
-        object Loading : State()
-        object LoadingMore : State()
+        data object Loading : State()
+        data object LoadingMore : State()
         data class SuccessLoading(val people: People, val hasMore: Boolean) : State()
         data class FailedLoading(val error: Exception) : State()
     }

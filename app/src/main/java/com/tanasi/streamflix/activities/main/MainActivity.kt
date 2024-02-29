@@ -25,7 +25,7 @@ import com.tanasi.streamflix.utils.getCurrentFragment
 class MainActivity : FragmentActivity() {
 
     private var _binding: ActivityMainBinding? = null
-    private val binding: ActivityMainBinding get() = _binding!!
+    private val binding get() = _binding!!
 
     private val viewModel by viewModels<MainViewModel>()
 
@@ -38,7 +38,7 @@ class MainActivity : FragmentActivity() {
         setContentView(binding.root)
 
         val navHostFragment = this.supportFragmentManager
-            .findFragmentById(R.id.nav_main_fragment) as NavHostFragment
+            .findFragmentById(binding.navMainFragment.id) as NavHostFragment
         val navController = navHostFragment.navController
 
         UserPreferences.setup(this)

@@ -10,5 +10,5 @@ class Provider(
 ) : AppAdapter.Item {
 
 
-    override var itemType = AppAdapter.Type.PROVIDER
+    override var itemType = AppAdapter.Type.PROVIDER_ITEM
 }

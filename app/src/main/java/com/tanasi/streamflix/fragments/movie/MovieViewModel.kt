@@ -16,7 +16,7 @@ class MovieViewModel(id: String) : ViewModel() {
     val state: LiveData<State> = _state
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         data class SuccessLoading(val movie: Movie) : State()
         data class FailedLoading(val error: Exception) : State()
     }

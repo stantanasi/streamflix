@@ -18,7 +18,7 @@ class TvShowViewModel(id: String) : ViewModel() {
     val state: LiveData<State> = _state
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         data class SuccessLoading(val tvShow: TvShow) : State()
         data class FailedLoading(val error: Exception) : State()
     }
@@ -27,7 +27,7 @@ class TvShowViewModel(id: String) : ViewModel() {
     val seasonState: LiveData<SeasonState> = _seasonState
 
     sealed class SeasonState {
-        object Loading :  SeasonState()
+        data object Loading :  SeasonState()
         data class SuccessLoading(
             val tvShow: TvShow,
             val season: Season,

@@ -792,7 +792,7 @@ class PlayerSettingsView @JvmOverloads constructor(
 
             abstract val isSelected: Boolean
 
-            object Auto : Quality() {
+            data object Auto : Quality() {
                 val currentTrack: VideoTrackInformation?
                     get() = list
                         .filterIsInstance<VideoTrackInformation>()
@@ -898,7 +898,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                     )
                 }
 
-                object ResetStyle : Style()
+                data object ResetStyle : Style()
 
                 class FontColor(
                     val stringId: Int,
@@ -1227,7 +1227,7 @@ class PlayerSettingsView @JvmOverloads constructor(
                 }
             }
 
-            object None : Subtitle() {
+            data object None : Subtitle() {
                 val isSelected: Boolean
                     get() = list
                         .filterIsInstance<TextTrackInformation>()

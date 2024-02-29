@@ -328,14 +328,8 @@ class PlayerFragment : Fragment() {
         })
 
         if (currentPosition == 0L) {
-            val lastPlaybackPositionMillis = requireContext().contentResolver.query(
-                TvContractCompat.WatchNextPrograms.CONTENT_URI,
-                WatchNextProgram.PROJECTION,
-                null,
-                null,
-                null
-            )?.map { WatchNextProgram.fromCursor(it) }
-                ?.find { it.contentId == args.id && it.internalProviderId == UserPreferences.currentProvider!!.name }
+            val lastPlaybackPositionMillis = WatchNextUtils.programs(requireContext())
+                .find { it.contentId == args.id }
                 ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
 
             player.seekTo(lastPlaybackPositionMillis ?: 0)

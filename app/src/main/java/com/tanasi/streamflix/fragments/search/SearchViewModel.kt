@@ -19,8 +19,8 @@ class SearchViewModel : ViewModel() {
     private var page = 1
 
     sealed class State {
-        object Searching : State()
-        object SearchingMore : State()
+        data object Searching : State()
+        data object SearchingMore : State()
         data class SuccessSearching(val results: List<AppAdapter.Item>, val hasMore: Boolean) : State()
         data class FailedSearching(val error: Exception) : State()
     }

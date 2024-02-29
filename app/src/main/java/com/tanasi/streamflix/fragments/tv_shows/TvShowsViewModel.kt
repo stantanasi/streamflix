@@ -18,8 +18,8 @@ class TvShowsViewModel : ViewModel() {
     private var page = 1
 
     sealed class State {
-        object Loading : State()
-        object LoadingMore : State()
+        data object Loading : State()
+        data object LoadingMore : State()
         data class SuccessLoading(val tvShows: List<TvShow>, val hasMore: Boolean) : State()
         data class FailedLoading(val error: Exception) : State()
     }

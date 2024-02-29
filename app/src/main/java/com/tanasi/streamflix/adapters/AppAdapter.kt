@@ -62,7 +62,7 @@ class AppAdapter(
 
         GENRE_GRID_ITEM,
 
-        LOADING,
+        LOADING_ITEM,
 
         MOVIE_ITEM,
         MOVIE_GRID_ITEM,
@@ -74,7 +74,7 @@ class AppAdapter(
 
         PEOPLE_ITEM,
 
-        PROVIDER,
+        PROVIDER_ITEM,
 
         SEASON_ITEM,
 
@@ -93,7 +93,7 @@ class AppAdapter(
     private var onLoadMoreListener: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-        when (Type.values()[viewType]) {
+        when (Type.entries[viewType]) {
             Type.CATEGORY_ITEM -> CategoryViewHolder(
                 ItemCategoryBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -133,7 +133,7 @@ class AppAdapter(
                 )
             )
 
-            Type.LOADING -> LoadingViewHolder(
+            Type.LOADING_ITEM -> LoadingViewHolder(
                 ItemLoadingBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -193,7 +193,7 @@ class AppAdapter(
                 )
             )
 
-            Type.PROVIDER -> ProviderViewHolder(
+            Type.PROVIDER_ITEM -> ProviderViewHolder(
                 ItemProviderBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -287,7 +287,7 @@ class AppAdapter(
     }
 
     override fun getItemViewType(position: Int): Int = items.getOrNull(position)?.itemType?.ordinal
-        ?: Type.LOADING.ordinal
+        ?: Type.LOADING_ITEM.ordinal
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
