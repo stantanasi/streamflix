@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.activities.main
 
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -31,5 +32,15 @@ class MainMobileActivity : FragmentActivity() {
         }
 
         binding.bnvMain.setupWithNavController(navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.search,
+                R.id.home,
+                R.id.movies,
+                R.id.tv_shows -> binding.bnvMain.visibility = View.VISIBLE
+                else -> binding.bnvMain.visibility = View.GONE
+            }
+        }
     }
 }
