@@ -110,4 +110,36 @@
             android:id="@+id/action_tv_show_to_player"
             app:destination="@id/player" />
     </fragment>
+    <fragment
+        android:id="@+id/season"
+        android:name="com.tanasi.streamflix.fragments.season.SeasonMobileFragment"
+        android:label="fragment_season_mobile"
+        tools:layout="@layout/fragment_season_mobile">
+        <action
+            android:id="@+id/action_season_to_player"
+            app:destination="@id/player" />
+        <argument
+            android:name="tvShowId"
+            app:argType="string" />
+        <argument
+            android:name="tvShowTitle"
+            app:argType="string" />
+        <argument
+            android:name="tvShowPoster"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="tvShowBanner"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="seasonId"
+            app:argType="string" />
+        <argument
+            android:name="seasonNumber"
+            app:argType="integer" />
+        <argument
+            android:name="seasonTitle"
+            app:argType="string" />
+    </fragment>
 </navigation>
