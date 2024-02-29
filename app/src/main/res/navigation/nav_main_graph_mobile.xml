@@ -32,4 +32,19 @@
             android:id="@+id/action_home_to_player"
             app:destination="@id/player" />
     </fragment>
+    <fragment
+        android:id="@+id/search"
+        android:name="com.tanasi.streamflix.fragments.search.SearchMobileFragment"
+        android:label="fragment_search_mobile"
+        tools:layout="@layout/fragment_search_mobile">
+        <action
+            android:id="@+id/action_search_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_search_to_tv_show"
+            app:destination="@id/tv_show" />
+        <action
+            android:id="@+id/action_search_to_genre"
+            app:destination="@id/genre" />
+    </fragment>
 </navigation>
