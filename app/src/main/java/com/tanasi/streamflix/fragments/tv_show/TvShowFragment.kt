@@ -12,6 +12,7 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentTvShowBinding
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.viewModelsFactory
 
 class TvShowFragment : Fragment() {
@@ -77,7 +78,24 @@ class TvShowFragment : Fragment() {
                                 }
                         }
 
-                        if (season != null && (season.episodes.isEmpty() || state.tvShow.seasons.lastOrNull() == season)) {
+                        val episodeIndex = WatchNextUtils.programs(requireContext())
+                            .filter { it.seriesId == state.tvShow.id }
+                            .sortedByDescending { it.lastEngagementTimeUtcMillis }
+                            .let { programs ->
+                                val program = programs.find { program ->
+                                    episodes.any { it.id == program.contentId }
+                                }
+                                episodes.indexOfFirst { it.id == program?.contentId }.takeIf { it != -1 }
+                            }
+                            ?: episodes.indexOfLast { it.isWatched }
+                                .takeIf { it + 1 < episodes.size }
+                                ?.let { it + 1 }
+
+                        if (
+                            episodeIndex == null &&
+                            season != null &&
+                            (season.episodes.isEmpty() || state.tvShow.seasons.lastOrNull() == season)
+                        ) {
                             viewModel.getSeason(state.tvShow, season)
                         }
                     }
