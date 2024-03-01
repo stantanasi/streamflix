@@ -177,6 +177,7 @@ class CategoryViewHolder(
                 false
             }
             setOnClickListener {
+                handler.removeCallbacksAndMessages(null)
                 findNavController().navigate(
                     when (selected) {
                         is Movie -> HomeFragmentDirections.actionHomeToMovie(selected.id)
