@@ -312,7 +312,19 @@ class AppAdapter(
             override fun getNewListSize() = list.size
 
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return items[oldItemPosition] === list[newItemPosition]
+                val oldItem = items[oldItemPosition]
+                val newItem = list[newItemPosition]
+                return when {
+                    oldItem is Category && newItem is Category -> oldItem.name == newItem.name
+                    oldItem is Episode && newItem is Episode -> oldItem.id == newItem.id
+                    oldItem is Genre && newItem is Genre -> oldItem.id == newItem.id
+                    oldItem is Movie && newItem is Movie -> oldItem.id == newItem.id
+                    oldItem is People && newItem is People -> oldItem.id == newItem.id
+                    oldItem is Provider && newItem is Provider -> oldItem.name == newItem.name
+                    oldItem is Season && newItem is Season -> oldItem.id == newItem.id
+                    oldItem is TvShow && newItem is TvShow -> oldItem.id == newItem.id
+                    else -> false
+                }
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
