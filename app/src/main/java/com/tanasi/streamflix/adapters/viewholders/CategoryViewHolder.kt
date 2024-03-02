@@ -20,6 +20,7 @@ import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Show
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
@@ -64,6 +65,10 @@ class CategoryViewHolder(
 
     private fun displaySwiper(binding: ContentCategorySwiperBinding) {
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
+        val program = when (selected) {
+            is Movie -> WatchNextUtils.getProgram(context, selected.id)
+            is TvShow -> WatchNextUtils.getProgram(context, selected.id)
+        }
 
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(8_000) {
@@ -184,6 +189,17 @@ class CategoryViewHolder(
                         is TvShow -> HomeFragmentDirections.actionHomeToTvShow(selected.id)
                     }
                 )
+            }
+        }
+
+        binding.pbSwiperProgress.apply {
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                else -> View.GONE
             }
         }
 
