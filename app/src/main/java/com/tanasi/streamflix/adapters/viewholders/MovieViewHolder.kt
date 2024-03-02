@@ -17,7 +17,6 @@ import com.tanasi.streamflix.databinding.ContentMovieBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
-import com.tanasi.streamflix.databinding.ItemMovieContinueWatchingBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
 import com.tanasi.streamflix.fragments.genre.GenreFragment
 import com.tanasi.streamflix.fragments.genre.GenreFragmentDirections
@@ -65,7 +64,6 @@ class MovieViewHolder(
         when (_binding) {
             is ItemMovieBinding -> displayItem(_binding)
             is ItemMovieGridBinding -> displayGridItem(_binding)
-            is ItemMovieContinueWatchingBinding -> displayItemContinueWatching(_binding)
 
             is ContentMovieBinding -> displayMovie(_binding)
             is ContentMovieCastsBinding -> displayCasts(_binding)
@@ -221,69 +219,6 @@ class MovieViewHolder(
 
         binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
             ?: context.getString(R.string.movie_item_type)
-
-        binding.tvMovieTitle.text = movie.title
-    }
-
-    private fun displayItemContinueWatching(binding: ItemMovieContinueWatchingBinding) {
-        val program = WatchNextUtils.getProgram(context, movie.id)
-
-        binding.root.apply {
-            setOnClickListener {
-                findNavController().navigate(
-                    HomeFragmentDirections.actionHomeToPlayer(
-                        id = movie.id,
-                        title = movie.title,
-                        subtitle = movie.released?.format("yyyy") ?: "",
-                        videoType = PlayerFragment.VideoType.Movie(
-                            id = movie.id,
-                            title = movie.title,
-                            releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",
-                            poster = movie.poster ?: "",
-                        ),
-                    )
-                )
-            }
-            setOnLongClickListener {
-                ShowOptionsDialog(context).also {
-                    it.show = movie
-                    it.show()
-                }
-                true
-            }
-            setOnFocusChangeListener { _, hasFocus ->
-                val animation = when {
-                    hasFocus -> AnimationUtils.loadAnimation(context, R.anim.zoom_in)
-                    else -> AnimationUtils.loadAnimation(context, R.anim.zoom_out)
-                }
-                binding.root.startAnimation(animation)
-                animation.fillAfter = true
-
-                if (hasFocus) {
-                    when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> fragment.updateBackground(movie.banner)
-                    }
-                }
-            }
-        }
-
-        Glide.with(context)
-            .load(movie.poster)
-            .centerCrop()
-            .into(binding.ivMoviePoster)
-
-        binding.pbMovieProgress.apply {
-            progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
-                else -> 0
-            }
-            visibility = when {
-                program != null -> View.VISIBLE
-                else -> View.GONE
-            }
-        }
-
-        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy") ?: ""
 
         binding.tvMovieTitle.text = movie.title
     }
