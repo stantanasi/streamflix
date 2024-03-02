@@ -75,6 +75,8 @@ class MovieViewHolder(
 
 
     private fun displayItem(binding: ItemMovieBinding) {
+        val program = WatchNextUtils.getProgram(context, movie.id)
+
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -123,6 +125,17 @@ class MovieViewHolder(
             .centerCrop()
             .into(binding.ivMoviePoster)
 
+        binding.pbMovieProgress.apply {
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+
         binding.tvMovieQuality.apply {
             text = movie.quality ?: ""
             visibility = when {
@@ -138,6 +151,8 @@ class MovieViewHolder(
     }
 
     private fun displayGridItem(binding: ItemMovieGridBinding) {
+        val program = WatchNextUtils.getProgram(context, movie.id)
+
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -184,6 +199,17 @@ class MovieViewHolder(
             .load(movie.poster)
             .centerCrop()
             .into(binding.ivMoviePoster)
+
+        binding.pbMovieProgress.apply {
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
 
         binding.tvMovieQuality.apply {
             text = movie.quality ?: ""
