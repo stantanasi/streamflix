@@ -21,6 +21,7 @@ import androidx.media3.common.Tracks
 import androidx.navigation.fragment.NavHostFragment
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.activities.main.MainActivity
+import com.tanasi.streamflix.activities.main.MainMobileActivity
 import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -62,6 +63,11 @@ fun Context.hideKeyboard(view: View) {
 fun Context.toActivity(): FragmentActivity? = this as? FragmentActivity
 
 fun FragmentActivity.getCurrentFragment(): Fragment? = when (this) {
+    is MainMobileActivity -> {
+        val navHostFragment = this.supportFragmentManager
+            .findFragmentById(R.id.nav_main_fragment) as NavHostFragment
+        navHostFragment.childFragmentManager.fragments.firstOrNull()
+    }
     is MainActivity -> {
         val navHostFragment = this.supportFragmentManager
             .findFragmentById(R.id.nav_main_fragment) as NavHostFragment
