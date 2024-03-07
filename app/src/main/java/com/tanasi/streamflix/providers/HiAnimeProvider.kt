@@ -22,13 +22,13 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
-object AniwatchProvider : Provider {
+object HiAnimeProvider : Provider {
 
-    override val name = "Aniwatch"
-    override val logo = "https://aniwatch.to/images/logo.png"
-    override val url = "https://aniwatch.to/"
+    override val name = "HiAnime"
+    override val logo = "https://hianime.to/images/logo.png"
+    override val url = "https://hianime.to/"
 
-    private val service = AniwatchService.build()
+    private val service = HiAnimeService.build()
 
 
     override suspend fun getHome(): List<Category> {
@@ -659,10 +659,10 @@ object AniwatchProvider : Provider {
     }
 
 
-    interface AniwatchService {
+    interface HiAnimeService {
 
         companion object {
-            fun build(): AniwatchService {
+            fun build(): HiAnimeService {
                 val client = OkHttpClient.Builder()
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
@@ -675,7 +675,7 @@ object AniwatchProvider : Provider {
                     .client(client)
                     .build()
 
-                return retrofit.create(AniwatchService::class.java)
+                return retrofit.create(HiAnimeService::class.java)
             }
         }
 
