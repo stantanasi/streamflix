@@ -16,7 +16,7 @@ class MainMobileActivity : FragmentActivity() {
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.AppTheme_Base)
+        setTheme(R.style.AppTheme_Mobile)
         super.onCreate(savedInstanceState)
         _binding = ActivityMainMobileBinding.inflate(layoutInflater)
         setContentView(binding.root)

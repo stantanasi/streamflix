@@ -21,7 +21,6 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:screenOrientation="landscape"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.Base"
         android:usesCleartextTraffic="true">
 
         <activity
