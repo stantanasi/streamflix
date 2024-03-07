@@ -25,6 +25,7 @@
 
         <activity
             android:name=".activities.main.MainMobileActivity"
+            android:configChanges="orientation|screenLayout|screenSize"
             android:exported="true"
             android:theme="@style/AppTheme.SplashScreen">
             <intent-filter>
