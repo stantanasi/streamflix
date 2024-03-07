@@ -31,6 +31,7 @@ import com.tanasi.streamflix.databinding.ItemMovieBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
 import com.tanasi.streamflix.databinding.ItemPeopleBinding
 import com.tanasi.streamflix.databinding.ItemProviderBinding
+import com.tanasi.streamflix.databinding.ItemProviderMobileBinding
 import com.tanasi.streamflix.databinding.ItemSeasonBinding
 import com.tanasi.streamflix.databinding.ItemTvShowBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridBinding
@@ -72,6 +73,7 @@ class AppAdapter(
 
         PEOPLE_ITEM,
 
+        PROVIDER_MOBILE_ITEM,
         PROVIDER_ITEM,
 
         SEASON_ITEM,
@@ -184,6 +186,13 @@ class AppAdapter(
                 )
             )
 
+            Type.PROVIDER_MOBILE_ITEM -> ProviderViewHolder(
+                ItemProviderMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
             Type.PROVIDER_ITEM -> ProviderViewHolder(
                 ItemProviderBinding.inflate(
                     LayoutInflater.from(parent.context),
