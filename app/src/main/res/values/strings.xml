@@ -32,7 +32,7 @@
     <string name="option_show_unfavorite">Remove from favorites</string>
     <string name="option_show_watched">Mark as watched</string>
     <string name="option_show_unwatched">Mark as unwatched</string>
-    <string name="option_clear_program">Clear progression</string>
+    <string name="option_clear_program">Remove from Continue Watching</string>
     <string name="option_cancel">Cancel</string>
 
     <string name="episode_item_info">S%d E%d • %s</string>
