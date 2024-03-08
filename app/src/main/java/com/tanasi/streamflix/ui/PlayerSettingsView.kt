@@ -23,6 +23,7 @@ import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsBinding
 import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.findClosest
 import com.tanasi.streamflix.utils.getAlpha
 import com.tanasi.streamflix.utils.getRgb
@@ -235,8 +236,8 @@ class PlayerSettingsView @JvmOverloads constructor(
             binding.root.apply {
                 when (item) {
                     Settings.Subtitle.Style,
-                    Settings.Subtitle.Style.ResetStyle -> margin(bottom = 16F)
-                    else -> margin(bottom = 0F)
+                    Settings.Subtitle.Style.ResetStyle -> margin(bottom = 16.dp(context))
+                    else -> margin(bottom = 0)
                 }
                 setOnClickListener {
                     when (item) {
