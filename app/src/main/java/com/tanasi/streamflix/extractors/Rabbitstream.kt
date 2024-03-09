@@ -26,22 +26,28 @@ open class Rabbitstream : Extractor() {
 
     override val name = "Rabbitstream"
     override val mainUrl = "https://rabbitstream.net"
-    protected open val embed = "ajax/embed-4"
+    protected open val embed = "ajax/v2/embed-4"
     protected open val key = "https://keys4.fun"
 
     override suspend fun extract(link: String): Video {
         val service = Service.build(mainUrl)
 
+        val keys = service.getSourceEncryptedKey(key).rabbitstream.keys
+
         val response = service.getSources(
             url = "$mainUrl/$embed/getSources",
             id = link.substringAfterLast("/").substringBefore("?"),
+            v = keys.v,
+            h = keys.h,
+            b = keys.b,
+            userAgent = keys.agent,
             referer = mainUrl,
         )
 
         val sources = when (response) {
             is Service.Sources -> response
             is Service.Sources.Encrypted -> response.decrypt(
-                keys = service.getSourceEncryptedKey(key).rabbitstream.keys
+                key = keys.key,
             )
         }
 
@@ -107,6 +113,10 @@ open class Rabbitstream : Extractor() {
         suspend fun getSources(
             @Url url: String,
             @Query("id") id: String,
+            @Query("v") v: String,
+            @Query("h") h: String,
+            @Query("b") b: String,
+            @Header("user-agent") userAgent: String,
             @Header("referer") referer: String,
         ): SourcesResponse
 
@@ -144,11 +154,7 @@ open class Rabbitstream : Extractor() {
                 val tracks: List<Track> = listOf(),
                 val server: Int? = null,
             ) : SourcesResponse() {
-                fun decrypt(keys: List<Int>): Sources {
-                    fun List<Int>.toByteArray(): ByteArray {
-                        return ByteArray(size) { index -> this[index].toByte() }
-                    }
-
+                fun decrypt(key: String): Sources {
                     fun decryptSourceUrl(decryptionKey: ByteArray, sourceUrl: String): String {
                         val cipherData = Base64.decode(sourceUrl, Base64.DEFAULT)
                         val encrypted = cipherData.copyOfRange(16, cipherData.size)
@@ -169,21 +175,19 @@ open class Rabbitstream : Extractor() {
                     fun generateKey(salt: ByteArray, secret: ByteArray): ByteArray {
                         fun md5(input: ByteArray) = MessageDigest.getInstance("MD5").digest(input)
 
-                        var key = md5(secret + salt)
-                        var currentKey = key
+                        var output = md5(secret + salt)
+                        var currentKey = output
                         while (currentKey.size < 48) {
-                            key = md5(key + secret + salt)
-                            currentKey += key
+                            output = md5(output + secret + salt)
+                            currentKey += output
                         }
                         return currentKey
                     }
 
-                    val keyString = Base64.encodeToString(keys.toByteArray(), Base64.NO_WRAP)
-
                     val decrypted = decryptSourceUrl(
                         generateKey(
                             Base64.decode(sources, Base64.DEFAULT).copyOfRange(8, 16),
-                            keyString.toByteArray(),
+                            key.toByteArray(),
                         ),
                         sources,
                     )
@@ -209,10 +213,24 @@ open class Rabbitstream : Extractor() {
         }
 
         data class KeysResponse(
-            val rabbitstream: Keys,
+            val rabbitstream: Rabbitstream,
+            val megacloud_m: MegacloudM,
         ) {
 
-            data class Keys(
+            data class Rabbitstream(
+                val keys: Keys,
+                val updated_at: Int,
+            ) {
+                data class Keys(
+                    val v: String,
+                    val h: String,
+                    val b: String,
+                    val agent: String,
+                    val key: String,
+                )
+            }
+
+            data class MegacloudM(
                 val keys: List<Int>,
                 val updated_at: Int,
             )
