@@ -4,10 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.media3.ui.CaptionStyleCompat
 import com.tanasi.streamflix.BuildConfig
-import com.tanasi.streamflix.providers.AnyMovieProvider
-import com.tanasi.streamflix.providers.HiAnimeProvider
 import com.tanasi.streamflix.providers.Provider
-import com.tanasi.streamflix.providers.SflixProvider
+import com.tanasi.streamflix.providers.Provider.Companion.providers
 import com.tanasi.streamflix.ui.PlayerSettingsView
 
 object UserPreferences {
@@ -21,12 +19,6 @@ object UserPreferences {
         )
     }
 
-
-    val providers = listOf(
-        SflixProvider,
-        AnyMovieProvider,
-        HiAnimeProvider,
-    )
 
     var currentProvider: Provider?
         get() = providers.find { it.name == Key.CURRENT_PROVIDER.getString() }

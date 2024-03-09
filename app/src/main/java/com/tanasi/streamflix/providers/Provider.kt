@@ -43,4 +43,13 @@ interface Provider {
     suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server>
 
     suspend fun getVideo(server: Video.Server): Video
+
+
+    companion object {
+        val providers = listOf(
+            SflixProvider,
+            AnyMovieProvider,
+            HiAnimeProvider,
+        )
+    }
 }
