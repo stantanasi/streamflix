@@ -659,7 +659,7 @@ object HiAnimeProvider : Provider {
     }
 
 
-    interface HiAnimeService {
+    private interface HiAnimeService {
 
         companion object {
             fun build(): HiAnimeService {
