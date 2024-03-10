@@ -15,6 +15,7 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentMovieBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
+import com.tanasi.streamflix.databinding.ContentMovieMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
@@ -84,6 +85,7 @@ class MovieViewHolder(
             is ItemMovieGridMobileBinding -> displayGridMobileItem(_binding)
             is ItemMovieGridBinding -> displayGridItem(_binding)
 
+            is ContentMovieMobileBinding -> displayMovieMobile(_binding)
             is ContentMovieBinding -> displayMovie(_binding)
             is ContentMovieCastsBinding -> displayCasts(_binding)
             is ContentMovieRecommendationsBinding -> displayRecommendations(_binding)
@@ -371,6 +373,130 @@ class MovieViewHolder(
         binding.tvMovieTitle.text = movie.title
     }
 
+
+    private fun displayMovieMobile(binding: ContentMovieMobileBinding) {
+        val program = WatchNextUtils.getProgram(context, movie.id)
+
+        binding.ivMoviePoster.run {
+            Glide.with(context)
+                .load(movie.poster)
+                .into(this)
+            visibility = when {
+                movie.poster.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvMovieTitle.text = movie.title
+
+        binding.tvMovieRating.text = movie.rating?.let { String.format("%.1f", it) } ?: "N/A"
+
+        binding.tvMovieQuality.apply {
+            text = movie.quality
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvMovieReleased.apply {
+            text = movie.released?.format("yyyy")
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvMovieRuntime.apply {
+            text = movie.runtime?.let {
+                val hours = it / 60
+                val minutes = it % 60
+                when {
+                    hours > 0 -> context.getString(
+                        R.string.movie_runtime_hours_minutes,
+                        hours,
+                        minutes
+                    )
+                    else -> context.getString(R.string.movie_runtime_minutes, minutes)
+                }
+            }
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvMovieGenres.apply {
+            text = movie.genres.joinToString(", ") { it.name }
+            visibility = when {
+                movie.genres.isEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvMovieOverview.text = movie.overview
+
+        binding.btnMovieWatchNow.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    MovieMobileFragmentDirections.actionMovieToPlayer(
+                        id = movie.id,
+                        title = movie.title,
+                        subtitle = movie.released?.format("yyyy") ?: "",
+                        videoType = PlayerFragment.VideoType.Movie(
+                            id = movie.id,
+                            title = movie.title,
+                            releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",
+                            poster = movie.poster ?: movie.banner ?: "",
+                        ),
+                    )
+                )
+            }
+        }
+
+        binding.pbMovieProgress.apply {
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+
+        binding.btnMovieTrailer.setOnClickListener {
+            context.startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(movie.trailer)
+                )
+            )
+        }
+
+        binding.btnMovieFavorite.apply {
+            fun Boolean.drawable() = when (this) {
+                true -> R.drawable.ic_favorite_enable
+                false -> R.drawable.ic_favorite_disable
+            }
+
+            setOnClickListener {
+                database.movieDao().updateFavorite(
+                    id = movie.id,
+                    isFavorite = !movie.isFavorite
+                )
+                movie.isFavorite = !movie.isFavorite
+
+                setImageDrawable(
+                    ContextCompat.getDrawable(context, movie.isFavorite.drawable())
+                )
+            }
+
+            setImageDrawable(
+                ContextCompat.getDrawable(context, movie.isFavorite.drawable())
+            )
+        }
+    }
 
     private fun displayMovie(binding: ContentMovieBinding) {
         val program = WatchNextUtils.getProgram(context, movie.id)
