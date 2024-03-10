@@ -114,6 +114,11 @@ class ShowOptionsMobileDialog(context: Context) : BottomSheetDialog(context) {
                 if (episode.isWatched) {
                     program?.let { WatchNextUtils.deleteProgramById(context, program.id) }
                 }
+
+                when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                    is HomeMobileFragment -> fragment.refresh()
+                    is SeasonMobileFragment -> fragment.refresh(episode)
+                }
                 hide()
             }
 
@@ -129,6 +134,10 @@ class ShowOptionsMobileDialog(context: Context) : BottomSheetDialog(context) {
                 if (program == null) return@setOnClickListener
 
                 WatchNextUtils.deleteProgramById(context, program.id)
+                when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                    is HomeMobileFragment -> fragment.refresh()
+                    is SeasonMobileFragment -> fragment.refresh(episode)
+                }
                 hide()
             }
 
@@ -170,6 +179,10 @@ class ShowOptionsMobileDialog(context: Context) : BottomSheetDialog(context) {
                     movie.isFavorite = !movie.isFavorite
                     database.movieDao().insert(movie)
                 }
+
+                when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                    is HomeMobileFragment -> fragment.refresh()
+                }
                 hide()
             }
 
@@ -195,6 +208,10 @@ class ShowOptionsMobileDialog(context: Context) : BottomSheetDialog(context) {
                 if (movie.isWatched) {
                     program?.let { WatchNextUtils.deleteProgramById(context, program.id) }
                 }
+
+                when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                    is HomeMobileFragment -> fragment.refresh()
+                }
                 hide()
             }
 
@@ -210,6 +227,9 @@ class ShowOptionsMobileDialog(context: Context) : BottomSheetDialog(context) {
                 if (program == null) return@setOnClickListener
 
                 WatchNextUtils.deleteProgramById(context, program.id)
+                when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                    is HomeMobileFragment -> fragment.refresh()
+                }
                 hide()
             }
 
@@ -248,6 +268,10 @@ class ShowOptionsMobileDialog(context: Context) : BottomSheetDialog(context) {
                 } ?: let {
                     tvShow.isFavorite = !tvShow.isFavorite
                     database.tvShowDao().insert(tvShow)
+                }
+
+                when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                    is HomeMobileFragment -> fragment.refresh()
                 }
                 hide()
             }
