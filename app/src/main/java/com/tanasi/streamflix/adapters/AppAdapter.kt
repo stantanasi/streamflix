@@ -27,6 +27,7 @@ import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowCastsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsMobileBinding
 import com.tanasi.streamflix.databinding.ItemCategoryBinding
@@ -116,6 +117,7 @@ class AppAdapter(
         TV_SHOW_SEASONS,
         TV_SHOW_CASTS_MOBILE,
         TV_SHOW_CASTS,
+        TV_SHOW_RECOMMENDATIONS_MOBILE,
         TV_SHOW_RECOMMENDATIONS,
     }
 
@@ -384,6 +386,13 @@ class AppAdapter(
             )
             Type.TV_SHOW_CASTS -> TvShowViewHolder(
                 ContentTvShowCastsBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+            Type.TV_SHOW_RECOMMENDATIONS_MOBILE -> TvShowViewHolder(
+                ContentTvShowRecommendationsMobileBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
