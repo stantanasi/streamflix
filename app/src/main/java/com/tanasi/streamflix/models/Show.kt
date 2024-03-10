@@ -21,8 +21,6 @@ class Movie(
     var rating: Double? = null,
     var poster: String? = null,
     var banner: String? = null,
-    var isFavorite: Boolean = false,
-    var isWatched: Boolean = false,
 
     @Ignore
     val genres: List<Genre> = listOf(),
@@ -37,6 +35,8 @@ class Movie(
     constructor() : this("", "")
 
     var released = released?.toCalendar()
+    var isFavorite: Boolean = false
+    var isWatched: Boolean = false
 
 
     @Ignore
@@ -58,7 +58,6 @@ class TvShow(
     var rating: Double? = null,
     var poster: String? = null,
     var banner: String? = null,
-    var isFavorite: Boolean = false,
 
     @Ignore
     val seasons: List<Season> = listOf(),
@@ -75,6 +74,7 @@ class TvShow(
     constructor() : this("", "")
 
     var released = released?.toCalendar()
+    var isFavorite: Boolean = false
 
 
     @Ignore

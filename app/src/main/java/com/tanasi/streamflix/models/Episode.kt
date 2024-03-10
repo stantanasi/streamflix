@@ -14,7 +14,6 @@ class Episode(
     var title: String = "",
     released: String? = null,
     var poster: String? = null,
-    var isWatched: Boolean = false,
 
     var tvShow: TvShow? = null,
     var season: Season? = null,
@@ -23,6 +22,7 @@ class Episode(
     constructor() : this("", 0)
 
     var released = released?.toCalendar()
+    var isWatched: Boolean = false
 
 
     @Ignore
