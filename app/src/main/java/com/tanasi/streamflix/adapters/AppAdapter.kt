@@ -32,6 +32,7 @@ import com.tanasi.streamflix.databinding.ItemGenreGridBinding
 import com.tanasi.streamflix.databinding.ItemLoadingBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
+import com.tanasi.streamflix.databinding.ItemMovieGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemMovieMobileBinding
 import com.tanasi.streamflix.databinding.ItemPeopleBinding
 import com.tanasi.streamflix.databinding.ItemProviderBinding
@@ -74,6 +75,7 @@ class AppAdapter(
 
         MOVIE_MOBILE_ITEM,
         MOVIE_ITEM,
+        MOVIE_GRID_MOBILE_ITEM,
         MOVIE_GRID_ITEM,
 
         MOVIE,
@@ -181,6 +183,13 @@ class AppAdapter(
             )
             Type.MOVIE_ITEM -> MovieViewHolder(
                 ItemMovieBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
+            Type.MOVIE_GRID_MOBILE_ITEM -> MovieViewHolder(
+                ItemMovieGridMobileBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
