@@ -19,9 +19,12 @@ import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
 import com.tanasi.streamflix.databinding.ItemTvShowBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridBinding
+import com.tanasi.streamflix.databinding.ItemTvShowGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemTvShowMobileBinding
 import com.tanasi.streamflix.fragments.genre.GenreFragment
 import com.tanasi.streamflix.fragments.genre.GenreFragmentDirections
+import com.tanasi.streamflix.fragments.genre.GenreMobileFragment
+import com.tanasi.streamflix.fragments.genre.GenreMobileFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeFragment
 import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeMobileFragment
@@ -32,15 +35,21 @@ import com.tanasi.streamflix.fragments.movie.MovieMobileFragment
 import com.tanasi.streamflix.fragments.movie.MovieMobileFragmentDirections
 import com.tanasi.streamflix.fragments.people.PeopleFragment
 import com.tanasi.streamflix.fragments.people.PeopleFragmentDirections
+import com.tanasi.streamflix.fragments.people.PeopleMobileFragment
+import com.tanasi.streamflix.fragments.people.PeopleMobileFragmentDirections
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.fragments.search.SearchFragment
 import com.tanasi.streamflix.fragments.search.SearchFragmentDirections
+import com.tanasi.streamflix.fragments.search.SearchMobileFragment
+import com.tanasi.streamflix.fragments.search.SearchMobileFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragment
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragmentDirections
+import com.tanasi.streamflix.fragments.tv_shows.TvShowsMobileFragment
+import com.tanasi.streamflix.fragments.tv_shows.TvShowsMobileFragmentDirections
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Season
@@ -76,6 +85,7 @@ class TvShowViewHolder(
         when (_binding) {
             is ItemTvShowMobileBinding -> displayMobileItem(_binding)
             is ItemTvShowBinding -> displayItem(_binding)
+            is ItemTvShowGridMobileBinding -> displayGridMobileItem(_binding)
             is ItemTvShowGridBinding -> displayGridItem(_binding)
 
             is ContentTvShowBinding -> displayTvShow(_binding)
@@ -190,6 +200,74 @@ class TvShowViewHolder(
                         is HomeFragment -> fragment.updateBackground(tvShow.banner)
                     }
                 }
+            }
+        }
+
+        Glide.with(context)
+            .load(tvShow.poster)
+            .centerCrop()
+            .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowQuality.apply {
+            text = tvShow.quality ?: ""
+            visibility = when {
+                tvShow.quality.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
+            season.episodes.lastOrNull()?.let { episode ->
+                if (season.number != 0) {
+                    context.getString(
+                        R.string.tv_show_item_season_number_episode_number,
+                        season.number,
+                        episode.number
+                    )
+                } else {
+                    context.getString(
+                        R.string.tv_show_item_episode_number,
+                        episode.number
+                    )
+                }
+            }
+        } ?: context.getString(R.string.tv_show_item_type)
+
+        binding.tvTvShowTitle.text = tvShow.title
+    }
+
+    private fun displayGridMobileItem(binding: ItemTvShowGridMobileBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                when (context.toActivity()?.getCurrentFragment()) {
+                    is GenreMobileFragment -> findNavController().navigate(
+                        GenreMobileFragmentDirections.actionGenreToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                    is PeopleMobileFragment -> findNavController().navigate(
+                        PeopleMobileFragmentDirections.actionPeopleToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                    is SearchMobileFragment -> findNavController().navigate(
+                        SearchMobileFragmentDirections.actionSearchToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                    is TvShowsMobileFragment -> findNavController().navigate(
+                        TvShowsMobileFragmentDirections.actionTvShowsToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                }
+            }
+            setOnLongClickListener {
+                ShowOptionsMobileDialog(context).also {
+                    it.show = tvShow
+                    it.show()
+                }
+                true
             }
         }
 
