@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.extractors
 
-import android.util.Log
 import com.tanasi.streamflix.models.Video
 
 abstract class Extractor {
@@ -34,8 +33,6 @@ abstract class Extractor {
                         )
                     )
                 ) {
-                    Log.d("streamflixDebug", "found extractor for video" +
-                            ": " + extractor.name)
                     return extractor.extract(link)
                 }
             }

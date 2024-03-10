@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.extractors
 
-import android.util.Log
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.models.Video
 import org.jsoup.nodes.Document
@@ -14,20 +13,13 @@ class VidozaExtractor : Extractor() {
     override val mainUrl = "https://vidoza.net"
 
     override suspend fun extract(link: String): Video {
-        Log.d("streamflixDebug", "Vidoza link: " + link)
-
         val service = VoeExtractorService.build(mainUrl)
         val source = service.getSource(link.replace(mainUrl, ""))
-
         val videoUrl = source.select("source").attr("src")
-
-        Log.d("streamflixDebug", "VoeExtractor videoUrl: " + videoUrl)
-        val video = Video(
+        return Video(
             source = videoUrl,
             subtitles = listOf()
         )
-
-        return video
     }
 
 

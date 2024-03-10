@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.extractors
 
-import android.util.Log
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.models.Video
 import org.jsoup.nodes.Document
@@ -14,20 +13,13 @@ class VoeExtractor : Extractor() {
     override val mainUrl = "https://sharonwhiledemocratic.com"
 
     override suspend fun extract(link: String): Video {
-        Log.d("streamflixDebug", "VoeExtractor link: " + link)
-
         val service = VoeExtractorService.build(mainUrl)
         val source = service.getSource(link.replace(mainUrl, ""))
-
         val hlsUrl = source.html().split("'hls': '")[1].split("',")[0]
-
-        Log.d("streamflixDebug", "VoeExtractor hlsurl: " + hlsUrl)
-        val video = Video(
+        return Video(
             source = hlsUrl,
             subtitles = listOf()
         )
-
-        return video
     }
 
 

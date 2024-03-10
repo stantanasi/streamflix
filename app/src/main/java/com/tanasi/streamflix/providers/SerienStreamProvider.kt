@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.providers
 
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
@@ -66,18 +65,15 @@ object SerienStreamProvider : Provider {
     }
 
     suspend fun getPosterUrlFromTvShowLink(seriesLink: String): String {
-        Log.d("streamflixDebug", "dynamic posterpath request: " + seriesLink)
         val seriesId = getTvShowIdFromLink(seriesLink)
         val document = service.getTvShow(seriesId)
         val posterPath = document.select("img").attr("data-src")
-        Log.d("streamflixDebug", "dynamic posterpath: " + posterPath)
         return url + posterPath
     }
 
     override suspend fun getHome(): List<Category> {
         val document = service.getHome()
         val categories = mutableListOf<Category>()
-
         categories.add(
             Category(name = "Popular TV Shows",
                 list = document.select("div.container > div:nth-child(7) > div.previews div.coverListItem")
@@ -129,23 +125,20 @@ object SerienStreamProvider : Provider {
         val document = service.getSeriesListAlphabet()
         val tvShows = mutableListOf<TvShow>()
         val allTitles = document.select("a[data-alternative-titles]")
-        val allTitlesFiltered =
-            allTitles.filter { it ->
-                it.text().contains(query, true)
-            }
-        allTitlesFiltered.filter {
-            (resultsCount++ > ((page - 1) * 20))
-                    && (resultsCount < (page * 20))
+        val allTitlesFiltered = allTitles.filter { it ->
+            it.text().contains(query, true)
         }
-            .map {
-                tvShows.add(
-                    TvShow(
-                        id = getTvShowIdFromLink(it.attr("href")),
-                        title = it.text(),
-                        poster = getPosterUrlFromTvShowLink(it.attr("href"))
-                    )
+        allTitlesFiltered.filter {
+            (resultsCount++ > ((page - 1) * 20)) && (resultsCount < (page * 20))
+        }.map {
+            tvShows.add(
+                TvShow(
+                    id = getTvShowIdFromLink(it.attr("href")),
+                    title = it.text(),
+                    poster = getPosterUrlFromTvShowLink(it.attr("href"))
                 )
-            }
+            )
+        }
         return tvShows
     }
 
@@ -158,8 +151,7 @@ object SerienStreamProvider : Provider {
         val tvShows = mutableListOf<TvShow>()
         document.select(".genre > ul > li")
             .filter { it ->
-                (it.siblingIndex() > ((page - 1) * 20))
-                        && (it.siblingIndex() < (page * 20))
+                (it.siblingIndex() > ((page - 1) * 20)) && (it.siblingIndex() < (page * 20))
             }
             .map {
                 tvShows.add(
@@ -186,7 +178,8 @@ object SerienStreamProvider : Provider {
         val imdbTitleUrl = document.selectFirst("div.series-title a.imdb-link")?.attr("href") ?: ""
         val imdbDocument = service.getCustomUrl(imdbTitleUrl)
 
-        val tvShow = TvShow(id = id,
+        val tvShow = TvShow(
+            id = id,
             title = document.selectFirst("h1 > span")?.text() ?: "",
             overview = document.selectFirst("p.seri_des")?.attr("data-full-description") ?: "",
             released = document.selectFirst("div.series-title > small > span:nth-child(1)")?.text()
@@ -240,7 +233,6 @@ object SerienStreamProvider : Provider {
                         && it.siblingIndex() < ((page) * 20)
             }
             .map {
-                Log.d("streamflixDebug", "siblingIndex: " + it.siblingIndex())
                 shows.add(
                     TvShow(
                         id = it.select("a").attr("href"),
@@ -267,18 +259,10 @@ object SerienStreamProvider : Provider {
         val episodeNumber = seasonIdSplitted[2]
 
         val document = service.getTvShowEpisodeServers(showName, seasonNumber, episodeNumber)
-
         val servers = mutableListOf<Video.Server>()
         document.select("div.hosterSiteVideo > ul > li").map {
             val redirectUrl = url + it.select("a").attr("href")
             val serverAfterRedirect = service.getRedirectLink(redirectUrl)
-
-            Log.d(
-                "streamflixDebug",
-                "redirect: " + (serverAfterRedirect.raw() as okhttp3.Response).request.url + " from url: " + url + it.select(
-                    "a"
-                ).attr("href")
-            )
             servers.add(
                 Video.Server(
                     id = (serverAfterRedirect.raw() as okhttp3.Response).request.url.toString(),
