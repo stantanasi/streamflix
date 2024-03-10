@@ -23,6 +23,7 @@ import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
 import com.tanasi.streamflix.databinding.ItemCategoryBinding
+import com.tanasi.streamflix.databinding.ItemCategoryMobileBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingBinding
 import com.tanasi.streamflix.databinding.ItemGenreGridBinding
@@ -55,6 +56,7 @@ class AppAdapter(
     }
 
     enum class Type {
+        CATEGORY_MOBILE_ITEM,
         CATEGORY_ITEM,
 
         CATEGORY_SWIPER,
@@ -98,6 +100,13 @@ class AppAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (Type.entries[viewType]) {
+            Type.CATEGORY_MOBILE_ITEM -> CategoryViewHolder(
+                ItemCategoryMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
             Type.CATEGORY_ITEM -> CategoryViewHolder(
                 ItemCategoryBinding.inflate(
                     LayoutInflater.from(parent.context),
