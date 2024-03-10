@@ -1,6 +1,8 @@
 package com.tanasi.streamflix.adapters.viewholders
 
 import android.content.Intent
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
@@ -28,7 +30,7 @@ class ProviderViewHolder(
     }
 
 
-    private fun displayItem(binding: ItemProviderBinding) {
+    @OptIn(UnstableApi::class) private fun displayItem(binding: ItemProviderBinding) {
         binding.root.apply {
             setOnClickListener {
                 UserPreferences.currentProvider = provider.provider

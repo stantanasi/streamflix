@@ -1,5 +1,7 @@
 package com.tanasi.streamflix.providers
 
+import androidx.annotation.OptIn
+import androidx.media3.common.util.UnstableApi
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
@@ -16,7 +18,6 @@ interface Provider {
     val logo: String
     val url: String
 
-
     suspend fun getHome(): List<Category>
 
     suspend fun search(query: String, page: Int = 1): List<AppAdapter.Item>
@@ -25,21 +26,17 @@ interface Provider {
 
     suspend fun getTvShows(page: Int = 1): List<TvShow>
 
-
     suspend fun getMovie(id: String): Movie
-
 
     suspend fun getTvShow(id: String): TvShow
 
     suspend fun getEpisodesBySeason(seasonId: String): List<Episode>
 
-
     suspend fun getGenre(id: String, page: Int = 1): Genre
-
 
     suspend fun getPeople(id: String, page: Int = 1): People
 
-
+    @OptIn(UnstableApi::class)
     suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server>
 
     suspend fun getVideo(server: Video.Server): Video
@@ -50,6 +47,7 @@ interface Provider {
             SflixProvider,
             AnyMovieProvider,
             HiAnimeProvider,
+            SerienStreamProvider
         )
     }
 }

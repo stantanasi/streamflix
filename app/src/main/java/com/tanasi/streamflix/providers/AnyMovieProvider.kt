@@ -928,7 +928,7 @@ object AnyMovieProvider : Provider {
         }
 
 
-        @GET(".")
+        @GET("/index.php")
         suspend fun getHome(): Document
 
         @GET("page/{page}")
