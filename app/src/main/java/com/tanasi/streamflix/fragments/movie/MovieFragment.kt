@@ -87,7 +87,7 @@ class MovieFragment : Fragment() {
     }
 
     private fun displayMovie(movie: Movie) {
-        database.movieDao().getMovie(movie.id)?.let {
+        database.movieDao().getById(movie.id)?.let {
             movie.isFavorite = it.isFavorite
             movie.isWatched = it.isWatched
         }

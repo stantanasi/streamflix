@@ -9,14 +9,14 @@ import com.tanasi.streamflix.models.Episode
 @Dao
 interface EpisodeDao {
 
+    @Query("SELECT * FROM episodes WHERE id = :id")
+    fun getById(id: String): Episode?
+
     @Query("SELECT * FROM episodes WHERE tvShow = :tvShowId ORDER BY season, number")
-    fun getEpisodesByTvShowId(tvShowId: String): List<Episode>
+    fun getByTvShowId(tvShowId: String): List<Episode>
 
     @Query("SELECT * FROM episodes WHERE season = :seasonId ORDER BY season, number")
-    fun getEpisodesBySeasonId(seasonId: String): List<Episode>
-
-    @Query("SELECT * FROM episodes WHERE id = :id")
-    fun getEpisode(id: String): Episode?
+    fun getBySeasonId(seasonId: String): List<Episode>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(episode: Episode)

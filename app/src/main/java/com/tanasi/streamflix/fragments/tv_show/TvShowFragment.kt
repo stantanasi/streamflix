@@ -51,7 +51,7 @@ class TvShowFragment : Fragment() {
                     gIsLoadingRetry.visibility = View.GONE
                 }
                 is TvShowViewModel.State.SuccessLoading -> {
-                    val episodes = database.episodeDao().getEpisodesByTvShowId(state.tvShow.id)
+                    val episodes = database.episodeDao().getByTvShowId(state.tvShow.id)
                     state.tvShow.seasons.onEach { season ->
                         season.episodes = episodes.filter { it.season?.id == season.id }
                     }
@@ -125,7 +125,7 @@ class TvShowFragment : Fragment() {
             when (state) {
                 TvShowViewModel.SeasonState.Loading -> {}
                 is TvShowViewModel.SeasonState.SuccessLoading -> {
-                    val episodes = database.episodeDao().getEpisodesByTvShowId(state.tvShow.id)
+                    val episodes = database.episodeDao().getByTvShowId(state.tvShow.id)
                     state.episodes.onEach { episode ->
                         episode.isWatched = episodes.find { it.id == episode.id }?.isWatched
                             ?: false
@@ -162,7 +162,7 @@ class TvShowFragment : Fragment() {
     }
 
     private fun displayTvShow(tvShow: TvShow) {
-        database.tvShowDao().getTvShowById(tvShow.id)?.let {
+        database.tvShowDao().getById(tvShow.id)?.let {
             tvShow.isFavorite = it.isFavorite
         }
         database.tvShowDao().insert(tvShow)

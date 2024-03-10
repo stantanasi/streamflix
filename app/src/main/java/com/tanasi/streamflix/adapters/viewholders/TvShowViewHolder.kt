@@ -475,7 +475,7 @@ class TvShowViewHolder(
                     ),
                 )
             }
-            ?: database.episodeDao().getEpisodesByTvShowId(tvShow.id)
+            ?: database.episodeDao().getByTvShowId(tvShow.id)
                 .let { episodes ->
                     episodes.indexOfLast { it.isWatched }
                         .takeIf { it != -1 && it + 1 < episodes.size }
@@ -483,7 +483,7 @@ class TvShowViewHolder(
                         ?: episodes.firstOrNull()
                 }
                 ?.also { episode ->
-                    episode.season = episode.season?.let { database.seasonDao().getSeason(it.id) }
+                    episode.season = episode.season?.let { database.seasonDao().getById(it.id) }
                 }
 
         binding.btnTvShowWatchEpisode.apply {
@@ -682,7 +682,7 @@ class TvShowViewHolder(
                     ),
                 )
             }
-            ?: database.episodeDao().getEpisodesByTvShowId(tvShow.id)
+            ?: database.episodeDao().getByTvShowId(tvShow.id)
                 .let { episodes ->
                     episodes.indexOfLast { it.isWatched }
                         .takeIf { it != -1 && it + 1 < episodes.size }
@@ -690,7 +690,7 @@ class TvShowViewHolder(
                         ?: episodes.firstOrNull()
                 }
                 ?.also { episode ->
-                    episode.season = episode.season?.let { database.seasonDao().getSeason(it.id) }
+                    episode.season = episode.season?.let { database.seasonDao().getById(it.id) }
                 }
 
         binding.btnTvShowWatchEpisode.apply {

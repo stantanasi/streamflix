@@ -57,7 +57,7 @@ class ShowOptionsDialog(context: Context) : Dialog(context) {
 
 
     private fun displayEpisode(episode: Episode) {
-        val saved = database.episodeDao().getEpisode(episode.id)?.also {
+        val saved = database.episodeDao().getById(episode.id)?.also {
             episode.isWatched = it.isWatched
         }
         val program = WatchNextUtils.getProgram(context, episode.id)
@@ -155,7 +155,7 @@ class ShowOptionsDialog(context: Context) : Dialog(context) {
     }
 
     private fun displayMovie(movie: Movie) {
-        val saved = database.movieDao().getMovie(movie.id)?.also {
+        val saved = database.movieDao().getById(movie.id)?.also {
             movie.isFavorite = it.isFavorite
             movie.isWatched = it.isWatched
         }
@@ -247,7 +247,7 @@ class ShowOptionsDialog(context: Context) : Dialog(context) {
     }
 
     private fun displayTvShow(tvShow: TvShow) {
-        val saved = database.tvShowDao().getTvShowById(tvShow.id)?.also {
+        val saved = database.tvShowDao().getById(tvShow.id)?.also {
             tvShow.isFavorite = it.isFavorite
         }
 

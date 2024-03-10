@@ -158,7 +158,7 @@ class HomeFragment : Fragment() {
 
             Category(
                 name = getString(R.string.home_favorite_movies),
-                list = database.movieDao().getFavoriteMovies()
+                list = database.movieDao().getFavorites()
                     .reversed(),
             ).takeIf { it.list.isNotEmpty() }?.also {
                 it.list.onEach { show ->
@@ -173,7 +173,7 @@ class HomeFragment : Fragment() {
 
             Category(
                 name = getString(R.string.home_favorite_tv_shows),
-                list = database.tvShowDao().getFavoriteTvShows()
+                list = database.tvShowDao().getFavorites()
                     .reversed(),
             ).takeIf { it.list.isNotEmpty() }?.also {
                 it.list.onEach { show ->

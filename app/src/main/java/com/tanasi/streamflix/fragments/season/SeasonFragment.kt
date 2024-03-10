@@ -97,8 +97,8 @@ class SeasonFragment : Fragment() {
 
     private fun displaySeason(episodes: List<Episode>) {
         val list = args.seasonNumber.takeIf { it != 0 }?.let {
-            database.episodeDao().getEpisodesBySeasonId(args.seasonId)
-        } ?: database.episodeDao().getEpisodesByTvShowId(args.tvShowId)
+            database.episodeDao().getBySeasonId(args.seasonId)
+        } ?: database.episodeDao().getByTvShowId(args.tvShowId)
 
         appAdapter.submitList(episodes.onEach { episode ->
             episode.isWatched = list.find { it.id == episode.id }?.isWatched ?: false

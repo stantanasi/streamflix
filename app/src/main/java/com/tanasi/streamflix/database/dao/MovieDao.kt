@@ -9,11 +9,11 @@ import com.tanasi.streamflix.models.Movie
 @Dao
 interface MovieDao {
 
-    @Query("SELECT * FROM movies WHERE isFavorite = 1")
-    fun getFavoriteMovies(): List<Movie>
-
     @Query("SELECT * FROM movies WHERE id = :id")
-    fun getMovie(id: String): Movie?
+    fun getById(id: String): Movie?
+
+    @Query("SELECT * FROM movies WHERE isFavorite = 1")
+    fun getFavorites(): List<Movie>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(movie: Movie)

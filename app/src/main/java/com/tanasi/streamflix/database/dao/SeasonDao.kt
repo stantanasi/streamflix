@@ -10,7 +10,7 @@ import com.tanasi.streamflix.models.Season
 interface SeasonDao {
 
     @Query("SELECT * FROM seasons WHERE id = :id")
-    fun getSeason(id: String): Season?
+    fun getById(id: String): Season?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(seasons: List<Season>)
