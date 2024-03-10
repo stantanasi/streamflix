@@ -41,7 +41,6 @@ interface Provider {
 
     suspend fun getVideo(server: Video.Server): Video
 
-
     companion object {
         val providers = listOf(
             SflixProvider,

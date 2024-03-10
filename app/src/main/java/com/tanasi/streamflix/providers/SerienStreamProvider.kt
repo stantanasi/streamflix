@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit
 
 
 object SerienStreamProvider : Provider {
+
     override val name = "SerienStream (German)"
     override val logo =
         "https://s.to/public/img/logo-sto-serienstream-sx-to-serien-online-streaming-vod.png"

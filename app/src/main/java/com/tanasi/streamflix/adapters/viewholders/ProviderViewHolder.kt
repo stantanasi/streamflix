@@ -30,7 +30,8 @@ class ProviderViewHolder(
     }
 
 
-    @OptIn(UnstableApi::class) private fun displayItem(binding: ItemProviderBinding) {
+    @OptIn(UnstableApi::class)
+    private fun displayItem(binding: ItemProviderBinding) {
         binding.root.apply {
             setOnClickListener {
                 UserPreferences.currentProvider = provider.provider

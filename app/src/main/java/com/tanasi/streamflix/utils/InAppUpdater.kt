@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
+import com.tanasi.streamflix.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -30,7 +31,13 @@ object InAppUpdater {
         }
     }
 
-    fun getReleaseUpdate(): GitHub.Release? {
+    suspend fun getReleaseUpdate(): GitHub.Release? {
+        val latestRelease = GitHub.service.getLatestRelease(GITHUB_OWNER, GITHUB_REPO)
+        val currentVersion = BuildConfig.VERSION_NAME
+
+        if (Version(latestRelease.tagName.substringAfter("v")) > Version(currentVersion)) {
+            return latestRelease
+        }
         return null
     }
 
@@ -62,7 +69,7 @@ object InAppUpdater {
             intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
             intent.data = FileProvider.getUriForFile(
                 context,
-                "streamflix.provider",
+                BuildConfig.APPLICATION_ID + ".provider",
                 File(uri.path!!)
             )
         }
