@@ -5,6 +5,7 @@ import androidx.media3.common.util.UnstableApi
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
+import com.tanasi.streamflix.extractors.VoeExtractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
@@ -264,9 +265,14 @@ object SerienStreamProvider : Provider {
         document.select("div.hosterSiteVideo > ul > li").map {
             val redirectUrl = url + it.select("a").attr("href")
             val serverAfterRedirect = service.getRedirectLink(redirectUrl)
+            val videoUrl = (serverAfterRedirect.raw() as okhttp3.Response).request.url
+            var videoUrlString = videoUrl.toString();
+            if (it.select("h4").text() == "VOE")
+                videoUrlString = "https://voe.sx" + videoUrl.encodedPath
+
             servers.add(
                 Video.Server(
-                    id = (serverAfterRedirect.raw() as okhttp3.Response).request.url.toString(),
+                    id = videoUrlString,
                     name = it.select("h4").text()
                 )
             )

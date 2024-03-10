@@ -10,7 +10,7 @@ import retrofit2.http.Url
 class VoeExtractor : Extractor() {
 
     override val name = "VOE"
-    override val mainUrl = "https://sharonwhiledemocratic.com"
+    override val mainUrl = "https://voe.sx/"
 
     override suspend fun extract(link: String): Video {
         val service = VoeExtractorService.build(mainUrl)
