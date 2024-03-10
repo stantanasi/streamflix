@@ -29,6 +29,7 @@ import com.tanasi.streamflix.databinding.ItemEpisodeBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingMobileBinding
 import com.tanasi.streamflix.databinding.ItemGenreGridBinding
+import com.tanasi.streamflix.databinding.ItemGenreGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemLoadingBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
@@ -70,6 +71,7 @@ class AppAdapter(
         EPISODE_CONTINUE_WATCHING_MOBILE_ITEM,
         EPISODE_CONTINUE_WATCHING_ITEM,
 
+        GENRE_GRID_MOBILE_ITEM,
         GENRE_GRID_ITEM,
 
         LOADING_ITEM,
@@ -160,6 +162,13 @@ class AppAdapter(
                 )
             )
 
+            Type.GENRE_GRID_MOBILE_ITEM -> GenreViewHolder(
+                ItemGenreGridMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
             Type.GENRE_GRID_ITEM -> GenreViewHolder(
                 ItemGenreGridBinding.inflate(
                     LayoutInflater.from(parent.context),
