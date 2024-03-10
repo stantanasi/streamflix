@@ -36,6 +36,7 @@ import com.tanasi.streamflix.databinding.ItemProviderMobileBinding
 import com.tanasi.streamflix.databinding.ItemSeasonBinding
 import com.tanasi.streamflix.databinding.ItemTvShowBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridBinding
+import com.tanasi.streamflix.databinding.ItemTvShowMobileBinding
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -80,6 +81,7 @@ class AppAdapter(
 
         SEASON_ITEM,
 
+        TV_SHOW_MOBILE_ITEM,
         TV_SHOW_ITEM,
         TV_SHOW_GRID_ITEM,
 
@@ -218,6 +220,13 @@ class AppAdapter(
                 )
             )
 
+            Type.TV_SHOW_MOBILE_ITEM -> TvShowViewHolder(
+                ItemTvShowMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
             Type.TV_SHOW_ITEM -> TvShowViewHolder(
                 ItemTvShowBinding.inflate(
                     LayoutInflater.from(parent.context),
