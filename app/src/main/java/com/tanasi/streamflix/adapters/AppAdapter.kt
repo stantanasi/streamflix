@@ -36,6 +36,7 @@ import com.tanasi.streamflix.databinding.ItemMovieGridBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemMovieMobileBinding
 import com.tanasi.streamflix.databinding.ItemPeopleBinding
+import com.tanasi.streamflix.databinding.ItemPeopleMobileBinding
 import com.tanasi.streamflix.databinding.ItemProviderBinding
 import com.tanasi.streamflix.databinding.ItemProviderMobileBinding
 import com.tanasi.streamflix.databinding.ItemSeasonBinding
@@ -85,6 +86,7 @@ class AppAdapter(
         MOVIE_CASTS,
         MOVIE_RECOMMENDATIONS,
 
+        PEOPLE_MOBILE_ITEM,
         PEOPLE_ITEM,
 
         PROVIDER_MOBILE_ITEM,
@@ -236,6 +238,13 @@ class AppAdapter(
                 )
             )
 
+            Type.PEOPLE_MOBILE_ITEM -> PeopleViewHolder(
+                ItemPeopleMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
             Type.PEOPLE_ITEM -> PeopleViewHolder(
                 ItemPeopleBinding.inflate(
                     LayoutInflater.from(parent.context),
