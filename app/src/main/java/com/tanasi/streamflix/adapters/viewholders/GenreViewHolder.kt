@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemGenreGridBinding
+import com.tanasi.streamflix.databinding.ItemGenreGridMobileBinding
 import com.tanasi.streamflix.fragments.search.SearchFragmentDirections
+import com.tanasi.streamflix.fragments.search.SearchMobileFragmentDirections
 import com.tanasi.streamflix.models.Genre
 
 
@@ -24,10 +26,29 @@ class GenreViewHolder(
         this.genre = genre
 
         when (_binding) {
+            is ItemGenreGridMobileBinding -> displayGridMobileItem(_binding)
             is ItemGenreGridBinding -> displayGridItem(_binding)
         }
     }
 
+
+    private fun displayGridMobileItem(binding: ItemGenreGridMobileBinding) {
+        binding.root.apply {
+            val colors = context.resources.getIntArray(R.array.genres)
+            (background as? GradientDrawable)?.setColor(colors[bindingAdapterPosition % colors.size])
+
+            setOnClickListener {
+                findNavController().navigate(
+                    SearchMobileFragmentDirections.actionSearchToGenre(
+                        id = genre.id,
+                        name = genre.name,
+                    )
+                )
+            }
+        }
+
+        binding.tvGenreName.text = genre.name
+    }
 
     private fun displayGridItem(binding: ItemGenreGridBinding) {
         binding.root.apply {
