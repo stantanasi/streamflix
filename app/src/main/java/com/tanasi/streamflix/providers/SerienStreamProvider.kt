@@ -5,7 +5,6 @@ import androidx.media3.common.util.UnstableApi
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
-import com.tanasi.streamflix.extractors.VoeExtractor
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
@@ -127,20 +126,20 @@ object SerienStreamProvider : Provider {
         val document = service.getSeriesListAlphabet()
         val tvShows = mutableListOf<TvShow>()
         val allTitles = document.select("a[data-alternative-titles]")
-        val allTitlesFiltered = allTitles.filter { it ->
+        allTitles.filter { it ->
             it.text().contains(query, true)
         }
-        allTitlesFiltered.filter {
-            (resultsCount++ > ((page - 1) * 20)) && (resultsCount < (page * 20))
-        }.map {
-            tvShows.add(
-                TvShow(
-                    id = getTvShowIdFromLink(it.attr("href")),
-                    title = it.text(),
-                    poster = getPosterUrlFromTvShowLink(it.attr("href"))
+            .filter {
+                (resultsCount++ > ((page - 1) * 20)) && (resultsCount < (page * 20))
+            }.map {
+                tvShows.add(
+                    TvShow(
+                        id = getTvShowIdFromLink(it.attr("href")),
+                        title = it.text(),
+                        poster = getPosterUrlFromTvShowLink(it.attr("href"))
+                    )
                 )
-            )
-        }
+            }
         return tvShows
     }
 
@@ -231,7 +230,7 @@ object SerienStreamProvider : Provider {
             .filter { it -> it.select("h3").text() == id }.get(0)
             .select("li")
             .filter { it ->
-                it.siblingIndex() > (page - 1 * 20)
+                it.siblingIndex() > ((page - 1) * 20)
                         && it.siblingIndex() < ((page) * 20)
             }
             .map {
