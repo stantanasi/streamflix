@@ -18,6 +18,7 @@ import com.tanasi.streamflix.databinding.ContentCategorySwiperBinding
 import com.tanasi.streamflix.databinding.ContentCategorySwiperMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
+import com.tanasi.streamflix.databinding.ContentMovieMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowBinding
 import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
@@ -82,6 +83,7 @@ class AppAdapter(
         MOVIE_GRID_MOBILE_ITEM,
         MOVIE_GRID_ITEM,
 
+        MOVIE_MOBILE,
         MOVIE,
         MOVIE_CASTS,
         MOVIE_RECOMMENDATIONS,
@@ -216,6 +218,13 @@ class AppAdapter(
                 )
             )
 
+            Type.MOVIE_MOBILE -> MovieViewHolder(
+                ContentMovieMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
             Type.MOVIE -> MovieViewHolder(
                 ContentMovieBinding.inflate(
                     LayoutInflater.from(parent.context),
