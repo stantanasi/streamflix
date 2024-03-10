@@ -3,6 +3,7 @@ package com.tanasi.streamflix.activities.main
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -90,5 +91,17 @@ class MainMobileActivity : FragmentActivity() {
                 }
             }
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                when (navController.currentDestination?.id) {
+                    R.id.home -> finish()
+                    R.id.search,
+                    R.id.movies,
+                    R.id.tv_shows -> binding.bnvMain.findViewById<View>(R.id.home).performClick()
+                    else -> navController.navigateUp()
+                }
+            }
+        })
     }
 }
