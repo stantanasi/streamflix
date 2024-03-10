@@ -1,16 +1,57 @@
 package com.tanasi.streamflix.fragments.player
 
+import android.content.pm.ActivityInfo
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.media3.common.AudioAttributes
+import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MimeTypes
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.MediaSession
+import androidx.media3.ui.PlayerView
+import androidx.media3.ui.SubtitleView
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import com.tanasi.streamflix.R
+import com.tanasi.streamflix.database.AppDatabase
+import com.tanasi.streamflix.databinding.ContentExoControllerMobileBinding
 import com.tanasi.streamflix.databinding.FragmentPlayerMobileBinding
+import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.MediaServer
+import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.WatchNextUtils
+import com.tanasi.streamflix.utils.setMediaServerId
+import com.tanasi.streamflix.utils.setMediaServers
+import com.tanasi.streamflix.utils.viewModelsFactory
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class PlayerMobileFragment : Fragment() {
 
     private var _binding: FragmentPlayerMobileBinding? = null
     private val binding get() = _binding!!
+
+    private val PlayerView.controller
+        get() = ContentExoControllerMobileBinding.bind(this.findViewById(R.id.cl_exo_controller))
+
+    private val args by navArgs<PlayerMobileFragmentArgs>()
+    private val viewModel by viewModelsFactory { PlayerViewModel(args.videoType, args.id) }
+
+    private lateinit var database: AppDatabase
+
+    private lateinit var player: ExoPlayer
+    private lateinit var mediaSession: MediaSession
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,5 +64,190 @@ class PlayerMobileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        database = AppDatabase.getInstance(requireContext())
+
+        initializeVideo()
+
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                PlayerViewModel.State.LoadingServers -> {}
+                is PlayerViewModel.State.SuccessLoadingServers -> {
+                    player.playlistMetadata = MediaMetadata.Builder()
+                        .setTitle(state.toString())
+                        .setMediaServers(state.servers.map {
+                            MediaServer(
+                                id = it.id,
+                                name = it.name,
+                            )
+                        })
+                        .build()
+                    binding.settings.setOnServerSelected { server ->
+                        viewModel.getVideo(state.servers.find { server.id == it.id }!!)
+                    }
+                }
+                is PlayerViewModel.State.FailedLoadingServers -> {
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message ?: "",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    findNavController().navigateUp()
+                }
+
+                PlayerViewModel.State.LoadingVideo -> {}
+                is PlayerViewModel.State.SuccessLoadingVideo -> {
+                    displayVideo(state.video, state.server)
+                }
+                is PlayerViewModel.State.FailedLoadingVideo -> {
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message ?: "",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        player.pause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        WindowCompat.getInsetsController(
+            requireActivity().window,
+            requireActivity().window.decorView
+        ).run {
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            show(WindowInsetsCompat.Type.systemBars())
+        }
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        player.release()
+        mediaSession.release()
+        _binding = null
+    }
+
+
+    private fun initializeVideo() {
+        WindowCompat.getInsetsController(
+            requireActivity().window,
+            requireActivity().window.decorView
+        ).run {
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            hide(WindowInsetsCompat.Type.systemBars())
+        }
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+
+        player = ExoPlayer.Builder(requireContext())
+            .setSeekBackIncrementMs(10_000)
+            .setSeekForwardIncrementMs(10_000)
+            .build().also { player ->
+                player.setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(C.USAGE_MEDIA)
+                        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                        .build(),
+                    true,
+                )
+
+                mediaSession = MediaSession.Builder(requireContext(), player)
+                    .build()
+            }
+
+        binding.pvPlayer.player = player
+        binding.settings.player = player
+        binding.settings.subtitleView = binding.pvPlayer.subtitleView
+
+        binding.pvPlayer.subtitleView?.apply {
+            setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
+            setStyle(UserPreferences.captionStyle)
+        }
+
+        binding.pvPlayer.controller.tvExoTitle.text = args.title
+
+        binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
+
+        binding.pvPlayer.controller.exoSettings.setOnClickListener {
+            binding.settings.show()
+        }
+    }
+
+    private fun displayVideo(video: Video, server: Video.Server) {
+        val currentPosition = player.currentPosition
+
+        player.setMediaItem(
+            MediaItem.Builder()
+                .setUri(Uri.parse(video.source))
+                .setSubtitleConfigurations(video.subtitles.map {
+                    MediaItem.SubtitleConfiguration.Builder(Uri.parse(it.file))
+                        .setMimeType(MimeTypes.TEXT_VTT)
+                        .setLabel(it.label)
+                        .build()
+                })
+                .setMediaMetadata(
+                    MediaMetadata.Builder()
+                        .setMediaServerId(server.id)
+                        .build()
+                )
+                .build()
+        )
+
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                binding.pvPlayer.keepScreenOn = isPlaying
+
+                if (!isPlaying) {
+                    when {
+                        player.hasStarted() && !player.hasFinished() -> {
+                        }
+                        player.hasFinished() -> {
+                        }
+                    }
+
+                    if (player.hasStarted()) {
+                        when (val videoType = args.videoType as PlayerFragment.VideoType) {
+                            is PlayerFragment.VideoType.Movie -> database.movieDao().updateWatched(
+                                id = videoType.id,
+                                isWatched = player.hasFinished()
+                            )
+                            is PlayerFragment.VideoType.Episode -> {
+                                if (player.hasFinished()) {
+                                    database.episodeDao().resetProgressionFromEpisode(videoType.id)
+                                }
+                                database.episodeDao().updateWatched(
+                                    id = videoType.id,
+                                    isWatched = player.hasFinished()
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+        if (currentPosition == 0L) {
+            val lastPlaybackPositionMillis = WatchNextUtils.programs(requireContext())
+                .find { it.contentId == args.id }
+                ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
+
+            player.seekTo(lastPlaybackPositionMillis ?: 0)
+        } else {
+            player.seekTo(currentPosition)
+        }
+
+        player.prepare()
+        player.play()
+    }
+
+
+    private fun ExoPlayer.hasStarted(): Boolean {
+        return (this.currentPosition > (this.duration * 0.03) || this.currentPosition > 2.minutes.inWholeMilliseconds)
+    }
+
+    private fun ExoPlayer.hasFinished(): Boolean {
+        return (this.currentPosition > (this.duration * 0.90))
     }
 }
