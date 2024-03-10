@@ -14,12 +14,14 @@ import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.databinding.ContentCategorySwiperBinding
 import com.tanasi.streamflix.databinding.ItemCategoryBinding
+import com.tanasi.streamflix.databinding.ItemCategoryMobileBinding
 import com.tanasi.streamflix.fragments.home.HomeFragment
 import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Show
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
@@ -36,6 +38,7 @@ class CategoryViewHolder(
 
     val childRecyclerView: RecyclerView?
         get() = when (_binding) {
+            is ItemCategoryMobileBinding -> _binding.rvCategory
             is ItemCategoryBinding -> _binding.hgvCategory
             else -> null
         }
@@ -44,12 +47,24 @@ class CategoryViewHolder(
         this.category = category
 
         when (_binding) {
+            is ItemCategoryMobileBinding -> displayMobileItem(_binding)
             is ItemCategoryBinding -> displayItem(_binding)
 
             is ContentCategorySwiperBinding -> displaySwiper(_binding)
         }
     }
 
+
+    private fun displayMobileItem(binding: ItemCategoryMobileBinding) {
+        binding.tvCategoryTitle.text = category.name
+
+        binding.rvCategory.apply {
+            adapter = AppAdapter().apply {
+                items.addAll(category.list)
+            }
+            addItemDecoration(SpacingItemDecoration(category.itemSpacing))
+        }
+    }
 
     private fun displayItem(binding: ItemCategoryBinding) {
         binding.tvCategoryTitle.text = category.name
