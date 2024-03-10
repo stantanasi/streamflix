@@ -33,7 +33,6 @@ import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.WatchNextUtils
-import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory

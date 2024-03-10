@@ -1,9 +1,7 @@
 package com.tanasi.streamflix.extractors
 
-import android.util.Log
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.utils.JsUnpacker
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.http.GET

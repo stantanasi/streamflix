@@ -1,13 +1,8 @@
 package com.tanasi.streamflix.providers
 
-import android.app.Application
-import android.content.Context
 import android.util.Log
 import androidx.annotation.OptIn
 import androidx.media3.common.util.UnstableApi
-import com.bumptech.glide.Glide
-import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader
-import com.bumptech.glide.load.model.GlideUrl
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
@@ -35,7 +30,6 @@ import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Url
 import java.io.File
-import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
 
@@ -187,12 +181,12 @@ object SerienStreamProvider : Provider {
         return Movie()
     }
 
-    override suspend fun getTvShow(tvShowId: String): TvShow {
-        val document = service.getTvShow(tvShowId)
+    override suspend fun getTvShow(id: String): TvShow {
+        val document = service.getTvShow(id)
         val imdbTitleUrl = document.selectFirst("div.series-title a.imdb-link")?.attr("href") ?: ""
         val imdbDocument = service.getCustomUrl(imdbTitleUrl)
 
-        val tvShow = TvShow(id = tvShowId,
+        val tvShow = TvShow(id = id,
             title = document.selectFirst("h1 > span")?.text() ?: "",
             overview = document.selectFirst("p.seri_des")?.attr("data-full-description") ?: "",
             released = document.selectFirst("div.series-title > small > span:nth-child(1)")?.text()
@@ -265,9 +259,9 @@ object SerienStreamProvider : Provider {
 
     @OptIn(UnstableApi::class)
     override suspend fun getServers(
-        episodeId: String, videoType: PlayerFragment.VideoType
+        id: String, videoType: PlayerFragment.VideoType
     ): List<Video.Server> {
-        val seasonIdSplitted = episodeId.split("/")
+        val seasonIdSplitted = id.split("/")
         val showName = seasonIdSplitted[0]
         val seasonNumber = seasonIdSplitted[1]
         val episodeNumber = seasonIdSplitted[2]
@@ -305,7 +299,7 @@ object SerienStreamProvider : Provider {
         companion object {
             val dnsQueryUrl = "https://1.1.1.1/dns-query"
 
-            fun okHttpClient(): OkHttpClient {
+            fun getOkHttpClient(): OkHttpClient {
                 val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
                 val bootstrapClient = Builder().cache(appCache).readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS).build()
@@ -317,9 +311,8 @@ object SerienStreamProvider : Provider {
             }
 
             fun build(): BurningSeriesService {
-                val client = okHttpClient()
-
-                val retrofit = Retrofit.Builder().baseUrl(SerienStreamProvider.url)
+                val client = getOkHttpClient()
+                val retrofit = Retrofit.Builder().baseUrl(url)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create()).client(client).build()
                 return retrofit.create(BurningSeriesService::class.java)

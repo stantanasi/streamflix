@@ -30,8 +30,7 @@ object InAppUpdater {
         }
     }
 
-    suspend fun getReleaseUpdate(): GitHub.Release? {
-
+    fun getReleaseUpdate(): GitHub.Release? {
         return null
     }
 
