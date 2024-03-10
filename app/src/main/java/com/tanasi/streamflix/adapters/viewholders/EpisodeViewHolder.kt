@@ -10,11 +10,13 @@ import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemEpisodeBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingMobileBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeMobileBinding
 import com.tanasi.streamflix.fragments.home.HomeFragment
 import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.fragments.season.SeasonFragmentDirections
+import com.tanasi.streamflix.fragments.season.SeasonMobileFragmentDirections
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.ui.ShowOptionsDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
@@ -35,12 +37,91 @@ class EpisodeViewHolder(
         this.episode = episode
 
         when (_binding) {
+            is ItemEpisodeMobileBinding -> displayMobileItem(_binding)
             is ItemEpisodeBinding -> displayItem(_binding)
             is ItemEpisodeContinueWatchingMobileBinding -> displayContinueWatchingMobileItem(_binding)
             is ItemEpisodeContinueWatchingBinding -> displayContinueWatchingItem(_binding)
         }
     }
 
+
+    private fun displayMobileItem(binding: ItemEpisodeMobileBinding) {
+        val program = WatchNextUtils.getProgram(context, episode.id)
+
+        binding.root.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    SeasonMobileFragmentDirections.actionSeasonToPlayer(
+                        id = episode.id,
+                        title = episode.tvShow?.title ?: "",
+                        subtitle = episode.season?.let { season ->
+                            context.getString(
+                                R.string.player_subtitle_tv_show,
+                                season.number,
+                                episode.number,
+                                episode.title
+                            )
+                        } ?: context.getString(
+                            R.string.player_subtitle_tv_show_episode_only,
+                            episode.number,
+                            episode.title
+                        ),
+                        videoType = PlayerFragment.VideoType.Episode(
+                            id = episode.id,
+                            number = episode.number,
+                            title = episode.title,
+                            poster = episode.poster,
+                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                                id = episode.tvShow?.id ?: "",
+                                title = episode.tvShow?.title ?: "",
+                                poster = episode.tvShow?.poster,
+                                banner = episode.tvShow?.banner,
+                            ),
+                            season = PlayerFragment.VideoType.Episode.Season(
+                                number = episode.season?.number ?: 0,
+                                title = episode.season?.title ?: "",
+                            ),
+                        ),
+                    )
+                )
+            }
+            setOnLongClickListener {
+                ShowOptionsMobileDialog(context).also {
+                    it.show = episode
+                    it.show()
+                }
+                true
+            }
+        }
+
+        binding.ivEpisodePoster.apply {
+            clipToOutline = true
+            Glide.with(context)
+                .load(episode.poster)
+                .centerCrop()
+                .into(this)
+        }
+
+        binding.pbEpisodeProgress.apply {
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                episode.isWatched -> 100
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                episode.isWatched -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+
+        binding.tvEpisodeInfo.text = context.getString(
+            R.string.seasons_episode_number,
+            episode.number
+        )
+
+        binding.tvEpisodeTitle.text = episode.title
+    }
 
     private fun displayItem(binding: ItemEpisodeBinding) {
         val program = WatchNextUtils.getProgram(context, episode.id)
