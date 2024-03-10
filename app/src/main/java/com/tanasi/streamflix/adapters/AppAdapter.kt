@@ -15,6 +15,7 @@ import com.tanasi.streamflix.adapters.viewholders.ProviderViewHolder
 import com.tanasi.streamflix.adapters.viewholders.SeasonViewHolder
 import com.tanasi.streamflix.adapters.viewholders.TvShowViewHolder
 import com.tanasi.streamflix.databinding.ContentCategorySwiperBinding
+import com.tanasi.streamflix.databinding.ContentCategorySwiperMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
@@ -59,6 +60,7 @@ class AppAdapter(
         CATEGORY_MOBILE_ITEM,
         CATEGORY_ITEM,
 
+        CATEGORY_MOBILE_SWIPER,
         CATEGORY_SWIPER,
 
         EPISODE_ITEM,
@@ -115,6 +117,13 @@ class AppAdapter(
                 )
             )
 
+            Type.CATEGORY_MOBILE_SWIPER -> CategoryViewHolder(
+                ContentCategorySwiperMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
             Type.CATEGORY_SWIPER -> CategoryViewHolder(
                 ContentCategorySwiperBinding.inflate(
                     LayoutInflater.from(parent.context),
