@@ -15,6 +15,7 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentMovieBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
+import com.tanasi.streamflix.databinding.ContentMovieCastsMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
@@ -54,7 +55,9 @@ import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.ShowOptionsDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
+import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.WatchNextUtils
+import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
@@ -71,6 +74,7 @@ class MovieViewHolder(
 
     val childRecyclerView: RecyclerView?
         get() = when (_binding) {
+            is ContentMovieCastsMobileBinding -> _binding.rvMovieCasts
             is ContentMovieCastsBinding -> _binding.hgvMovieCasts
             is ContentMovieRecommendationsBinding -> _binding.hgvMovieRecommendations
             else -> null
@@ -87,6 +91,7 @@ class MovieViewHolder(
 
             is ContentMovieMobileBinding -> displayMovieMobile(_binding)
             is ContentMovieBinding -> displayMovie(_binding)
+            is ContentMovieCastsMobileBinding -> displayCastsMobile(_binding)
             is ContentMovieCastsBinding -> displayCasts(_binding)
             is ContentMovieRecommendationsBinding -> displayRecommendations(_binding)
         }
@@ -619,6 +624,17 @@ class MovieViewHolder(
             setImageDrawable(
                 ContextCompat.getDrawable(context, movie.isFavorite.drawable())
             )
+        }
+    }
+
+    private fun displayCastsMobile(binding: ContentMovieCastsMobileBinding) {
+        binding.rvMovieCasts.apply {
+            adapter = AppAdapter().apply {
+                items.addAll(movie.cast.onEach {
+                    it.itemType = AppAdapter.Type.PEOPLE_MOBILE_ITEM
+                })
+            }
+            addItemDecoration(SpacingItemDecoration(20.dp(context)))
         }
     }
 
