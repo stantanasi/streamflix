@@ -129,10 +129,8 @@ class MovieViewHolder(
                 }
             }
             setOnLongClickListener {
-                ShowOptionsMobileDialog(context).also {
-                    it.show = movie
-                    it.show()
-                }
+                ShowOptionsMobileDialog(context, movie)
+                    .show()
                 true
             }
         }
@@ -193,10 +191,8 @@ class MovieViewHolder(
                 }
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context).also {
-                    it.show = movie
-                    it.show()
-                }
+                ShowOptionsDialog(context, movie)
+                    .show()
                 true
             }
             setOnFocusChangeListener { _, hasFocus ->
@@ -278,10 +274,8 @@ class MovieViewHolder(
                 }
             }
             setOnLongClickListener {
-                ShowOptionsMobileDialog(context).also {
-                    it.show = movie
-                    it.show()
-                }
+                ShowOptionsMobileDialog(context, movie)
+                    .show()
                 true
             }
         }
@@ -347,10 +341,8 @@ class MovieViewHolder(
                 }
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context).also {
-                    it.show = movie
-                    it.show()
-                }
+                ShowOptionsDialog(context, movie)
+                    .show()
                 true
             }
             setOnFocusChangeListener { _, hasFocus ->

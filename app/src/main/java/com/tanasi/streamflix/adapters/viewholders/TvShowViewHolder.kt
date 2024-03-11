@@ -135,10 +135,8 @@ class TvShowViewHolder(
                 }
             }
             setOnLongClickListener {
-                ShowOptionsMobileDialog(context).also {
-                    it.show = tvShow
-                    it.show()
-                }
+                ShowOptionsMobileDialog(context, tvShow)
+                    .show()
                 true
             }
         }
@@ -198,10 +196,8 @@ class TvShowViewHolder(
                 }
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context).also {
-                    it.show = tvShow
-                    it.show()
-                }
+                ShowOptionsDialog(context, tvShow)
+                    .show()
                 true
             }
             setOnFocusChangeListener { _, hasFocus ->
@@ -284,10 +280,8 @@ class TvShowViewHolder(
                 }
             }
             setOnLongClickListener {
-                ShowOptionsMobileDialog(context).also {
-                    it.show = tvShow
-                    it.show()
-                }
+                ShowOptionsMobileDialog(context, tvShow)
+                    .show()
                 true
             }
         }
@@ -352,10 +346,8 @@ class TvShowViewHolder(
                 }
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context).also {
-                    it.show = tvShow
-                    it.show()
-                }
+                ShowOptionsDialog(context, tvShow)
+                    .show()
                 true
             }
             setOnFocusChangeListener { _, hasFocus ->

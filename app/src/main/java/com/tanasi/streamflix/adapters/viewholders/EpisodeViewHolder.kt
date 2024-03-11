@@ -91,10 +91,8 @@ class EpisodeViewHolder(
                 )
             }
             setOnLongClickListener {
-                ShowOptionsMobileDialog(context).also {
-                    it.show = episode
-                    it.show()
-                }
+                ShowOptionsMobileDialog(context, episode)
+                    .show()
                 true
             }
         }
@@ -171,10 +169,8 @@ class EpisodeViewHolder(
                 )
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context).also {
-                    it.show = episode
-                    it.show()
-                }
+                ShowOptionsDialog(context, episode)
+                    .show()
                 true
             }
             setOnFocusChangeListener { _, hasFocus ->
@@ -249,10 +245,8 @@ class EpisodeViewHolder(
                 )
             }
             setOnLongClickListener {
-                ShowOptionsMobileDialog(context).also {
-                    it.show = episode
-                    it.show()
-                }
+                ShowOptionsMobileDialog(context, episode)
+                    .show()
                 true
             }
         }
@@ -324,10 +318,8 @@ class EpisodeViewHolder(
                 )
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context).also {
-                    it.show = episode
-                    it.show()
-                }
+                ShowOptionsDialog(context, episode)
+                    .show()
                 true
             }
             setOnFocusChangeListener { _, hasFocus ->

@@ -22,27 +22,26 @@ import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
 
-class ShowOptionsDialog(context: Context) : Dialog(context) {
+class ShowOptionsDialog(
+    context: Context,
+    show: AppAdapter.Item,
+) : Dialog(context) {
 
     private val binding = DialogShowOptionsBinding.inflate(LayoutInflater.from(context))
 
     private val database = AppDatabase.getInstance(context)
-
-    var show: AppAdapter.Item? = null
-        set(value) {
-            when (value) {
-                is Episode -> displayEpisode(value)
-                is Movie -> displayMovie(value)
-                is TvShow -> displayTvShow(value)
-            }
-            field = value
-        }
 
     init {
         setContentView(binding.root)
 
         binding.btnOptionCancel.setOnClickListener {
             hide()
+        }
+
+        when (show) {
+            is Episode -> displayEpisode(show)
+            is Movie -> displayMovie(show)
+            is TvShow -> displayTvShow(show)
         }
 
 

@@ -16,7 +16,7 @@ import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ActivityMainBinding
 import com.tanasi.streamflix.databinding.ContentHeaderMenuMainBinding
 import com.tanasi.streamflix.fragments.player.PlayerFragment
-import com.tanasi.streamflix.ui.UpdateDialog
+import com.tanasi.streamflix.ui.UpdateAppDialog
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.getCurrentFragment
 
@@ -27,7 +27,7 @@ class MainActivity : FragmentActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
 
-    private lateinit var updateDialog: UpdateDialog
+    private lateinit var updateAppDialog: UpdateAppDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_Tv)
@@ -93,8 +93,7 @@ class MainActivity : FragmentActivity() {
                     val asset = state.release?.assets
                         ?.find { it.contentType == "application/vnd.android.package-archive" }
                     if (asset != null) {
-                        updateDialog = UpdateDialog(this).also {
-                            it.release = state.release
+                        updateAppDialog = UpdateAppDialog(this, state.release).also {
                             it.setOnUpdateClickListener { _ ->
                                 if (!it.isLoading) viewModel.downloadUpdate(this, asset)
                             }
@@ -103,13 +102,13 @@ class MainActivity : FragmentActivity() {
                     }
                 }
 
-                MainViewModel.State.DownloadingUpdate -> updateDialog.isLoading = true
+                MainViewModel.State.DownloadingUpdate -> updateAppDialog.isLoading = true
                 is MainViewModel.State.SuccessDownloadingUpdate -> {
                     viewModel.installUpdate(this, state.apk)
-                    updateDialog.hide()
+                    updateAppDialog.hide()
                 }
 
-                MainViewModel.State.InstallingUpdate -> updateDialog.isLoading = true
+                MainViewModel.State.InstallingUpdate -> updateAppDialog.isLoading = true
 
                 is MainViewModel.State.FailedUpdate -> {
                     Toast.makeText(

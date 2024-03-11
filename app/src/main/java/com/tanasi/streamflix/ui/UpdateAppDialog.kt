@@ -7,22 +7,15 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.view.isVisible
 import com.tanasi.streamflix.BuildConfig
-import com.tanasi.streamflix.databinding.DialogUpdateMobileBinding
+import com.tanasi.streamflix.databinding.DialogUpdateBinding
 import com.tanasi.streamflix.utils.GitHub
 
-class UpdateMobileDialog(context: Context) : Dialog(context) {
+class UpdateAppDialog(
+    context: Context,
+    release: GitHub.Release
+) : Dialog(context) {
 
-    private val binding = DialogUpdateMobileBinding.inflate(LayoutInflater.from(context))
-
-    var release: GitHub.Release? = null
-        set(value) {
-            binding.tvUpdateNewVersion.text = value?.tagName?.substringAfter("v") ?: "-"
-            binding.tvUpdateReleaseNotes.text = value?.body?.replace(
-                Regex("^- ([a-z0-9]+: )?(.*?)(#\\d+ )?\$", RegexOption.MULTILINE),
-                "- $2"
-            )
-            field = value
-        }
+    private val binding = DialogUpdateBinding.inflate(LayoutInflater.from(context))
 
     var isLoading: Boolean
         get() = binding.pbUpdateIsLoading.isVisible
@@ -38,13 +31,26 @@ class UpdateMobileDialog(context: Context) : Dialog(context) {
 
         binding.tvUpdateCurrentVersion.text = BuildConfig.VERSION_NAME
 
+        binding.tvUpdateNewVersion.text = release.tagName.substringAfter("v")
+
+        binding.tvUpdateReleaseNotes.text = release.body?.replace(
+            Regex("^- ([a-z0-9]+: )?(.*?)(#\\d+ )?\$", RegexOption.MULTILINE),
+            "- $2"
+        )
+
+        binding.btnUpdateReleaseNotes.setOnClickListener {
+            binding.tvUpdateReleaseNotes.isVisible = !binding.tvUpdateReleaseNotes.isVisible
+        }
+
         binding.btnUpdateCancel.setOnClickListener {
             hide()
         }
 
+        binding.btnUpdate.requestFocus()
+
 
         window?.setLayout(
-            context.resources.displayMetrics.widthPixels,
+            (context.resources.displayMetrics.widthPixels * 0.55).toInt(),
             WindowManager.LayoutParams.WRAP_CONTENT
         )
     }

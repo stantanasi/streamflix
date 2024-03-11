@@ -11,7 +11,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ActivityMainMobileBinding
-import com.tanasi.streamflix.ui.UpdateMobileDialog
+import com.tanasi.streamflix.ui.UpdateAppMobileDialog
 import com.tanasi.streamflix.utils.UserPreferences
 
 class MainMobileActivity : FragmentActivity() {
@@ -21,7 +21,7 @@ class MainMobileActivity : FragmentActivity() {
 
     private val viewModel by viewModels<MainViewModel>()
 
-    private lateinit var updateDialog: UpdateMobileDialog
+    private lateinit var updateAppDialog: UpdateAppMobileDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme_Mobile)
@@ -64,8 +64,7 @@ class MainMobileActivity : FragmentActivity() {
                     val asset = state.release?.assets
                         ?.find { it.contentType == "application/vnd.android.package-archive" }
                     if (asset != null) {
-                        updateDialog = UpdateMobileDialog(this).also {
-                            it.release = state.release
+                        updateAppDialog = UpdateAppMobileDialog(this, state.release).also {
                             it.setOnUpdateClickListener { _ ->
                                 if (!it.isLoading) viewModel.downloadUpdate(this, asset)
                             }
@@ -74,13 +73,13 @@ class MainMobileActivity : FragmentActivity() {
                     }
                 }
 
-                MainViewModel.State.DownloadingUpdate -> updateDialog.isLoading = true
+                MainViewModel.State.DownloadingUpdate -> updateAppDialog.isLoading = true
                 is MainViewModel.State.SuccessDownloadingUpdate -> {
                     viewModel.installUpdate(this, state.apk)
-                    updateDialog.hide()
+                    updateAppDialog.hide()
                 }
 
-                MainViewModel.State.InstallingUpdate -> updateDialog.isLoading = true
+                MainViewModel.State.InstallingUpdate -> updateAppDialog.isLoading = true
 
                 is MainViewModel.State.FailedUpdate -> {
                     Toast.makeText(

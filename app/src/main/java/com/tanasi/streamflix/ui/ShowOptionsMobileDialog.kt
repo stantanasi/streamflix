@@ -21,27 +21,26 @@ import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
 
-class ShowOptionsMobileDialog(context: Context) : BottomSheetDialog(context) {
+class ShowOptionsMobileDialog(
+    context: Context,
+    show: AppAdapter.Item,
+) : BottomSheetDialog(context) {
 
     private val binding = DialogShowOptionsMobileBinding.inflate(LayoutInflater.from(context))
 
     private val database = AppDatabase.getInstance(context)
-
-    var show: AppAdapter.Item? = null
-        set(value) {
-            when (value) {
-                is Episode -> displayEpisode(value)
-                is Movie -> displayMovie(value)
-                is TvShow -> displayTvShow(value)
-            }
-            field = value
-        }
 
     init {
         setContentView(binding.root)
 
         findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
             ?.setBackgroundColor(Color.TRANSPARENT)
+
+        when (show) {
+            is Episode -> displayEpisode(show)
+            is Movie -> displayMovie(show)
+            is TvShow -> displayTvShow(show)
+        }
 
         binding.btnOptionCancel.setOnClickListener {
             hide()
