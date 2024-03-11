@@ -16,6 +16,9 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE isFavorite = 1")
     fun getFavorites(): List<Movie>
 
+    @Query("SELECT * FROM movies WHERE lastEngagementTimeUtcMillis IS NOT NULL ORDER BY lastEngagementTimeUtcMillis DESC")
+    fun getWatchingMovies(): List<Movie>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(movie: Movie)
 

@@ -19,6 +19,9 @@ interface EpisodeDao {
     @Query("SELECT * FROM episodes WHERE season = :seasonId ORDER BY season, number")
     fun getBySeasonId(seasonId: String): List<Episode>
 
+    @Query("SELECT * FROM episodes WHERE lastEngagementTimeUtcMillis IS NOT NULL ORDER BY lastEngagementTimeUtcMillis DESC")
+    fun getWatchingEpisodes(): List<Episode>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(episode: Episode)
 
