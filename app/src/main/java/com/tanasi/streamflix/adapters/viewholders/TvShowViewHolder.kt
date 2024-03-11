@@ -15,6 +15,7 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentTvShowBinding
 import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
@@ -79,6 +80,7 @@ class TvShowViewHolder(
         get() = when (_binding) {
             is ContentTvShowSeasonsMobileBinding -> _binding.rvTvShowSeasons
             is ContentTvShowSeasonsBinding -> _binding.hgvTvShowSeasons
+            is ContentTvShowCastsMobileBinding -> _binding.rvTvShowCasts
             is ContentTvShowCastsBinding -> _binding.hgvTvShowCasts
             is ContentTvShowRecommendationsBinding -> _binding.hgvTvShowRecommendations
             else -> null
@@ -97,6 +99,7 @@ class TvShowViewHolder(
             is ContentTvShowBinding -> displayTvShow(_binding)
             is ContentTvShowSeasonsMobileBinding -> displaySeasonsMobile(_binding)
             is ContentTvShowSeasonsBinding -> displaySeasons(_binding)
+            is ContentTvShowCastsMobileBinding -> displayCastsMobile(_binding)
             is ContentTvShowCastsBinding -> displayCasts(_binding)
             is ContentTvShowRecommendationsBinding -> displayRecommendations(_binding)
         }
@@ -820,6 +823,17 @@ class TvShowViewHolder(
                 items.addAll(tvShow.seasons)
             }
             setItemSpacing(80)
+        }
+    }
+
+    private fun displayCastsMobile(binding: ContentTvShowCastsMobileBinding) {
+        binding.rvTvShowCasts.apply {
+            adapter = AppAdapter().apply {
+                items.addAll(tvShow.cast.onEach {
+                    it.itemType = AppAdapter.Type.PEOPLE_MOBILE_ITEM
+                })
+            }
+            addItemDecoration(SpacingItemDecoration(20.dp(context)))
         }
     }
 
