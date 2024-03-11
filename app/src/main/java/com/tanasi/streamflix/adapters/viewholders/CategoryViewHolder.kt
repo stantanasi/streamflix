@@ -67,7 +67,9 @@ class CategoryViewHolder(
             adapter = AppAdapter().apply {
                 items.addAll(category.list)
             }
-            addItemDecoration(SpacingItemDecoration(category.itemSpacing))
+            if (itemDecorationCount == 0) {
+                addItemDecoration(SpacingItemDecoration(category.itemSpacing))
+            }
         }
     }
 

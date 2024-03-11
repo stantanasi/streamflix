@@ -637,7 +637,9 @@ class MovieViewHolder(
                     it.itemType = AppAdapter.Type.PEOPLE_MOBILE_ITEM
                 })
             }
-            addItemDecoration(SpacingItemDecoration(20.dp(context)))
+            if (itemDecorationCount == 0) {
+                addItemDecoration(SpacingItemDecoration(20.dp(context)))
+            }
         }
     }
 
@@ -661,7 +663,9 @@ class MovieViewHolder(
                     }
                 })
             }
-            addItemDecoration(SpacingItemDecoration(10.dp(context)))
+            if (itemDecorationCount == 0) {
+                addItemDecoration(SpacingItemDecoration(10.dp(context)))
+            }
         }
     }
 
