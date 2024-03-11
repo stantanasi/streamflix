@@ -18,12 +18,17 @@ import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
+import com.tanasi.streamflix.databinding.ItemMovieMobileBinding
 import com.tanasi.streamflix.fragments.genre.GenreFragment
 import com.tanasi.streamflix.fragments.genre.GenreFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeFragment
 import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
+import com.tanasi.streamflix.fragments.home.HomeMobileFragment
+import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
 import com.tanasi.streamflix.fragments.movie.MovieFragment
 import com.tanasi.streamflix.fragments.movie.MovieFragmentDirections
+import com.tanasi.streamflix.fragments.movie.MovieMobileFragment
+import com.tanasi.streamflix.fragments.movie.MovieMobileFragmentDirections
 import com.tanasi.streamflix.fragments.movies.MoviesFragment
 import com.tanasi.streamflix.fragments.movies.MoviesFragmentDirections
 import com.tanasi.streamflix.fragments.people.PeopleFragment
@@ -33,9 +38,12 @@ import com.tanasi.streamflix.fragments.search.SearchFragment
 import com.tanasi.streamflix.fragments.search.SearchFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragment
+import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.ShowOptionsDialog
+import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
@@ -62,6 +70,7 @@ class MovieViewHolder(
         this.movie = movie
 
         when (_binding) {
+            is ItemMovieMobileBinding -> displayMobileItem(_binding)
             is ItemMovieBinding -> displayItem(_binding)
             is ItemMovieGridBinding -> displayGridItem(_binding)
 
@@ -71,6 +80,68 @@ class MovieViewHolder(
         }
     }
 
+
+    private fun displayMobileItem(binding: ItemMovieMobileBinding) {
+        val program = WatchNextUtils.getProgram(context, movie.id)
+
+        binding.root.apply {
+            setOnClickListener {
+                when (context.toActivity()?.getCurrentFragment()) {
+                    is HomeMobileFragment -> findNavController().navigate(
+                        HomeMobileFragmentDirections.actionHomeToMovie(
+                            id = movie.id
+                        )
+                    )
+                    is MovieMobileFragment -> findNavController().navigate(
+                        MovieMobileFragmentDirections.actionMovieToMovie(
+                            id = movie.id
+                        )
+                    )
+                    is TvShowMobileFragment -> findNavController().navigate(
+                        TvShowMobileFragmentDirections.actionTvShowToMovie(
+                            id = movie.id
+                        )
+                    )
+                }
+            }
+            setOnLongClickListener {
+                ShowOptionsMobileDialog(context).also {
+                    it.show = movie
+                    it.show()
+                }
+                true
+            }
+        }
+
+        Glide.with(context)
+            .load(movie.poster)
+            .centerCrop()
+            .into(binding.ivMoviePoster)
+
+        binding.tvMovieQuality.apply {
+            text = movie.quality ?: ""
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
+            ?: context.getString(R.string.movie_item_type)
+
+        binding.pbMovieProgress.apply {
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+
+        binding.tvMovieTitle.text = movie.title
+    }
 
     private fun displayItem(binding: ItemMovieBinding) {
         val program = WatchNextUtils.getProgram(context, movie.id)
