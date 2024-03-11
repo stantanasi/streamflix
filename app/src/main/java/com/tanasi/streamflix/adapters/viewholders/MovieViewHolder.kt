@@ -18,9 +18,12 @@ import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
+import com.tanasi.streamflix.databinding.ItemMovieGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemMovieMobileBinding
 import com.tanasi.streamflix.fragments.genre.GenreFragment
 import com.tanasi.streamflix.fragments.genre.GenreFragmentDirections
+import com.tanasi.streamflix.fragments.genre.GenreMobileFragment
+import com.tanasi.streamflix.fragments.genre.GenreMobileFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeFragment
 import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeMobileFragment
@@ -31,11 +34,17 @@ import com.tanasi.streamflix.fragments.movie.MovieMobileFragment
 import com.tanasi.streamflix.fragments.movie.MovieMobileFragmentDirections
 import com.tanasi.streamflix.fragments.movies.MoviesFragment
 import com.tanasi.streamflix.fragments.movies.MoviesFragmentDirections
+import com.tanasi.streamflix.fragments.movies.MoviesMobileFragment
+import com.tanasi.streamflix.fragments.movies.MoviesMobileFragmentDirections
 import com.tanasi.streamflix.fragments.people.PeopleFragment
 import com.tanasi.streamflix.fragments.people.PeopleFragmentDirections
+import com.tanasi.streamflix.fragments.people.PeopleMobileFragment
+import com.tanasi.streamflix.fragments.people.PeopleMobileFragmentDirections
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.fragments.search.SearchFragment
 import com.tanasi.streamflix.fragments.search.SearchFragmentDirections
+import com.tanasi.streamflix.fragments.search.SearchMobileFragment
+import com.tanasi.streamflix.fragments.search.SearchMobileFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragment
@@ -72,6 +81,7 @@ class MovieViewHolder(
         when (_binding) {
             is ItemMovieMobileBinding -> displayMobileItem(_binding)
             is ItemMovieBinding -> displayItem(_binding)
+            is ItemMovieGridMobileBinding -> displayGridMobileItem(_binding)
             is ItemMovieGridBinding -> displayGridItem(_binding)
 
             is ContentMovieBinding -> displayMovie(_binding)
@@ -215,6 +225,73 @@ class MovieViewHolder(
 
         binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
             ?: context.getString(R.string.movie_item_type)
+
+        binding.tvMovieTitle.text = movie.title
+    }
+
+    private fun displayGridMobileItem(binding: ItemMovieGridMobileBinding) {
+        val program = WatchNextUtils.getProgram(context, movie.id)
+
+        binding.root.apply {
+            setOnClickListener {
+                when (context.toActivity()?.getCurrentFragment()) {
+                    is GenreMobileFragment -> findNavController().navigate(
+                        GenreMobileFragmentDirections.actionGenreToMovie(
+                            id = movie.id
+                        )
+                    )
+                    is MoviesMobileFragment -> findNavController().navigate(
+                        MoviesMobileFragmentDirections.actionMoviesToMovie(
+                            id = movie.id
+                        )
+                    )
+                    is PeopleMobileFragment -> findNavController().navigate(
+                        PeopleMobileFragmentDirections.actionPeopleToMovie(
+                            id = movie.id
+                        )
+                    )
+                    is SearchMobileFragment -> findNavController().navigate(
+                        SearchMobileFragmentDirections.actionSearchToMovie(
+                            id = movie.id
+                        )
+                    )
+                }
+            }
+            setOnLongClickListener {
+                ShowOptionsMobileDialog(context).also {
+                    it.show = movie
+                    it.show()
+                }
+                true
+            }
+        }
+
+        Glide.with(context)
+            .load(movie.poster)
+            .centerCrop()
+            .into(binding.ivMoviePoster)
+
+        binding.tvMovieQuality.apply {
+            text = movie.quality ?: ""
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvMovieReleasedYear.text = movie.released?.format("yyyy")
+            ?: context.getString(R.string.movie_item_type)
+
+        binding.pbMovieProgress.apply {
+            progress = when {
+                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                program != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
 
         binding.tvMovieTitle.text = movie.title
     }
