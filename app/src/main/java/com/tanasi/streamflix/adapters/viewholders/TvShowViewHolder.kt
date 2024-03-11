@@ -18,6 +18,7 @@ import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowCastsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsMobileBinding
 import com.tanasi.streamflix.databinding.ItemTvShowBinding
@@ -82,6 +83,7 @@ class TvShowViewHolder(
             is ContentTvShowSeasonsBinding -> _binding.hgvTvShowSeasons
             is ContentTvShowCastsMobileBinding -> _binding.rvTvShowCasts
             is ContentTvShowCastsBinding -> _binding.hgvTvShowCasts
+            is ContentTvShowRecommendationsMobileBinding -> _binding.rvTvShowRecommendations
             is ContentTvShowRecommendationsBinding -> _binding.hgvTvShowRecommendations
             else -> null
         }
@@ -101,6 +103,7 @@ class TvShowViewHolder(
             is ContentTvShowSeasonsBinding -> displaySeasons(_binding)
             is ContentTvShowCastsMobileBinding -> displayCastsMobile(_binding)
             is ContentTvShowCastsBinding -> displayCasts(_binding)
+            is ContentTvShowRecommendationsMobileBinding -> displayRecommendationsMobile(_binding)
             is ContentTvShowRecommendationsBinding -> displayRecommendations(_binding)
         }
     }
@@ -844,6 +847,20 @@ class TvShowViewHolder(
                 items.addAll(tvShow.cast)
             }
             setItemSpacing(80)
+        }
+    }
+
+    private fun displayRecommendationsMobile(binding: ContentTvShowRecommendationsMobileBinding) {
+        binding.rvTvShowRecommendations.apply {
+            adapter = AppAdapter().apply {
+                items.addAll(tvShow.recommendations.onEach {
+                    when (it) {
+                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_MOBILE_ITEM
+                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_MOBILE_ITEM
+                    }
+                })
+            }
+            addItemDecoration(SpacingItemDecoration(10.dp(context)))
         }
     }
 
