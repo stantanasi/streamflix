@@ -18,6 +18,7 @@ import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
+import com.tanasi.streamflix.databinding.ContentMovieRecommendationsMobileBinding
 import com.tanasi.streamflix.databinding.ItemMovieBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridMobileBinding
@@ -76,6 +77,7 @@ class MovieViewHolder(
         get() = when (_binding) {
             is ContentMovieCastsMobileBinding -> _binding.rvMovieCasts
             is ContentMovieCastsBinding -> _binding.hgvMovieCasts
+            is ContentMovieRecommendationsMobileBinding -> _binding.rvMovieRecommendations
             is ContentMovieRecommendationsBinding -> _binding.hgvMovieRecommendations
             else -> null
         }
@@ -93,6 +95,7 @@ class MovieViewHolder(
             is ContentMovieBinding -> displayMovie(_binding)
             is ContentMovieCastsMobileBinding -> displayCastsMobile(_binding)
             is ContentMovieCastsBinding -> displayCasts(_binding)
+            is ContentMovieRecommendationsMobileBinding -> displayRecommendationsMobile(_binding)
             is ContentMovieRecommendationsBinding -> displayRecommendations(_binding)
         }
     }
@@ -645,6 +648,20 @@ class MovieViewHolder(
                 items.addAll(movie.cast)
             }
             setItemSpacing(80)
+        }
+    }
+
+    private fun displayRecommendationsMobile(binding: ContentMovieRecommendationsMobileBinding) {
+        binding.rvMovieRecommendations.apply {
+            adapter = AppAdapter().apply {
+                items.addAll(movie.recommendations.onEach {
+                    when (it) {
+                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_MOBILE_ITEM
+                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_MOBILE_ITEM
+                    }
+                })
+            }
+            addItemDecoration(SpacingItemDecoration(10.dp(context)))
         }
     }
 
