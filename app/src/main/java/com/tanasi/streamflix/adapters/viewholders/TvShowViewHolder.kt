@@ -18,6 +18,7 @@ import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowSeasonsMobileBinding
 import com.tanasi.streamflix.databinding.ItemTvShowBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridMobileBinding
@@ -57,7 +58,9 @@ import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.ShowOptionsDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
+import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.WatchNextUtils
+import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
@@ -74,6 +77,7 @@ class TvShowViewHolder(
 
     val childRecyclerView: RecyclerView?
         get() = when (_binding) {
+            is ContentTvShowSeasonsMobileBinding -> _binding.rvTvShowSeasons
             is ContentTvShowSeasonsBinding -> _binding.hgvTvShowSeasons
             is ContentTvShowCastsBinding -> _binding.hgvTvShowCasts
             is ContentTvShowRecommendationsBinding -> _binding.hgvTvShowRecommendations
@@ -91,6 +95,7 @@ class TvShowViewHolder(
 
             is ContentTvShowMobileBinding -> displayTvShowMobile(_binding)
             is ContentTvShowBinding -> displayTvShow(_binding)
+            is ContentTvShowSeasonsMobileBinding -> displaySeasonsMobile(_binding)
             is ContentTvShowSeasonsBinding -> displaySeasons(_binding)
             is ContentTvShowCastsBinding -> displayCasts(_binding)
             is ContentTvShowRecommendationsBinding -> displayRecommendations(_binding)
@@ -794,6 +799,17 @@ class TvShowViewHolder(
             setImageDrawable(
                 ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
             )
+        }
+    }
+
+    private fun displaySeasonsMobile(binding: ContentTvShowSeasonsMobileBinding) {
+        binding.rvTvShowSeasons.apply {
+            adapter = AppAdapter().apply {
+                items.addAll(tvShow.seasons.onEach {
+                    it.itemType = AppAdapter.Type.SEASON_MOBILE_ITEM
+                })
+            }
+            addItemDecoration(SpacingItemDecoration(20.dp(context)))
         }
     }
 
