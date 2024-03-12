@@ -13,6 +13,9 @@ interface EpisodeDao {
     @Query("SELECT * FROM episodes WHERE id = :id")
     fun getById(id: String): Episode?
 
+    @Query("SELECT * FROM episodes WHERE id IN (:ids)")
+    fun getByIds(ids: List<String>): List<Episode>
+
     @Query("SELECT * FROM episodes WHERE tvShow = :tvShowId ORDER BY season, number")
     fun getByTvShowId(tvShowId: String): List<Episode>
 
