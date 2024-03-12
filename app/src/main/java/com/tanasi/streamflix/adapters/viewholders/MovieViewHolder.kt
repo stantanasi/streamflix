@@ -57,7 +57,6 @@ import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.ShowOptionsDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.ui.SpacingItemDecoration
-import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
@@ -168,7 +167,11 @@ class MovieViewHolder(
     }
 
     private fun displayItem(binding: ItemMovieBinding) {
-        val program = WatchNextUtils.getProgram(context, movie.id)
+        database.movieDao().getById(movie.id)?.let { movieDb ->
+            movie.isFavorite = movieDb.isFavorite
+            movie.isWatched = movieDb.isWatched
+            movie.watchHistory = movieDb.watchHistory
+        }
 
         binding.root.apply {
             setOnClickListener {
@@ -217,12 +220,14 @@ class MovieViewHolder(
             .into(binding.ivMoviePoster)
 
         binding.pbMovieProgress.apply {
+            val watchHistory = movie.watchHistory
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
@@ -313,7 +318,11 @@ class MovieViewHolder(
     }
 
     private fun displayGridItem(binding: ItemMovieGridBinding) {
-        val program = WatchNextUtils.getProgram(context, movie.id)
+        database.movieDao().getById(movie.id)?.let { movieDb ->
+            movie.isFavorite = movieDb.isFavorite
+            movie.isWatched = movieDb.isWatched
+            movie.watchHistory = movieDb.watchHistory
+        }
 
         binding.root.apply {
             setOnClickListener {
@@ -361,12 +370,14 @@ class MovieViewHolder(
             .into(binding.ivMoviePoster)
 
         binding.pbMovieProgress.apply {
+            val watchHistory = movie.watchHistory
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
@@ -493,11 +504,8 @@ class MovieViewHolder(
             }
 
             setOnClickListener {
-                database.movieDao().updateFavorite(
-                    id = movie.id,
-                    isFavorite = !movie.isFavorite
-                )
                 movie.isFavorite = !movie.isFavorite
+                database.movieDao().update(movie)
 
                 setImageDrawable(
                     ContextCompat.getDrawable(context, movie.isFavorite.drawable())
@@ -511,8 +519,6 @@ class MovieViewHolder(
     }
 
     private fun displayMovie(binding: ContentMovieBinding) {
-        val program = WatchNextUtils.getProgram(context, movie.id)
-
         binding.ivMoviePoster.run {
             Glide.with(context)
                 .load(movie.poster)
@@ -591,12 +597,14 @@ class MovieViewHolder(
         }
 
         binding.pbMovieProgress.apply {
+            val watchHistory = movie.watchHistory
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
@@ -617,11 +625,8 @@ class MovieViewHolder(
             }
 
             setOnClickListener {
-                database.movieDao().updateFavorite(
-                    id = movie.id,
-                    isFavorite = !movie.isFavorite
-                )
                 movie.isFavorite = !movie.isFavorite
+                database.movieDao().update(movie)
 
                 setImageDrawable(
                     ContextCompat.getDrawable(context, movie.isFavorite.drawable())
