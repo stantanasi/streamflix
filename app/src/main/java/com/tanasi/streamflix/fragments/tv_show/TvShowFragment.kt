@@ -87,8 +87,8 @@ class TvShowFragment : Fragment() {
                                 }
                                 episodes.indexOfFirst { it.id == program?.contentId }.takeIf { it != -1 }
                             }
-                            ?: episodes.indexOfLast { it.isWatched }
-                                .takeIf { it + 1 < episodes.size }
+                            ?: season?.episodes?.indexOfLast { it.isWatched }
+                                ?.takeIf { it != -1 && it + 1 < episodes.size }
                                 ?.let { it + 1 }
 
                         if (
