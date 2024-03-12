@@ -21,7 +21,6 @@ import com.tanasi.streamflix.fragments.season.SeasonMobileFragmentDirections
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.ui.ShowOptionsDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
-import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
 
@@ -129,7 +128,10 @@ class EpisodeViewHolder(
     }
 
     private fun displayItem(binding: ItemEpisodeBinding) {
-        val program = WatchNextUtils.getProgram(context, episode.id)
+        database.episodeDao().getById(episode.id)?.let { episodeDb ->
+            episode.isWatched = episodeDb.isWatched
+            episode.watchHistory = episodeDb.watchHistory
+        }
 
         binding.root.apply {
             setOnClickListener {
@@ -192,13 +194,15 @@ class EpisodeViewHolder(
         }
 
         binding.pbEpisodeProgress.apply {
+            val watchHistory = episode.watchHistory
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 episode.isWatched -> 100
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 episode.isWatched -> View.VISIBLE
                 else -> View.GONE
             }
@@ -289,7 +293,10 @@ class EpisodeViewHolder(
     }
 
     private fun displayContinueWatchingItem(binding: ItemEpisodeContinueWatchingBinding) {
-        val program = WatchNextUtils.getProgram(context, episode.id)
+        database.episodeDao().getById(episode.id)?.let { episodeDb ->
+            episode.isWatched = episodeDb.isWatched
+            episode.watchHistory = episodeDb.watchHistory
+        }
 
         binding.root.apply {
             setOnClickListener {
@@ -347,12 +354,16 @@ class EpisodeViewHolder(
         }
 
         binding.pbEpisodeProgress.apply {
+            val watchHistory = episode.watchHistory
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
+                episode.isWatched -> 100
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
+                episode.isWatched -> View.VISIBLE
                 else -> View.GONE
             }
         }
