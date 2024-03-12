@@ -38,9 +38,6 @@ interface EpisodeDao {
         ?.let { update(episode) }
         ?: insert(episode)
 
-    @Query("UPDATE episodes SET isWatched = :isWatched WHERE id = :id")
-    fun updateWatched(id: String, isWatched: Boolean)
-
     @Query("""
         UPDATE episodes
         SET isWatched = 0
