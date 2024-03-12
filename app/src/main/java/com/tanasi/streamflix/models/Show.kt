@@ -37,7 +37,7 @@ class Movie(
 
     var released = released?.toCalendar()
     var isFavorite: Boolean = false
-    var isWatched: Boolean = false
+    override var isWatched: Boolean = false
     @Embedded
     override var watchHistory: WatchItem.WatchHistory? = null
 

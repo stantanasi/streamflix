@@ -209,6 +209,7 @@ class PlayerMobileFragment : Fragment() {
 
                     when {
                         player.hasStarted() && !player.hasFinished() -> {
+                            watchItem?.isWatched = false
                             watchItem?.watchHistory = WatchItem.WatchHistory(
                                 lastEngagementTimeUtcMillis = System.currentTimeMillis(),
                                 lastPlaybackPositionMillis = player.currentPosition,
@@ -216,31 +217,21 @@ class PlayerMobileFragment : Fragment() {
                             )
                         }
                         player.hasFinished() -> {
+                            watchItem?.isWatched = true
                             watchItem?.watchHistory = null
                         }
                     }
 
-                    if (player.hasStarted()) {
-                        when (val videoType = args.videoType as PlayerFragment.VideoType) {
-                            is PlayerFragment.VideoType.Movie -> database.movieDao().updateWatched(
-                                id = videoType.id,
-                                isWatched = player.hasFinished()
-                            )
-                            is PlayerFragment.VideoType.Episode -> {
-                                if (player.hasFinished()) {
-                                    database.episodeDao().resetProgressionFromEpisode(videoType.id)
-                                }
-                                database.episodeDao().updateWatched(
-                                    id = videoType.id,
-                                    isWatched = player.hasFinished()
-                                )
-                            }
+                    when (val videoType = args.videoType as PlayerFragment.VideoType) {
+                        is PlayerFragment.VideoType.Movie -> {
+                            database.movieDao().update(watchItem as Movie)
                         }
-                    }
-
-                    when (args.videoType) {
-                        is PlayerFragment.VideoType.Movie -> database.movieDao().update(watchItem as Movie)
-                        is PlayerFragment.VideoType.Episode -> database.episodeDao().update(watchItem as Episode)
+                        is PlayerFragment.VideoType.Episode -> {
+                            if (player.hasFinished()) {
+                                database.episodeDao().resetProgressionFromEpisode(videoType.id)
+                            }
+                            database.episodeDao().update(watchItem as Episode)
+                        }
                     }
                 }
             }

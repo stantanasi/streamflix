@@ -23,7 +23,7 @@ class Episode(
     constructor() : this("", 0)
 
     var released = released?.toCalendar()
-    var isWatched: Boolean = false
+    override var isWatched: Boolean = false
     @Embedded
     override var watchHistory: WatchItem.WatchHistory? = null
 
