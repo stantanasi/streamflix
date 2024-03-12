@@ -22,6 +22,10 @@ interface TvShowDao {
     @Update
     fun update(tvShow: TvShow)
 
+    fun save(tvShow: TvShow) = getById(tvShow.id)
+        ?.let { update(tvShow) }
+        ?: insert(tvShow)
+
     @Query("UPDATE tv_shows SET isFavorite = :isFavorite WHERE id = :id")
     fun updateFavorite(id: String, isFavorite: Boolean)
 }

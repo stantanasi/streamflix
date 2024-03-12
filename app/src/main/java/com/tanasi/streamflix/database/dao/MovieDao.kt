@@ -25,6 +25,10 @@ interface MovieDao {
     @Update
     fun update(movie: Movie)
 
+    fun save(movie: Movie) = getById(movie.id)
+        ?.let { update(movie) }
+        ?: insert(movie)
+
     @Query("UPDATE movies SET isFavorite = :isFavorite WHERE id = :id")
     fun updateFavorite(id: String, isFavorite: Boolean)
 
