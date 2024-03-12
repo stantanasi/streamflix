@@ -14,7 +14,6 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.SpacingItemDecoration
-import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.viewModelsFactory
 
@@ -98,13 +97,14 @@ class SeasonMobileFragment : Fragment() {
     }
 
     private fun displaySeason(episodes: List<Episode>) {
-        val list = args.seasonNumber.takeIf { it != 0 }?.let {
-            database.episodeDao().getBySeasonId(args.seasonId)
-        } ?: database.episodeDao().getByTvShowId(args.tvShowId)
+        database.episodeDao().getByIds(episodes.map { it.id }).forEach { episodeDb ->
+            episodes.find { it.id == episodeDb.id }?.let { episode ->
+                episode.isWatched = episodeDb.isWatched
+                episode.watchHistory = episodeDb.watchHistory
+            }
+        }
 
         appAdapter.submitList(episodes.onEach { episode ->
-            episode.isWatched = list.find { it.id == episode.id }?.isWatched ?: false
-
             episode.tvShow = TvShow(
                 id = args.tvShowId,
                 title = args.tvShowTitle,
@@ -124,15 +124,9 @@ class SeasonMobileFragment : Fragment() {
 
         database.episodeDao().insertAll(episodes)
 
-        val episodeIndex = WatchNextUtils.programs(requireContext())
-            .filter { it.seriesId == args.tvShowId }
-            .sortedByDescending { it.lastEngagementTimeUtcMillis }
-            .let { programs ->
-                val program = programs.find { program ->
-                    episodes.any { it.id == program.contentId }
-                }
-                episodes.indexOfFirst { it.id == program?.contentId }.takeIf { it != -1 }
-            }
+        val episodeIndex = episodes
+            .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
+            .indexOfFirst { it.watchHistory != null }.takeIf { it != -1 }
             ?: episodes.indexOfLast { it.isWatched }
                 .takeIf { it != -1 && it + 1 < episodes.size }
                 ?.let { it + 1 }
