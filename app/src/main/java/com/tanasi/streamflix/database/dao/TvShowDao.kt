@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.tanasi.streamflix.models.TvShow
 
 @Dao
@@ -17,6 +18,9 @@ interface TvShowDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(tvShow: TvShow)
+
+    @Update
+    fun update(tvShow: TvShow)
 
     @Query("UPDATE tv_shows SET isFavorite = :isFavorite WHERE id = :id")
     fun updateFavorite(id: String, isFavorite: Boolean)

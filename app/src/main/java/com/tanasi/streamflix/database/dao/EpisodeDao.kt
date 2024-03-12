@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.tanasi.streamflix.models.Episode
 
 @Dao
@@ -23,6 +24,9 @@ interface EpisodeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(episodes: List<Episode>)
+
+    @Update
+    fun update(episode: Episode)
 
     @Query("UPDATE episodes SET isWatched = :isWatched WHERE id = :id")
     fun updateWatched(id: String, isWatched: Boolean)
