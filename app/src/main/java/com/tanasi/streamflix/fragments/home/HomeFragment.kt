@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.tvprovider.media.tv.TvContractCompat
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
@@ -16,9 +15,7 @@ import com.tanasi.streamflix.databinding.FragmentHomeBinding
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
-import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.utils.WatchNextUtils
 
 class HomeFragment : Fragment() {
 
@@ -116,35 +113,13 @@ class HomeFragment : Fragment() {
 
             Category(
                 name = getString(R.string.home_continue_watching),
-                list = WatchNextUtils.programs(requireContext())
-                    .sortedByDescending { it.lastEngagementTimeUtcMillis }
-                    .mapNotNull {
-                        when (it.type) {
-                            TvContractCompat.PreviewPrograms.TYPE_MOVIE -> Movie(
-                                id = it.contentId ?: "",
-                                title = it.title ?: "",
-                                released = it.releaseDate,
-                                poster = it.posterArtUri?.toString(),
-                            )
-                            TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE -> Episode(
-                                id = it.contentId,
-                                number = it.episodeNumber?.toIntOrNull() ?: 0,
-                                title = it.episodeTitle ?: "",
-
-                                tvShow = TvShow(
-                                    id = it.seriesId ?: "",
-                                    title = it.title ?: "",
-                                    poster = it.posterArtUri?.toString(),
-                                ),
-                                season = Season(
-                                    id = "",
-                                    number = it.seasonNumber?.toIntOrNull() ?: 0,
-                                    title = it.seasonTitle ?: "",
-                                ),
-                            )
-                            else -> null
-                        }
-                    }
+                list = listOf(
+                    database.movieDao().getWatchingMovies(),
+                    database.episodeDao().getWatchingEpisodes().onEach { episode ->
+                        episode.tvShow = episode.tvShow?.let { database.tvShowDao().getById(it.id) }
+                        episode.season = episode.season?.let { database.seasonDao().getById(it.id) }
+                    },
+                ).flatten().sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
             ).takeIf { it.list.isNotEmpty() }?.also {
                 it.list.onEach { show ->
                     when (show) {
