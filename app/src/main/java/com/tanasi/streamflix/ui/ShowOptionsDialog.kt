@@ -17,7 +17,6 @@ import com.tanasi.streamflix.fragments.season.SeasonFragment
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
@@ -56,10 +55,10 @@ class ShowOptionsDialog(
 
 
     private fun displayEpisode(episode: Episode) {
-        val saved = database.episodeDao().getById(episode.id)?.also {
-            episode.isWatched = it.isWatched
+        database.episodeDao().getById(episode.id)?.let { episodeDb ->
+            episode.isWatched = episodeDb.isWatched
+            episode.watchHistory = episodeDb.watchHistory
         }
-        val program = WatchNextUtils.getProgram(context, episode.id)
 
         Glide.with(context)
             .load(episode.poster ?: episode.tvShow?.poster)
@@ -106,19 +105,11 @@ class ShowOptionsDialog(
 
         binding.btnOptionShowWatched.apply {
             setOnClickListener {
-                saved?.let {
-                    database.episodeDao().updateWatched(
-                        id = episode.id,
-                        isWatched = !episode.isWatched
-                    )
-                    episode.isWatched = !episode.isWatched
-                } ?: let { _ ->
-                    episode.isWatched = !episode.isWatched
-                    database.episodeDao().insert(episode)
-                }
+                episode.isWatched = !episode.isWatched
                 if (episode.isWatched) {
-                    program?.let { WatchNextUtils.deleteProgramById(context, program.id) }
+                    episode.watchHistory = null
                 }
+                database.episodeDao().save(episode)
 
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
                     is HomeFragment -> fragment.refresh()
@@ -136,9 +127,11 @@ class ShowOptionsDialog(
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                if (program == null) return@setOnClickListener
+                if (episode.watchHistory == null) return@setOnClickListener
 
-                WatchNextUtils.deleteProgramById(context, program.id)
+                episode.watchHistory = null
+                database.episodeDao().save(episode)
+
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
                     is HomeFragment -> fragment.refresh()
                     is SeasonFragment -> fragment.refresh(episode)
@@ -147,18 +140,18 @@ class ShowOptionsDialog(
             }
 
             visibility = when {
-                program != null -> View.VISIBLE
+                episode.watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
     }
 
     private fun displayMovie(movie: Movie) {
-        val saved = database.movieDao().getById(movie.id)?.also {
-            movie.isFavorite = it.isFavorite
-            movie.isWatched = it.isWatched
+        database.movieDao().getById(movie.id)?.let { movieDb ->
+            movie.isFavorite = movieDb.isFavorite
+            movie.isWatched = movieDb.isWatched
+            movie.watchHistory = movieDb.watchHistory
         }
-        val program = WatchNextUtils.getProgram(context, movie.id)
 
         Glide.with(context)
             .load(movie.poster)
@@ -174,16 +167,8 @@ class ShowOptionsDialog(
 
         binding.btnOptionShowFavorite.apply {
             setOnClickListener {
-                saved?.let {
-                    database.movieDao().updateFavorite(
-                        id = movie.id,
-                        isFavorite = !movie.isFavorite
-                    )
-                    movie.isFavorite = !movie.isFavorite
-                } ?: let { _ ->
-                    movie.isFavorite = !movie.isFavorite
-                    database.movieDao().insert(movie)
-                }
+                movie.isFavorite = !movie.isFavorite
+                database.movieDao().save(movie)
 
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
                     is HomeFragment -> fragment.refresh()
@@ -200,19 +185,11 @@ class ShowOptionsDialog(
 
         binding.btnOptionShowWatched.apply {
             setOnClickListener {
-                saved?.let {
-                    database.movieDao().updateWatched(
-                        id = movie.id,
-                        isWatched = !movie.isWatched
-                    )
-                    movie.isWatched = !movie.isWatched
-                } ?: let { _ ->
-                    movie.isWatched = !movie.isWatched
-                    database.movieDao().insert(movie)
-                }
+                movie.isWatched = !movie.isWatched
                 if (movie.isWatched) {
-                    program?.let { WatchNextUtils.deleteProgramById(context, program.id) }
+                    movie.watchHistory = null
                 }
+                database.movieDao().save(movie)
 
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
                     is HomeFragment -> fragment.refresh()
@@ -229,9 +206,11 @@ class ShowOptionsDialog(
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                if (program == null) return@setOnClickListener
+                if (movie.watchHistory == null) return@setOnClickListener
 
-                WatchNextUtils.deleteProgramById(context, program.id)
+                movie.watchHistory = null
+                database.movieDao().save(movie)
+
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
                     is HomeFragment -> fragment.refresh()
                 }
@@ -239,15 +218,15 @@ class ShowOptionsDialog(
             }
 
             visibility = when {
-                program != null -> View.VISIBLE
+                movie.watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
     }
 
     private fun displayTvShow(tvShow: TvShow) {
-        val saved = database.tvShowDao().getById(tvShow.id)?.also {
-            tvShow.isFavorite = it.isFavorite
+        database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
+            tvShow.isFavorite = tvShowDb.isFavorite
         }
 
         Glide.with(context)
@@ -264,16 +243,8 @@ class ShowOptionsDialog(
 
         binding.btnOptionShowFavorite.apply {
             setOnClickListener {
-                saved?.let {
-                    database.tvShowDao().updateFavorite(
-                        id = tvShow.id,
-                        isFavorite = !tvShow.isFavorite
-                    )
-                    tvShow.isFavorite = !tvShow.isFavorite
-                } ?: let {
-                    tvShow.isFavorite = !tvShow.isFavorite
-                    database.tvShowDao().insert(tvShow)
-                }
+                tvShow.isFavorite = !tvShow.isFavorite
+                database.tvShowDao().save(tvShow)
 
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
                     is HomeFragment -> fragment.refresh()
