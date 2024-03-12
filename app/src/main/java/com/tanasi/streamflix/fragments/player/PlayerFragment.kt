@@ -23,17 +23,16 @@ import androidx.media3.ui.PlayerView
 import androidx.media3.ui.SubtitleView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.tvprovider.media.tv.TvContractCompat
-import androidx.tvprovider.media.tv.WatchNextProgram
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentExoControllerBinding
 import com.tanasi.streamflix.databinding.FragmentPlayerBinding
+import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.models.WatchItem
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
-import com.tanasi.streamflix.utils.WatchNextUtils
-import com.tanasi.streamflix.utils.map
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
@@ -240,83 +239,35 @@ class PlayerFragment : Fragment() {
                 binding.pvPlayer.keepScreenOn = isPlaying
 
                 if (!isPlaying) {
-                    val program = WatchNextUtils.getProgram(requireContext(), args.id)
+                    val watchItem = when (val videoType = args.videoType as VideoType) {
+                        is VideoType.Movie -> database.movieDao().getById(videoType.id)
+                        is VideoType.Episode -> database.episodeDao().getById(videoType.id)
+                    }
 
                     when {
                         player.hasStarted() && !player.hasFinished() -> {
-                            if (program == null) {
-                                val builder = WatchNextProgram.Builder()
-                                    .setTitle(args.title)
-                                    .setDescription(args.subtitle)
-                                    .setWatchNextType(TvContractCompat.WatchNextPrograms.WATCH_NEXT_TYPE_CONTINUE)
-                                    .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
-                                    .setLastPlaybackPositionMillis(player.currentPosition.toInt())
-                                    .setDurationMillis(player.duration.toInt())
-                                    .setContentId(args.id)
-                                    .setInternalProviderId(UserPreferences.currentProvider!!.name)
-
-                                when (val videoType = args.videoType as VideoType) {
-                                    is VideoType.Movie -> {
-                                        builder
-                                            .setType(TvContractCompat.PreviewPrograms.TYPE_MOVIE)
-                                            .setReleaseDate(videoType.releaseDate)
-                                            .setPosterArtUri(Uri.parse(videoType.poster))
-                                    }
-                                    is VideoType.Episode -> {
-                                        builder
-                                            .setType(TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE)
-                                            .setSeriesId(videoType.tvShow.id)
-                                            .setEpisodeNumber(videoType.number)
-                                            .setEpisodeTitle(videoType.title)
-                                            .setSeasonNumber(videoType.season.number)
-                                            .setSeasonTitle(videoType.season.title)
-                                            .setPosterArtUri(
-                                                Uri.parse(
-                                                    videoType.tvShow.poster
-                                                        ?: videoType.tvShow.banner
-                                                )
-                                            )
-                                    }
-                                }
-
-                                WatchNextUtils.insert(
-                                    requireContext(),
-                                    builder.build()
-                                )
-                            } else {
-                                WatchNextUtils.updateProgram(
-                                    requireContext(),
-                                    program.id,
-                                    WatchNextProgram.Builder(program)
-                                        .setLastEngagementTimeUtcMillis(System.currentTimeMillis())
-                                        .setLastPlaybackPositionMillis(player.currentPosition.toInt())
-                                        .setDurationMillis(player.duration.toInt())
-                                        .build()
-                                )
-                            }
+                            watchItem?.isWatched = false
+                            watchItem?.watchHistory = WatchItem.WatchHistory(
+                                lastEngagementTimeUtcMillis = System.currentTimeMillis(),
+                                lastPlaybackPositionMillis = player.currentPosition,
+                                durationMillis = player.duration,
+                            )
                         }
                         player.hasFinished() -> {
-                            if (program != null) {
-                                WatchNextUtils.deleteProgramById(requireContext(), program.id)
-                            }
+                            watchItem?.isWatched = true
+                            watchItem?.watchHistory = null
                         }
                     }
 
-                    if (player.hasStarted()) {
-                        when (val videoType = args.videoType as VideoType) {
-                            is VideoType.Movie -> database.movieDao().updateWatched(
-                                id = videoType.id,
-                                isWatched = player.hasFinished()
-                            )
-                            is VideoType.Episode -> {
-                                if (player.hasFinished()) {
-                                    database.episodeDao().resetProgressionFromEpisode(videoType.id)
-                                }
-                                database.episodeDao().updateWatched(
-                                    id = videoType.id,
-                                    isWatched = player.hasFinished()
-                                )
+                    when (val videoType = args.videoType as VideoType) {
+                        is VideoType.Movie -> {
+                            database.movieDao().update(watchItem as Movie)
+                        }
+                        is VideoType.Episode -> {
+                            if (player.hasFinished()) {
+                                database.episodeDao().resetProgressionFromEpisode(videoType.id)
                             }
+                            database.episodeDao().update(watchItem as Episode)
                         }
                     }
                 }
@@ -324,9 +275,12 @@ class PlayerFragment : Fragment() {
         })
 
         if (currentPosition == 0L) {
-            val lastPlaybackPositionMillis = WatchNextUtils.programs(requireContext())
-                .find { it.contentId == args.id }
-                ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
+            val watchItem = when (val videoType = args.videoType as VideoType) {
+                is VideoType.Movie -> database.movieDao().getById(videoType.id)
+                is VideoType.Episode -> database.episodeDao().getById(videoType.id)
+            }
+            val lastPlaybackPositionMillis = watchItem?.watchHistory
+                ?.let { it.lastPlaybackPositionMillis - 10.seconds.inWholeMilliseconds }
 
             player.seekTo(lastPlaybackPositionMillis ?: 0)
         } else {
