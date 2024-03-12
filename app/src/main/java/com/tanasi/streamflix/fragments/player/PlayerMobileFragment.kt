@@ -27,10 +27,12 @@ import com.tanasi.streamflix.R
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentExoControllerMobileBinding
 import com.tanasi.streamflix.databinding.FragmentPlayerMobileBinding
+import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.models.WatchItem
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
-import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
@@ -200,10 +202,21 @@ class PlayerMobileFragment : Fragment() {
                 binding.pvPlayer.keepScreenOn = isPlaying
 
                 if (!isPlaying) {
+                    val watchItem = when (val videoType = args.videoType as PlayerFragment.VideoType) {
+                        is PlayerFragment.VideoType.Movie -> database.movieDao().getById(videoType.id)
+                        is PlayerFragment.VideoType.Episode -> database.episodeDao().getById(videoType.id)
+                    }
+
                     when {
                         player.hasStarted() && !player.hasFinished() -> {
+                            watchItem?.watchHistory = WatchItem.WatchHistory(
+                                lastEngagementTimeUtcMillis = System.currentTimeMillis(),
+                                lastPlaybackPositionMillis = player.currentPosition,
+                                durationMillis = player.duration,
+                            )
                         }
                         player.hasFinished() -> {
+                            watchItem?.watchHistory = null
                         }
                     }
 
@@ -224,14 +237,22 @@ class PlayerMobileFragment : Fragment() {
                             }
                         }
                     }
+
+                    when (args.videoType) {
+                        is PlayerFragment.VideoType.Movie -> database.movieDao().update(watchItem as Movie)
+                        is PlayerFragment.VideoType.Episode -> database.episodeDao().update(watchItem as Episode)
+                    }
                 }
             }
         })
 
         if (currentPosition == 0L) {
-            val lastPlaybackPositionMillis = WatchNextUtils.programs(requireContext())
-                .find { it.contentId == args.id }
-                ?.let { it.lastPlaybackPositionMillis.toLong() - 10.seconds.inWholeMilliseconds }
+            val watchItem = when (val videoType = args.videoType as PlayerFragment.VideoType) {
+                is PlayerFragment.VideoType.Movie -> database.movieDao().getById(videoType.id)
+                is PlayerFragment.VideoType.Episode -> database.episodeDao().getById(videoType.id)
+            }
+            val lastPlaybackPositionMillis = watchItem?.watchHistory
+                ?.let { it.lastPlaybackPositionMillis - 10.seconds.inWholeMilliseconds }
 
             player.seekTo(lastPlaybackPositionMillis ?: 0)
         } else {
