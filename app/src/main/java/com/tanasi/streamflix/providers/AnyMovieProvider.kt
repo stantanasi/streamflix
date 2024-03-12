@@ -908,7 +908,7 @@ object AnyMovieProvider : Provider {
     }.substringBefore("?")
 
 
-    interface AllMoviesForYouService {
+    private interface AllMoviesForYouService {
 
         companion object {
             fun build(): AllMoviesForYouService {

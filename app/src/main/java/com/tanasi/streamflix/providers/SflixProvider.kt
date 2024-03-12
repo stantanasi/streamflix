@@ -722,7 +722,7 @@ object SflixProvider : Provider {
     }
 
 
-    interface SflixService {
+    private interface SflixService {
 
         companion object {
             fun build(): SflixService {

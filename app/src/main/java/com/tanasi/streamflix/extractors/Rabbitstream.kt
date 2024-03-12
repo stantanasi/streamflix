@@ -8,6 +8,7 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.StringConverterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -18,6 +19,7 @@ import retrofit2.http.Url
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
+import java.util.Date
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
@@ -26,22 +28,28 @@ open class Rabbitstream : Extractor() {
 
     override val name = "Rabbitstream"
     override val mainUrl = "https://rabbitstream.net"
-    protected open val embed = "ajax/embed-4"
+    protected open val embed = "ajax/v2/embed-4"
     protected open val key = "https://keys4.fun"
 
     override suspend fun extract(link: String): Video {
         val service = Service.build(mainUrl)
 
+        val keys = service.getSourceEncryptedKey(key).rabbitstream.keys
+
         val response = service.getSources(
             url = "$mainUrl/$embed/getSources",
             id = link.substringAfterLast("/").substringBefore("?"),
+            v = keys.v,
+            h = keys.h,
+            b = keys.b,
+            userAgent = keys.agent,
             referer = mainUrl,
         )
 
         val sources = when (response) {
             is Service.Sources -> response
             is Service.Sources.Encrypted -> response.decrypt(
-                keys = service.getSourceEncryptedKey(key).rabbitstream.keys
+                key = keys.key,
             )
         }
 
@@ -65,6 +73,81 @@ open class Rabbitstream : Extractor() {
         override val name = "Megacloud"
         override val mainUrl = "https://megacloud.tv"
         override val embed = "embed-2/ajax/e-1"
+        private val scriptUrl = "$mainUrl/js/player/a/prod/e1-player.min.js"
+
+        override suspend fun extract(link: String): Video {
+            val service = Service.build(mainUrl)
+
+            val response = service.getSources(
+                url = "$mainUrl/$embed/getSources",
+                id = link.substringAfterLast("/").substringBefore("?"),
+                referer = mainUrl,
+            )
+
+            val sources = when (response) {
+                is Service.Sources -> response
+                is Service.Sources.Encrypted -> {
+                    val (key, sources) = extractRealKey(response.sources)
+                    response.sources = sources
+                    response.decrypt(key)
+                }
+            }
+
+            val video = Video(
+                source = sources.sources.map { it.file }.firstOrNull() ?: "",
+                subtitles = sources.tracks
+                    .filter { it.kind == "captions" }
+                    .map {
+                        Video.Subtitle(
+                            label = it.label,
+                            file = it.file,
+                        )
+                    }
+            )
+
+            return video
+        }
+
+        private suspend fun extractRealKey(source: String): Pair<String, String> {
+            val rawKeys = getKeys()
+
+            var secret = ""
+            var encryptedSource = source
+            var totalInc = 0
+            for (i in 0 until rawKeys[0]) {
+                val start = rawKeys[(i + 1) * 2]
+                val inc = rawKeys[(i + 1) * 2 - 1]
+
+                val from = start + totalInc
+                val to = from + inc
+
+                secret += source.slice(from until to)
+                encryptedSource = encryptedSource.replace(
+                    source.substring(from, to),
+                    ""
+                )
+                totalInc += inc
+            }
+
+            return secret to encryptedSource
+        }
+
+        private suspend fun getKeys(): List<Int> {
+            val service = Service.build(mainUrl)
+            val script = service.getScript(scriptUrl, Date().time / 1000)
+
+            val keys = Regex("const \\w{1,2}=new URLSearchParams.+?;(?=function)")
+                .findAll(script).toList().lastOrNull()?.let { match ->
+                    match.value
+                        .substring(0, match.value.length - 1)
+                        .split("=")
+                        .drop(1)
+                        .mapNotNull { pair -> pair.split(",").first().replace("0x", "").toIntOrNull(16) }
+                }
+                ?: throw Exception("Can't retrieve encryption key")
+
+            return keys
+        }
     }
 
     class Dokicloud : Rabbitstream() {
@@ -79,6 +162,7 @@ open class Rabbitstream : Extractor() {
             fun build(baseUrl: String): Service {
                 val retrofit = Retrofit.Builder()
                     .baseUrl(baseUrl)
+                    .addConverterFactory(StringConverterFactory.create())
                     .addConverterFactory(
                         GsonConverterFactory.create(
                             GsonBuilder()
@@ -111,7 +195,28 @@ open class Rabbitstream : Extractor() {
         ): SourcesResponse
 
         @GET
+        @Headers(
+            "Accept: */*",
+            "Accept-Language: en-US,en;q=0.5",
+            "Connection: keep-alive",
+            "TE: trailers",
+            "X-Requested-With: XMLHttpRequest",
+        )
+        suspend fun getSources(
+            @Url url: String,
+            @Query("id") id: String,
+            @Query("v") v: String,
+            @Query("h") h: String,
+            @Query("b") b: String,
+            @Header("user-agent") userAgent: String,
+            @Header("referer") referer: String,
+        ): SourcesResponse
+
+        @GET
         suspend fun getSourceEncryptedKey(@Url url: String): KeysResponse
+
+        @GET
+        suspend fun getScript(@Url url: String, @Query("v") v: Long): String
 
 
         sealed class SourcesResponse {
@@ -139,16 +244,12 @@ open class Rabbitstream : Extractor() {
         ) : SourcesResponse() {
 
             data class Encrypted(
-                val sources: String,
+                var sources: String,
                 val sourcesBackup: String? = null,
                 val tracks: List<Track> = listOf(),
                 val server: Int? = null,
             ) : SourcesResponse() {
-                fun decrypt(keys: List<Int>): Sources {
-                    fun List<Int>.toByteArray(): ByteArray {
-                        return ByteArray(size) { index -> this[index].toByte() }
-                    }
-
+                fun decrypt(key: String): Sources {
                     fun decryptSourceUrl(decryptionKey: ByteArray, sourceUrl: String): String {
                         val cipherData = Base64.decode(sourceUrl, Base64.DEFAULT)
                         val encrypted = cipherData.copyOfRange(16, cipherData.size)
@@ -169,21 +270,19 @@ open class Rabbitstream : Extractor() {
                     fun generateKey(salt: ByteArray, secret: ByteArray): ByteArray {
                         fun md5(input: ByteArray) = MessageDigest.getInstance("MD5").digest(input)
 
-                        var key = md5(secret + salt)
-                        var currentKey = key
+                        var output = md5(secret + salt)
+                        var currentKey = output
                         while (currentKey.size < 48) {
-                            key = md5(key + secret + salt)
-                            currentKey += key
+                            output = md5(output + secret + salt)
+                            currentKey += output
                         }
                         return currentKey
                     }
 
-                    val keyString = Base64.encodeToString(keys.toByteArray(), Base64.NO_WRAP)
-
                     val decrypted = decryptSourceUrl(
                         generateKey(
                             Base64.decode(sources, Base64.DEFAULT).copyOfRange(8, 16),
-                            keyString.toByteArray(),
+                            key.toByteArray(),
                         ),
                         sources,
                     )
@@ -209,10 +308,24 @@ open class Rabbitstream : Extractor() {
         }
 
         data class KeysResponse(
-            val rabbitstream: Keys,
+            val rabbitstream: Rabbitstream,
+            val megacloud_m: MegacloudM,
         ) {
 
-            data class Keys(
+            data class Rabbitstream(
+                val keys: Keys,
+                val updated_at: Int,
+            ) {
+                data class Keys(
+                    val v: String,
+                    val h: String,
+                    val b: String,
+                    val agent: String,
+                    val key: String,
+                )
+            }
+
+            data class MegacloudM(
                 val keys: List<Int>,
                 val updated_at: Int,
             )
