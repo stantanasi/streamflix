@@ -54,14 +54,11 @@ import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragment
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragmentDirections
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsMobileFragment
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsMobileFragmentDirections
-import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
-import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.ShowOptionsDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.ui.SpacingItemDecoration
-import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
@@ -561,11 +558,8 @@ class TvShowViewHolder(
             }
 
             setOnClickListener {
-                database.tvShowDao().updateFavorite(
-                    id = tvShow.id,
-                    isFavorite = !tvShow.isFavorite
-                )
                 tvShow.isFavorite = !tvShow.isFavorite
+                database.tvShowDao().update(tvShow)
 
                 setImageDrawable(
                     ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
@@ -638,37 +632,14 @@ class TvShowViewHolder(
 
         binding.tvTvShowOverview.text = tvShow.overview
 
-        val episode = WatchNextUtils.programs(context)
-            .sortedByDescending { it.lastEngagementTimeUtcMillis }
-            .find { it.seriesId == tvShow.id }
-            ?.let {
-                Episode(
-                    id = it.contentId,
-                    number = it.episodeNumber?.toIntOrNull() ?: 0,
-                    title = it.episodeTitle ?: "",
-
-                    tvShow = TvShow(
-                        id = it.seriesId ?: "",
-                        title = it.title ?: "",
-                        poster = it.posterArtUri?.toString(),
-                    ),
-                    season = Season(
-                        id = "",
-                        number = it.seasonNumber?.toIntOrNull() ?: 0,
-                        title = it.seasonTitle ?: "",
-                    ),
-                )
-            }
-            ?: database.episodeDao().getByTvShowId(tvShow.id)
-                .let { episodes ->
-                    episodes.indexOfLast { it.isWatched }
-                        .takeIf { it != -1 && it + 1 < episodes.size }
-                        ?.let { episodes.getOrNull(it + 1) }
-                        ?: episodes.firstOrNull()
-                }
-                ?.also { episode ->
-                    episode.season = episode.season?.let { database.seasonDao().getById(it.id) }
-                }
+        val episodes = database.episodeDao().getByTvShowId(tvShow.id)
+        val episode = episodes
+            .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
+            .firstOrNull()
+            ?: episodes.indexOfLast { it.isWatched }
+                .takeIf { it != -1 && it + 1 < episodes.size }
+                ?.let { episodes.getOrNull(it + 1) }
+            ?: episodes.firstOrNull()
 
         binding.btnTvShowWatchEpisode.apply {
             setOnClickListener {
@@ -738,16 +709,14 @@ class TvShowViewHolder(
         }
 
         binding.pbTvShowProgressEpisode.apply {
-            val program = episode?.let {
-                WatchNextUtils.getProgram(context, episode.id)
-            }
+            val watchHistory = episode?.watchHistory
 
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
@@ -768,11 +737,8 @@ class TvShowViewHolder(
             }
 
             setOnClickListener {
-                database.tvShowDao().updateFavorite(
-                    id = tvShow.id,
-                    isFavorite = !tvShow.isFavorite
-                )
                 tvShow.isFavorite = !tvShow.isFavorite
+                database.tvShowDao().update(tvShow)
 
                 setImageDrawable(
                     ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
