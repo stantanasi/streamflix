@@ -27,7 +27,6 @@ import com.tanasi.streamflix.models.Show
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.OnSwipeTouchListener
 import com.tanasi.streamflix.ui.SpacingItemDecoration
-import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
@@ -254,9 +253,13 @@ class CategoryViewHolder(
 
     private fun displaySwiper(binding: ContentCategorySwiperBinding) {
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
-        val program = when (selected) {
-            is Movie -> WatchNextUtils.getProgram(context, selected.id)
-            is TvShow -> WatchNextUtils.getProgram(context, selected.id)
+        when (selected) {
+            is Movie -> database.movieDao().getById(selected.id)?.let { movieDb ->
+                selected.isFavorite = movieDb.isFavorite
+                selected.isWatched = movieDb.isWatched
+                selected.watchHistory = movieDb.watchHistory
+            }
+            is TvShow -> {}
         }
 
         val handler = Handler(Looper.getMainLooper())
@@ -382,12 +385,17 @@ class CategoryViewHolder(
         }
 
         binding.pbSwiperProgress.apply {
+            val watchHistory = when (selected) {
+                is Movie -> selected.watchHistory
+                is TvShow -> null
+            }
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
