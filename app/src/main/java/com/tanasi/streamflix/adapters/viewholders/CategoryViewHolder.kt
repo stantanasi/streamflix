@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentCategorySwiperBinding
 import com.tanasi.streamflix.databinding.ContentCategorySwiperMobileBinding
 import com.tanasi.streamflix.databinding.ItemCategoryBinding
@@ -38,6 +39,7 @@ class CategoryViewHolder(
 ) {
 
     private val context = itemView.context
+    private val database = AppDatabase.getInstance(context)
     private lateinit var category: Category
 
     val childRecyclerView: RecyclerView?
@@ -88,9 +90,13 @@ class CategoryViewHolder(
 
     private fun displayMobileSwiper(binding: ContentCategorySwiperMobileBinding) {
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
-        val program = when (selected) {
-            is Movie -> WatchNextUtils.getProgram(context, selected.id)
-            is TvShow -> WatchNextUtils.getProgram(context, selected.id)
+        when (selected) {
+            is Movie -> database.movieDao().getById(selected.id)?.let { movieDb ->
+                selected.isFavorite = movieDb.isFavorite
+                selected.isWatched = movieDb.isWatched
+                selected.watchHistory = movieDb.watchHistory
+            }
+            is TvShow -> {}
         }
 
         val handler = Handler(Looper.getMainLooper())
@@ -216,12 +222,17 @@ class CategoryViewHolder(
         }
 
         binding.pbSwiperProgress.apply {
+            val watchHistory = when (selected) {
+                is Movie -> selected.watchHistory
+                is TvShow -> null
+            }
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
