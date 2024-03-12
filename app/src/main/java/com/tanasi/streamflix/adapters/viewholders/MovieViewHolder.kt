@@ -102,7 +102,11 @@ class MovieViewHolder(
 
 
     private fun displayMobileItem(binding: ItemMovieMobileBinding) {
-        val program = WatchNextUtils.getProgram(context, movie.id)
+        database.movieDao().getById(movie.id)?.let { movieDb ->
+            movie.isFavorite = movieDb.isFavorite
+            movie.isWatched = movieDb.isWatched
+            movie.watchHistory = movieDb.watchHistory
+        }
 
         binding.root.apply {
             setOnClickListener {
@@ -150,12 +154,14 @@ class MovieViewHolder(
             ?: context.getString(R.string.movie_item_type)
 
         binding.pbMovieProgress.apply {
+            val watchHistory = movie.watchHistory
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
@@ -240,7 +246,11 @@ class MovieViewHolder(
     }
 
     private fun displayGridMobileItem(binding: ItemMovieGridMobileBinding) {
-        val program = WatchNextUtils.getProgram(context, movie.id)
+        database.movieDao().getById(movie.id)?.let { movieDb ->
+            movie.isFavorite = movieDb.isFavorite
+            movie.isWatched = movieDb.isWatched
+            movie.watchHistory = movieDb.watchHistory
+        }
 
         binding.root.apply {
             setOnClickListener {
@@ -293,12 +303,14 @@ class MovieViewHolder(
             ?: context.getString(R.string.movie_item_type)
 
         binding.pbMovieProgress.apply {
+            val watchHistory = movie.watchHistory
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
@@ -383,8 +395,6 @@ class MovieViewHolder(
 
 
     private fun displayMovieMobile(binding: ContentMovieMobileBinding) {
-        val program = WatchNextUtils.getProgram(context, movie.id)
-
         binding.ivMoviePoster.run {
             Glide.with(context)
                 .load(movie.poster)
@@ -463,12 +473,14 @@ class MovieViewHolder(
         }
 
         binding.pbMovieProgress.apply {
+            val watchHistory = movie.watchHistory
+
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
