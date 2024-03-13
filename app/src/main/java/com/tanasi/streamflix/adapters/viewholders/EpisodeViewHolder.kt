@@ -49,6 +49,7 @@ class EpisodeViewHolder(
     private fun displayMobileItem(binding: ItemEpisodeMobileBinding) {
         database.episodeDao().getById(episode.id)?.let { episodeDb ->
             episode.isWatched = episodeDb.isWatched
+            episode.watchedDate = episodeDb.watchedDate
             episode.watchHistory = episodeDb.watchHistory
         }
 
@@ -130,6 +131,7 @@ class EpisodeViewHolder(
     private fun displayItem(binding: ItemEpisodeBinding) {
         database.episodeDao().getById(episode.id)?.let { episodeDb ->
             episode.isWatched = episodeDb.isWatched
+            episode.watchedDate = episodeDb.watchedDate
             episode.watchHistory = episodeDb.watchHistory
         }
 
@@ -219,6 +221,7 @@ class EpisodeViewHolder(
     private fun displayContinueWatchingMobileItem(binding: ItemEpisodeContinueWatchingMobileBinding) {
         database.episodeDao().getById(episode.id)?.let { episodeDb ->
             episode.isWatched = episodeDb.isWatched
+            episode.watchedDate = episodeDb.watchedDate
             episode.watchHistory = episodeDb.watchHistory
         }
 
@@ -295,6 +298,7 @@ class EpisodeViewHolder(
     private fun displayContinueWatchingItem(binding: ItemEpisodeContinueWatchingBinding) {
         database.episodeDao().getById(episode.id)?.let { episodeDb ->
             episode.isWatched = episodeDb.isWatched
+            episode.watchedDate = episodeDb.watchedDate
             episode.watchHistory = episodeDb.watchHistory
         }
 

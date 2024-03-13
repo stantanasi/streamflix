@@ -93,6 +93,7 @@ class CategoryViewHolder(
             is Movie -> database.movieDao().getById(selected.id)?.let { movieDb ->
                 selected.isFavorite = movieDb.isFavorite
                 selected.isWatched = movieDb.isWatched
+                selected.watchedDate = movieDb.watchedDate
                 selected.watchHistory = movieDb.watchHistory
             }
             is TvShow -> {}
@@ -257,6 +258,7 @@ class CategoryViewHolder(
             is Movie -> database.movieDao().getById(selected.id)?.let { movieDb ->
                 selected.isFavorite = movieDb.isFavorite
                 selected.isWatched = movieDb.isWatched
+                selected.watchedDate = movieDb.watchedDate
                 selected.watchHistory = movieDb.watchHistory
             }
             is TvShow -> {}

@@ -123,6 +123,7 @@ class TvShowMobileFragment : Fragment() {
                     database.episodeDao().getByIds(state.episodes.map { it.id }).forEach { episodeDb ->
                         state.episodes.find { it.id == episodeDb.id }?.let { episode ->
                             episode.isWatched = episodeDb.isWatched
+                            episode.watchedDate = episodeDb.watchedDate
                             episode.watchHistory = episodeDb.watchHistory
                         }
                     }
