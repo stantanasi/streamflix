@@ -8,7 +8,9 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.utils.toCalendar
 import java.util.Calendar
 
-sealed class Show : AppAdapter.Item
+sealed interface Show : AppAdapter.Item {
+    var isFavorite: Boolean
+}
 
 @Entity("movies")
 class Movie(
@@ -32,12 +34,12 @@ class Movie(
     val cast: List<People> = listOf(),
     @Ignore
     val recommendations: List<Show> = listOf(),
-) : Show(), WatchItem, AppAdapter.Item, Cloneable {
+) : Show, WatchItem, AppAdapter.Item, Cloneable {
 
     constructor() : this("", "")
 
     var released = released?.toCalendar()
-    var isFavorite: Boolean = false
+    override var isFavorite: Boolean = false
     override var isWatched: Boolean = false
     override var watchedDate: Calendar? = null
     @Embedded
@@ -82,12 +84,12 @@ class TvShow(
     val cast: List<People> = listOf(),
     @Ignore
     val recommendations: List<Show> = listOf(),
-) : Show(), AppAdapter.Item, Cloneable {
+) : Show, AppAdapter.Item, Cloneable {
 
     constructor() : this("", "")
 
     var released = released?.toCalendar()
-    var isFavorite: Boolean = false
+    override var isFavorite: Boolean = false
 
 
     fun merge(tvShow: TvShow) {
