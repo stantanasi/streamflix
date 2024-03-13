@@ -37,6 +37,7 @@ import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.parcelize.Parcelize
+import java.util.Calendar
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -247,6 +248,7 @@ class PlayerFragment : Fragment() {
                     when {
                         player.hasStarted() && !player.hasFinished() -> {
                             watchItem?.isWatched = false
+                            watchItem?.watchedDate = null
                             watchItem?.watchHistory = WatchItem.WatchHistory(
                                 lastEngagementTimeUtcMillis = System.currentTimeMillis(),
                                 lastPlaybackPositionMillis = player.currentPosition,
@@ -255,6 +257,7 @@ class PlayerFragment : Fragment() {
                         }
                         player.hasFinished() -> {
                             watchItem?.isWatched = true
+                            watchItem?.watchedDate = Calendar.getInstance()
                             watchItem?.watchHistory = null
                         }
                     }

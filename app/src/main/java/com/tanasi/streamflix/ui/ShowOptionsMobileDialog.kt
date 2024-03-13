@@ -20,6 +20,7 @@ import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
+import java.util.Calendar
 
 class ShowOptionsMobileDialog(
     context: Context,
@@ -101,7 +102,10 @@ class ShowOptionsMobileDialog(
             setOnClickListener {
                 episode.isWatched = !episode.isWatched
                 if (episode.isWatched) {
+                    episode.watchedDate = Calendar.getInstance()
                     episode.watchHistory = null
+                } else {
+                    episode.watchedDate = null
                 }
                 database.episodeDao().save(episode)
 
@@ -181,7 +185,10 @@ class ShowOptionsMobileDialog(
             setOnClickListener {
                 movie.isWatched = !movie.isWatched
                 if (movie.isWatched) {
+                    movie.watchedDate = Calendar.getInstance()
                     movie.watchHistory = null
+                } else {
+                    movie.watchedDate = null
                 }
                 database.movieDao().save(movie)
 
