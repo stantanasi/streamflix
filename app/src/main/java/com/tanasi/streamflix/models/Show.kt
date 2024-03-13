@@ -6,6 +6,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.utils.toCalendar
+import java.util.Calendar
 
 sealed class Show : AppAdapter.Item
 
@@ -38,6 +39,7 @@ class Movie(
     var released = released?.toCalendar()
     var isFavorite: Boolean = false
     override var isWatched: Boolean = false
+    override var watchedDate: Calendar? = null
     @Embedded
     override var watchHistory: WatchItem.WatchHistory? = null
 

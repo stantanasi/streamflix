@@ -6,6 +6,7 @@ import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.utils.toCalendar
+import java.util.Calendar
 
 @Entity("episodes")
 class Episode(
@@ -24,6 +25,7 @@ class Episode(
 
     var released = released?.toCalendar()
     override var isWatched: Boolean = false
+    override var watchedDate: Calendar? = null
     @Embedded
     override var watchHistory: WatchItem.WatchHistory? = null
 
