@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentSeasonMobileBinding
@@ -132,7 +133,11 @@ class SeasonMobileFragment : Fragment() {
                 ?.let { it + 1 }
 
         if (episodeIndex != null) {
-            binding.rvEpisodes.scrollToPosition(episodeIndex)
+            val layoutManager = binding.rvEpisodes.layoutManager as? LinearLayoutManager
+            layoutManager?.scrollToPositionWithOffset(
+                episodeIndex,
+                binding.rvEpisodes.height / 2 - 100.dp(requireContext())
+            )
         }
     }
 }
