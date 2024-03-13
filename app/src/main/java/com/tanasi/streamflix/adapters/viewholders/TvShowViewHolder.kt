@@ -108,7 +108,7 @@ class TvShowViewHolder(
 
     private fun displayMobileItem(binding: ItemTvShowMobileBinding) {
         database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
-            tvShow.isFavorite = tvShowDb.isFavorite
+            tvShow.merge(tvShowDb)
         }
 
         binding.root.apply {
@@ -248,7 +248,7 @@ class TvShowViewHolder(
 
     private fun displayGridMobileItem(binding: ItemTvShowGridMobileBinding) {
         database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
-            tvShow.isFavorite = tvShowDb.isFavorite
+            tvShow.merge(tvShowDb)
         }
 
         binding.root.apply {

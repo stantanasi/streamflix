@@ -91,10 +91,7 @@ class CategoryViewHolder(
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
         when (selected) {
             is Movie -> database.movieDao().getById(selected.id)?.let { movieDb ->
-                selected.isFavorite = movieDb.isFavorite
-                selected.isWatched = movieDb.isWatched
-                selected.watchedDate = movieDb.watchedDate
-                selected.watchHistory = movieDb.watchHistory
+                selected.merge(movieDb)
             }
             is TvShow -> {}
         }
@@ -256,10 +253,7 @@ class CategoryViewHolder(
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
         when (selected) {
             is Movie -> database.movieDao().getById(selected.id)?.let { movieDb ->
-                selected.isFavorite = movieDb.isFavorite
-                selected.isWatched = movieDb.isWatched
-                selected.watchedDate = movieDb.watchedDate
-                selected.watchHistory = movieDb.watchHistory
+                selected.merge(movieDb)
             }
             is TvShow -> {}
         }

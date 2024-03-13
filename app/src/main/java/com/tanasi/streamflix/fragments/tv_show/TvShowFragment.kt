@@ -120,11 +120,8 @@ class TvShowFragment : Fragment() {
                 TvShowViewModel.SeasonState.Loading -> {}
                 is TvShowViewModel.SeasonState.SuccessLoading -> {
                     database.episodeDao().getByIds(state.episodes.map { it.id }).forEach { episodeDb ->
-                        state.episodes.find { it.id == episodeDb.id }?.let { episode ->
-                            episode.isWatched = episodeDb.isWatched
-                            episode.watchedDate = episodeDb.watchedDate
-                            episode.watchHistory = episodeDb.watchHistory
-                        }
+                        state.episodes.find { it.id == episodeDb.id }
+                            ?.merge(episodeDb)
                     }
 
                     state.episodes.onEach { episode ->
@@ -161,7 +158,7 @@ class TvShowFragment : Fragment() {
 
     private fun displayTvShow(tvShow: TvShow) {
         database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
-            tvShow.isFavorite = tvShowDb.isFavorite
+            tvShow.merge(tvShowDb)
         }
         database.tvShowDao().insert(tvShow)
 

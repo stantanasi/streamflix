@@ -57,9 +57,7 @@ class ShowOptionsDialog(
 
     private fun displayEpisode(episode: Episode) {
         database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.isWatched = episodeDb.isWatched
-            episode.watchedDate = episodeDb.watchedDate
-            episode.watchHistory = episodeDb.watchHistory
+            episode.merge(episodeDb)
         }
 
         Glide.with(context)
@@ -153,10 +151,7 @@ class ShowOptionsDialog(
 
     private fun displayMovie(movie: Movie) {
         database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.isFavorite = movieDb.isFavorite
-            movie.isWatched = movieDb.isWatched
-            movie.watchedDate = movieDb.watchedDate
-            movie.watchHistory = movieDb.watchHistory
+            movie.merge(movieDb)
         }
 
         Glide.with(context)
@@ -235,7 +230,7 @@ class ShowOptionsDialog(
 
     private fun displayTvShow(tvShow: TvShow) {
         database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
-            tvShow.isFavorite = tvShowDb.isFavorite
+            tvShow.merge(tvShowDb)
         }
 
         Glide.with(context)

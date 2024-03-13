@@ -30,6 +30,13 @@ class Episode(
     override var watchHistory: WatchItem.WatchHistory? = null
 
 
+    fun merge(episode: Episode) {
+        this.isWatched = episode.isWatched
+        this.watchedDate = episode.watchedDate
+        this.watchHistory = episode.watchHistory
+    }
+
+
     @Ignore
     override var itemType = AppAdapter.Type.EPISODE_ITEM
 }

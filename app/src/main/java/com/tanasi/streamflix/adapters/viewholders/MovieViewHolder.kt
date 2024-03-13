@@ -102,10 +102,7 @@ class MovieViewHolder(
 
     private fun displayMobileItem(binding: ItemMovieMobileBinding) {
         database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.isFavorite = movieDb.isFavorite
-            movie.isWatched = movieDb.isWatched
-            movie.watchedDate = movieDb.watchedDate
-            movie.watchHistory = movieDb.watchHistory
+            movie.merge(movieDb)
         }
 
         binding.root.apply {
@@ -169,10 +166,7 @@ class MovieViewHolder(
 
     private fun displayItem(binding: ItemMovieBinding) {
         database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.isFavorite = movieDb.isFavorite
-            movie.isWatched = movieDb.isWatched
-            movie.watchedDate = movieDb.watchedDate
-            movie.watchHistory = movieDb.watchHistory
+            movie.merge(movieDb)
         }
 
         binding.root.apply {
@@ -250,10 +244,7 @@ class MovieViewHolder(
 
     private fun displayGridMobileItem(binding: ItemMovieGridMobileBinding) {
         database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.isFavorite = movieDb.isFavorite
-            movie.isWatched = movieDb.isWatched
-            movie.watchedDate = movieDb.watchedDate
-            movie.watchHistory = movieDb.watchHistory
+            movie.merge(movieDb)
         }
 
         binding.root.apply {
@@ -322,10 +313,7 @@ class MovieViewHolder(
 
     private fun displayGridItem(binding: ItemMovieGridBinding) {
         database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.isFavorite = movieDb.isFavorite
-            movie.isWatched = movieDb.isWatched
-            movie.watchedDate = movieDb.watchedDate
-            movie.watchHistory = movieDb.watchHistory
+            movie.merge(movieDb)
         }
 
         binding.root.apply {

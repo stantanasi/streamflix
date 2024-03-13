@@ -96,11 +96,8 @@ class SeasonFragment : Fragment() {
 
     private fun displaySeason(episodes: List<Episode>) {
         database.episodeDao().getByIds(episodes.map { it.id }).forEach { episodeDb ->
-            episodes.find { it.id == episodeDb.id }?.let { episode ->
-                episode.isWatched = episodeDb.isWatched
-                episode.watchedDate = episodeDb.watchedDate
-                episode.watchHistory = episodeDb.watchHistory
-            }
+            episodes.find { it.id == episodeDb.id }
+                ?.merge(episodeDb)
         }
 
         appAdapter.submitList(episodes.onEach { episode ->

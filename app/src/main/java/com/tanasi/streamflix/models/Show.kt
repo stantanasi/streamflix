@@ -44,6 +44,14 @@ class Movie(
     override var watchHistory: WatchItem.WatchHistory? = null
 
 
+    fun merge(movie: Movie) {
+        this.isFavorite = movie.isFavorite
+        this.isWatched = movie.isWatched
+        this.watchedDate = movie.watchedDate
+        this.watchHistory = movie.watchHistory
+    }
+
+
     @Ignore
     override lateinit var itemType: AppAdapter.Type
 
@@ -80,6 +88,11 @@ class TvShow(
 
     var released = released?.toCalendar()
     var isFavorite: Boolean = false
+
+
+    fun merge(tvShow: TvShow) {
+        this.isFavorite = tvShow.isFavorite
+    }
 
 
     @Ignore
