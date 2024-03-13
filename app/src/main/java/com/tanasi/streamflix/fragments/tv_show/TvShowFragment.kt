@@ -12,7 +12,6 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentTvShowBinding
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.viewModelsFactory
 
 class TvShowFragment : Fragment() {
@@ -78,15 +77,10 @@ class TvShowFragment : Fragment() {
                                 }
                         }
 
-                        val episodeIndex = WatchNextUtils.programs(requireContext())
-                            .filter { it.seriesId == state.tvShow.id }
-                            .sortedByDescending { it.lastEngagementTimeUtcMillis }
-                            .let { programs ->
-                                val program = programs.find { program ->
-                                    episodes.any { it.id == program.contentId }
-                                }
-                                episodes.indexOfFirst { it.id == program?.contentId }.takeIf { it != -1 }
-                            }
+                        val episodeIndex = episodes
+                            .filter { it.watchHistory != null }
+                            .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
+                            .indexOfFirst { it.watchHistory != null }.takeIf { it != -1 }
                             ?: season?.episodes?.indexOfLast { it.isWatched }
                                 ?.takeIf { it != -1 && it + 1 < episodes.size }
                                 ?.let { it + 1 }
@@ -125,11 +119,14 @@ class TvShowFragment : Fragment() {
             when (state) {
                 TvShowViewModel.SeasonState.Loading -> {}
                 is TvShowViewModel.SeasonState.SuccessLoading -> {
-                    val episodes = database.episodeDao().getByTvShowId(state.tvShow.id)
-                    state.episodes.onEach { episode ->
-                        episode.isWatched = episodes.find { it.id == episode.id }?.isWatched
-                            ?: false
+                    database.episodeDao().getByIds(state.episodes.map { it.id }).forEach { episodeDb ->
+                        state.episodes.find { it.id == episodeDb.id }?.let { episode ->
+                            episode.isWatched = episodeDb.isWatched
+                            episode.watchHistory = episodeDb.watchHistory
+                        }
+                    }
 
+                    state.episodes.onEach { episode ->
                         episode.tvShow = state.tvShow
                         episode.season = state.season.takeIf { it.number != 0 }
                     }
@@ -162,8 +159,8 @@ class TvShowFragment : Fragment() {
     }
 
     private fun displayTvShow(tvShow: TvShow) {
-        database.tvShowDao().getById(tvShow.id)?.let {
-            tvShow.isFavorite = it.isFavorite
+        database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
+            tvShow.isFavorite = tvShowDb.isFavorite
         }
         database.tvShowDao().insert(tvShow)
 
