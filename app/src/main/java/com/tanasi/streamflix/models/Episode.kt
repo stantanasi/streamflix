@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.models
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
@@ -17,12 +18,14 @@ class Episode(
 
     var tvShow: TvShow? = null,
     var season: Season? = null,
-) : AppAdapter.Item {
+) : WatchItem, AppAdapter.Item {
 
     constructor() : this("", 0)
 
     var released = released?.toCalendar()
     var isWatched: Boolean = false
+    @Embedded
+    override var watchHistory: WatchItem.WatchHistory? = null
 
 
     @Ignore

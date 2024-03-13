@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.models
 
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
@@ -30,13 +31,15 @@ class Movie(
     val cast: List<People> = listOf(),
     @Ignore
     val recommendations: List<Show> = listOf(),
-) : Show(), AppAdapter.Item, Cloneable {
+) : Show(), WatchItem, AppAdapter.Item, Cloneable {
 
     constructor() : this("", "")
 
     var released = released?.toCalendar()
     var isFavorite: Boolean = false
     var isWatched: Boolean = false
+    @Embedded
+    override var watchHistory: WatchItem.WatchHistory? = null
 
 
     @Ignore
