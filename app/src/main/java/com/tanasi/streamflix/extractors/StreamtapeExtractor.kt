@@ -17,7 +17,7 @@ class StreamtapeExtractor : Extractor() {
         val linkJustParameter = link.replace(mainUrl, "")
         val linkVideoId = link.replace("https://streamtape.com/e/", "")
 
-        val service = VoeExtractorService.build(mainUrl)
+        val service = StreamtapeExtractorService.build(mainUrl)
         val source = service.getSource(linkJustParameter)
 
         val requestVideoParamters = source.html().split(linkVideoId)[10].split("').substring(")[0]
@@ -30,15 +30,15 @@ class StreamtapeExtractor : Extractor() {
         return video
     }
 
-    private interface VoeExtractorService {
+    private interface StreamtapeExtractorService {
         companion object {
-            fun build(baseUrl: String): VoeExtractorService {
+            fun build(baseUrl: String): StreamtapeExtractorService {
                 val retrofit = Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .build()
 
-                return retrofit.create(VoeExtractorService::class.java)
+                return retrofit.create(StreamtapeExtractorService::class.java)
             }
         }
 
