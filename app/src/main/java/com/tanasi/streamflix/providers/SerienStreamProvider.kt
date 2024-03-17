@@ -29,6 +29,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Url
 import java.io.File
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 
@@ -68,7 +69,7 @@ object SerienStreamProvider : Provider {
     suspend fun getPosterUrlFromTvShowLink(seriesLink: String): String {
         val seriesId = getTvShowIdFromLink(seriesLink)
         val document = service.getTvShow(seriesId)
-        val posterPath = document.select("img").attr("data-src")
+        val posterPath = document.selectFirst("img")?.attr("data-src")
         return url + posterPath
     }
 
@@ -80,9 +81,9 @@ object SerienStreamProvider : Provider {
                 list = document.select("div.container > div:nth-child(7) > div.previews div.coverListItem")
                     .map {
                         TvShow(
-                            id = getTvShowIdFromLink(it.select("a").attr("href")),
-                            title = it.select("a").text(),
-                            poster = url + it.select("img").attr("data-src")
+                            id = getTvShowIdFromLink(it.selectFirst("a")?.attr("href") ?: ""),
+                            title = it.selectFirst("a")?.text() ?: "",
+                            poster = url + it.selectFirst("img")?.attr("data-src")
                         )
                     })
         )
@@ -91,20 +92,20 @@ object SerienStreamProvider : Provider {
                 list = document.select("div.container > div:nth-child(11) > div.previews div.coverListItem")
                     .map {
                         TvShow(
-                            id = getTvShowIdFromLink(it.select("a").attr("href")),
-                            title = it.select("a").text(),
-                            poster = url + it.select("img").attr("data-src")
+                            id = getTvShowIdFromLink(it.selectFirst("a")?.attr("href") ?: ""),
+                            title = it.selectFirst("a")?.text() ?: "",
+                            poster = url + it.selectFirst("img")?.attr("data-src")
                         )
                     })
         )
         categories.add(
-            Category(name = "Recently Popular TV Shows",
+            Category(name = "Currently Popular TV Shows",
                 list = document.select("div.container > div:nth-child(16) > div.previews div.coverListItem")
                     .map {
                         TvShow(
-                            id = getTvShowIdFromLink(it.select("a").attr("href")),
-                            title = it.select("a").text(),
-                            poster = url + it.select("img").attr("data-src")
+                            id = getTvShowIdFromLink(it.selectFirst("a")?.attr("href") ?: ""),
+                            title = it.selectFirst("a")?.text() ?: "",
+                            poster = url + it.selectFirst("img")?.attr("data-src")
                         )
                     })
         )
@@ -115,11 +116,9 @@ object SerienStreamProvider : Provider {
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
         if (query.isEmpty()) {
             val document = service.getSeriesListWithCategories()
-            val genres = mutableListOf<Genre>()
-            document.select("#seriesContainer h3").map {
-                genres.add(Genre(id = it.text(), name = it.text()))
+            return document.select("#seriesContainer h3").map {
+                Genre(id = it.text().lowercase(Locale.getDefault()), name = it.text())
             }
-            return genres
         }
 
         if (page == 1) resultsCount = 0
@@ -128,18 +127,18 @@ object SerienStreamProvider : Provider {
         val allTitles = document.select("a[data-alternative-titles]")
         allTitles.filter { it ->
             it.text().contains(query, true)
-        }
-            .filter {
-                (resultsCount++ > ((page - 1) * 20)) && (resultsCount < (page * 20))
-            }.map {
-                tvShows.add(
-                    TvShow(
-                        id = getTvShowIdFromLink(it.attr("href")),
-                        title = it.text(),
-                        poster = getPosterUrlFromTvShowLink(it.attr("href"))
-                    )
+                    && (resultsCount > ((page - 1) * 20))
+                    && (resultsCount <= (page * 20))
+        }.map {
+            resultsCount++
+            tvShows.add(
+                TvShow(
+                    id = getTvShowIdFromLink(it.attr("href")),
+                    title = it.text(),
+                    poster = getPosterUrlFromTvShowLink(it.attr("href"))
                 )
-            }
+            )
+        }
         return tvShows
     }
 
@@ -149,25 +148,21 @@ object SerienStreamProvider : Provider {
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
         val document = service.getSeriesListAlphabet()
-        val tvShows = mutableListOf<TvShow>()
-        document.select(".genre > ul > li")
+        return document.select(".genre > ul > li")
             .filter { it ->
                 (it.siblingIndex() > ((page - 1) * 20)) && (it.siblingIndex() < (page * 20))
             }
             .map {
-                tvShows.add(
-                    TvShow(
-                        id = getTvShowIdFromLink(
-                            it.select("a[data-alternative-titles]").attr("href")
-                        ),
-                        title = it.select("a[data-alternative-titles]").text(),
-                        poster = getPosterUrlFromTvShowLink(
-                            it.select("a[data-alternative-titles]").attr("href")
-                        )
+                TvShow(
+                    id = getTvShowIdFromLink(
+                        it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
+                    ),
+                    title = it.selectFirst("a[data-alternative-titles]")?.text() ?: "",
+                    poster = getPosterUrlFromTvShowLink(
+                        it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
                     )
                 )
             }
-        return tvShows
     }
 
     override suspend fun getMovie(id: String): Movie {
@@ -178,8 +173,7 @@ object SerienStreamProvider : Provider {
         val document = service.getTvShow(id)
         val imdbTitleUrl = document.selectFirst("div.series-title a.imdb-link")?.attr("href") ?: ""
         val imdbDocument = service.getCustomUrl(imdbTitleUrl)
-
-        val tvShow = TvShow(
+        return TvShow(
             id = id,
             title = document.selectFirst("h1 > span")?.text() ?: "",
             overview = document.selectFirst("p.seri_des")?.attr("data-full-description") ?: "",
@@ -188,7 +182,12 @@ object SerienStreamProvider : Provider {
             rating = imdbDocument.selectFirst("div[data-testid='hero-rating-bar__aggregate-rating__score'] span")
                 ?.text()?.toDoubleOrNull() ?: 0.0,
             cast = document.select("div.cast li[itemprop='actor']")
-                .map { People(id = it.select("span").text(), name = it.select("span").text()) },
+                .map {
+                    People(
+                        id = it.selectFirst("span")?.text() ?: "",
+                        name = it.selectFirst("span")?.text() ?: ""
+                    )
+                },
             trailer = document.selectFirst("div[itemprop='trailer'] a")?.attr("href") ?: "",
             poster = url + document.selectFirst("div.seriesCoverBox img")?.attr("data-src"),
             banner = url + document.selectFirst("#series > section > div.backdrop")?.attr("style")
@@ -202,7 +201,6 @@ object SerienStreamProvider : Provider {
                         title = it.selectFirst("a")?.attr("title") ?: "",
                     )
                 })
-        return tvShow
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
@@ -211,38 +209,31 @@ object SerienStreamProvider : Provider {
         val seasonNumber = seasonIdSplitted[1]
 
         val document = service.getTvShowEpisodes(showName, seasonNumber)
-        val episodes = mutableListOf<Episode>()
-        document.select("tbody tr").map {
-            episodes.add(Episode(
+        return document.select("tbody tr").map {
+            Episode(
                 id = it.selectFirst("a")?.attr("href")?.let { it1 -> getEpisodeIdFromLink(it1) }
                     ?: "",
                 number = it.selectFirst("meta")?.attr("content")?.toIntOrNull() ?: 0,
                 title = it.selectFirst("strong")?.text() ?: "",
-            ))
+            )
         }
-        return episodes
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
         val shows = mutableListOf<TvShow>()
-        val document = service.getSeriesListWithCategories()
-        document.select("#seriesContainer .genre")
-            .filter { it -> it.select("h3").text() == id }.get(0)
-            .select("li")
-            .filter { it ->
-                it.siblingIndex() > ((page - 1) * 20)
-                        && it.siblingIndex() < ((page) * 20)
-            }
+        val document = service.getGenre(id, page)
+        document.select(".seriesListContainer > div")
             .map {
                 shows.add(
                     TvShow(
-                        id = it.select("a").attr("href"),
-                        title = it.select("a").text(),
-                        poster = getPosterUrlFromTvShowLink(it.select("a").attr("href"))
+                        id = it.selectFirst("a")?.attr("href")
+                            ?.let { it1 -> getTvShowIdFromLink(it1) }
+                            ?: "",
+                        title = it.selectFirst("h3")?.text() ?: "",
+                        poster = url + it.selectFirst("img")?.attr("data-src")
                     )
                 )
             }
-
         return Genre(id = id, name = id, shows = shows)
     }
 
@@ -260,23 +251,19 @@ object SerienStreamProvider : Provider {
         val episodeNumber = seasonIdSplitted[2]
 
         val document = service.getTvShowEpisodeServers(showName, seasonNumber, episodeNumber)
-        val servers = mutableListOf<Video.Server>()
-        document.select("div.hosterSiteVideo > ul > li").map {
-            val redirectUrl = url + it.select("a").attr("href")
+        return document.select("div.hosterSiteVideo > ul > li").map {
+            val redirectUrl = url + it.selectFirst("a")?.attr("href")
             val serverAfterRedirect = service.getRedirectLink(redirectUrl)
             val videoUrl = (serverAfterRedirect.raw() as okhttp3.Response).request.url
-            var videoUrlString = videoUrl.toString();
-            if (it.select("h4").text() == "VOE")
+            var videoUrlString = videoUrl.toString()
+            if (it.selectFirst("h4")?.text() == "VOE")
                 videoUrlString = "https://voe.sx" + videoUrl.encodedPath
 
-            servers.add(
-                Video.Server(
-                    id = videoUrlString,
-                    name = it.select("h4").text()
-                )
+            Video.Server(
+                id = videoUrlString,
+                name = it.selectFirst("h4")?.text() ?: ""
             )
         }
-        return servers
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
@@ -317,6 +304,12 @@ object SerienStreamProvider : Provider {
 
         @GET("serien-alphabet")
         suspend fun getSeriesListAlphabet(): Document
+
+        @GET("genre/{genreName}/{page}")
+        suspend fun getGenre(
+            @Path("genreName") genreName: String,
+            @Path("page") page: Int
+        ): Document
 
         @GET("serie/stream/{tvShowName}")
         suspend fun getTvShow(@Path("tvShowName") tvShowName: String): Document
