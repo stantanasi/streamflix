@@ -121,25 +121,17 @@ object SerienStreamProvider : Provider {
             }
         }
 
-        if (page == 1) resultsCount = 0
+        if (page == 2) return emptyList()
         val document = service.getSeriesListAlphabet()
-        val tvShows = mutableListOf<TvShow>()
-        val allTitles = document.select("a[data-alternative-titles]")
-        allTitles.filter { it ->
-            it.text().contains(query, true)
-                    && (resultsCount > ((page - 1) * 20))
-                    && (resultsCount <= (page * 20))
-        }.map {
-            resultsCount++
-            tvShows.add(
+        return document.select("a[data-alternative-titles]")
+            .filter { it -> it.text().contains(query, true) }
+            .map {
                 TvShow(
                     id = getTvShowIdFromLink(it.attr("href")),
                     title = it.text(),
-                    poster = getPosterUrlFromTvShowLink(it.attr("href"))
+                    //poster = getPosterUrlFromTvShowLink(it.attr("href"))
                 )
-            )
-        }
-        return tvShows
+            }
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
@@ -171,13 +163,15 @@ object SerienStreamProvider : Provider {
 
     override suspend fun getTvShow(id: String): TvShow {
         val document = service.getTvShow(id)
-        val imdbTitleUrl = document.selectFirst("div.series-title a.imdb-link")?.attr("href") ?: ""
+        val imdbTitleUrl =
+            document.selectFirst("div.series-title a.imdb-link")?.attr("href") ?: ""
         val imdbDocument = service.getCustomUrl(imdbTitleUrl)
         return TvShow(
             id = id,
             title = document.selectFirst("h1 > span")?.text() ?: "",
             overview = document.selectFirst("p.seri_des")?.attr("data-full-description") ?: "",
-            released = document.selectFirst("div.series-title > small > span:nth-child(1)")?.text()
+            released = document.selectFirst("div.series-title > small > span:nth-child(1)")
+                ?.text()
                 ?: "",
             rating = imdbDocument.selectFirst("div[data-testid='hero-rating-bar__aggregate-rating__score'] span")
                 ?.text()?.toDoubleOrNull() ?: 0.0,
@@ -190,7 +184,8 @@ object SerienStreamProvider : Provider {
                 },
             trailer = document.selectFirst("div[itemprop='trailer'] a")?.attr("href") ?: "",
             poster = url + document.selectFirst("div.seriesCoverBox img")?.attr("data-src"),
-            banner = url + document.selectFirst("#series > section > div.backdrop")?.attr("style")
+            banner = url + document.selectFirst("#series > section > div.backdrop")
+                ?.attr("style")
                 ?.replace("background-image: url(/", "")?.replace(")", ""),
             seasons = document.select("#stream > ul:nth-child(1) > li")
                 .filter { it -> it.select("a").size > 0 }.map {
@@ -278,8 +273,9 @@ object SerienStreamProvider : Provider {
 
             fun getOkHttpClient(): OkHttpClient {
                 val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
-                val bootstrapClient = Builder().cache(appCache).readTimeout(30, TimeUnit.SECONDS)
-                    .connectTimeout(30, TimeUnit.SECONDS).build()
+                val bootstrapClient =
+                    Builder().cache(appCache).readTimeout(30, TimeUnit.SECONDS)
+                        .connectTimeout(30, TimeUnit.SECONDS).build()
                 val dns =
                     DnsOverHttps.Builder().client(bootstrapClient).url(dnsQueryUrl.toHttpUrl())
                         .build()

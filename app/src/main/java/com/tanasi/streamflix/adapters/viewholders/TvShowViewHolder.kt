@@ -123,6 +123,7 @@ class TvShowViewHolder(
 
         Glide.with(context)
             .load(tvShow.poster)
+            .fallback(R.drawable.glide_fallback_cover)
             .centerCrop()
             .into(binding.ivTvShowPoster)
 
@@ -199,6 +200,7 @@ class TvShowViewHolder(
 
         Glide.with(context)
             .load(tvShow.poster)
+            .fallback(R.drawable.glide_fallback_cover)
             .centerCrop()
             .into(binding.ivTvShowPoster)
 
