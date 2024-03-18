@@ -495,11 +495,13 @@ class AppAdapter(
                     oldItem is Season && newItem is Season -> oldItem.id == newItem.id
                     oldItem is TvShow && newItem is TvShow -> oldItem.id == newItem.id
                     else -> false
-                }
+                } && oldItem.itemType.ordinal == newItem.itemType.ordinal
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return items[oldItemPosition] == list[newItemPosition]
+                val oldItem = items[oldItemPosition]
+                val newItem = list[newItemPosition]
+                return oldItem == newItem
             }
         })
 
