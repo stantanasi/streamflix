@@ -103,11 +103,11 @@ class MovieMobileFragment : Fragment() {
             movie.apply { itemType = AppAdapter.Type.MOVIE_MOBILE },
 
             movie.takeIf { it.cast.isNotEmpty() }
-                ?.clone()
+                ?.copy()
                 ?.apply { itemType = AppAdapter.Type.MOVIE_CASTS_MOBILE },
 
             movie.takeIf { it.recommendations.isNotEmpty() }
-                ?.clone()
+                ?.copy()
                 ?.apply { itemType = AppAdapter.Type.MOVIE_RECOMMENDATIONS_MOBILE },
         ))
     }

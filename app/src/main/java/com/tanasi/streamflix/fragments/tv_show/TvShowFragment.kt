@@ -170,7 +170,7 @@ class TvShowFragment : Fragment() {
             tvShow.apply { itemType = AppAdapter.Type.TV_SHOW },
 
             tvShow.takeIf { it.seasons.isNotEmpty() }
-                ?.clone()
+                ?.copy()
                 ?.apply {
                     seasons.onEach {
                         it.tvShow = tvShow
@@ -180,11 +180,11 @@ class TvShowFragment : Fragment() {
                 },
 
             tvShow.takeIf { it.cast.isNotEmpty() }
-                ?.clone()
+                ?.copy()
                 ?.apply { itemType = AppAdapter.Type.TV_SHOW_CASTS },
 
             tvShow.takeIf { it.recommendations.isNotEmpty() }
-                ?.clone()
+                ?.copy()
                 ?.apply { itemType = AppAdapter.Type.TV_SHOW_RECOMMENDATIONS },
         ))
     }

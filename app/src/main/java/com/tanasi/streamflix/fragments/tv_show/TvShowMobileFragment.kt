@@ -173,7 +173,7 @@ class TvShowMobileFragment : Fragment() {
             tvShow.apply { itemType = AppAdapter.Type.TV_SHOW_MOBILE },
 
             tvShow.takeIf { it.seasons.isNotEmpty() }
-                ?.clone()
+                ?.copy()
                 ?.apply {
                     seasons.onEach {
                         it.tvShow = tvShow
@@ -183,11 +183,11 @@ class TvShowMobileFragment : Fragment() {
                 },
 
             tvShow.takeIf { it.cast.isNotEmpty() }
-                ?.clone()
+                ?.copy()
                 ?.apply { itemType = AppAdapter.Type.TV_SHOW_CASTS_MOBILE },
 
             tvShow.takeIf { it.recommendations.isNotEmpty() }
-                ?.clone()
+                ?.copy()
                 ?.apply { itemType = AppAdapter.Type.TV_SHOW_RECOMMENDATIONS_MOBILE },
         ))
     }
