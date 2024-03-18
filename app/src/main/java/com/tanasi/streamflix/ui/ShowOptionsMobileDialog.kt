@@ -61,10 +61,10 @@ class ShowOptionsMobileDialog(
 
         binding.tvOptionsShowTitle.text = episode.title
 
-        binding.tvShowSubtitle.text = episode.season?.number?.let { seasonNumber ->
+        binding.tvShowSubtitle.text = episode.season?.takeIf { it.number != 0 }?.let { season ->
             context.getString(
                 R.string.episode_item_info,
-                seasonNumber,
+                season.number,
                 episode.number,
                 episode.title,
             )

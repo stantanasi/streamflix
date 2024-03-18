@@ -470,19 +470,18 @@ class TvShowViewHolder(
                     TvShowMobileFragmentDirections.actionTvShowToPlayer(
                         id = episode.id,
                         title = tvShow.title,
-                        subtitle = when (val season = episode.season) {
-                            null -> context.getString(
-                                R.string.player_subtitle_tv_show_episode_only,
-                                episode.number,
-                                episode.title
-                            )
-                            else -> context.getString(
+                        subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
+                            context.getString(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
                                 episode.number,
                                 episode.title
                             )
-                        },
+                        } ?: context.getString(
+                            R.string.player_subtitle_tv_show_episode_only,
+                            episode.number,
+                            episode.title
+                        ),
                         videoType = PlayerFragment.VideoType.Episode(
                             id = episode.id,
                             number = episode.number,
@@ -504,17 +503,16 @@ class TvShowViewHolder(
             }
 
             text = if (episode != null) {
-                when (val season = episode.season) {
-                    null -> context.getString(
-                        R.string.tv_show_watch_episode,
-                        episode.number
-                    )
-                    else -> context.getString(
+                episode.season?.takeIf { it.number != 0 }?.let { season ->
+                    context.getString(
                         R.string.tv_show_watch_season_episode,
                         season.number,
                         episode.number
                     )
-                }
+                } ?: context.getString(
+                    R.string.tv_show_watch_episode,
+                    episode.number
+                )
             } else ""
             visibility = when {
                 episode != null -> View.VISIBLE
@@ -649,19 +647,18 @@ class TvShowViewHolder(
                     TvShowFragmentDirections.actionTvShowToPlayer(
                         id = episode.id,
                         title = tvShow.title,
-                        subtitle = when (val season = episode.season) {
-                            null -> context.getString(
-                                R.string.player_subtitle_tv_show_episode_only,
-                                episode.number,
-                                episode.title
-                            )
-                            else -> context.getString(
+                        subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
+                            context.getString(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
                                 episode.number,
                                 episode.title
                             )
-                        },
+                        } ?: context.getString(
+                            R.string.player_subtitle_tv_show_episode_only,
+                            episode.number,
+                            episode.title
+                        ),
                         videoType = PlayerFragment.VideoType.Episode(
                             id = episode.id,
                             number = episode.number,
@@ -683,17 +680,16 @@ class TvShowViewHolder(
             }
 
             text = if (episode != null) {
-                when (val season = episode.season) {
-                    null -> context.getString(
-                        R.string.tv_show_watch_episode,
-                        episode.number
-                    )
-                    else -> context.getString(
+                episode.season?.takeIf { it.number != 0 }?.let { season ->
+                    context.getString(
                         R.string.tv_show_watch_season_episode,
                         season.number,
                         episode.number
                     )
-                }
+                } ?: context.getString(
+                    R.string.tv_show_watch_episode,
+                    episode.number
+                )
             } else ""
             visibility = when {
                 episode != null -> View.VISIBLE

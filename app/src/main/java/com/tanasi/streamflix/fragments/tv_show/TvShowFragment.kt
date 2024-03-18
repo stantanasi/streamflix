@@ -126,7 +126,7 @@ class TvShowFragment : Fragment() {
 
                     state.episodes.onEach { episode ->
                         episode.tvShow = state.tvShow
-                        episode.season = state.season.takeIf { it.number != 0 }
+                        episode.season = state.season
                     }
                     database.episodeDao().insertAll(state.episodes)
                     appAdapter.notifyItemChanged(0)

@@ -107,13 +107,11 @@ class SeasonFragment : Fragment() {
                 poster = args.tvShowPoster,
                 banner = args.tvShowBanner,
             )
-            episode.season = args.seasonNumber.takeIf { it != 0 }?.let {
-                Season(
-                    id = args.seasonId,
-                    number = args.seasonNumber,
-                    title = args.seasonTitle,
-                )
-            }
+            episode.season = Season(
+                id = args.seasonId,
+                number = args.seasonNumber,
+                title = args.seasonTitle,
+            )
         })
 
         database.episodeDao().insertAll(episodes)

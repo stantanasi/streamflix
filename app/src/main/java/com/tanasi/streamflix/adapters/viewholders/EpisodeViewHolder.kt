@@ -57,7 +57,7 @@ class EpisodeViewHolder(
                     SeasonMobileFragmentDirections.actionSeasonToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
-                        subtitle = episode.season?.let { season ->
+                        subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
                             context.getString(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
@@ -137,7 +137,7 @@ class EpisodeViewHolder(
                     SeasonFragmentDirections.actionSeasonToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
-                        subtitle = episode.season?.let { season ->
+                        subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
                             context.getString(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
@@ -225,7 +225,18 @@ class EpisodeViewHolder(
                     HomeMobileFragmentDirections.actionHomeToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
-                        subtitle = "S${episode.season?.number ?: 0} E${episode.number} • ${episode.title}",
+                        subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
+                            context.getString(
+                                R.string.player_subtitle_tv_show,
+                                season.number,
+                                episode.number,
+                                episode.title
+                            )
+                        } ?: context.getString(
+                            R.string.player_subtitle_tv_show_episode_only,
+                            episode.number,
+                            episode.title
+                        ),
                         videoType = PlayerFragment.VideoType.Episode(
                             id = episode.id,
                             number = episode.number,
@@ -275,7 +286,7 @@ class EpisodeViewHolder(
 
         binding.tvEpisodeTvShowTitle.text = episode.tvShow?.title ?: ""
 
-        binding.tvEpisodeInfo.text = episode.season?.let { season ->
+        binding.tvEpisodeInfo.text = episode.season?.takeIf { it.number != 0 }?.let { season ->
             context.getString(
                 R.string.episode_item_info,
                 season.number,
@@ -300,7 +311,18 @@ class EpisodeViewHolder(
                     HomeFragmentDirections.actionHomeToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
-                        subtitle = "S${episode.season?.number ?: 0} E${episode.number} • ${episode.title}",
+                        subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
+                            context.getString(
+                                R.string.player_subtitle_tv_show,
+                                season.number,
+                                episode.number,
+                                episode.title
+                            )
+                        } ?: context.getString(
+                            R.string.player_subtitle_tv_show_episode_only,
+                            episode.number,
+                            episode.title
+                        ),
                         videoType = PlayerFragment.VideoType.Episode(
                             id = episode.id,
                             number = episode.number,
@@ -366,7 +388,7 @@ class EpisodeViewHolder(
 
         binding.tvEpisodeTvShowTitle.text = episode.tvShow?.title ?: ""
 
-        binding.tvEpisodeInfo.text = episode.season?.let { season ->
+        binding.tvEpisodeInfo.text = episode.season?.takeIf { it.number != 0 }?.let { season ->
             context.getString(
                 R.string.episode_item_info,
                 season.number,
