@@ -1,7 +1,5 @@
 package com.tanasi.streamflix.providers
 
-import androidx.annotation.OptIn
-import androidx.media3.common.util.UnstableApi
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
@@ -36,7 +34,6 @@ interface Provider {
 
     suspend fun getPeople(id: String, page: Int = 1): People
 
-    @OptIn(UnstableApi::class)
     suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server>
 
     suspend fun getVideo(server: Video.Server): Video

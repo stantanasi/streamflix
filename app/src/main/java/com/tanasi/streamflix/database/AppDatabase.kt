@@ -1,8 +1,6 @@
 package com.tanasi.streamflix.database
 
 import android.content.Context
-import androidx.annotation.OptIn
-import androidx.media3.common.util.UnstableApi
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -42,7 +40,6 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
-        @UnstableApi
         fun setup(context: Context) {
             if (UserPreferences.currentProvider == null) return
 
@@ -56,7 +53,6 @@ abstract class AppDatabase : RoomDatabase() {
                 buildDatabase(context).also { INSTANCE = it }
             }
 
-        @OptIn(UnstableApi::class)
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(
                 context = context.applicationContext,

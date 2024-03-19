@@ -1,7 +1,5 @@
 package com.tanasi.streamflix.providers
 
-import androidx.annotation.OptIn
-import androidx.media3.common.util.UnstableApi
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
@@ -236,7 +234,6 @@ object SerienStreamProvider : Provider {
         return People(id = id, name = id)
     }
 
-    @OptIn(UnstableApi::class)
     override suspend fun getServers(
         id: String, videoType: PlayerFragment.VideoType
     ): List<Video.Server> {
