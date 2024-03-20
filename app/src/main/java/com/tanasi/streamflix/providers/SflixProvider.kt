@@ -742,7 +742,6 @@ object SflixProvider : Provider {
             }
         }
 
-
         @GET("home")
         suspend fun getHome(): Document
 
