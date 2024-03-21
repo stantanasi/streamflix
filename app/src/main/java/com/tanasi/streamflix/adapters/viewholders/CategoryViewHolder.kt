@@ -209,6 +209,7 @@ class CategoryViewHolder(
 
         binding.btnSwiperWatchNow.apply {
             setOnClickListener {
+                handler.removeCallbacksAndMessages(null)
                 findNavController().navigate(
                     when (selected) {
                         is Movie -> HomeMobileFragmentDirections.actionHomeToMovie(selected.id)
