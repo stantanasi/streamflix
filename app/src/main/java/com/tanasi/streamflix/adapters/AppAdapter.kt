@@ -528,9 +528,11 @@ class AppAdapter(
 
 
     fun setOnLoadMoreListener(onLoadMoreListener: (() -> Unit)?) {
-        this.onLoadMoreListener = onLoadMoreListener
-        if (onLoadMoreListener == null) {
+        if (this.onLoadMoreListener != null && onLoadMoreListener == null) {
+            this.onLoadMoreListener = null
             notifyItemRemoved(items.size)
+        } else {
+            this.onLoadMoreListener = onLoadMoreListener
         }
     }
 }
