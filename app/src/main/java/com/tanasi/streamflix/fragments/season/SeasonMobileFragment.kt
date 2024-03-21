@@ -123,7 +123,8 @@ class SeasonMobileFragment : Fragment() {
 
         val episodeIndex = episodes
             .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
-            .indexOfFirst { it.watchHistory != null }.takeIf { it != -1 }
+            .firstOrNull { it.watchHistory != null }
+            ?.let { episodes.indexOf(it) }
             ?: episodes.indexOfLast { it.isWatched }
                 .takeIf { it != -1 && it + 1 < episodes.size }
                 ?.let { it + 1 }
