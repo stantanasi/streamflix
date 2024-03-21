@@ -52,6 +52,7 @@ class Season(
         if (poster != other.poster) return false
         if (tvShow != other.tvShow) return false
         if (episodes != other.episodes) return false
+        if (!::itemType.isInitialized || !other::itemType.isInitialized) return false
         return itemType == other.itemType
     }
 
@@ -62,7 +63,7 @@ class Season(
         result = 31 * result + poster.hashCode()
         result = 31 * result + (tvShow?.hashCode() ?: 0)
         result = 31 * result + episodes.hashCode()
-        result = 31 * result + itemType.hashCode()
+        result = 31 * result + (if (::itemType.isInitialized) itemType.hashCode() else 0)
         return result
     }
 }

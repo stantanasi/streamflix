@@ -104,6 +104,7 @@ class TvShow(
         if (recommendations != other.recommendations) return false
         if (released != other.released) return false
         if (isFavorite != other.isFavorite) return false
+        if (!::itemType.isInitialized || !other::itemType.isInitialized) return false
         return itemType == other.itemType
     }
 
@@ -124,7 +125,7 @@ class TvShow(
         result = 31 * result + recommendations.hashCode()
         result = 31 * result + (released?.hashCode() ?: 0)
         result = 31 * result + isFavorite.hashCode()
-        result = 31 * result + itemType.hashCode()
+        result = 31 * result + (if (::itemType.isInitialized) itemType.hashCode() else 0)
         return result
     }
 }

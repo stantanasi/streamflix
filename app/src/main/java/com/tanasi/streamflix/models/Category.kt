@@ -32,6 +32,7 @@ class Category(
         if (list != other.list) return false
         if (selectedIndex != other.selectedIndex) return false
         if (itemSpacing != other.itemSpacing) return false
+        if (!::itemType.isInitialized || !other::itemType.isInitialized) return false
         return itemType == other.itemType
     }
 
@@ -40,7 +41,7 @@ class Category(
         result = 31 * result + list.hashCode()
         result = 31 * result + selectedIndex
         result = 31 * result + itemSpacing
-        result = 31 * result + itemType.hashCode()
+        result = 31 * result + (if (::itemType.isInitialized) itemType.hashCode() else 0)
         return result
     }
 

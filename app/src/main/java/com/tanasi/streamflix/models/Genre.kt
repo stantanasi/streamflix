@@ -31,6 +31,7 @@ class Genre(
         if (id != other.id) return false
         if (name != other.name) return false
         if (shows != other.shows) return false
+        if (!::itemType.isInitialized || !other::itemType.isInitialized) return false
         return itemType == other.itemType
     }
 
@@ -38,7 +39,7 @@ class Genre(
         var result = id.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + shows.hashCode()
-        result = 31 * result + itemType.hashCode()
+        result = 31 * result + (if (::itemType.isInitialized) itemType.hashCode() else 0)
         return result
     }
 }

@@ -35,6 +35,7 @@ class People(
         if (name != other.name) return false
         if (image != other.image) return false
         if (filmography != other.filmography) return false
+        if (!::itemType.isInitialized || !other::itemType.isInitialized) return false
         return itemType == other.itemType
     }
 
@@ -43,7 +44,7 @@ class People(
         result = 31 * result + name.hashCode()
         result = 31 * result + (image?.hashCode() ?: 0)
         result = 31 * result + filmography.hashCode()
-        result = 31 * result + itemType.hashCode()
+        result = 31 * result + (if (::itemType.isInitialized) itemType.hashCode() else 0)
         return result
     }
 }
