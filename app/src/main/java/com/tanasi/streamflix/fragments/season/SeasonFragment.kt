@@ -112,6 +112,8 @@ class SeasonFragment : Fragment() {
                 number = args.seasonNumber,
                 title = args.seasonTitle,
             )
+
+            episode.itemType = AppAdapter.Type.EPISODE_ITEM
         })
 
         database.episodeDao().insertAll(episodes)

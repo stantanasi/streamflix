@@ -85,7 +85,9 @@ class ProvidersFragment : Fragment() {
     }
 
     private fun displayProviders(providers: List<Provider>) {
-        appAdapter.submitList(providers)
+        appAdapter.submitList(providers.onEach {
+            it.itemType = AppAdapter.Type.PROVIDER_ITEM
+        })
 
         binding.rvProviders.requestFocus()
     }

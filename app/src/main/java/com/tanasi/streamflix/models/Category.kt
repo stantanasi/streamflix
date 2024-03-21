@@ -7,11 +7,11 @@ class Category(
     val list: List<AppAdapter.Item>,
 ) : AppAdapter.Item {
 
-    var selectedIndex = 0
+    var selectedIndex: Int = 0
     var itemSpacing: Int = 0
 
 
-    override var itemType = AppAdapter.Type.CATEGORY_ITEM
+    override lateinit var itemType: AppAdapter.Type
 
 
     fun copy(

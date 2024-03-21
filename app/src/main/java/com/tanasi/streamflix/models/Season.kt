@@ -22,7 +22,7 @@ class Season(
 
 
     @Ignore
-    override var itemType = AppAdapter.Type.SEASON_ITEM
+    override lateinit var itemType: AppAdapter.Type
 
     fun copy(
         id: String = this.id,

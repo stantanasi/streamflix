@@ -10,7 +10,7 @@ class People(
     val filmography: List<Show> = listOf(),
 ) : AppAdapter.Item {
 
-    override var itemType = AppAdapter.Type.PEOPLE_ITEM
+    override lateinit var itemType: AppAdapter.Type
 
 
     fun copy(
