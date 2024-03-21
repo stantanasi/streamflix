@@ -750,7 +750,7 @@ class TvShowViewHolder(
     private fun displaySeasonsMobile(binding: ContentTvShowSeasonsMobileBinding) {
         binding.rvTvShowSeasons.apply {
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.seasons.onEach {
+                submitList(tvShow.seasons.onEach {
                     it.itemType = AppAdapter.Type.SEASON_MOBILE_ITEM
                 })
             }
@@ -764,7 +764,9 @@ class TvShowViewHolder(
         binding.hgvTvShowSeasons.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.seasons)
+                submitList(tvShow.seasons.onEach {
+                    it.itemType = AppAdapter.Type.SEASON_ITEM
+                })
             }
             setItemSpacing(80)
         }
@@ -773,7 +775,7 @@ class TvShowViewHolder(
     private fun displayCastsMobile(binding: ContentTvShowCastsMobileBinding) {
         binding.rvTvShowCasts.apply {
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.cast.onEach {
+                submitList(tvShow.cast.onEach {
                     it.itemType = AppAdapter.Type.PEOPLE_MOBILE_ITEM
                 })
             }
@@ -787,7 +789,9 @@ class TvShowViewHolder(
         binding.hgvTvShowCasts.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.cast)
+                submitList(tvShow.cast.onEach {
+                    it.itemType = AppAdapter.Type.PEOPLE_ITEM
+                })
             }
             setItemSpacing(80)
         }
@@ -796,7 +800,7 @@ class TvShowViewHolder(
     private fun displayRecommendationsMobile(binding: ContentTvShowRecommendationsMobileBinding) {
         binding.rvTvShowRecommendations.apply {
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.recommendations.onEach {
+                submitList(tvShow.recommendations.onEach {
                     when (it) {
                         is Movie -> it.itemType = AppAdapter.Type.MOVIE_MOBILE_ITEM
                         is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_MOBILE_ITEM
@@ -813,7 +817,7 @@ class TvShowViewHolder(
         binding.hgvTvShowRecommendations.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.recommendations.onEach {
+                submitList(tvShow.recommendations.onEach {
                     when (it) {
                         is Movie -> it.itemType = AppAdapter.Type.MOVIE_ITEM
                         is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_ITEM

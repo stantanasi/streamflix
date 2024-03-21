@@ -66,7 +66,7 @@ class CategoryViewHolder(
 
         binding.rvCategory.apply {
             adapter = AppAdapter().apply {
-                items.addAll(category.list)
+                submitList(category.list)
             }
             if (itemDecorationCount == 0) {
                 addItemDecoration(SpacingItemDecoration(category.itemSpacing))
@@ -80,7 +80,7 @@ class CategoryViewHolder(
         binding.hgvCategory.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(category.list)
+                submitList(category.list)
             }
             setItemSpacing(category.itemSpacing)
         }

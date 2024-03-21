@@ -634,7 +634,7 @@ class MovieViewHolder(
     private fun displayCastsMobile(binding: ContentMovieCastsMobileBinding) {
         binding.rvMovieCasts.apply {
             adapter = AppAdapter().apply {
-                items.addAll(movie.cast.onEach {
+                submitList(movie.cast.onEach {
                     it.itemType = AppAdapter.Type.PEOPLE_MOBILE_ITEM
                 })
             }
@@ -648,7 +648,9 @@ class MovieViewHolder(
         binding.hgvMovieCasts.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(movie.cast)
+                submitList(movie.cast.onEach {
+                    it.itemType = AppAdapter.Type.PEOPLE_ITEM
+                })
             }
             setItemSpacing(80)
         }
@@ -657,7 +659,7 @@ class MovieViewHolder(
     private fun displayRecommendationsMobile(binding: ContentMovieRecommendationsMobileBinding) {
         binding.rvMovieRecommendations.apply {
             adapter = AppAdapter().apply {
-                items.addAll(movie.recommendations.onEach {
+                submitList(movie.recommendations.onEach {
                     when (it) {
                         is Movie -> it.itemType = AppAdapter.Type.MOVIE_MOBILE_ITEM
                         is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_MOBILE_ITEM
@@ -674,7 +676,7 @@ class MovieViewHolder(
         binding.hgvMovieRecommendations.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(movie.recommendations.onEach {
+                submitList(movie.recommendations.onEach {
                     when (it) {
                         is Movie -> it.itemType = AppAdapter.Type.MOVIE_ITEM
                         is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_ITEM
