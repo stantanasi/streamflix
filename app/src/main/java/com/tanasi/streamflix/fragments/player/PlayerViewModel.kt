@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    videoType: PlayerFragment.VideoType,
+    videoType: Video.Type,
     id: String,
 ) : ViewModel() {
 
@@ -34,7 +34,7 @@ class PlayerViewModel(
 
 
     private fun getServers(
-        videoType: PlayerFragment.VideoType,
+        videoType: Video.Type,
         id: String,
     ) = viewModelScope.launch(Dispatchers.IO) {
         _state.postValue(State.LoadingServers)

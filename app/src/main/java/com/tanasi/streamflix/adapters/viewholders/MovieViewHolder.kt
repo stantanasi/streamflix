@@ -43,7 +43,6 @@ import com.tanasi.streamflix.fragments.people.PeopleFragment
 import com.tanasi.streamflix.fragments.people.PeopleFragmentDirections
 import com.tanasi.streamflix.fragments.people.PeopleMobileFragment
 import com.tanasi.streamflix.fragments.people.PeopleMobileFragmentDirections
-import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.fragments.search.SearchFragment
 import com.tanasi.streamflix.fragments.search.SearchFragmentDirections
 import com.tanasi.streamflix.fragments.search.SearchMobileFragment
@@ -54,6 +53,7 @@ import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.ui.ShowOptionsDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.ui.SpacingItemDecoration
@@ -458,7 +458,7 @@ class MovieViewHolder(
                         id = movie.id,
                         title = movie.title,
                         subtitle = movie.released?.format("yyyy") ?: "",
-                        videoType = PlayerFragment.VideoType.Movie(
+                        videoType = Video.Type.Movie(
                             id = movie.id,
                             title = movie.title,
                             releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",
@@ -579,7 +579,7 @@ class MovieViewHolder(
                         id = movie.id,
                         title = movie.title,
                         subtitle = movie.released?.format("yyyy") ?: "",
-                        videoType = PlayerFragment.VideoType.Movie(
+                        videoType = Video.Type.Movie(
                             id = movie.id,
                             title = movie.title,
                             releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",

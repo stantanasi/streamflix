@@ -2,7 +2,6 @@ package com.tanasi.streamflix.fragments.player
 
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,46 +35,11 @@ import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
-import kotlinx.parcelize.Parcelize
 import java.util.Calendar
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class PlayerFragment : Fragment() {
-
-    sealed class VideoType : Parcelable {
-        @Parcelize
-        data class Movie(
-            val id: String,
-            val title: String,
-            val releaseDate: String,
-            val poster: String,
-        ) : VideoType()
-
-        @Parcelize
-        data class Episode(
-            val id: String,
-            val number: Int,
-            val title: String,
-            val poster: String?,
-            val tvShow: TvShow,
-            val season: Season,
-        ) : VideoType() {
-            @Parcelize
-            data class TvShow(
-                val id: String,
-                val title: String,
-                val poster: String?,
-                val banner: String?,
-            ) : Parcelable
-
-            @Parcelize
-            data class Season(
-                val number: Int,
-                val title: String,
-            ) : Parcelable
-        }
-    }
 
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
@@ -240,9 +204,9 @@ class PlayerFragment : Fragment() {
                 binding.pvPlayer.keepScreenOn = isPlaying
 
                 if (!isPlaying) {
-                    val watchItem = when (val videoType = args.videoType as VideoType) {
-                        is VideoType.Movie -> database.movieDao().getById(videoType.id)
-                        is VideoType.Episode -> database.episodeDao().getById(videoType.id)
+                    val watchItem = when (val videoType = args.videoType as Video.Type) {
+                        is Video.Type.Movie -> database.movieDao().getById(videoType.id)
+                        is Video.Type.Episode -> database.episodeDao().getById(videoType.id)
                     }
 
                     when {
@@ -262,11 +226,11 @@ class PlayerFragment : Fragment() {
                         }
                     }
 
-                    when (val videoType = args.videoType as VideoType) {
-                        is VideoType.Movie -> {
+                    when (val videoType = args.videoType as Video.Type) {
+                        is Video.Type.Movie -> {
                             database.movieDao().update(watchItem as Movie)
                         }
-                        is VideoType.Episode -> {
+                        is Video.Type.Episode -> {
                             if (player.hasFinished()) {
                                 database.episodeDao().resetProgressionFromEpisode(videoType.id)
                             }
@@ -278,9 +242,9 @@ class PlayerFragment : Fragment() {
         })
 
         if (currentPosition == 0L) {
-            val watchItem = when (val videoType = args.videoType as VideoType) {
-                is VideoType.Movie -> database.movieDao().getById(videoType.id)
-                is VideoType.Episode -> database.episodeDao().getById(videoType.id)
+            val watchItem = when (val videoType = args.videoType as Video.Type) {
+                is Video.Type.Movie -> database.movieDao().getById(videoType.id)
+                is Video.Type.Episode -> database.episodeDao().getById(videoType.id)
             }
             val lastPlaybackPositionMillis = watchItem?.watchHistory
                 ?.let { it.lastPlaybackPositionMillis - 10.seconds.inWholeMilliseconds }

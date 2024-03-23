@@ -203,9 +203,9 @@ class PlayerMobileFragment : Fragment() {
                 binding.pvPlayer.keepScreenOn = isPlaying
 
                 if (!isPlaying) {
-                    val watchItem = when (val videoType = args.videoType as PlayerFragment.VideoType) {
-                        is PlayerFragment.VideoType.Movie -> database.movieDao().getById(videoType.id)
-                        is PlayerFragment.VideoType.Episode -> database.episodeDao().getById(videoType.id)
+                    val watchItem = when (val videoType = args.videoType as Video.Type) {
+                        is Video.Type.Movie -> database.movieDao().getById(videoType.id)
+                        is Video.Type.Episode -> database.episodeDao().getById(videoType.id)
                     }
 
                     when {
@@ -225,11 +225,11 @@ class PlayerMobileFragment : Fragment() {
                         }
                     }
 
-                    when (val videoType = args.videoType as PlayerFragment.VideoType) {
-                        is PlayerFragment.VideoType.Movie -> {
+                    when (val videoType = args.videoType as Video.Type) {
+                        is Video.Type.Movie -> {
                             database.movieDao().update(watchItem as Movie)
                         }
-                        is PlayerFragment.VideoType.Episode -> {
+                        is Video.Type.Episode -> {
                             if (player.hasFinished()) {
                                 database.episodeDao().resetProgressionFromEpisode(videoType.id)
                             }
@@ -241,9 +241,9 @@ class PlayerMobileFragment : Fragment() {
         })
 
         if (currentPosition == 0L) {
-            val watchItem = when (val videoType = args.videoType as PlayerFragment.VideoType) {
-                is PlayerFragment.VideoType.Movie -> database.movieDao().getById(videoType.id)
-                is PlayerFragment.VideoType.Episode -> database.episodeDao().getById(videoType.id)
+            val watchItem = when (val videoType = args.videoType as Video.Type) {
+                is Video.Type.Movie -> database.movieDao().getById(videoType.id)
+                is Video.Type.Episode -> database.episodeDao().getById(videoType.id)
             }
             val lastPlaybackPositionMillis = watchItem?.watchHistory
                 ?.let { it.lastPlaybackPositionMillis - 10.seconds.inWholeMilliseconds }

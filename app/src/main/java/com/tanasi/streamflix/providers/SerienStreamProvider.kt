@@ -3,7 +3,6 @@ package com.tanasi.streamflix.providers
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
-import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -234,9 +233,7 @@ object SerienStreamProvider : Provider {
         throw Exception("Not yet implemented")
     }
 
-    override suspend fun getServers(
-        id: String, videoType: PlayerFragment.VideoType
-    ): List<Video.Server> {
+    override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         val seasonIdSplitted = id.split("/")
         val showName = seasonIdSplitted[0]
         val seasonNumber = seasonIdSplitted[1]

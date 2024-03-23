@@ -15,10 +15,10 @@ import com.tanasi.streamflix.databinding.ItemEpisodeMobileBinding
 import com.tanasi.streamflix.fragments.home.HomeFragment
 import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
-import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.fragments.season.SeasonFragmentDirections
 import com.tanasi.streamflix.fragments.season.SeasonMobileFragmentDirections
 import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.ui.ShowOptionsDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.utils.getCurrentFragment
@@ -69,18 +69,18 @@ class EpisodeViewHolder(
                             episode.number,
                             episode.title
                         ),
-                        videoType = PlayerFragment.VideoType.Episode(
+                        videoType = Video.Type.Episode(
                             id = episode.id,
                             number = episode.number,
                             title = episode.title,
                             poster = episode.poster,
-                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                            tvShow = Video.Type.Episode.TvShow(
                                 id = episode.tvShow?.id ?: "",
                                 title = episode.tvShow?.title ?: "",
                                 poster = episode.tvShow?.poster,
                                 banner = episode.tvShow?.banner,
                             ),
-                            season = PlayerFragment.VideoType.Episode.Season(
+                            season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
                                 title = episode.season?.title ?: "",
                             ),
@@ -149,18 +149,18 @@ class EpisodeViewHolder(
                             episode.number,
                             episode.title
                         ),
-                        videoType = PlayerFragment.VideoType.Episode(
+                        videoType = Video.Type.Episode(
                             id = episode.id,
                             number = episode.number,
                             title = episode.title,
                             poster = episode.poster,
-                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                            tvShow = Video.Type.Episode.TvShow(
                                 id = episode.tvShow?.id ?: "",
                                 title = episode.tvShow?.title ?: "",
                                 poster = episode.tvShow?.poster,
                                 banner = episode.tvShow?.banner,
                             ),
-                            season = PlayerFragment.VideoType.Episode.Season(
+                            season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
                                 title = episode.season?.title ?: "",
                             ),
@@ -238,18 +238,18 @@ class EpisodeViewHolder(
                             episode.number,
                             episode.title
                         ),
-                        videoType = PlayerFragment.VideoType.Episode(
+                        videoType = Video.Type.Episode(
                             id = episode.id,
                             number = episode.number,
                             title = episode.title,
                             poster = episode.poster,
-                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                            tvShow = Video.Type.Episode.TvShow(
                                 id = episode.tvShow?.id ?: "",
                                 title = episode.tvShow?.title ?: "",
                                 poster = episode.tvShow?.poster,
                                 banner = episode.tvShow?.banner,
                             ),
-                            season = PlayerFragment.VideoType.Episode.Season(
+                            season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
                                 title = episode.season?.title ?: "",
                             ),
@@ -324,18 +324,18 @@ class EpisodeViewHolder(
                             episode.number,
                             episode.title
                         ),
-                        videoType = PlayerFragment.VideoType.Episode(
+                        videoType = Video.Type.Episode(
                             id = episode.id,
                             number = episode.number,
                             title = episode.title,
                             poster = episode.poster,
-                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                            tvShow = Video.Type.Episode.TvShow(
                                 id = episode.tvShow?.id ?: "",
                                 title = episode.tvShow?.title ?: "",
                                 poster = episode.tvShow?.poster,
                                 banner = episode.tvShow?.banner,
                             ),
-                            season = PlayerFragment.VideoType.Episode.Season(
+                            season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
                                 title = episode.season?.title ?: "",
                             ),

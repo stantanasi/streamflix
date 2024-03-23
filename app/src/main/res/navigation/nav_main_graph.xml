@@ -57,7 +57,7 @@
             app:argType="string" />
         <argument
             android:name="videoType"
-            app:argType="com.tanasi.streamflix.fragments.player.PlayerFragment$VideoType" />
+            app:argType="com.tanasi.streamflix.models.Video$Type" />
     </fragment>
     <fragment
         android:id="@+id/tv_show"

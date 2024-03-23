@@ -41,7 +41,6 @@ import com.tanasi.streamflix.fragments.people.PeopleFragment
 import com.tanasi.streamflix.fragments.people.PeopleFragmentDirections
 import com.tanasi.streamflix.fragments.people.PeopleMobileFragment
 import com.tanasi.streamflix.fragments.people.PeopleMobileFragmentDirections
-import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.fragments.search.SearchFragment
 import com.tanasi.streamflix.fragments.search.SearchFragmentDirections
 import com.tanasi.streamflix.fragments.search.SearchMobileFragment
@@ -56,6 +55,7 @@ import com.tanasi.streamflix.fragments.tv_shows.TvShowsMobileFragment
 import com.tanasi.streamflix.fragments.tv_shows.TvShowsMobileFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.ui.ShowOptionsDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.ui.SpacingItemDecoration
@@ -484,18 +484,18 @@ class TvShowViewHolder(
                             episode.number,
                             episode.title
                         ),
-                        videoType = PlayerFragment.VideoType.Episode(
+                        videoType = Video.Type.Episode(
                             id = episode.id,
                             number = episode.number,
                             title = episode.title,
                             poster = episode.poster,
-                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                            tvShow = Video.Type.Episode.TvShow(
                                 id = tvShow.id,
                                 title = tvShow.title,
                                 poster = tvShow.poster,
                                 banner = tvShow.banner,
                             ),
-                            season = PlayerFragment.VideoType.Episode.Season(
+                            season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
                                 title = episode.season?.title ?: "",
                             ),
@@ -661,18 +661,18 @@ class TvShowViewHolder(
                             episode.number,
                             episode.title
                         ),
-                        videoType = PlayerFragment.VideoType.Episode(
+                        videoType = Video.Type.Episode(
                             id = episode.id,
                             number = episode.number,
                             title = episode.title,
                             poster = episode.poster,
-                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                            tvShow = Video.Type.Episode.TvShow(
                                 id = tvShow.id,
                                 title = tvShow.title,
                                 poster = tvShow.poster,
                                 banner = tvShow.banner,
                             ),
-                            season = PlayerFragment.VideoType.Episode.Season(
+                            season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
                                 title = episode.season?.title ?: "",
                             ),

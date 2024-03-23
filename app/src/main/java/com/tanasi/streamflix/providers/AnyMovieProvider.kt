@@ -3,7 +3,6 @@ package com.tanasi.streamflix.providers
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
-import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -860,10 +859,10 @@ object AnyMovieProvider : Provider {
     }
 
 
-    override suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server> {
+    override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         val document = when (videoType) {
-            is PlayerFragment.VideoType.Movie -> service.getMovie(id)
-            is PlayerFragment.VideoType.Episode -> service.getEpisode(id)
+            is Video.Type.Movie -> service.getMovie(id)
+            is Video.Type.Episode -> service.getEpisode(id)
         }
 
         val servers = document.select("ul.optnslst button").map {
