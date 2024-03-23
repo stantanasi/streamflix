@@ -354,10 +354,10 @@ object SflixProvider : Provider {
             overview = document.selectFirst("div.description")
                 ?.ownText() ?: "",
             released = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Released") ?: false }
+                .find { it.select(".type").text().contains("Released") }
                 ?.ownText()?.trim(),
             runtime = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Duration") ?: false }
+                .find { it.select(".type").text().contains("Duration") }
                 ?.ownText()?.removeSuffix("min")?.trim()?.toIntOrNull(),
             trailer = document.selectFirst("iframe#iframe-trailer")
                 ?.attr("data-src")?.substringAfterLast("/")
@@ -372,7 +372,7 @@ object SflixProvider : Provider {
                 ?.attr("style")?.substringAfter("background-image: url(")?.substringBefore(");"),
 
             genres = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Genre") ?: false }
+                .find { it.select(".type").text().contains("Genre") }
                 ?.select("a")?.map {
                     Genre(
                         id = it.attr("href").substringAfter("/genre/"),
@@ -380,7 +380,7 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             cast = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Casts") ?: false }
+                .find { it.select(".type").text().contains("Casts") }
                 ?.select("a")?.map {
                     People(
                         id = it.attr("href").substringAfter("/cast/"),
@@ -447,10 +447,10 @@ object SflixProvider : Provider {
             overview = document.selectFirst("div.description")
                 ?.ownText() ?: "",
             released = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Released") ?: false }
+                .find { it.select(".type").text().contains("Released") }
                 ?.ownText()?.trim(),
             runtime = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Duration") ?: false }
+                .find { it.select(".type").text().contains("Duration") }
                 ?.ownText()?.removeSuffix("min")?.trim()?.toIntOrNull(),
             trailer = document.selectFirst("iframe#iframe-trailer")
                 ?.attr("data-src")?.substringAfterLast("/")
@@ -474,7 +474,7 @@ object SflixProvider : Provider {
                     )
                 },
             genres = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Genre") ?: false }
+                .find { it.select(".type").text().contains("Genre") }
                 ?.select("a")?.map {
                     Genre(
                         id = it.attr("href").substringAfter("/genre/"),
@@ -482,7 +482,7 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             cast = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Casts") ?: false }
+                .find { it.select(".type").text().contains("Casts") }
                 ?.select("a")?.map {
                     People(
                         id = it.attr("href").substringAfter("/cast/"),

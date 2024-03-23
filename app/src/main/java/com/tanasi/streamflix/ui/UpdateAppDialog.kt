@@ -7,7 +7,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.view.isVisible
 import com.tanasi.streamflix.BuildConfig
-import com.tanasi.streamflix.databinding.DialogUpdateBinding
+import com.tanasi.streamflix.databinding.DialogUpdateAppBinding
 import com.tanasi.streamflix.utils.GitHub
 
 class UpdateAppDialog(
@@ -15,7 +15,7 @@ class UpdateAppDialog(
     release: GitHub.Release
 ) : Dialog(context) {
 
-    private val binding = DialogUpdateBinding.inflate(LayoutInflater.from(context))
+    private val binding = DialogUpdateAppBinding.inflate(LayoutInflater.from(context))
 
     var isLoading: Boolean
         get() = binding.pbUpdateIsLoading.isVisible

@@ -613,7 +613,6 @@ object HiAnimeProvider : Provider {
                 when (it) {
                     is Movie -> it.id
                     is TvShow -> it.id
-                    else -> it
                 }
             }
         )

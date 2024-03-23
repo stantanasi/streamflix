@@ -117,6 +117,7 @@ fun <T> List<T>.findClosest(value: Float, selector: (T) -> Float): T? {
 inline fun <reified T : ViewModel> Fragment.viewModelsFactory(crossinline viewModelInitialization: () -> T): Lazy<T> {
     return viewModels {
         object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return viewModelInitialization.invoke() as T
             }

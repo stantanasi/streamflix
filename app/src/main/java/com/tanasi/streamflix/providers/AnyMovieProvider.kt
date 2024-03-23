@@ -850,7 +850,6 @@ object AnyMovieProvider : Provider {
                     when (it) {
                         is Movie -> it.released
                         is TvShow -> it.released
-                        else -> null
                     }
                 },
         )
@@ -869,7 +868,7 @@ object AnyMovieProvider : Provider {
             val nmopt = it.selectFirst("span")?.text() ?: ""
             Video.Server(
                 id = it.attr("data-id"),
-                name = it.select("span")[1]?.text() ?: "",
+                name = it.select("span").getOrNull(1)?.text() ?: "",
                 src = document.selectFirst("div#VideoOption${nmopt}")
                     ?.selectFirst("iframe")
                     ?.attr("src")

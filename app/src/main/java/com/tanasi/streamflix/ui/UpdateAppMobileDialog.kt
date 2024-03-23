@@ -7,7 +7,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.view.isVisible
 import com.tanasi.streamflix.BuildConfig
-import com.tanasi.streamflix.databinding.DialogUpdateMobileBinding
+import com.tanasi.streamflix.databinding.DialogUpdateAppMobileBinding
 import com.tanasi.streamflix.utils.GitHub
 
 class UpdateAppMobileDialog(
@@ -15,7 +15,7 @@ class UpdateAppMobileDialog(
     release: GitHub.Release,
 ) : Dialog(context) {
 
-    private val binding = DialogUpdateMobileBinding.inflate(LayoutInflater.from(context))
+    private val binding = DialogUpdateAppMobileBinding.inflate(LayoutInflater.from(context))
 
     var isLoading: Boolean
         get() = binding.pbUpdateIsLoading.isVisible

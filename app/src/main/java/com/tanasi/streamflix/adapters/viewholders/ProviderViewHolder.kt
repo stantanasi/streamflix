@@ -4,7 +4,6 @@ import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
-import com.tanasi.streamflix.activities.main.MainActivity
 import com.tanasi.streamflix.databinding.ItemProviderBinding
 import com.tanasi.streamflix.databinding.ItemProviderMobileBinding
 import com.tanasi.streamflix.models.Provider
