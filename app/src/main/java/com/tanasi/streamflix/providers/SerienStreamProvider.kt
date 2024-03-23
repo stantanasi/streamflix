@@ -125,8 +125,7 @@ object SerienStreamProvider : Provider {
             .map {
                 TvShow(
                     id = getTvShowIdFromLink(it.attr("href")),
-                    title = it.text(),
-                    //poster = getPosterUrlFromTvShowLink(it.attr("href"))
+                    title = it.text()
                 )
             }
     }
@@ -138,18 +137,12 @@ object SerienStreamProvider : Provider {
     override suspend fun getTvShows(page: Int): List<TvShow> {
         val document = service.getSeriesListAlphabet()
         return document.select(".genre > ul > li")
-            .filter { it ->
-                (it.siblingIndex() > ((page - 1) * 20)) && (it.siblingIndex() < (page * 20))
-            }
             .map {
                 TvShow(
                     id = getTvShowIdFromLink(
                         it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
                     ),
-                    title = it.selectFirst("a[data-alternative-titles]")?.text() ?: "",
-                    poster = getPosterUrlFromTvShowLink(
-                        it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
-                    )
+                    title = it.selectFirst("a[data-alternative-titles]")?.text() ?: ""
                 )
             }
     }
@@ -172,13 +165,26 @@ object SerienStreamProvider : Provider {
                 ?: "",
             rating = imdbDocument.selectFirst("div[data-testid='hero-rating-bar__aggregate-rating__score'] span")
                 ?.text()?.toDoubleOrNull() ?: 0.0,
-            cast = document.select("div.cast li[itemprop='actor']")
+            cast = document.select(".cast li[itemprop='actor']")
                 .map {
                     People(
                         id = it.selectFirst("span")?.text() ?: "",
                         name = it.selectFirst("span")?.text() ?: ""
                     )
                 },
+            directors = document.select(".cast li[itemprop='director']")
+                .map {
+                    People(
+                        id = it.selectFirst("span")?.text() ?: "",
+                        name = it.selectFirst("span")?.text() ?: ""
+                    )
+                },
+            genres = document.select(".genres li").map {
+                Genre(
+                    id = it.selectFirst("a")?.text()?.lowercase(Locale.getDefault()) ?: "",
+                    name = it.selectFirst("a")?.text() ?: ""
+                )
+            },
             trailer = document.selectFirst("div[itemprop='trailer'] a")?.attr("href") ?: "",
             poster = url + document.selectFirst("div.seriesCoverBox img")?.attr("data-src"),
             banner = url + document.selectFirst("#series > section > div.backdrop")
