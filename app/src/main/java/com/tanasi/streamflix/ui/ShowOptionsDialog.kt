@@ -62,6 +62,7 @@ class ShowOptionsDialog(
 
         Glide.with(context)
             .load(episode.poster ?: episode.tvShow?.poster)
+            .fallback(R.drawable.glide_fallback_cover)
             .fitCenter()
             .into(binding.ivOptionsShowPoster)
 
@@ -156,6 +157,7 @@ class ShowOptionsDialog(
 
         Glide.with(context)
             .load(movie.poster)
+            .fallback(R.drawable.glide_fallback_cover)
             .fitCenter()
             .into(binding.ivOptionsShowPoster)
 
@@ -235,6 +237,7 @@ class ShowOptionsDialog(
 
         Glide.with(context)
             .load(tvShow.poster)
+            .fallback(R.drawable.glide_fallback_cover)
             .fitCenter()
             .into(binding.ivOptionsShowPoster)
 

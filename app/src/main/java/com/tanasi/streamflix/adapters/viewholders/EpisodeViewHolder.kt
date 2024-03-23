@@ -187,6 +187,7 @@ class EpisodeViewHolder(
             clipToOutline = true
             Glide.with(context)
                 .load(episode.poster)
+                .fallback(R.drawable.glide_fallback_cover)
                 .centerCrop()
                 .into(this)
         }
@@ -367,6 +368,7 @@ class EpisodeViewHolder(
             clipToOutline = true
             Glide.with(context)
                 .load(episode.tvShow?.poster ?: episode.tvShow?.banner ?: episode.poster)
+                .fallback(R.drawable.glide_fallback_cover)
                 .centerCrop()
                 .into(this)
         }

@@ -212,6 +212,7 @@ class MovieViewHolder(
 
         Glide.with(context)
             .load(movie.poster)
+            .fallback(R.drawable.glide_fallback_cover)
             .centerCrop()
             .into(binding.ivMoviePoster)
 
@@ -358,6 +359,7 @@ class MovieViewHolder(
 
         Glide.with(context)
             .load(movie.poster)
+            .fallback(R.drawable.glide_fallback_cover)
             .centerCrop()
             .into(binding.ivMoviePoster)
 

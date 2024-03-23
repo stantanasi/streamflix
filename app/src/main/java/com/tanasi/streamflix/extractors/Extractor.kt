@@ -16,6 +16,9 @@ abstract class Extractor {
             Rabbitstream.Megacloud(),
             Rabbitstream.Dokicloud(),
             Streamhub(),
+            VoeExtractor(),
+            StreamtapeExtractor(),
+            VidozaExtractor()
         )
 
         suspend fun extract(link: String): Video {
@@ -23,7 +26,13 @@ abstract class Extractor {
             val compareUrl = link.lowercase().replace(urlRegex, "")
             for (extractor in extractors) {
                 if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, "")) ||
-                    compareUrl.startsWith(extractor.mainUrl.replace(Regex("^(https?://)?(www\\.)?(.*?)(\\.[a-z]+)"), "$3"))) {
+                    compareUrl.startsWith(
+                        extractor.mainUrl.replace(
+                            Regex("^(https?://)?(www\\.)?(.*?)(\\.[a-z]+)"),
+                            "$3"
+                        )
+                    )
+                ) {
                     return extractor.extract(link)
                 }
             }

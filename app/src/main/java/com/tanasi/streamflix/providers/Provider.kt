@@ -16,7 +16,6 @@ interface Provider {
     val logo: String
     val url: String
 
-
     suspend fun getHome(): List<Category>
 
     suspend fun search(query: String, page: Int = 1): List<AppAdapter.Item>
@@ -25,31 +24,26 @@ interface Provider {
 
     suspend fun getTvShows(page: Int = 1): List<TvShow>
 
-
     suspend fun getMovie(id: String): Movie
-
 
     suspend fun getTvShow(id: String): TvShow
 
     suspend fun getEpisodesBySeason(seasonId: String): List<Episode>
 
-
     suspend fun getGenre(id: String, page: Int = 1): Genre
 
-
     suspend fun getPeople(id: String, page: Int = 1): People
-
 
     suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server>
 
     suspend fun getVideo(server: Video.Server): Video
-
 
     companion object {
         val providers = listOf(
             SflixProvider,
             AnyMovieProvider,
             HiAnimeProvider,
+            SerienStreamProvider
         )
     }
 }

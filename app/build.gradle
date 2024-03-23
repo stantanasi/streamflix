@@ -14,8 +14,8 @@ android {
         applicationId "com.tanasi.streamflix"
         minSdk 21
         targetSdk 34
-        versionCode 15
-        versionName "1.5.1"
+        versionCode 16
+        versionName "1.5.2"
     }
 
     compileOptions {
@@ -53,7 +53,9 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.leanback:leanback:1.0.0'
-    implementation 'com.github.bumptech.glide:glide:4.13.1'
+    implementation 'com.github.bumptech.glide:glide:5.0.0-rc01'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.16.0'
+
 
     implementation 'androidx.media3:media3-exoplayer:1.3.0'
     implementation 'androidx.media3:media3-exoplayer-dash:1.3.0'
@@ -61,11 +63,13 @@ dependencies {
     implementation "androidx.media3:media3-session:1.3.0"
     implementation 'androidx.media3:media3-ui:1.3.0'
 
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.9'
+    implementation ('com.squareup.retrofit2:retrofit:2.9.0')
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.12.0'
+    implementation 'dnsjava:dnsjava:3.5.3'
     implementation project(path: ':retrofit-jsoup-converter')
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'org.jsoup:jsoup:1.15.3'
+    implementation 'org.jsoup:jsoup:1.17.2'
 
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'

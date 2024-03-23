@@ -33,13 +33,11 @@ object InAppUpdater {
 
     suspend fun getReleaseUpdate(): GitHub.Release? {
         val latestRelease = GitHub.service.getLatestRelease(GITHUB_OWNER, GITHUB_REPO)
-
         val currentVersion = BuildConfig.VERSION_NAME
 
         if (Version(latestRelease.tagName.substringAfter("v")) > Version(currentVersion)) {
             return latestRelease
         }
-
         return null
     }
 
