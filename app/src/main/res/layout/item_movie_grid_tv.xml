@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_item_tv_show_tv"
+    android:background="@drawable/bg_item_movie_tv"
     android:focusable="true"
     android:focusableInTouchMode="true">
 
     <ImageView
-        android:id="@+id/iv_tv_show_poster"
+        android:id="@+id/iv_movie_poster"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
@@ -19,8 +19,23 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription" />
 
+    <ProgressBar
+        android:id="@+id/pb_movie_progress"
+        style="@android:style/Widget.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#CC646464"
+        android:progressTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@id/iv_movie_poster"
+        app:layout_constraintEnd_toEndOf="@id/iv_movie_poster"
+        app:layout_constraintStart_toStartOf="@id/iv_movie_poster"
+        tools:progress="80" />
+
     <TextView
-        android:id="@+id/tv_tv_show_quality"
+        android:id="@+id/tv_movie_quality"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -28,30 +43,30 @@
         android:textAllCaps="true"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/iv_tv_show_poster"
+        app:layout_constraintTop_toBottomOf="@id/iv_movie_poster"
         tools:text="HD"
         tools:visibility="visible" />
 
     <TextView
-        android:id="@+id/tv_tv_show_last_episode"
+        android:id="@+id/tv_movie_released_year"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@id/tv_tv_show_quality"
-        app:layout_constraintTop_toBottomOf="@id/iv_tv_show_poster"
+        app:layout_constraintStart_toEndOf="@id/tv_movie_quality"
+        app:layout_constraintTop_toBottomOf="@id/iv_movie_poster"
         app:layout_goneMarginStart="8dp"
-        tools:text="S1 E1" />
+        tools:text="2022" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="bottom"
-        app:constraint_referenced_ids="tv_tv_show_quality,tv_tv_show_last_episode" />
+        app:constraint_referenced_ids="tv_movie_quality,tv_movie_released_year" />
 
     <TextView
-        android:id="@+id/tv_tv_show_title"
+        android:id="@+id/tv_movie_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

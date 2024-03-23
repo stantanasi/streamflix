@@ -14,42 +14,42 @@ import com.tanasi.streamflix.adapters.viewholders.PeopleViewHolder
 import com.tanasi.streamflix.adapters.viewholders.ProviderViewHolder
 import com.tanasi.streamflix.adapters.viewholders.SeasonViewHolder
 import com.tanasi.streamflix.adapters.viewholders.TvShowViewHolder
-import com.tanasi.streamflix.databinding.ContentCategorySwiperBinding
+import com.tanasi.streamflix.databinding.ContentCategorySwiperTvBinding
 import com.tanasi.streamflix.databinding.ContentCategorySwiperMobileBinding
-import com.tanasi.streamflix.databinding.ContentMovieBinding
-import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
+import com.tanasi.streamflix.databinding.ContentMovieTvBinding
+import com.tanasi.streamflix.databinding.ContentMovieCastsTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieMobileBinding
-import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
+import com.tanasi.streamflix.databinding.ContentMovieRecommendationsTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsMobileBinding
-import com.tanasi.streamflix.databinding.ContentTvShowBinding
-import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowTvBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastsTvBinding
 import com.tanasi.streamflix.databinding.ContentTvShowCastsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowMobileBinding
-import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsTvBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsMobileBinding
-import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
+import com.tanasi.streamflix.databinding.ContentTvShowSeasonsTvBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsMobileBinding
-import com.tanasi.streamflix.databinding.ItemCategoryBinding
+import com.tanasi.streamflix.databinding.ItemCategoryTvBinding
 import com.tanasi.streamflix.databinding.ItemCategoryMobileBinding
-import com.tanasi.streamflix.databinding.ItemEpisodeBinding
-import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeTvBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingTvBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingMobileBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeMobileBinding
-import com.tanasi.streamflix.databinding.ItemGenreGridBinding
+import com.tanasi.streamflix.databinding.ItemGenreGridTvBinding
 import com.tanasi.streamflix.databinding.ItemGenreGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemLoadingBinding
-import com.tanasi.streamflix.databinding.ItemMovieBinding
-import com.tanasi.streamflix.databinding.ItemMovieGridBinding
+import com.tanasi.streamflix.databinding.ItemMovieTvBinding
+import com.tanasi.streamflix.databinding.ItemMovieGridTvBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemMovieMobileBinding
-import com.tanasi.streamflix.databinding.ItemPeopleBinding
+import com.tanasi.streamflix.databinding.ItemPeopleTvBinding
 import com.tanasi.streamflix.databinding.ItemPeopleMobileBinding
-import com.tanasi.streamflix.databinding.ItemProviderBinding
+import com.tanasi.streamflix.databinding.ItemProviderTvBinding
 import com.tanasi.streamflix.databinding.ItemProviderMobileBinding
-import com.tanasi.streamflix.databinding.ItemSeasonBinding
+import com.tanasi.streamflix.databinding.ItemSeasonTvBinding
 import com.tanasi.streamflix.databinding.ItemSeasonMobileBinding
-import com.tanasi.streamflix.databinding.ItemTvShowBinding
+import com.tanasi.streamflix.databinding.ItemTvShowTvBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemTvShowMobileBinding
@@ -72,55 +72,55 @@ class AppAdapter(
 
     enum class Type {
         CATEGORY_MOBILE_ITEM,
-        CATEGORY_ITEM,
+        CATEGORY_TV_ITEM,
 
         CATEGORY_MOBILE_SWIPER,
-        CATEGORY_SWIPER,
+        CATEGORY_TV_SWIPER,
 
         EPISODE_MOBILE_ITEM,
-        EPISODE_ITEM,
+        EPISODE_TV_ITEM,
         EPISODE_CONTINUE_WATCHING_MOBILE_ITEM,
-        EPISODE_CONTINUE_WATCHING_ITEM,
+        EPISODE_CONTINUE_WATCHING_TV_ITEM,
 
         GENRE_GRID_MOBILE_ITEM,
-        GENRE_GRID_ITEM,
+        GENRE_GRID_TV_ITEM,
 
         LOADING_ITEM,
 
         MOVIE_MOBILE_ITEM,
-        MOVIE_ITEM,
+        MOVIE_TV_ITEM,
         MOVIE_GRID_MOBILE_ITEM,
-        MOVIE_GRID_ITEM,
+        MOVIE_GRID_TV_ITEM,
 
         MOVIE_MOBILE,
-        MOVIE,
+        MOVIE_TV,
         MOVIE_CASTS_MOBILE,
-        MOVIE_CASTS,
+        MOVIE_CASTS_TV,
         MOVIE_RECOMMENDATIONS_MOBILE,
-        MOVIE_RECOMMENDATIONS,
+        MOVIE_RECOMMENDATIONS_TV,
 
         PEOPLE_MOBILE_ITEM,
-        PEOPLE_ITEM,
+        PEOPLE_TV_ITEM,
 
         PROVIDER_MOBILE_ITEM,
-        PROVIDER_ITEM,
+        PROVIDER_TV_ITEM,
 
         SEASON_MOBILE_ITEM,
-        SEASON_ITEM,
+        SEASON_TV_ITEM,
 
         TV_SHOW_MOBILE_ITEM,
-        TV_SHOW_ITEM,
+        TV_SHOW_TV_ITEM,
         TV_SHOW_GRID_MOBILE_ITEM,
-        TV_SHOW_GRID_ITEM,
+        TV_SHOW_GRID_TV_ITEM,
 
         TV_SHOW_MOBILE,
-        TV_SHOW,
+        TV_SHOW_TV,
         TV_SHOW_SEASONS_MOBILE,
-        TV_SHOW_SEASONS,
+        TV_SHOW_SEASONS_TV,
         TV_SHOW_CASTS_MOBILE,
-        TV_SHOW_CASTS,
+        TV_SHOW_CASTS_TV,
         TV_SHOW_RECOMMENDATIONS_MOBILE,
-        TV_SHOW_RECOMMENDATIONS,
+        TV_SHOW_RECOMMENDATIONS_TV,
     }
 
     private val states = mutableMapOf<Int, Parcelable?>()
@@ -137,8 +137,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.CATEGORY_ITEM -> CategoryViewHolder(
-                ItemCategoryBinding.inflate(
+            Type.CATEGORY_TV_ITEM -> CategoryViewHolder(
+                ItemCategoryTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -152,8 +152,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.CATEGORY_SWIPER -> CategoryViewHolder(
-                ContentCategorySwiperBinding.inflate(
+            Type.CATEGORY_TV_SWIPER -> CategoryViewHolder(
+                ContentCategorySwiperTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -167,8 +167,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.EPISODE_ITEM -> EpisodeViewHolder(
-                ItemEpisodeBinding.inflate(
+            Type.EPISODE_TV_ITEM -> EpisodeViewHolder(
+                ItemEpisodeTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -181,8 +181,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.EPISODE_CONTINUE_WATCHING_ITEM -> EpisodeViewHolder(
-                ItemEpisodeContinueWatchingBinding.inflate(
+            Type.EPISODE_CONTINUE_WATCHING_TV_ITEM -> EpisodeViewHolder(
+                ItemEpisodeContinueWatchingTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -196,8 +196,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.GENRE_GRID_ITEM -> GenreViewHolder(
-                ItemGenreGridBinding.inflate(
+            Type.GENRE_GRID_TV_ITEM -> GenreViewHolder(
+                ItemGenreGridTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -219,8 +219,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.MOVIE_ITEM -> MovieViewHolder(
-                ItemMovieBinding.inflate(
+            Type.MOVIE_TV_ITEM -> MovieViewHolder(
+                ItemMovieTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -233,8 +233,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.MOVIE_GRID_ITEM -> MovieViewHolder(
-                ItemMovieGridBinding.inflate(
+            Type.MOVIE_GRID_TV_ITEM -> MovieViewHolder(
+                ItemMovieGridTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -248,8 +248,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.MOVIE -> MovieViewHolder(
-                ContentMovieBinding.inflate(
+            Type.MOVIE_TV -> MovieViewHolder(
+                ContentMovieTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -262,8 +262,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.MOVIE_CASTS -> MovieViewHolder(
-                ContentMovieCastsBinding.inflate(
+            Type.MOVIE_CASTS_TV -> MovieViewHolder(
+                ContentMovieCastsTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -276,8 +276,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.MOVIE_RECOMMENDATIONS -> MovieViewHolder(
-                ContentMovieRecommendationsBinding.inflate(
+            Type.MOVIE_RECOMMENDATIONS_TV -> MovieViewHolder(
+                ContentMovieRecommendationsTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -291,8 +291,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.PEOPLE_ITEM -> PeopleViewHolder(
-                ItemPeopleBinding.inflate(
+            Type.PEOPLE_TV_ITEM -> PeopleViewHolder(
+                ItemPeopleTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -306,8 +306,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.PROVIDER_ITEM -> ProviderViewHolder(
-                ItemProviderBinding.inflate(
+            Type.PROVIDER_TV_ITEM -> ProviderViewHolder(
+                ItemProviderTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -321,8 +321,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.SEASON_ITEM -> SeasonViewHolder(
-                ItemSeasonBinding.inflate(
+            Type.SEASON_TV_ITEM -> SeasonViewHolder(
+                ItemSeasonTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -336,8 +336,8 @@ class AppAdapter(
                     false
                 )
             )
-            Type.TV_SHOW_ITEM -> TvShowViewHolder(
-                ItemTvShowBinding.inflate(
+            Type.TV_SHOW_TV_ITEM -> TvShowViewHolder(
+                ItemTvShowTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
@@ -350,7 +350,7 @@ class AppAdapter(
                     false
                 )
             )
-            Type.TV_SHOW_GRID_ITEM -> TvShowViewHolder(
+            Type.TV_SHOW_GRID_TV_ITEM -> TvShowViewHolder(
                 ItemTvShowGridBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -365,8 +365,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.TV_SHOW -> TvShowViewHolder(
-                ContentTvShowBinding.inflate(
+            Type.TV_SHOW_TV -> TvShowViewHolder(
+                ContentTvShowTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -379,8 +379,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.TV_SHOW_SEASONS -> TvShowViewHolder(
-                ContentTvShowSeasonsBinding.inflate(
+            Type.TV_SHOW_SEASONS_TV -> TvShowViewHolder(
+                ContentTvShowSeasonsTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -393,8 +393,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.TV_SHOW_CASTS -> TvShowViewHolder(
-                ContentTvShowCastsBinding.inflate(
+            Type.TV_SHOW_CASTS_TV -> TvShowViewHolder(
+                ContentTvShowCastsTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -407,8 +407,8 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.TV_SHOW_RECOMMENDATIONS -> TvShowViewHolder(
-                ContentTvShowRecommendationsBinding.inflate(
+            Type.TV_SHOW_RECOMMENDATIONS_TV -> TvShowViewHolder(
+                ContentTvShowRecommendationsTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,

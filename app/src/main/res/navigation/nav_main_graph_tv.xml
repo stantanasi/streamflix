@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_main_graph"
+    app:startDestination="@id/providers">
+
+    <fragment
+        android:id="@+id/home"
+        android:name="com.tanasi.streamflix.fragments.home.HomeTvFragment"
+        android:label="fragment_home_tv"
+        tools:layout="@layout/fragment_home_tv">
+        <action
+            android:id="@+id/action_home_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_home_to_tv_show"
+            app:destination="@id/tv_show" />
+        <action
+            android:id="@+id/action_home_to_player"
+            app:destination="@id/player" />
+    </fragment>
+    <fragment
+        android:id="@+id/movie"
+        android:name="com.tanasi.streamflix.fragments.movie.MovieTvFragment"
+        android:label="fragment_movie_tv"
+        tools:layout="@layout/fragment_movie_tv">
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_movie_to_player"
+            app:destination="@id/player" />
+        <action
+            android:id="@+id/action_movie_to_people"
+            app:destination="@id/people" />
+        <action
+            android:id="@+id/action_movie_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_movie_to_tv_show"
+            app:destination="@id/tv_show" />
+    </fragment>
+    <fragment
+        android:id="@+id/player"
+        android:name="com.tanasi.streamflix.fragments.player.PlayerTvFragment"
+        android:label="fragment_player_tv"
+        tools:layout="@layout/fragment_player_tv">
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="subtitle"
+            app:argType="string" />
+        <argument
+            android:name="videoType"
+            app:argType="com.tanasi.streamflix.models.Video$Type" />
+    </fragment>
+    <fragment
+        android:id="@+id/tv_show"
+        android:name="com.tanasi.streamflix.fragments.tv_show.TvShowTvFragment"
+        android:label="fragment_tv_show_tv"
+        tools:layout="@layout/fragment_tv_show_tv">
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_tv_show_to_season"
+            app:destination="@id/season" />
+        <action
+            android:id="@+id/action_tv_show_to_people"
+            app:destination="@id/people" />
+        <action
+            android:id="@+id/action_tv_show_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_tv_show_to_tv_show"
+            app:destination="@id/tv_show" />
+        <action
+            android:id="@+id/action_tv_show_to_player"
+            app:destination="@id/player" />
+    </fragment>
+    <fragment
+        android:id="@+id/search"
+        android:name="com.tanasi.streamflix.fragments.search.SearchTvFragment"
+        android:label="fragment_search_tv"
+        tools:layout="@layout/fragment_search_tv">
+        <action
+            android:id="@+id/action_search_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_search_to_tv_show"
+            app:destination="@id/tv_show" />
+        <action
+            android:id="@+id/action_search_to_genre"
+            app:destination="@id/genre" />
+    </fragment>
+    <fragment
+        android:id="@+id/season"
+        android:name="com.tanasi.streamflix.fragments.season.SeasonTvFragment"
+        android:label="fragment_season_tv"
+        tools:layout="@layout/fragment_season_tv">
+        <action
+            android:id="@+id/action_season_to_player"
+            app:destination="@id/player" />
+        <argument
+            android:name="tvShowId"
+            app:argType="string" />
+        <argument
+            android:name="tvShowTitle"
+            app:argType="string" />
+        <argument
+            android:name="tvShowPoster"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="tvShowBanner"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="seasonId"
+            app:argType="string" />
+        <argument
+            android:name="seasonNumber"
+            app:argType="integer" />
+        <argument
+            android:name="seasonTitle"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/movies"
+        android:name="com.tanasi.streamflix.fragments.movies.MoviesTvFragment"
+        android:label="fragment_movies_tv"
+        tools:layout="@layout/fragment_movies_tv">
+        <action
+            android:id="@+id/action_movies_to_movie"
+            app:destination="@id/movie" />
+    </fragment>
+    <fragment
+        android:id="@+id/tv_shows"
+        android:name="com.tanasi.streamflix.fragments.tv_shows.TvShowsTvFragment"
+        android:label="fragment_tv_shows_tv"
+        tools:layout="@layout/fragment_tv_shows_tv">
+        <action
+            android:id="@+id/action_tv_shows_to_tv_show"
+            app:destination="@id/tv_show" />
+    </fragment>
+    <fragment
+        android:id="@+id/people"
+        android:name="com.tanasi.streamflix.fragments.people.PeopleTvFragment"
+        android:label="fragment_people_tv"
+        tools:layout="@layout/fragment_people_tv">
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_people_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_people_to_tv_show"
+            app:destination="@id/tv_show" />
+    </fragment>
+    <fragment
+        android:id="@+id/providers"
+        android:name="com.tanasi.streamflix.fragments.providers.ProvidersTvFragment"
+        android:label="fragment_providers_tv"
+        tools:layout="@layout/fragment_providers_tv">
+        <action
+            android:id="@+id/action_providers_to_home"
+            app:destination="@id/home" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_providers"
+        app:destination="@id/providers" />
+    <fragment
+        android:id="@+id/genre"
+        android:name="com.tanasi.streamflix.fragments.genre.GenreTvFragment"
+        android:label="fragment_genre_tv"
+        tools:layout="@layout/fragment_genre_tv">
+        <argument
+            android:name="id"
+            app:argType="string" />
+        <argument
+            android:name="name"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_genre_to_movie"
+            app:destination="@id/movie" />
+        <action
+            android:id="@+id/action_genre_to_tv_show"
+            app:destination="@id/tv_show" />
+    </fragment>
+</navigation>

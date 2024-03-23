@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tanasi.navigation.widget.NavigationSlideHeaderView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/iv_navigation_header_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="#000000"
+        android:duplicateParentState="true"
+        android:foreground="@drawable/fg_navigation_header_icon_tv"
+        android:padding="2dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription,UseAppTint" />
+
+    <TextView
+        android:id="@+id/tv_navigation_header_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:duplicateParentState="true"
+        android:maxLines="1"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"
+        app:layout_constraintStart_toEndOf="@id/iv_navigation_header_icon"
+        app:layout_constraintTop_toTopOf="@id/iv_navigation_header_icon"
+        tools:text="Title" />
+
+    <TextView
+        android:id="@+id/tv_navigation_header_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:duplicateParentState="true"
+        android:maxLines="1"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
+        android:textColor="#B3FFFFFF"
+        android:textSize="9sp"
+        app:layout_constraintStart_toEndOf="@id/iv_navigation_header_icon"
+        app:layout_constraintTop_toBottomOf="@id/tv_navigation_header_title"
+        tools:ignore="SmallSp"
+        tools:text="Subtitle" />
+
+</com.tanasi.navigation.widget.NavigationSlideHeaderView>

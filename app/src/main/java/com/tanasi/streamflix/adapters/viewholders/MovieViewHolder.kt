@@ -13,48 +13,48 @@ import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
-import com.tanasi.streamflix.databinding.ContentMovieBinding
-import com.tanasi.streamflix.databinding.ContentMovieCastsBinding
+import com.tanasi.streamflix.databinding.ContentMovieTvBinding
+import com.tanasi.streamflix.databinding.ContentMovieCastsTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieMobileBinding
-import com.tanasi.streamflix.databinding.ContentMovieRecommendationsBinding
+import com.tanasi.streamflix.databinding.ContentMovieRecommendationsTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsMobileBinding
-import com.tanasi.streamflix.databinding.ItemMovieBinding
-import com.tanasi.streamflix.databinding.ItemMovieGridBinding
+import com.tanasi.streamflix.databinding.ItemMovieTvBinding
+import com.tanasi.streamflix.databinding.ItemMovieGridTvBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemMovieMobileBinding
-import com.tanasi.streamflix.fragments.genre.GenreFragment
-import com.tanasi.streamflix.fragments.genre.GenreFragmentDirections
+import com.tanasi.streamflix.fragments.genre.GenreTvFragment
+import com.tanasi.streamflix.fragments.genre.GenreTvFragmentDirections
 import com.tanasi.streamflix.fragments.genre.GenreMobileFragment
 import com.tanasi.streamflix.fragments.genre.GenreMobileFragmentDirections
-import com.tanasi.streamflix.fragments.home.HomeFragment
-import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
+import com.tanasi.streamflix.fragments.home.HomeTvFragment
+import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeMobileFragment
 import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
-import com.tanasi.streamflix.fragments.movie.MovieFragment
-import com.tanasi.streamflix.fragments.movie.MovieFragmentDirections
+import com.tanasi.streamflix.fragments.movie.MovieTvFragment
+import com.tanasi.streamflix.fragments.movie.MovieTvFragmentDirections
 import com.tanasi.streamflix.fragments.movie.MovieMobileFragment
 import com.tanasi.streamflix.fragments.movie.MovieMobileFragmentDirections
-import com.tanasi.streamflix.fragments.movies.MoviesFragment
-import com.tanasi.streamflix.fragments.movies.MoviesFragmentDirections
+import com.tanasi.streamflix.fragments.movies.MoviesTvFragment
+import com.tanasi.streamflix.fragments.movies.MoviesTvFragmentDirections
 import com.tanasi.streamflix.fragments.movies.MoviesMobileFragment
 import com.tanasi.streamflix.fragments.movies.MoviesMobileFragmentDirections
-import com.tanasi.streamflix.fragments.people.PeopleFragment
-import com.tanasi.streamflix.fragments.people.PeopleFragmentDirections
+import com.tanasi.streamflix.fragments.people.PeopleTvFragment
+import com.tanasi.streamflix.fragments.people.PeopleTvFragmentDirections
 import com.tanasi.streamflix.fragments.people.PeopleMobileFragment
 import com.tanasi.streamflix.fragments.people.PeopleMobileFragmentDirections
-import com.tanasi.streamflix.fragments.search.SearchFragment
-import com.tanasi.streamflix.fragments.search.SearchFragmentDirections
+import com.tanasi.streamflix.fragments.search.SearchTvFragment
+import com.tanasi.streamflix.fragments.search.SearchTvFragmentDirections
 import com.tanasi.streamflix.fragments.search.SearchMobileFragment
 import com.tanasi.streamflix.fragments.search.SearchMobileFragmentDirections
-import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
-import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragment
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.ui.ShowOptionsDialog
+import com.tanasi.streamflix.ui.ShowOptionsTvDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.dp
@@ -75,9 +75,9 @@ class MovieViewHolder(
     val childRecyclerView: RecyclerView?
         get() = when (_binding) {
             is ContentMovieCastsMobileBinding -> _binding.rvMovieCasts
-            is ContentMovieCastsBinding -> _binding.hgvMovieCasts
+            is ContentMovieCastsTvBinding -> _binding.hgvMovieCasts
             is ContentMovieRecommendationsMobileBinding -> _binding.rvMovieRecommendations
-            is ContentMovieRecommendationsBinding -> _binding.hgvMovieRecommendations
+            is ContentMovieRecommendationsTvBinding -> _binding.hgvMovieRecommendations
             else -> null
         }
 
@@ -86,16 +86,16 @@ class MovieViewHolder(
 
         when (_binding) {
             is ItemMovieMobileBinding -> displayMobileItem(_binding)
-            is ItemMovieBinding -> displayItem(_binding)
+            is ItemMovieTvBinding -> displayTvItem(_binding)
             is ItemMovieGridMobileBinding -> displayGridMobileItem(_binding)
-            is ItemMovieGridBinding -> displayGridItem(_binding)
+            is ItemMovieGridTvBinding -> displayGridTvItem(_binding)
 
             is ContentMovieMobileBinding -> displayMovieMobile(_binding)
-            is ContentMovieBinding -> displayMovie(_binding)
+            is ContentMovieTvBinding -> displayMovieTv(_binding)
             is ContentMovieCastsMobileBinding -> displayCastsMobile(_binding)
-            is ContentMovieCastsBinding -> displayCasts(_binding)
+            is ContentMovieCastsTvBinding -> displayCastsTv(_binding)
             is ContentMovieRecommendationsMobileBinding -> displayRecommendationsMobile(_binding)
-            is ContentMovieRecommendationsBinding -> displayRecommendations(_binding)
+            is ContentMovieRecommendationsTvBinding -> displayRecommendationsTv(_binding)
         }
     }
 
@@ -164,7 +164,7 @@ class MovieViewHolder(
         binding.tvMovieTitle.text = movie.title
     }
 
-    private fun displayItem(binding: ItemMovieBinding) {
+    private fun displayTvItem(binding: ItemMovieTvBinding) {
         database.movieDao().getById(movie.id)?.let { movieDb ->
             movie.merge(movieDb)
         }
@@ -172,25 +172,25 @@ class MovieViewHolder(
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
-                    is HomeFragment -> findNavController().navigate(
-                        HomeFragmentDirections.actionHomeToMovie(
+                    is HomeTvFragment -> findNavController().navigate(
+                        HomeTvFragmentDirections.actionHomeToMovie(
                             id = movie.id
                         )
                     )
-                    is MovieFragment -> findNavController().navigate(
-                        MovieFragmentDirections.actionMovieToMovie(
+                    is MovieTvFragment -> findNavController().navigate(
+                        MovieTvFragmentDirections.actionMovieToMovie(
                             id = movie.id
                         )
                     )
-                    is TvShowFragment -> findNavController().navigate(
-                        TvShowFragmentDirections.actionTvShowToMovie(
+                    is TvShowTvFragment -> findNavController().navigate(
+                        TvShowTvFragmentDirections.actionTvShowToMovie(
                             id = movie.id
                         )
                     )
                 }
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context, movie)
+                ShowOptionsTvDialog(context, movie)
                     .show()
                 true
             }
@@ -204,7 +204,7 @@ class MovieViewHolder(
 
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> fragment.updateBackground(movie.banner)
+                        is HomeTvFragment -> fragment.updateBackground(movie.banner)
                     }
                 }
             }
@@ -312,7 +312,7 @@ class MovieViewHolder(
         binding.tvMovieTitle.text = movie.title
     }
 
-    private fun displayGridItem(binding: ItemMovieGridBinding) {
+    private fun displayGridTvItem(binding: ItemMovieGridTvBinding) {
         database.movieDao().getById(movie.id)?.let { movieDb ->
             movie.merge(movieDb)
         }
@@ -320,30 +320,30 @@ class MovieViewHolder(
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
-                    is GenreFragment -> findNavController().navigate(
-                        GenreFragmentDirections.actionGenreToMovie(
+                    is GenreTvFragment -> findNavController().navigate(
+                        GenreTvFragmentDirections.actionGenreToMovie(
                             id = movie.id
                         )
                     )
-                    is MoviesFragment -> findNavController().navigate(
-                        MoviesFragmentDirections.actionMoviesToMovie(
+                    is MoviesTvFragment -> findNavController().navigate(
+                        MoviesTvFragmentDirections.actionMoviesToMovie(
                             id = movie.id
                         )
                     )
-                    is PeopleFragment -> findNavController().navigate(
-                        PeopleFragmentDirections.actionPeopleToMovie(
+                    is PeopleTvFragment -> findNavController().navigate(
+                        PeopleTvFragmentDirections.actionPeopleToMovie(
                             id = movie.id
                         )
                     )
-                    is SearchFragment -> findNavController().navigate(
-                        SearchFragmentDirections.actionSearchToMovie(
+                    is SearchTvFragment -> findNavController().navigate(
+                        SearchTvFragmentDirections.actionSearchToMovie(
                             id = movie.id
                         )
                     )
                 }
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context, movie)
+                ShowOptionsTvDialog(context, movie)
                     .show()
                 true
             }
@@ -512,7 +512,7 @@ class MovieViewHolder(
         }
     }
 
-    private fun displayMovie(binding: ContentMovieBinding) {
+    private fun displayMovieTv(binding: ContentMovieTvBinding) {
         binding.ivMoviePoster.run {
             Glide.with(context)
                 .load(movie.poster)
@@ -575,7 +575,7 @@ class MovieViewHolder(
         binding.btnMovieWatchNow.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    MovieFragmentDirections.actionMovieToPlayer(
+                    MovieTvFragmentDirections.actionMovieToPlayer(
                         id = movie.id,
                         title = movie.title,
                         subtitle = movie.released?.format("yyyy") ?: "",
@@ -646,12 +646,12 @@ class MovieViewHolder(
         }
     }
 
-    private fun displayCasts(binding: ContentMovieCastsBinding) {
+    private fun displayCastsTv(binding: ContentMovieCastsTvBinding) {
         binding.hgvMovieCasts.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
                 submitList(movie.cast.onEach {
-                    it.itemType = AppAdapter.Type.PEOPLE_ITEM
+                    it.itemType = AppAdapter.Type.PEOPLE_TV_ITEM
                 })
             }
             setItemSpacing(80)
@@ -674,14 +674,14 @@ class MovieViewHolder(
         }
     }
 
-    private fun displayRecommendations(binding: ContentMovieRecommendationsBinding) {
+    private fun displayRecommendationsTv(binding: ContentMovieRecommendationsTvBinding) {
         binding.hgvMovieRecommendations.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
                 submitList(movie.recommendations.onEach {
                     when (it) {
-                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_ITEM
-                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_ITEM
+                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_TV_ITEM
+                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
                     }
                 })
             }

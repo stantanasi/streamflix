@@ -14,13 +14,13 @@ import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
-import com.tanasi.streamflix.databinding.ContentCategorySwiperBinding
 import com.tanasi.streamflix.databinding.ContentCategorySwiperMobileBinding
-import com.tanasi.streamflix.databinding.ItemCategoryBinding
+import com.tanasi.streamflix.databinding.ContentCategorySwiperTvBinding
 import com.tanasi.streamflix.databinding.ItemCategoryMobileBinding
-import com.tanasi.streamflix.fragments.home.HomeFragment
-import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
+import com.tanasi.streamflix.databinding.ItemCategoryTvBinding
 import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
+import com.tanasi.streamflix.fragments.home.HomeTvFragment
+import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Show
@@ -44,7 +44,7 @@ class CategoryViewHolder(
     val childRecyclerView: RecyclerView?
         get() = when (_binding) {
             is ItemCategoryMobileBinding -> _binding.rvCategory
-            is ItemCategoryBinding -> _binding.hgvCategory
+            is ItemCategoryTvBinding -> _binding.hgvCategory
             else -> null
         }
 
@@ -53,10 +53,10 @@ class CategoryViewHolder(
 
         when (_binding) {
             is ItemCategoryMobileBinding -> displayMobileItem(_binding)
-            is ItemCategoryBinding -> displayItem(_binding)
+            is ItemCategoryTvBinding -> displayTvItem(_binding)
 
             is ContentCategorySwiperMobileBinding -> displayMobileSwiper(_binding)
-            is ContentCategorySwiperBinding -> displaySwiper(_binding)
+            is ContentCategorySwiperTvBinding -> displayTvSwiper(_binding)
         }
     }
 
@@ -74,7 +74,7 @@ class CategoryViewHolder(
         }
     }
 
-    private fun displayItem(binding: ItemCategoryBinding) {
+    private fun displayTvItem(binding: ItemCategoryTvBinding) {
         binding.tvCategoryTitle.text = category.name
 
         binding.hgvCategory.apply {
@@ -250,7 +250,7 @@ class CategoryViewHolder(
         }
     }
 
-    private fun displaySwiper(binding: ContentCategorySwiperBinding) {
+    private fun displayTvSwiper(binding: ContentCategorySwiperTvBinding) {
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
         when (selected) {
             is Movie -> database.movieDao().getById(selected.id)?.let { movieDb ->
@@ -264,7 +264,7 @@ class CategoryViewHolder(
             category.selectedIndex = (category.selectedIndex + 1) % category.list.size
             if (binding.btnSwiperWatchNow.hasFocus()) {
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeFragment -> when (val it = category.list[category.selectedIndex]) {
+                    is HomeTvFragment -> when (val it = category.list[category.selectedIndex]) {
                         is Movie -> fragment.updateBackground(it.banner)
                         is TvShow -> fragment.updateBackground(it.banner)
                     }
@@ -344,7 +344,7 @@ class CategoryViewHolder(
             setOnFocusChangeListener { _, hasFocus ->
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> when (selected) {
+                        is HomeTvFragment -> when (selected) {
                             is Movie -> fragment.updateBackground(selected.banner)
                             is TvShow -> fragment.updateBackground(selected.banner)
                         }
@@ -358,7 +358,7 @@ class CategoryViewHolder(
                             handler.removeCallbacksAndMessages(null)
                             category.selectedIndex = (category.selectedIndex + 1) % category.list.size
                             when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                                is HomeFragment -> when (val it = category.list[category.selectedIndex]) {
+                                is HomeTvFragment -> when (val it = category.list[category.selectedIndex]) {
                                     is Movie -> fragment.updateBackground(it.banner)
                                     is TvShow -> fragment.updateBackground(it.banner)
                                 }
@@ -374,8 +374,8 @@ class CategoryViewHolder(
                 handler.removeCallbacksAndMessages(null)
                 findNavController().navigate(
                     when (selected) {
-                        is Movie -> HomeFragmentDirections.actionHomeToMovie(selected.id)
-                        is TvShow -> HomeFragmentDirections.actionHomeToTvShow(selected.id)
+                        is Movie -> HomeTvFragmentDirections.actionHomeToMovie(selected.id)
+                        is TvShow -> HomeTvFragmentDirections.actionHomeToTvShow(selected.id)
                     }
                 )
             }

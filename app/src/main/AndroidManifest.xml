@@ -35,7 +35,7 @@
         </activity>
 
         <activity
-            android:name=".activities.main.MainActivity"
+            android:name=".activities.main.MainTvActivity"
             android:exported="true"
             android:theme="@style/AppTheme.SplashScreen">
             <intent-filter>

@@ -6,12 +6,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.databinding.ItemSeasonBinding
+import com.tanasi.streamflix.databinding.ItemSeasonTvBinding
 import com.tanasi.streamflix.databinding.ItemSeasonMobileBinding
-import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
 import com.tanasi.streamflix.models.Season
-
 
 class SeasonViewHolder(
     private val _binding: ViewBinding
@@ -27,7 +26,7 @@ class SeasonViewHolder(
 
         when (_binding) {
             is ItemSeasonMobileBinding -> displayMobileItem(_binding)
-            is ItemSeasonBinding -> displayItem(_binding)
+            is ItemSeasonTvBinding -> displayTvItem(_binding)
         }
     }
 
@@ -60,11 +59,11 @@ class SeasonViewHolder(
         binding.tvSeasonTitle.text = season.title
     }
 
-    private fun displayItem(binding: ItemSeasonBinding) {
+    private fun displayTvItem(binding: ItemSeasonTvBinding) {
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    TvShowFragmentDirections.actionTvShowToSeason(
+                    TvShowTvFragmentDirections.actionTvShowToSeason(
                         tvShowId = season.tvShow?.id ?: "",
                         tvShowTitle = season.tvShow?.title ?: "",
                         tvShowPoster = season.tvShow?.poster,

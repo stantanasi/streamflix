@@ -8,18 +8,18 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.database.AppDatabase
-import com.tanasi.streamflix.databinding.ItemEpisodeBinding
-import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeTvBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingTvBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingMobileBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeMobileBinding
-import com.tanasi.streamflix.fragments.home.HomeFragment
-import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
+import com.tanasi.streamflix.fragments.home.HomeTvFragment
+import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
-import com.tanasi.streamflix.fragments.season.SeasonFragmentDirections
+import com.tanasi.streamflix.fragments.season.SeasonTvFragmentDirections
 import com.tanasi.streamflix.fragments.season.SeasonMobileFragmentDirections
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.ui.ShowOptionsDialog
+import com.tanasi.streamflix.ui.ShowOptionsTvDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
@@ -39,9 +39,9 @@ class EpisodeViewHolder(
 
         when (_binding) {
             is ItemEpisodeMobileBinding -> displayMobileItem(_binding)
-            is ItemEpisodeBinding -> displayItem(_binding)
+            is ItemEpisodeTvBinding -> displayTvItem(_binding)
             is ItemEpisodeContinueWatchingMobileBinding -> displayContinueWatchingMobileItem(_binding)
-            is ItemEpisodeContinueWatchingBinding -> displayContinueWatchingItem(_binding)
+            is ItemEpisodeContinueWatchingTvBinding -> displayContinueWatchingTvItem(_binding)
         }
     }
 
@@ -126,7 +126,7 @@ class EpisodeViewHolder(
         binding.tvEpisodeTitle.text = episode.title
     }
 
-    private fun displayItem(binding: ItemEpisodeBinding) {
+    private fun displayTvItem(binding: ItemEpisodeTvBinding) {
         database.episodeDao().getById(episode.id)?.let { episodeDb ->
             episode.merge(episodeDb)
         }
@@ -134,7 +134,7 @@ class EpisodeViewHolder(
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    SeasonFragmentDirections.actionSeasonToPlayer(
+                    SeasonTvFragmentDirections.actionSeasonToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
                         subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
@@ -169,7 +169,7 @@ class EpisodeViewHolder(
                 )
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context, episode)
+                ShowOptionsTvDialog(context, episode)
                     .show()
                 true
             }
@@ -301,7 +301,7 @@ class EpisodeViewHolder(
         )
     }
 
-    private fun displayContinueWatchingItem(binding: ItemEpisodeContinueWatchingBinding) {
+    private fun displayContinueWatchingTvItem(binding: ItemEpisodeContinueWatchingTvBinding) {
         database.episodeDao().getById(episode.id)?.let { episodeDb ->
             episode.merge(episodeDb)
         }
@@ -309,7 +309,7 @@ class EpisodeViewHolder(
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    HomeFragmentDirections.actionHomeToPlayer(
+                    HomeTvFragmentDirections.actionHomeToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
                         subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
@@ -344,7 +344,7 @@ class EpisodeViewHolder(
                 )
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context, episode)
+                ShowOptionsTvDialog(context, episode)
                     .show()
                 true
             }
@@ -358,7 +358,7 @@ class EpisodeViewHolder(
 
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> fragment.updateBackground(episode.tvShow?.banner)
+                        is HomeTvFragment -> fragment.updateBackground(episode.tvShow?.banner)
                     }
                 }
             }
