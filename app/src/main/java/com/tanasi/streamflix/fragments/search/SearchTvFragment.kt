@@ -72,7 +72,7 @@ class SearchTvFragment : Fragment() {
                             pbIsLoading.visibility = View.GONE
                             gIsLoadingRetry.visibility = View.VISIBLE
                             btnIsLoadingRetry.setOnClickListener {
-                                viewModel.search(viewModel.query)
+                                viewModel.search(binding.etSearch.text.toString())
                             }
                             binding.vgvSearch.visibility = View.INVISIBLE
                             binding.etSearch.nextFocusDownId = binding.isLoading.btnIsLoadingRetry.id

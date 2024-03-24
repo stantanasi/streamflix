@@ -71,7 +71,7 @@ class SearchMobileFragment : Fragment() {
                             pbIsLoading.visibility = View.GONE
                             gIsLoadingRetry.visibility = View.VISIBLE
                             btnIsLoadingRetry.setOnClickListener {
-                                viewModel.search(viewModel.query)
+                                viewModel.search(binding.etSearch.text.toString())
                             }
                         }
                     }
