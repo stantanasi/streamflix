@@ -68,10 +68,12 @@ abstract class AppDatabase : RoomDatabase() {
 
         private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE episodes ADD COLUMN watchedDate TEXT")
                 db.execSQL("ALTER TABLE episodes ADD COLUMN lastEngagementTimeUtcMillis INTEGER")
                 db.execSQL("ALTER TABLE episodes ADD COLUMN lastPlaybackPositionMillis INTEGER")
                 db.execSQL("ALTER TABLE episodes ADD COLUMN durationMillis INTEGER")
 
+                db.execSQL("ALTER TABLE movies ADD COLUMN watchedDate TEXT")
                 db.execSQL("ALTER TABLE movies ADD COLUMN lastEngagementTimeUtcMillis INTEGER")
                 db.execSQL("ALTER TABLE movies ADD COLUMN lastPlaybackPositionMillis INTEGER")
                 db.execSQL("ALTER TABLE movies ADD COLUMN durationMillis INTEGER")
