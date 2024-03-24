@@ -634,6 +634,7 @@ class TvShowViewHolder(
 
         val episodes = database.episodeDao().getByTvShowId(tvShow.id)
         val episode = episodes
+            .filter { it.watchHistory != null }
             .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
             .firstOrNull()
             ?: episodes.indexOfLast { it.isWatched }
