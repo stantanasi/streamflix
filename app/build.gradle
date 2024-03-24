@@ -78,6 +78,7 @@ dependencies {
     implementation 'androidx.tvprovider:tvprovider:1.1.0-alpha01'
 
     implementation "androidx.room:room-runtime:2.6.1"
+    implementation 'com.google.android.material:material:1.11.0'
     annotationProcessor "androidx.room:room-compiler:2.6.1"
     ksp "androidx.room:room-compiler:2.6.1"
 }

@@ -3,7 +3,6 @@ package com.tanasi.streamflix.providers
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
-import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -355,10 +354,10 @@ object SflixProvider : Provider {
             overview = document.selectFirst("div.description")
                 ?.ownText() ?: "",
             released = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Released") ?: false }
+                .find { it.select(".type").text().contains("Released") }
                 ?.ownText()?.trim(),
             runtime = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Duration") ?: false }
+                .find { it.select(".type").text().contains("Duration") }
                 ?.ownText()?.removeSuffix("min")?.trim()?.toIntOrNull(),
             trailer = document.selectFirst("iframe#iframe-trailer")
                 ?.attr("data-src")?.substringAfterLast("/")
@@ -373,7 +372,7 @@ object SflixProvider : Provider {
                 ?.attr("style")?.substringAfter("background-image: url(")?.substringBefore(");"),
 
             genres = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Genre") ?: false }
+                .find { it.select(".type").text().contains("Genre") }
                 ?.select("a")?.map {
                     Genre(
                         id = it.attr("href").substringAfter("/genre/"),
@@ -381,7 +380,7 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             cast = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Casts") ?: false }
+                .find { it.select(".type").text().contains("Casts") }
                 ?.select("a")?.map {
                     People(
                         id = it.attr("href").substringAfter("/cast/"),
@@ -448,10 +447,10 @@ object SflixProvider : Provider {
             overview = document.selectFirst("div.description")
                 ?.ownText() ?: "",
             released = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Released") ?: false }
+                .find { it.select(".type").text().contains("Released") }
                 ?.ownText()?.trim(),
             runtime = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Duration") ?: false }
+                .find { it.select(".type").text().contains("Duration") }
                 ?.ownText()?.removeSuffix("min")?.trim()?.toIntOrNull(),
             trailer = document.selectFirst("iframe#iframe-trailer")
                 ?.attr("data-src")?.substringAfterLast("/")
@@ -475,7 +474,7 @@ object SflixProvider : Provider {
                     )
                 },
             genres = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Genre") ?: false }
+                .find { it.select(".type").text().contains("Genre") }
                 ?.select("a")?.map {
                     Genre(
                         id = it.attr("href").substringAfter("/genre/"),
@@ -483,7 +482,7 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             cast = document.select("div.elements > .row > div > .row-line")
-                .find { it?.select(".type")?.text()?.contains("Casts") ?: false }
+                .find { it.select(".type").text().contains("Casts") }
                 ?.select("a")?.map {
                     People(
                         id = it.attr("href").substringAfter("/cast/"),
@@ -675,10 +674,10 @@ object SflixProvider : Provider {
         return people
     }
 
-    override suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server> {
+    override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         val servers = when (videoType) {
-            is PlayerFragment.VideoType.Movie -> service.getMovieServers(id)
-            is PlayerFragment.VideoType.Episode -> service.getEpisodeServers(id)
+            is Video.Type.Movie -> service.getMovieServers(id)
+            is Video.Type.Episode -> service.getEpisodeServers(id)
         }.select("a")
             .map {
                 Video.Server(

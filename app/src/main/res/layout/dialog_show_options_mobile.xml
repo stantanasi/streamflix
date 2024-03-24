@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_show_options_mobile"
+    android:paddingBottom="16dp">
+
+    <ImageView
+        android:id="@+id/ic_handlebar"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_handlebar"
+        android:tint="#808080"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription,UseAppTint" />
+
+    <ImageView
+        android:id="@+id/iv_options_show_poster"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ic_handlebar"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/tv_options_show_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_options_show_poster"
+        tools:text="Title" />
+
+    <TextView
+        android:id="@+id/tv_show_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_options_show_title"
+        tools:text="Subtitle" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_show_subtitle">
+
+        <TextView
+            android:id="@+id/btn_option_episode_open_tv_show"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_item_option"
+            android:gravity="center_vertical"
+            android:padding="12dp"
+            android:text="@string/option_episode_open_tv_show"
+            android:textColor="@color/option_text" />
+
+        <TextView
+            android:id="@+id/btn_option_show_favorite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_item_option"
+            android:gravity="center_vertical"
+            android:padding="12dp"
+            android:text="@string/option_show_favorite"
+            android:textColor="@color/option_text" />
+
+        <TextView
+            android:id="@+id/btn_option_show_watched"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_item_option"
+            android:gravity="center_vertical"
+            android:padding="12dp"
+            android:text="@string/option_show_watched"
+            android:textColor="@color/option_text" />
+
+        <TextView
+            android:id="@+id/btn_option_program_clear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_item_option"
+            android:gravity="center_vertical"
+            android:padding="12dp"
+            android:text="@string/option_clear_program"
+            android:textColor="@color/option_text" />
+
+        <TextView
+            android:id="@+id/btn_option_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_item_option"
+            android:gravity="center_vertical"
+            android:padding="12dp"
+            android:text="@string/option_cancel"
+            android:textColor="@color/option_text" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

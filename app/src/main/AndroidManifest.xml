@@ -6,7 +6,7 @@
         android:required="false" />
     <uses-feature
         android:name="android.software.leanback"
-        android:required="true" />
+        android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
@@ -21,11 +21,21 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:screenOrientation="landscape"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.Base"
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".activities.main.MainActivity"
+            android:name=".activities.main.MainMobileActivity"
+            android:configChanges="orientation|screenLayout|screenSize"
+            android:exported="true"
+            android:theme="@style/AppTheme.SplashScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.main.MainTvActivity"
             android:exported="true"
             android:theme="@style/AppTheme.SplashScreen">
             <intent-filter>

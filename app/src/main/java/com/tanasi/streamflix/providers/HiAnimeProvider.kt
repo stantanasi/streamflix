@@ -3,7 +3,6 @@ package com.tanasi.streamflix.providers
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
-import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -614,7 +613,6 @@ object HiAnimeProvider : Provider {
                 when (it) {
                     is Movie -> it.id
                     is TvShow -> it.id
-                    else -> it
                 }
             }
         )
@@ -623,9 +621,9 @@ object HiAnimeProvider : Provider {
     }
 
 
-    override suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server> {
+    override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         val episodeId = when (videoType) {
-            is PlayerFragment.VideoType.Movie -> {
+            is Video.Type.Movie -> {
                 val response = service.getTvShowEpisodes(tvShowId = id.substringAfterLast("-"))
 
                 Jsoup.parse(response.html).select("div.ss-list > a[href].ssl-item.ep-item")
@@ -635,7 +633,7 @@ object HiAnimeProvider : Provider {
                             ?.attr("href")?.substringAfterLast("=")
                     } ?: ""
             }
-            is PlayerFragment.VideoType.Episode -> id
+            is Video.Type.Episode -> id
         }
 
         val servers = Jsoup.parse(service.getServers(episodeId).html)

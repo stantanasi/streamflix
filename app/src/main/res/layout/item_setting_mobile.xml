@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:background="@drawable/bg_item_setting"
+    android:minHeight="52dp">
+
+    <ImageView
+        android:id="@+id/iv_setting_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        android:duplicateParentState="true"
+        android:tint="@color/setting_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription,UseAppTint"
+        tools:src="@drawable/ic_settings_quality"
+        tools:visibility="visible" />
+
+    <View
+        android:id="@+id/v_setting_color"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/bg_item_setting_color"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/barrier1"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrier1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="right"
+        app:constraint_referenced_ids="iv_setting_icon,v_setting_color" />
+
+    <TextView
+        android:id="@+id/tv_setting_main_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:duplicateParentState="true"
+        android:textColor="@color/setting_text"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@id/tv_setting_sub_text"
+        app:layout_constraintEnd_toStartOf="@id/iv_setting_enter"
+        app:layout_constraintStart_toEndOf="@id/barrier1"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Text" />
+
+    <TextView
+        android:id="@+id/tv_setting_sub_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:duplicateParentState="true"
+        android:textColor="#808080"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/iv_setting_enter"
+        app:layout_constraintStart_toEndOf="@id/barrier1"
+        app:layout_constraintTop_toBottomOf="@id/tv_setting_main_text"
+        tools:text="Subtitle"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/iv_setting_enter"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginEnd="10dp"
+        android:duplicateParentState="true"
+        android:src="@drawable/ic_setting_arrow_right"
+        android:tint="#808080"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription,UseAppTint"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/iv_setting_is_selected"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginEnd="10dp"
+        android:duplicateParentState="true"
+        android:src="@drawable/ic_setting_check"
+        android:tint="@color/setting_text"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ContentDescription,UseAppTint"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

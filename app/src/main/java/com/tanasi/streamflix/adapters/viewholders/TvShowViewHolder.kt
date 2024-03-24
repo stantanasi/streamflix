@@ -13,33 +13,53 @@ import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
-import com.tanasi.streamflix.databinding.ContentTvShowBinding
-import com.tanasi.streamflix.databinding.ContentTvShowCastsBinding
-import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsBinding
-import com.tanasi.streamflix.databinding.ContentTvShowSeasonsBinding
-import com.tanasi.streamflix.databinding.ItemTvShowBinding
+import com.tanasi.streamflix.databinding.ContentTvShowTvBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastsTvBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastsMobileBinding
+import com.tanasi.streamflix.databinding.ContentTvShowMobileBinding
+import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsTvBinding
+import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsMobileBinding
+import com.tanasi.streamflix.databinding.ContentTvShowSeasonsTvBinding
+import com.tanasi.streamflix.databinding.ContentTvShowSeasonsMobileBinding
+import com.tanasi.streamflix.databinding.ItemTvShowTvBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridBinding
-import com.tanasi.streamflix.fragments.genre.GenreFragment
-import com.tanasi.streamflix.fragments.genre.GenreFragmentDirections
-import com.tanasi.streamflix.fragments.home.HomeFragment
-import com.tanasi.streamflix.fragments.home.HomeFragmentDirections
-import com.tanasi.streamflix.fragments.movie.MovieFragment
-import com.tanasi.streamflix.fragments.movie.MovieFragmentDirections
-import com.tanasi.streamflix.fragments.people.PeopleFragment
-import com.tanasi.streamflix.fragments.people.PeopleFragmentDirections
-import com.tanasi.streamflix.fragments.player.PlayerFragment
-import com.tanasi.streamflix.fragments.search.SearchFragment
-import com.tanasi.streamflix.fragments.search.SearchFragmentDirections
-import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
-import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
-import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragment
-import com.tanasi.streamflix.fragments.tv_shows.TvShowsFragmentDirections
-import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.databinding.ItemTvShowGridMobileBinding
+import com.tanasi.streamflix.databinding.ItemTvShowMobileBinding
+import com.tanasi.streamflix.fragments.genre.GenreTvFragment
+import com.tanasi.streamflix.fragments.genre.GenreTvFragmentDirections
+import com.tanasi.streamflix.fragments.genre.GenreMobileFragment
+import com.tanasi.streamflix.fragments.genre.GenreMobileFragmentDirections
+import com.tanasi.streamflix.fragments.home.HomeTvFragment
+import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
+import com.tanasi.streamflix.fragments.home.HomeMobileFragment
+import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
+import com.tanasi.streamflix.fragments.movie.MovieTvFragment
+import com.tanasi.streamflix.fragments.movie.MovieTvFragmentDirections
+import com.tanasi.streamflix.fragments.movie.MovieMobileFragment
+import com.tanasi.streamflix.fragments.movie.MovieMobileFragmentDirections
+import com.tanasi.streamflix.fragments.people.PeopleTvFragment
+import com.tanasi.streamflix.fragments.people.PeopleTvFragmentDirections
+import com.tanasi.streamflix.fragments.people.PeopleMobileFragment
+import com.tanasi.streamflix.fragments.people.PeopleMobileFragmentDirections
+import com.tanasi.streamflix.fragments.search.SearchTvFragment
+import com.tanasi.streamflix.fragments.search.SearchTvFragmentDirections
+import com.tanasi.streamflix.fragments.search.SearchMobileFragment
+import com.tanasi.streamflix.fragments.search.SearchMobileFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragment
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragment
+import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
+import com.tanasi.streamflix.fragments.tv_shows.TvShowsTvFragment
+import com.tanasi.streamflix.fragments.tv_shows.TvShowsTvFragmentDirections
+import com.tanasi.streamflix.fragments.tv_shows.TvShowsMobileFragment
+import com.tanasi.streamflix.fragments.tv_shows.TvShowsMobileFragmentDirections
 import com.tanasi.streamflix.models.Movie
-import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.ui.ShowOptionsDialog
-import com.tanasi.streamflix.utils.WatchNextUtils
+import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.ui.ShowOptionsTvDialog
+import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
+import com.tanasi.streamflix.ui.SpacingItemDecoration
+import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
@@ -56,9 +76,12 @@ class TvShowViewHolder(
 
     val childRecyclerView: RecyclerView?
         get() = when (_binding) {
-            is ContentTvShowSeasonsBinding -> _binding.hgvTvShowSeasons
-            is ContentTvShowCastsBinding -> _binding.hgvTvShowCasts
-            is ContentTvShowRecommendationsBinding -> _binding.hgvTvShowRecommendations
+            is ContentTvShowSeasonsMobileBinding -> _binding.rvTvShowSeasons
+            is ContentTvShowSeasonsTvBinding -> _binding.hgvTvShowSeasons
+            is ContentTvShowCastsMobileBinding -> _binding.rvTvShowCasts
+            is ContentTvShowCastsTvBinding -> _binding.hgvTvShowCasts
+            is ContentTvShowRecommendationsMobileBinding -> _binding.rvTvShowRecommendations
+            is ContentTvShowRecommendationsTvBinding -> _binding.hgvTvShowRecommendations
             else -> null
         }
 
@@ -66,43 +89,112 @@ class TvShowViewHolder(
         this.tvShow = tvShow
 
         when (_binding) {
-            is ItemTvShowBinding -> displayItem(_binding)
-            is ItemTvShowGridBinding -> displayGridItem(_binding)
+            is ItemTvShowMobileBinding -> displayMobileItem(_binding)
+            is ItemTvShowTvBinding -> displayTvItem(_binding)
+            is ItemTvShowGridMobileBinding -> displayGridMobileItem(_binding)
+            is ItemTvShowGridBinding -> displayGridTvItem(_binding)
 
-            is ContentTvShowBinding -> displayTvShow(_binding)
-            is ContentTvShowSeasonsBinding -> displaySeasons(_binding)
-            is ContentTvShowCastsBinding -> displayCasts(_binding)
-            is ContentTvShowRecommendationsBinding -> displayRecommendations(_binding)
+            is ContentTvShowMobileBinding -> displayTvShowMobile(_binding)
+            is ContentTvShowTvBinding -> displayTvShowTv(_binding)
+            is ContentTvShowSeasonsMobileBinding -> displaySeasonsMobile(_binding)
+            is ContentTvShowSeasonsTvBinding -> displaySeasonsTv(_binding)
+            is ContentTvShowCastsMobileBinding -> displayCastsMobile(_binding)
+            is ContentTvShowCastsTvBinding -> displayCastsTv(_binding)
+            is ContentTvShowRecommendationsMobileBinding -> displayRecommendationsMobile(_binding)
+            is ContentTvShowRecommendationsTvBinding -> displayRecommendationsTv(_binding)
         }
     }
 
 
-    private fun displayItem(binding: ItemTvShowBinding) {
+    private fun displayMobileItem(binding: ItemTvShowMobileBinding) {
+        database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
+            tvShow.merge(tvShowDb)
+        }
+
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
-                    is HomeFragment -> findNavController().navigate(
-                        HomeFragmentDirections.actionHomeToTvShow(
+                    is HomeMobileFragment -> findNavController().navigate(
+                        HomeMobileFragmentDirections.actionHomeToTvShow(
                             id = tvShow.id
                         )
                     )
-                    is MovieFragment -> findNavController().navigate(
-                        MovieFragmentDirections.actionMovieToTvShow(
+                    is MovieMobileFragment -> findNavController().navigate(
+                        MovieMobileFragmentDirections.actionMovieToTvShow(
                             id = tvShow.id
                         )
                     )
-                    is TvShowFragment -> findNavController().navigate(
-                        TvShowFragmentDirections.actionTvShowToTvShow(
+                    is TvShowMobileFragment -> findNavController().navigate(
+                        TvShowMobileFragmentDirections.actionTvShowToTvShow(
                             id = tvShow.id
                         )
                     )
                 }
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context).also {
-                    it.show = tvShow
-                    it.show()
+                ShowOptionsMobileDialog(context, tvShow)
+                    .show()
+                true
+            }
+        }
+
+        Glide.with(context)
+            .load(tvShow.poster)
+            .centerCrop()
+            .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowQuality.apply {
+            text = tvShow.quality ?: ""
+            visibility = when {
+                tvShow.quality.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
+            season.episodes.lastOrNull()?.let { episode ->
+                if (season.number != 0) {
+                    context.getString(
+                        R.string.tv_show_item_season_number_episode_number,
+                        season.number,
+                        episode.number
+                    )
+                } else {
+                    context.getString(
+                        R.string.tv_show_item_episode_number,
+                        episode.number
+                    )
                 }
+            }
+        } ?: context.getString(R.string.tv_show_item_type)
+
+        binding.tvTvShowTitle.text = tvShow.title
+    }
+
+    private fun displayTvItem(binding: ItemTvShowTvBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                when (context.toActivity()?.getCurrentFragment()) {
+                    is HomeTvFragment -> findNavController().navigate(
+                        HomeTvFragmentDirections.actionHomeToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                    is MovieTvFragment -> findNavController().navigate(
+                        MovieTvFragmentDirections.actionMovieToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                    is TvShowTvFragment -> findNavController().navigate(
+                        TvShowTvFragmentDirections.actionTvShowToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                }
+            }
+            setOnLongClickListener {
+                ShowOptionsTvDialog(context, tvShow)
+                    .show()
                 true
             }
             setOnFocusChangeListener { _, hasFocus ->
@@ -115,7 +207,7 @@ class TvShowViewHolder(
 
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                        is HomeFragment -> fragment.updateBackground(tvShow.banner)
+                        is HomeTvFragment -> fragment.updateBackground(tvShow.banner)
                     }
                 }
             }
@@ -155,37 +247,105 @@ class TvShowViewHolder(
         binding.tvTvShowTitle.text = tvShow.title
     }
 
-    private fun displayGridItem(binding: ItemTvShowGridBinding) {
+    private fun displayGridMobileItem(binding: ItemTvShowGridMobileBinding) {
+        database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
+            tvShow.merge(tvShowDb)
+        }
+
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
-                    is GenreFragment -> findNavController().navigate(
-                        GenreFragmentDirections.actionGenreToTvShow(
+                    is GenreMobileFragment -> findNavController().navigate(
+                        GenreMobileFragmentDirections.actionGenreToTvShow(
                             id = tvShow.id
                         )
                     )
-                    is PeopleFragment -> findNavController().navigate(
-                        PeopleFragmentDirections.actionPeopleToTvShow(
+                    is PeopleMobileFragment -> findNavController().navigate(
+                        PeopleMobileFragmentDirections.actionPeopleToTvShow(
                             id = tvShow.id
                         )
                     )
-                    is SearchFragment -> findNavController().navigate(
-                        SearchFragmentDirections.actionSearchToTvShow(
+                    is SearchMobileFragment -> findNavController().navigate(
+                        SearchMobileFragmentDirections.actionSearchToTvShow(
                             id = tvShow.id
                         )
                     )
-                    is TvShowsFragment -> findNavController().navigate(
-                        TvShowsFragmentDirections.actionTvShowsToTvShow(
+                    is TvShowsMobileFragment -> findNavController().navigate(
+                        TvShowsMobileFragmentDirections.actionTvShowsToTvShow(
                             id = tvShow.id
                         )
                     )
                 }
             }
             setOnLongClickListener {
-                ShowOptionsDialog(context).also {
-                    it.show = tvShow
-                    it.show()
+                ShowOptionsMobileDialog(context, tvShow)
+                    .show()
+                true
+            }
+        }
+
+        Glide.with(context)
+            .load(tvShow.poster)
+            .centerCrop()
+            .into(binding.ivTvShowPoster)
+
+        binding.tvTvShowQuality.apply {
+            text = tvShow.quality ?: ""
+            visibility = when {
+                tvShow.quality.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvTvShowLastEpisode.text = tvShow.seasons.lastOrNull()?.let { season ->
+            season.episodes.lastOrNull()?.let { episode ->
+                if (season.number != 0) {
+                    context.getString(
+                        R.string.tv_show_item_season_number_episode_number,
+                        season.number,
+                        episode.number
+                    )
+                } else {
+                    context.getString(
+                        R.string.tv_show_item_episode_number,
+                        episode.number
+                    )
                 }
+            }
+        } ?: context.getString(R.string.tv_show_item_type)
+
+        binding.tvTvShowTitle.text = tvShow.title
+    }
+
+    private fun displayGridTvItem(binding: ItemTvShowGridBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                when (context.toActivity()?.getCurrentFragment()) {
+                    is GenreTvFragment -> findNavController().navigate(
+                        GenreTvFragmentDirections.actionGenreToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                    is PeopleTvFragment -> findNavController().navigate(
+                        PeopleTvFragmentDirections.actionPeopleToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                    is SearchTvFragment -> findNavController().navigate(
+                        SearchTvFragmentDirections.actionSearchToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                    is TvShowsTvFragment -> findNavController().navigate(
+                        TvShowsTvFragmentDirections.actionTvShowsToTvShow(
+                            id = tvShow.id
+                        )
+                    )
+                }
+            }
+            setOnLongClickListener {
+                ShowOptionsTvDialog(context, tvShow)
+                    .show()
                 true
             }
             setOnFocusChangeListener { _, hasFocus ->
@@ -233,7 +393,7 @@ class TvShowViewHolder(
     }
 
 
-    private fun displayTvShow(binding: ContentTvShowBinding) {
+    private fun displayTvShowMobile(binding: ContentTvShowMobileBinding) {
         binding.ivTvShowPoster.run {
             Glide.with(context)
                 .load(tvShow.poster)
@@ -293,71 +453,49 @@ class TvShowViewHolder(
 
         binding.tvTvShowOverview.text = tvShow.overview
 
-        val episode = WatchNextUtils.programs(context)
-            .sortedByDescending { it.lastEngagementTimeUtcMillis }
-            .find { it.seriesId == tvShow.id }
-            ?.let {
-                Episode(
-                    id = it.contentId,
-                    number = it.episodeNumber?.toIntOrNull() ?: 0,
-                    title = it.episodeTitle ?: "",
-
-                    tvShow = TvShow(
-                        id = it.seriesId ?: "",
-                        title = it.title ?: "",
-                        poster = it.posterArtUri?.toString(),
-                    ),
-                    season = Season(
-                        id = "",
-                        number = it.seasonNumber?.toIntOrNull() ?: 0,
-                        title = it.seasonTitle ?: "",
-                    ),
-                )
-            }
-            ?: database.episodeDao().getEpisodesByTvShowId(tvShow.id)
-                .let { episodes ->
-                    episodes.indexOfLast { it.isWatched }
-                        .takeIf { it != -1 && it + 1 < episodes.size }
-                        ?.let { episodes.getOrNull(it + 1) }
-                        ?: episodes.firstOrNull()
-                }
-                ?.also { episode ->
-                    episode.season = episode.season?.let { database.seasonDao().getSeason(it.id) }
-                }
+        val episodes = database.episodeDao().getByTvShowId(tvShow.id)
+        val episode = episodes
+            .filter { it.watchHistory != null }
+            .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
+            .firstOrNull()
+            ?: episodes.indexOfLast { it.isWatched }
+                .takeIf { it != -1 && it + 1 < episodes.size }
+                ?.let { episodes.getOrNull(it + 1) }
+            ?: episodes.firstOrNull()
+        episode?.season = episode?.season?.let { database.seasonDao().getById(it.id) }
 
         binding.btnTvShowWatchEpisode.apply {
             setOnClickListener {
                 if (episode == null) return@setOnClickListener
 
                 findNavController().navigate(
-                    TvShowFragmentDirections.actionTvShowToPlayer(
+                    TvShowMobileFragmentDirections.actionTvShowToPlayer(
                         id = episode.id,
                         title = tvShow.title,
-                        subtitle = when (val season = episode.season) {
-                            null -> context.getString(
-                                R.string.player_subtitle_tv_show_episode_only,
-                                episode.number,
-                                episode.title
-                            )
-                            else -> context.getString(
+                        subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
+                            context.getString(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
                                 episode.number,
                                 episode.title
                             )
-                        },
-                        videoType = PlayerFragment.VideoType.Episode(
+                        } ?: context.getString(
+                            R.string.player_subtitle_tv_show_episode_only,
+                            episode.number,
+                            episode.title
+                        ),
+                        videoType = Video.Type.Episode(
                             id = episode.id,
                             number = episode.number,
                             title = episode.title,
                             poster = episode.poster,
-                            tvShow = PlayerFragment.VideoType.Episode.TvShow(
+                            tvShow = Video.Type.Episode.TvShow(
                                 id = tvShow.id,
                                 title = tvShow.title,
                                 poster = tvShow.poster,
                                 banner = tvShow.banner,
                             ),
-                            season = PlayerFragment.VideoType.Episode.Season(
+                            season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
                                 title = episode.season?.title ?: "",
                             ),
@@ -367,17 +505,16 @@ class TvShowViewHolder(
             }
 
             text = if (episode != null) {
-                when (val season = episode.season) {
-                    null -> context.getString(
-                        R.string.tv_show_watch_episode,
-                        episode.number
-                    )
-                    else -> context.getString(
+                episode.season?.takeIf { it.number != 0 }?.let { season ->
+                    context.getString(
                         R.string.tv_show_watch_season_episode,
                         season.number,
                         episode.number
                     )
-                }
+                } ?: context.getString(
+                    R.string.tv_show_watch_episode,
+                    episode.number
+                )
             } else ""
             visibility = when {
                 episode != null -> View.VISIBLE
@@ -393,16 +530,14 @@ class TvShowViewHolder(
         }
 
         binding.pbTvShowProgressEpisode.apply {
-            val program = episode?.let {
-                WatchNextUtils.getProgram(context, episode.id)
-            }
+            val watchHistory = episode?.watchHistory
 
             progress = when {
-                program != null -> (program.lastPlaybackPositionMillis * 100 / program.durationMillis.toDouble()).toInt()
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
                 else -> 0
             }
             visibility = when {
-                program != null -> View.VISIBLE
+                watchHistory != null -> View.VISIBLE
                 else -> View.GONE
             }
         }
@@ -423,11 +558,8 @@ class TvShowViewHolder(
             }
 
             setOnClickListener {
-                database.tvShowDao().updateFavorite(
-                    id = tvShow.id,
-                    isFavorite = !tvShow.isFavorite
-                )
                 tvShow.isFavorite = !tvShow.isFavorite
+                database.tvShowDao().update(tvShow)
 
                 setImageDrawable(
                     ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
@@ -440,34 +572,257 @@ class TvShowViewHolder(
         }
     }
 
-    private fun displaySeasons(binding: ContentTvShowSeasonsBinding) {
+    private fun displayTvShowTv(binding: ContentTvShowTvBinding) {
+        binding.ivTvShowPoster.run {
+            Glide.with(context)
+                .load(tvShow.poster)
+                .into(this)
+            visibility = when {
+                tvShow.poster.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvTvShowTitle.text = tvShow.title
+
+        binding.tvTvShowRating.text = tvShow.rating?.let { String.format("%.1f", it) } ?: "N/A"
+
+        binding.tvTvShowQuality.apply {
+            text = tvShow.quality
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvTvShowReleased.apply {
+            text = tvShow.released?.format("yyyy")
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvTvShowRuntime.apply {
+            text = tvShow.runtime?.let {
+                val hours = it / 60
+                val minutes = it % 60
+                when {
+                    hours > 0 -> context.getString(
+                        R.string.tv_show_runtime_hours_minutes,
+                        hours,
+                        minutes
+                    )
+                    else -> context.getString(R.string.tv_show_runtime_minutes, minutes)
+                }
+            }
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvTvShowGenres.apply {
+            text = tvShow.genres.joinToString(", ") { it.name }
+            visibility = when {
+                tvShow.genres.isEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvTvShowOverview.text = tvShow.overview
+
+        val episodes = database.episodeDao().getByTvShowId(tvShow.id)
+        val episode = episodes
+            .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
+            .firstOrNull()
+            ?: episodes.indexOfLast { it.isWatched }
+                .takeIf { it != -1 && it + 1 < episodes.size }
+                ?.let { episodes.getOrNull(it + 1) }
+            ?: episodes.firstOrNull()
+
+        binding.btnTvShowWatchEpisode.apply {
+            setOnClickListener {
+                if (episode == null) return@setOnClickListener
+
+                findNavController().navigate(
+                    TvShowTvFragmentDirections.actionTvShowToPlayer(
+                        id = episode.id,
+                        title = tvShow.title,
+                        subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
+                            context.getString(
+                                R.string.player_subtitle_tv_show,
+                                season.number,
+                                episode.number,
+                                episode.title
+                            )
+                        } ?: context.getString(
+                            R.string.player_subtitle_tv_show_episode_only,
+                            episode.number,
+                            episode.title
+                        ),
+                        videoType = Video.Type.Episode(
+                            id = episode.id,
+                            number = episode.number,
+                            title = episode.title,
+                            poster = episode.poster,
+                            tvShow = Video.Type.Episode.TvShow(
+                                id = tvShow.id,
+                                title = tvShow.title,
+                                poster = tvShow.poster,
+                                banner = tvShow.banner,
+                            ),
+                            season = Video.Type.Episode.Season(
+                                number = episode.season?.number ?: 0,
+                                title = episode.season?.title ?: "",
+                            ),
+                        ),
+                    )
+                )
+            }
+
+            text = if (episode != null) {
+                episode.season?.takeIf { it.number != 0 }?.let { season ->
+                    context.getString(
+                        R.string.tv_show_watch_season_episode,
+                        season.number,
+                        episode.number
+                    )
+                } ?: context.getString(
+                    R.string.tv_show_watch_episode,
+                    episode.number
+                )
+            } else ""
+            visibility = when {
+                episode != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+
+        binding.pbTvShowWatchEpisodeLoading.apply {
+            visibility = when {
+                episode != null -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.pbTvShowProgressEpisode.apply {
+            val watchHistory = episode?.watchHistory
+
+            progress = when {
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                watchHistory != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
+
+        binding.btnTvShowTrailer.setOnClickListener {
+            context.startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(tvShow.trailer)
+                )
+            )
+        }
+
+        binding.btnTvShowFavorite.apply {
+            fun Boolean.drawable() = when (this) {
+                true -> R.drawable.ic_favorite_enable
+                false -> R.drawable.ic_favorite_disable
+            }
+
+            setOnClickListener {
+                tvShow.isFavorite = !tvShow.isFavorite
+                database.tvShowDao().update(tvShow)
+
+                setImageDrawable(
+                    ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
+                )
+            }
+
+            setImageDrawable(
+                ContextCompat.getDrawable(context, tvShow.isFavorite.drawable())
+            )
+        }
+    }
+
+    private fun displaySeasonsMobile(binding: ContentTvShowSeasonsMobileBinding) {
+        binding.rvTvShowSeasons.apply {
+            adapter = AppAdapter().apply {
+                submitList(tvShow.seasons.onEach {
+                    it.itemType = AppAdapter.Type.SEASON_MOBILE_ITEM
+                })
+            }
+            if (itemDecorationCount == 0) {
+                addItemDecoration(SpacingItemDecoration(20.dp(context)))
+            }
+        }
+    }
+
+    private fun displaySeasonsTv(binding: ContentTvShowSeasonsTvBinding) {
         binding.hgvTvShowSeasons.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.seasons)
+                submitList(tvShow.seasons.onEach {
+                    it.itemType = AppAdapter.Type.SEASON_TV_ITEM
+                })
             }
             setItemSpacing(80)
         }
     }
 
-    private fun displayCasts(binding: ContentTvShowCastsBinding) {
+    private fun displayCastsMobile(binding: ContentTvShowCastsMobileBinding) {
+        binding.rvTvShowCasts.apply {
+            adapter = AppAdapter().apply {
+                submitList(tvShow.cast.onEach {
+                    it.itemType = AppAdapter.Type.PEOPLE_MOBILE_ITEM
+                })
+            }
+            if (itemDecorationCount == 0) {
+                addItemDecoration(SpacingItemDecoration(20.dp(context)))
+            }
+        }
+    }
+
+    private fun displayCastsTv(binding: ContentTvShowCastsTvBinding) {
         binding.hgvTvShowCasts.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.cast)
+                submitList(tvShow.cast.onEach {
+                    it.itemType = AppAdapter.Type.PEOPLE_TV_ITEM
+                })
             }
             setItemSpacing(80)
         }
     }
 
-    private fun displayRecommendations(binding: ContentTvShowRecommendationsBinding) {
+    private fun displayRecommendationsMobile(binding: ContentTvShowRecommendationsMobileBinding) {
+        binding.rvTvShowRecommendations.apply {
+            adapter = AppAdapter().apply {
+                submitList(tvShow.recommendations.onEach {
+                    when (it) {
+                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_MOBILE_ITEM
+                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_MOBILE_ITEM
+                    }
+                })
+            }
+            if (itemDecorationCount == 0) {
+                addItemDecoration(SpacingItemDecoration(10.dp(context)))
+            }
+        }
+    }
+
+    private fun displayRecommendationsTv(binding: ContentTvShowRecommendationsTvBinding) {
         binding.hgvTvShowRecommendations.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
-                items.addAll(tvShow.recommendations.onEach {
+                submitList(tvShow.recommendations.onEach {
                     when (it) {
-                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_ITEM
-                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_ITEM
+                        is Movie -> it.itemType = AppAdapter.Type.MOVIE_TV_ITEM
+                        is TvShow -> it.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
                     }
                 })
             }

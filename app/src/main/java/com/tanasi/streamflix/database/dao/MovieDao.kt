@@ -4,23 +4,28 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.tanasi.streamflix.models.Movie
 
 @Dao
 interface MovieDao {
 
-    @Query("SELECT * FROM movies WHERE isFavorite = 1")
-    fun getFavoriteMovies(): List<Movie>
-
     @Query("SELECT * FROM movies WHERE id = :id")
-    fun getMovie(id: String): Movie?
+    fun getById(id: String): Movie?
+
+    @Query("SELECT * FROM movies WHERE isFavorite = 1")
+    fun getFavorites(): List<Movie>
+
+    @Query("SELECT * FROM movies WHERE lastEngagementTimeUtcMillis IS NOT NULL ORDER BY lastEngagementTimeUtcMillis DESC")
+    fun getWatchingMovies(): List<Movie>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(movie: Movie)
 
-    @Query("UPDATE movies SET isFavorite = :isFavorite WHERE id = :id")
-    fun updateFavorite(id: String, isFavorite: Boolean)
+    @Update
+    fun update(movie: Movie)
 
-    @Query("UPDATE movies SET isWatched = :isWatched WHERE id = :id")
-    fun updateWatched(id: String, isWatched: Boolean)
+    fun save(movie: Movie) = getById(movie.id)
+        ?.let { update(movie) }
+        ?: insert(movie)
 }

@@ -1,7 +1,6 @@
 package com.tanasi.streamflix.providers
 
 import com.tanasi.streamflix.adapters.AppAdapter
-import com.tanasi.streamflix.fragments.player.PlayerFragment
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -34,7 +33,7 @@ interface Provider {
 
     suspend fun getPeople(id: String, page: Int = 1): People
 
-    suspend fun getServers(id: String, videoType: PlayerFragment.VideoType): List<Video.Server>
+    suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server>
 
     suspend fun getVideo(server: Video.Server): Video
 

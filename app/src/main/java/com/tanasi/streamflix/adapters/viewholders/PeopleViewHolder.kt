@@ -6,11 +6,16 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.databinding.ItemPeopleBinding
-import com.tanasi.streamflix.fragments.movie.MovieFragment
-import com.tanasi.streamflix.fragments.movie.MovieFragmentDirections
-import com.tanasi.streamflix.fragments.tv_show.TvShowFragment
-import com.tanasi.streamflix.fragments.tv_show.TvShowFragmentDirections
+import com.tanasi.streamflix.databinding.ItemPeopleTvBinding
+import com.tanasi.streamflix.databinding.ItemPeopleMobileBinding
+import com.tanasi.streamflix.fragments.movie.MovieTvFragment
+import com.tanasi.streamflix.fragments.movie.MovieTvFragmentDirections
+import com.tanasi.streamflix.fragments.movie.MovieMobileFragment
+import com.tanasi.streamflix.fragments.movie.MovieMobileFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragment
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragment
+import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
 import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
@@ -28,20 +33,47 @@ class PeopleViewHolder(
         this.people = people
 
         when (_binding) {
-            is ItemPeopleBinding -> displayItem(_binding)
+            is ItemPeopleMobileBinding -> displayMobileItem(_binding)
+            is ItemPeopleTvBinding -> displayTvItem(_binding)
         }
     }
 
 
-    private fun displayItem(binding: ItemPeopleBinding) {
+    private fun displayMobileItem(binding: ItemPeopleMobileBinding) {
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
-                    is MovieFragment -> findNavController().navigate(
-                        MovieFragmentDirections.actionMovieToPeople(people.id)
+                    is MovieMobileFragment -> findNavController().navigate(
+                        MovieMobileFragmentDirections.actionMovieToPeople(people.id)
                     )
-                    is TvShowFragment -> findNavController().navigate(
-                        TvShowFragmentDirections.actionTvShowToPeople(people.id)
+                    is TvShowMobileFragment -> findNavController().navigate(
+                        TvShowMobileFragmentDirections.actionTvShowToPeople(people.id)
+                    )
+                }
+            }
+        }
+
+        binding.ivPeopleImage.apply {
+            clipToOutline = true
+            Glide.with(context)
+                .load(people.image)
+                .placeholder(R.drawable.ic_person_placeholder)
+                .centerCrop()
+                .into(this)
+        }
+
+        binding.tvPeopleName.text = people.name
+    }
+
+    private fun displayTvItem(binding: ItemPeopleTvBinding) {
+        binding.root.apply {
+            setOnClickListener {
+                when (context.toActivity()?.getCurrentFragment()) {
+                    is MovieTvFragment -> findNavController().navigate(
+                        MovieTvFragmentDirections.actionMovieToPeople(people.id)
+                    )
+                    is TvShowTvFragment -> findNavController().navigate(
+                        TvShowTvFragmentDirections.actionTvShowToPeople(people.id)
                     )
                 }
             }

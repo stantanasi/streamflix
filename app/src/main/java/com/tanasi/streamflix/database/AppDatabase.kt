@@ -5,6 +5,8 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.tanasi.streamflix.database.dao.EpisodeDao
 import com.tanasi.streamflix.database.dao.MovieDao
 import com.tanasi.streamflix.database.dao.SeasonDao
@@ -22,7 +24,7 @@ import com.tanasi.streamflix.utils.UserPreferences
         Season::class,
         TvShow::class,
     ],
-    version = 1,
+    version = 2,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -60,7 +62,22 @@ abstract class AppDatabase : RoomDatabase() {
                 name = "${UserPreferences.currentProvider!!.name.lowercase()}.db"
             )
                 .allowMainThreadQueries()
-                .fallbackToDestructiveMigration()
+                .addMigrations(MIGRATION_1_2)
                 .build()
+
+
+        private val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE episodes ADD COLUMN watchedDate TEXT")
+                db.execSQL("ALTER TABLE episodes ADD COLUMN lastEngagementTimeUtcMillis INTEGER")
+                db.execSQL("ALTER TABLE episodes ADD COLUMN lastPlaybackPositionMillis INTEGER")
+                db.execSQL("ALTER TABLE episodes ADD COLUMN durationMillis INTEGER")
+
+                db.execSQL("ALTER TABLE movies ADD COLUMN watchedDate TEXT")
+                db.execSQL("ALTER TABLE movies ADD COLUMN lastEngagementTimeUtcMillis INTEGER")
+                db.execSQL("ALTER TABLE movies ADD COLUMN lastPlaybackPositionMillis INTEGER")
+                db.execSQL("ALTER TABLE movies ADD COLUMN durationMillis INTEGER")
+            }
+        }
     }
 }

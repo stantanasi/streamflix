@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme.Widget.Button" parent="AppTheme.Base">
-        <item name="android:background">@drawable/bg_button</item>
+    <style name="AppTheme.Widget.Button" parent="AppTheme.Tv">
+        <item name="android:background">@drawable/bg_button_tv</item>
         <item name="android:focusable">true</item>
         <item name="android:focusableInTouchMode">true</item>
         <item name="android:paddingTop">6dp</item>
@@ -11,6 +11,20 @@
         <item name="android:paddingEnd">16dp</item>
         <item name="android:textColor">@drawable/color_button_text</item>
         <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="AppTheme.Widget.Mobile.Button" parent="AppTheme.Mobile">
+        <item name="android:background">@drawable/bg_button_mobile</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textColor">#000000</item>
+    </style>
+
+    <style name="AppTheme.Widget.Mobile.Button.Secondary" parent="AppTheme.Widget.Mobile.Button">
+        <item name="android:background">@drawable/bg_button_secondary_mobile</item>
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 
 </resources>

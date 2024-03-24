@@ -6,7 +6,7 @@ import androidx.media3.ui.CaptionStyleCompat
 import com.tanasi.streamflix.BuildConfig
 import com.tanasi.streamflix.providers.Provider
 import com.tanasi.streamflix.providers.Provider.Companion.providers
-import com.tanasi.streamflix.ui.PlayerSettingsView
+import com.tanasi.streamflix.ui.PlayerSettingsTvView
 
 object UserPreferences {
 
@@ -26,7 +26,7 @@ object UserPreferences {
 
     var captionTextSize: Float
         get() = Key.CAPTION_TEXT_SIZE.getFloat()
-            ?: PlayerSettingsView.Settings.Subtitle.Style.TextSize.DEFAULT.value
+            ?: PlayerSettingsTvView.Settings.Subtitle.Style.TextSize.DEFAULT.value
         set(value) {
             Key.CAPTION_TEXT_SIZE.setFloat(value)
         }
@@ -34,16 +34,16 @@ object UserPreferences {
     var captionStyle: CaptionStyleCompat
         get() = CaptionStyleCompat(
             Key.CAPTION_STYLE_FONT_COLOR.getInt()
-                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.foregroundColor,
+                ?: PlayerSettingsTvView.Settings.Subtitle.Style.DEFAULT.foregroundColor,
             Key.CAPTION_STYLE_BACKGROUND_COLOR.getInt()
-                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.backgroundColor,
+                ?: PlayerSettingsTvView.Settings.Subtitle.Style.DEFAULT.backgroundColor,
             Key.CAPTION_STYLE_WINDOW_COLOR.getInt()
-                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.windowColor,
+                ?: PlayerSettingsTvView.Settings.Subtitle.Style.DEFAULT.windowColor,
             Key.CAPTION_STYLE_EDGE_TYPE.getInt()
-                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.edgeType,
+                ?: PlayerSettingsTvView.Settings.Subtitle.Style.DEFAULT.edgeType,
             Key.CAPTION_STYLE_EDGE_COLOR.getInt()
-                ?: PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.edgeColor,
-            PlayerSettingsView.Settings.Subtitle.Style.DEFAULT.typeface
+                ?: PlayerSettingsTvView.Settings.Subtitle.Style.DEFAULT.edgeColor,
+            PlayerSettingsTvView.Settings.Subtitle.Style.DEFAULT.typeface
         )
         set(value) {
             Key.CAPTION_STYLE_FONT_COLOR.setInt(value.foregroundColor)
