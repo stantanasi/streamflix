@@ -19,7 +19,6 @@
         android:label="@string/app_name"
         android:logo="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
-        android:screenOrientation="landscape"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true">
 
