@@ -3,7 +3,7 @@
 <p align="center">
   <img src="./app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" height="100px" />
   <br />
-  An Android TV app to stream movies and TV shows for free, made with Android Studio, in Kotlin
+  An Android TV and mobile app to stream movies and TV shows for free, made with Android Studio, in Kotlin
   <br />
   <a href="https://github.com/stantanasi/streamflix/releases/latest">
     <strong>Download app »</strong>
@@ -37,7 +37,7 @@
   <img src="./.github/docs/screenshot.png" alt="Streamflix Preview">
 </p>
 
-Streamflix is an Android TV app that allows users to watch movies and TV shows online in HD quality for free.
+Streamflix is an Android TV and mobile app that allows users to watch movies and TV shows online in HD quality for free.
 
 With no registration or payment required, you can binge-watch hundreds of thousands of movies and TV shows in 1080p and 720p, with multiple subtitles, seamlessly and safely. 
 
@@ -59,6 +59,7 @@ New titles are updated on the app daily to make sure fun never ends on Streamfli
 - [Kotlin](https://kotlinlang.org)
 - [Retrofit](https://square.github.io/retrofit)
 - [ExoPlayer](https://exoplayer.dev)
+- Leanback
 - Coroutines
 - MVVM Architecture
 - Android Architecture Components
