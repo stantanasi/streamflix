@@ -640,6 +640,7 @@ class TvShowViewHolder(
                 .takeIf { it != -1 && it + 1 < episodes.size }
                 ?.let { episodes.getOrNull(it + 1) }
             ?: episodes.firstOrNull()
+        episode?.season = episode?.season?.let { database.seasonDao().getById(it.id) }
 
         binding.btnTvShowWatchEpisode.apply {
             setOnClickListener {
