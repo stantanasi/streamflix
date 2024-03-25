@@ -52,5 +52,7 @@ class Video(
         val id: String,
         val name: String,
         val src: String = "",
-    )
+    ) {
+        var video: Video? = null
+    }
 }
