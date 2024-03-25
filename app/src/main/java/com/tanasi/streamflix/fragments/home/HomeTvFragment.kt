@@ -85,7 +85,7 @@ class HomeTvFragment : Fragment() {
                             ?: database.episodeDao().insert(Episode(
                                 id = program.contentId,
                                 number = program.episodeNumber?.toIntOrNull() ?: 0,
-                                title = program.episodeTitle ?: "",
+                                title = program.episodeTitle,
 
                                 tvShow = TvShow(
                                     id = program.seriesId ?: "",
@@ -95,7 +95,7 @@ class HomeTvFragment : Fragment() {
                                 season = Season(
                                     id = "",
                                     number = program.seasonNumber?.toIntOrNull() ?: 0,
-                                    title = program.seasonTitle ?: "",
+                                    title = program.seasonTitle,
                                 ),
                             ).also { episode ->
                                 episode.watchHistory = WatchItem.WatchHistory(

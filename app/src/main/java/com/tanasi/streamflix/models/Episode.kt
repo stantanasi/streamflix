@@ -14,7 +14,7 @@ class Episode(
     @PrimaryKey
     var id: String,
     var number: Int,
-    var title: String = "",
+    var title: String? = null,
     released: String? = null,
     var poster: String? = null,
 
@@ -44,7 +44,7 @@ class Episode(
     fun copy(
         id: String = this.id,
         number: Int = this.number,
-        title: String = this.title,
+        title: String? = this.title,
         released: String? = this.released?.format("yyyy-MM-dd"),
         poster: String? = this.poster,
         tvShow: TvShow? = this.tvShow,
@@ -82,7 +82,7 @@ class Episode(
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + number
-        result = 31 * result + title.hashCode()
+        result = 31 * result + (title?.hashCode() ?: 0)
         result = 31 * result + (poster?.hashCode() ?: 0)
         result = 31 * result + (tvShow?.hashCode() ?: 0)
         result = 31 * result + (season?.hashCode() ?: 0)

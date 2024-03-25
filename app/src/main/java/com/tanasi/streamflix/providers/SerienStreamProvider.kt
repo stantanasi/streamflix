@@ -166,7 +166,7 @@ object SerienStreamProvider : Provider {
         return TvShow(
             id = id,
             title = document.selectFirst("h1 > span")?.text() ?: "",
-            overview = document.selectFirst("p.seri_des")?.attr("data-full-description") ?: "",
+            overview = document.selectFirst("p.seri_des")?.attr("data-full-description"),
             released = document.selectFirst("div.series-title > small > span:nth-child(1)")
                 ?.text()
                 ?: "",
@@ -190,7 +190,7 @@ object SerienStreamProvider : Provider {
                         id = it.selectFirst("a")?.attr("href")
                             ?.let { it1 -> getSeasonIdFromLink(it1) } ?: "",
                         number = it.selectFirst("a")?.text()?.toIntOrNull() ?: 0,
-                        title = it.selectFirst("a")?.attr("title") ?: "",
+                        title = it.selectFirst("a")?.attr("title"),
                     )
                 })
     }
@@ -206,7 +206,7 @@ object SerienStreamProvider : Provider {
                 id = it.selectFirst("a")?.attr("href")?.let { it1 -> getEpisodeIdFromLink(it1) }
                     ?: "",
                 number = it.selectFirst("meta")?.attr("content")?.toIntOrNull() ?: 0,
-                title = it.selectFirst("strong")?.text() ?: "",
+                title = it.selectFirst("strong")?.text(),
             )
         }
     }

@@ -10,8 +10,8 @@ class Season(
     @PrimaryKey
     var id: String,
     var number: Int,
-    var title: String = "",
-    var poster: String = "",
+    var title: String? = null,
+    var poster: String? = null,
 
     var tvShow: TvShow? = null,
     @Ignore
@@ -27,8 +27,8 @@ class Season(
     fun copy(
         id: String = this.id,
         number: Int = this.number,
-        title: String = this.title,
-        poster: String = this.poster,
+        title: String? = this.title,
+        poster: String? = this.poster,
         tvShow: TvShow? = this.tvShow,
         episodes: List<Episode> = this.episodes,
     ) = Season(
@@ -59,8 +59,8 @@ class Season(
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + number
-        result = 31 * result + title.hashCode()
-        result = 31 * result + poster.hashCode()
+        result = 31 * result + (title?.hashCode() ?: 0)
+        result = 31 * result + (poster?.hashCode() ?: 0)
         result = 31 * result + (tvShow?.hashCode() ?: 0)
         result = 31 * result + episodes.hashCode()
         result = 31 * result + (if (::itemType.isInitialized) itemType.hashCode() else 0)

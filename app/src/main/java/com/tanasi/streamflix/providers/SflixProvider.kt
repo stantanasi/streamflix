@@ -45,7 +45,7 @@ object SflixProvider : Provider {
                     val title = it.selectFirst("h2.film-title")
                         ?.text() ?: ""
                     val overview = it.selectFirst("p.sc-desc")
-                        ?.text() ?: ""
+                        ?.text()
                     val info = it.select("div.sc-detail > div.scd-item").toInfo()
                     val poster = it.selectFirst("img.film-poster-img")
                         ?.attr("src")
@@ -352,7 +352,7 @@ object SflixProvider : Provider {
             title = document.selectFirst("h2.heading-name")
                 ?.text() ?: "",
             overview = document.selectFirst("div.description")
-                ?.ownText() ?: "",
+                ?.ownText(),
             released = document.select("div.elements > .row > div > .row-line")
                 .find { it.select(".type").text().contains("Released") }
                 ?.ownText()?.trim(),
@@ -445,7 +445,7 @@ object SflixProvider : Provider {
             title = document.selectFirst("h2.heading-name")
                 ?.text() ?: "",
             overview = document.selectFirst("div.description")
-                ?.ownText() ?: "",
+                ?.ownText(),
             released = document.select("div.elements > .row > div > .row-line")
                 .find { it.select(".type").text().contains("Released") }
                 ?.ownText()?.trim(),
@@ -549,7 +549,7 @@ object SflixProvider : Provider {
                         ?.text()?.substringAfter("Episode ")?.substringBefore(":")?.toIntOrNull()
                         ?: episodeNumber,
                     title = episodeElement.selectFirst("h3.film-name")
-                        ?.text() ?: "",
+                        ?.text(),
                     poster = episodeElement.selectFirst("img")
                         ?.attr("src"),
                 )

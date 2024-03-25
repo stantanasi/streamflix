@@ -62,12 +62,18 @@ class EpisodeViewHolder(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
                                 episode.number,
-                                episode.title
+                                episode.title ?: context.getString(
+                                    R.string.episode_number,
+                                    episode.number
+                                )
                             )
                         } ?: context.getString(
                             R.string.player_subtitle_tv_show_episode_only,
                             episode.number,
-                            episode.title
+                            episode.title ?: context.getString(
+                                R.string.episode_number,
+                                episode.number
+                            )
                         ),
                         videoType = Video.Type.Episode(
                             id = episode.id,
@@ -82,7 +88,7 @@ class EpisodeViewHolder(
                             ),
                             season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
-                                title = episode.season?.title ?: "",
+                                title = episode.season?.title,
                             ),
                         ),
                     )
@@ -119,11 +125,14 @@ class EpisodeViewHolder(
         }
 
         binding.tvEpisodeInfo.text = context.getString(
-            R.string.seasons_episode_number,
+            R.string.episode_number,
             episode.number
         )
 
-        binding.tvEpisodeTitle.text = episode.title
+        binding.tvEpisodeTitle.text = episode.title ?: context.getString(
+            R.string.episode_number,
+            episode.number
+        )
     }
 
     private fun displayTvItem(binding: ItemEpisodeTvBinding) {
@@ -142,12 +151,18 @@ class EpisodeViewHolder(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
                                 episode.number,
-                                episode.title
+                                episode.title ?: context.getString(
+                                    R.string.episode_number,
+                                    episode.number
+                                )
                             )
                         } ?: context.getString(
                             R.string.player_subtitle_tv_show_episode_only,
                             episode.number,
-                            episode.title
+                            episode.title ?: context.getString(
+                                R.string.episode_number,
+                                episode.number
+                            )
                         ),
                         videoType = Video.Type.Episode(
                             id = episode.id,
@@ -162,7 +177,7 @@ class EpisodeViewHolder(
                             ),
                             season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
-                                title = episode.season?.title ?: "",
+                                title = episode.season?.title,
                             ),
                         ),
                     )
@@ -208,11 +223,14 @@ class EpisodeViewHolder(
         }
 
         binding.tvEpisodeInfo.text = context.getString(
-            R.string.seasons_episode_number,
+            R.string.episode_number,
             episode.number
         )
 
-        binding.tvEpisodeTitle.text = episode.title
+        binding.tvEpisodeTitle.text = episode.title ?: context.getString(
+            R.string.episode_number,
+            episode.number
+        )
     }
 
     private fun displayContinueWatchingMobileItem(binding: ItemEpisodeContinueWatchingMobileBinding) {
@@ -231,12 +249,18 @@ class EpisodeViewHolder(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
                                 episode.number,
-                                episode.title
+                                episode.title ?: context.getString(
+                                    R.string.episode_number,
+                                    episode.number
+                                )
                             )
                         } ?: context.getString(
                             R.string.player_subtitle_tv_show_episode_only,
                             episode.number,
-                            episode.title
+                            episode.title ?: context.getString(
+                                R.string.episode_number,
+                                episode.number
+                            )
                         ),
                         videoType = Video.Type.Episode(
                             id = episode.id,
@@ -251,7 +275,7 @@ class EpisodeViewHolder(
                             ),
                             season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
-                                title = episode.season?.title ?: "",
+                                title = episode.season?.title,
                             ),
                         ),
                     )
@@ -292,12 +316,18 @@ class EpisodeViewHolder(
                 R.string.episode_item_info,
                 season.number,
                 episode.number,
-                episode.title
+                episode.title ?: context.getString(
+                    R.string.episode_number,
+                    episode.number
+                )
             )
         } ?: context.getString(
             R.string.episode_item_info_episode_only,
             episode.number,
-            episode.title
+            episode.title ?: context.getString(
+                R.string.episode_number,
+                episode.number
+            )
         )
     }
 
@@ -317,12 +347,18 @@ class EpisodeViewHolder(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
                                 episode.number,
-                                episode.title
+                                episode.title ?: context.getString(
+                                    R.string.episode_number,
+                                    episode.number
+                                )
                             )
                         } ?: context.getString(
                             R.string.player_subtitle_tv_show_episode_only,
                             episode.number,
-                            episode.title
+                            episode.title ?: context.getString(
+                                R.string.episode_number,
+                                episode.number
+                            )
                         ),
                         videoType = Video.Type.Episode(
                             id = episode.id,
@@ -337,7 +373,7 @@ class EpisodeViewHolder(
                             ),
                             season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
-                                title = episode.season?.title ?: "",
+                                title = episode.season?.title,
                             ),
                         ),
                     )
@@ -395,12 +431,18 @@ class EpisodeViewHolder(
                 R.string.episode_item_info,
                 season.number,
                 episode.number,
-                episode.title
+                episode.title ?: context.getString(
+                    R.string.episode_number,
+                    episode.number
+                )
             )
         } ?: context.getString(
             R.string.episode_item_info_episode_only,
             episode.number,
-            episode.title
+            episode.title ?: context.getString(
+                R.string.episode_number,
+                episode.number
+            )
         )
     }
 }

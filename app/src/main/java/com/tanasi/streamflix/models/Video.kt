@@ -22,7 +22,7 @@ class Video(
         data class Episode(
             val id: String,
             val number: Int,
-            val title: String,
+            val title: String?,
             val poster: String?,
             val tvShow: TvShow,
             val season: Season,
@@ -38,7 +38,7 @@ class Video(
             @Parcelize
             data class Season(
                 val number: Int,
-                val title: String,
+                val title: String?,
             ) : Parcelable
         }
     }

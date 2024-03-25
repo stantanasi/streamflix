@@ -14,7 +14,7 @@ class Movie(
     @PrimaryKey
     var id: String,
     var title: String,
-    var overview: String = "",
+    var overview: String? = null,
     released: String? = null,
     var runtime: Int? = null,
     var trailer: String? = null,
@@ -59,7 +59,7 @@ class Movie(
     fun copy(
         id: String = this.id,
         title: String = this.title,
-        overview: String = this.overview,
+        overview: String? = this.overview,
         released: String? = this.released?.format("yyyy-MM-dd"),
         runtime: Int? = this.runtime,
         trailer: String? = this.trailer,
@@ -119,7 +119,7 @@ class Movie(
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + title.hashCode()
-        result = 31 * result + overview.hashCode()
+        result = 31 * result + (overview?.hashCode() ?: 0)
         result = 31 * result + (runtime ?: 0)
         result = 31 * result + (trailer?.hashCode() ?: 0)
         result = 31 * result + (quality?.hashCode() ?: 0)

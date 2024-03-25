@@ -45,7 +45,7 @@ object AnyMovieProvider : Provider {
                     val title = it.selectFirst("div.Title")
                         ?.text() ?: ""
                     val overview = it.selectFirst("div.Description > p")
-                        ?.text() ?: ""
+                        ?.text()
                     val released = it.selectFirst("span.Date")
                         ?.text()
                     val runtime = it.selectFirst("span.Time")
@@ -166,7 +166,7 @@ object AnyMovieProvider : Provider {
                             title = it.selectFirst("h2.Title")
                                 ?.text() ?: "",
                             overview = it.selectFirst("div.Description > p")
-                                ?.text() ?: "",
+                                ?.text(),
                             released = it.selectFirst("div.Image span.Yr")
                                 ?.text(),
                             runtime = it.selectFirst("span.Time")
@@ -218,7 +218,7 @@ object AnyMovieProvider : Provider {
                             title = it.selectFirst("h2.Title")
                                 ?.text() ?: "",
                             overview = it.selectFirst("div.Description > p")
-                                ?.text() ?: "",
+                                ?.text(),
                             released = it.selectFirst("div.Image span.Yr")
                                 ?.text(),
                             runtime = it.selectFirst("span.Time")
@@ -290,7 +290,7 @@ object AnyMovieProvider : Provider {
             val title = it.selectFirst("h2.Title")
                 ?.text() ?: ""
             val overview = it.selectFirst("div.Description > p")
-                ?.text() ?: ""
+                ?.text()
             val released = it.selectFirst("div.Image span.Yr")
                 ?.text()
             val runtime = it.selectFirst("span.Time")
@@ -377,7 +377,7 @@ object AnyMovieProvider : Provider {
                 title = it.selectFirst("h2.Title")
                     ?.text() ?: "",
                 overview = it.selectFirst("div.Description > p")
-                    ?.text() ?: "",
+                    ?.text(),
                 released = it.selectFirst("div.Image span.Yr")
                     ?.text(),
                 runtime = it.selectFirst("span.Time")
@@ -433,7 +433,7 @@ object AnyMovieProvider : Provider {
                 title = it.selectFirst("h2.Title")
                     ?.text() ?: "",
                 overview = it.selectFirst("div.Description > p")
-                    ?.text() ?: "",
+                    ?.text(),
                 released = it.selectFirst("div.Image span.Yr")
                     ?.text(),
                 runtime = it.selectFirst("span.Time")
@@ -479,7 +479,7 @@ object AnyMovieProvider : Provider {
             title = document.selectFirst("h1.Title")
                 ?.text() ?: "",
             overview = document.selectFirst("div.Description > p")
-                ?.text() ?: "",
+                ?.text(),
             released = document.selectFirst("span.Date")
                 ?.text(),
             runtime = document.selectFirst("span.Time")
@@ -554,7 +554,7 @@ object AnyMovieProvider : Provider {
             title = document.selectFirst("h1.Title")
                 ?.text() ?: "",
             overview = document.selectFirst("div.Description > p")
-                ?.text() ?: "",
+                ?.text(),
             released = document.selectFirst("span.Date")
                 ?.text(),
             runtime = document.selectFirst("span.Time")
@@ -574,7 +574,7 @@ object AnyMovieProvider : Provider {
                     number = it.selectFirst("div.Title > a > span")
                         ?.text()?.toIntOrNull() ?: 0,
                     title = it.selectFirst("div.Title")
-                        ?.text() ?: "",
+                        ?.text(),
                 )
             },
             genres = document.select("div.Description > p.Genre a").map {
@@ -638,7 +638,7 @@ object AnyMovieProvider : Provider {
                 number = it.selectFirst("span.Num")
                     ?.text()?.toIntOrNull() ?: 0,
                 title = it.selectFirst("td.MvTbTtl > a")
-                    ?.text() ?: "",
+                    ?.text(),
                 released = it.selectFirst("td.MvTbTtl > span")
                     ?.text(),
                 poster = it.selectFirst("td.MvTbImg img")
@@ -671,7 +671,7 @@ object AnyMovieProvider : Provider {
                 val showTitle = it.selectFirst("h2.Title")
                     ?.text() ?: ""
                 val showOverview = it.selectFirst("div.Description > p")
-                    ?.text() ?: ""
+                    ?.text()
                 val showReleased = it.selectFirst("div.Image span.Yr")
                     ?.text()
                 val showRuntime = it.selectFirst("span.Time")
@@ -778,7 +778,7 @@ object AnyMovieProvider : Provider {
                         val showTitle = it.selectFirst("h2.Title")
                             ?.text() ?: ""
                         val showOverview = it.selectFirst("div.Description > p")
-                            ?.text() ?: ""
+                            ?.text()
                         val showReleased = it.selectFirst("div.Image span.Yr")
                             ?.text()
                         val showRuntime = it.selectFirst("span.Time")

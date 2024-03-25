@@ -24,7 +24,7 @@ import com.tanasi.streamflix.utils.UserPreferences
         Season::class,
         TvShow::class,
     ],
-    version = 2,
+    version = 3,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -63,6 +63,7 @@ abstract class AppDatabase : RoomDatabase() {
             )
                 .allowMainThreadQueries()
                 .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_2_3)
                 .build()
 
 
@@ -77,6 +78,34 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE movies ADD COLUMN lastEngagementTimeUtcMillis INTEGER")
                 db.execSQL("ALTER TABLE movies ADD COLUMN lastPlaybackPositionMillis INTEGER")
                 db.execSQL("ALTER TABLE movies ADD COLUMN durationMillis INTEGER")
+            }
+        }
+
+        private val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Change episodes.title to Nullable
+                db.execSQL("CREATE TABLE `episodes_temp` (`id` TEXT NOT NULL, `number` INTEGER NOT NULL, `title` TEXT, `poster` TEXT, `tvShow` TEXT, `season` TEXT, `released` TEXT, `isWatched` INTEGER NOT NULL, `watchedDate` TEXT, `lastEngagementTimeUtcMillis` INTEGER, `lastPlaybackPositionMillis` INTEGER, `durationMillis` INTEGER, PRIMARY KEY(`id`))")
+                db.execSQL("INSERT INTO episodes_temp SELECT * FROM episodes")
+                db.execSQL("DROP TABLE episodes")
+                db.execSQL("ALTER TABLE episodes_temp RENAME TO episodes")
+
+                // Change movies.overview to Nullable
+                db.execSQL("CREATE TABLE `movies_temp` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `overview` TEXT, `runtime` INTEGER, `trailer` TEXT, `quality` TEXT, `rating` REAL, `poster` TEXT, `banner` TEXT, `released` TEXT, `isFavorite` INTEGER NOT NULL, `isWatched` INTEGER NOT NULL, `watchedDate` TEXT, `lastEngagementTimeUtcMillis` INTEGER, `lastPlaybackPositionMillis` INTEGER, `durationMillis` INTEGER, PRIMARY KEY(`id`))")
+                db.execSQL("INSERT INTO movies_temp SELECT * FROM movies")
+                db.execSQL("DROP TABLE movies")
+                db.execSQL("ALTER TABLE movies_temp RENAME TO movies")
+
+                // Change seasons.title, seasons.poster to Nullable
+                db.execSQL("CREATE TABLE `seasons_temp` (`id` TEXT NOT NULL, `number` INTEGER NOT NULL, `title` TEXT, `poster` TEXT, `tvShow` TEXT, PRIMARY KEY(`id`))")
+                db.execSQL("INSERT INTO seasons_temp SELECT * FROM seasons")
+                db.execSQL("DROP TABLE seasons")
+                db.execSQL("ALTER TABLE seasons_temp RENAME TO seasons")
+
+                // Change tv_shows.overview to Nullable
+                db.execSQL("CREATE TABLE `tv_shows_temp` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `overview` TEXT, `runtime` INTEGER, `trailer` TEXT, `quality` TEXT, `rating` REAL, `poster` TEXT, `banner` TEXT, `released` TEXT, `isFavorite` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+                db.execSQL("INSERT INTO tv_shows_temp SELECT * FROM tv_shows")
+                db.execSQL("DROP TABLE tv_shows")
+                db.execSQL("ALTER TABLE tv_shows_temp RENAME TO tv_shows")
             }
         }
     }
