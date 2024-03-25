@@ -88,7 +88,7 @@ class EpisodeViewHolder(
                             ),
                             season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
-                                title = episode.season?.title ?: "",
+                                title = episode.season?.title,
                             ),
                         ),
                     )
@@ -177,7 +177,7 @@ class EpisodeViewHolder(
                             ),
                             season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
-                                title = episode.season?.title ?: "",
+                                title = episode.season?.title,
                             ),
                         ),
                     )
@@ -275,7 +275,7 @@ class EpisodeViewHolder(
                             ),
                             season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
-                                title = episode.season?.title ?: "",
+                                title = episode.season?.title,
                             ),
                         ),
                     )
@@ -373,7 +373,7 @@ class EpisodeViewHolder(
                             ),
                             season = Video.Type.Episode.Season(
                                 number = episode.season?.number ?: 0,
-                                title = episode.season?.title ?: "",
+                                title = episode.season?.title,
                             ),
                         ),
                     )

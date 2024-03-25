@@ -56,7 +56,10 @@ class SeasonViewHolder(
                 .into(this)
         }
 
-        binding.tvSeasonTitle.text = season.title
+        binding.tvSeasonTitle.text = season.title ?: context.getString(
+            R.string.season_number,
+            season.number
+        )
     }
 
     private fun displayTvItem(binding: ItemSeasonTvBinding) {
@@ -92,6 +95,9 @@ class SeasonViewHolder(
                 .into(this)
         }
 
-        binding.tvSeasonTitle.text = season.title
+        binding.tvSeasonTitle.text = season.title ?: context.getString(
+            R.string.season_number,
+            season.number
+        )
     }
 }

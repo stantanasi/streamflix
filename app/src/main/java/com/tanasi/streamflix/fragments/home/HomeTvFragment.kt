@@ -95,7 +95,7 @@ class HomeTvFragment : Fragment() {
                                 season = Season(
                                     id = "",
                                     number = program.seasonNumber?.toIntOrNull() ?: 0,
-                                    title = program.seasonTitle ?: "",
+                                    title = program.seasonTitle,
                                 ),
                             ).also { episode ->
                                 episode.watchHistory = WatchItem.WatchHistory(

@@ -574,7 +574,7 @@ object AnyMovieProvider : Provider {
                     number = it.selectFirst("div.Title > a > span")
                         ?.text()?.toIntOrNull() ?: 0,
                     title = it.selectFirst("div.Title")
-                        ?.text() ?: "",
+                        ?.text(),
                 )
             },
             genres = document.select("div.Description > p.Genre a").map {

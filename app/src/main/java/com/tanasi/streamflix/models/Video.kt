@@ -38,7 +38,7 @@ class Video(
             @Parcelize
             data class Season(
                 val number: Int,
-                val title: String,
+                val title: String?,
             ) : Parcelable
         }
     }

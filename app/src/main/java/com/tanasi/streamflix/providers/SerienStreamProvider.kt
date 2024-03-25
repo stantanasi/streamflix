@@ -190,7 +190,7 @@ object SerienStreamProvider : Provider {
                         id = it.selectFirst("a")?.attr("href")
                             ?.let { it1 -> getSeasonIdFromLink(it1) } ?: "",
                         number = it.selectFirst("a")?.text()?.toIntOrNull() ?: 0,
-                        title = it.selectFirst("a")?.attr("title") ?: "",
+                        title = it.selectFirst("a")?.attr("title"),
                     )
                 })
     }
