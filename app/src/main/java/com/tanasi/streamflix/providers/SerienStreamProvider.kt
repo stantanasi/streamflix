@@ -166,7 +166,7 @@ object SerienStreamProvider : Provider {
         return TvShow(
             id = id,
             title = document.selectFirst("h1 > span")?.text() ?: "",
-            overview = document.selectFirst("p.seri_des")?.attr("data-full-description") ?: "",
+            overview = document.selectFirst("p.seri_des")?.attr("data-full-description"),
             released = document.selectFirst("div.series-title > small > span:nth-child(1)")
                 ?.text()
                 ?: "",

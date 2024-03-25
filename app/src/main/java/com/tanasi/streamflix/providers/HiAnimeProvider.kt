@@ -44,7 +44,7 @@ object HiAnimeProvider : Provider {
                     val title = it.selectFirst("div.desi-head-title")
                         ?.text() ?: ""
                     val overview = it.selectFirst("div.desi-description")
-                        ?.text() ?: ""
+                        ?.text()
                     val runtime = it.select("div.scd-item").firstOrNull { element ->
                         element.selectFirst("i.fa-clock") != null
                     }?.text()?.removeSuffix("m")?.toIntOrNull()
@@ -272,7 +272,7 @@ object HiAnimeProvider : Provider {
                 title = it.selectFirst("h3.film-name")
                     ?.text() ?: "",
                 overview = it.selectFirst("div.description")
-                    ?.text() ?: "",
+                    ?.text(),
                 runtime = it.selectFirst("span.fdi-duration")
                     ?.text()?.removeSuffix("m")?.toIntOrNull(),
                 poster = it.selectFirst("img.film-poster-img")
@@ -293,7 +293,7 @@ object HiAnimeProvider : Provider {
                 title = it.selectFirst("h3.film-name")
                     ?.text() ?: "",
                 overview = it.selectFirst("div.description")
-                    ?.text() ?: "",
+                    ?.text(),
                 runtime = it.selectFirst("div.fd-infor span.fdi-duration")
                     ?.text()?.removeSuffix("m")?.toIntOrNull(),
                 poster = it.selectFirst("img.film-poster-img")
@@ -330,7 +330,7 @@ object HiAnimeProvider : Provider {
             title = document.selectFirst("div.anisc-detail h2.film-name")
                 ?.text() ?: "",
             overview = document.selectFirst("div.anisc-detail div.film-description  > .text")
-                ?.text() ?: "",
+                ?.text(),
             released = document.select("div.anisc-info div.item")
                 .find { it.selectFirst("span.item-head")?.text() == "Aired:" }
                 ?.selectFirst("span.name")?.text()?.substringBefore(" to"),
@@ -414,7 +414,7 @@ object HiAnimeProvider : Provider {
             title = document.selectFirst("div.anisc-detail h2.film-name")
                 ?.text() ?: "",
             overview = document.selectFirst("div.anisc-detail div.film-description  > .text")
-                ?.text() ?: "",
+                ?.text(),
             released = document.select("div.anisc-info div.item")
                 .find { it.selectFirst("span.item-head")?.text() == "Aired:" }
                 ?.selectFirst("span.name")?.text()?.substringBefore(" to"),
@@ -528,7 +528,7 @@ object HiAnimeProvider : Provider {
                 val showTitle = it.selectFirst("h3.film-name")
                     ?.text() ?: ""
                 val showOverview = it.selectFirst("div.description")
-                    ?.text() ?: ""
+                    ?.text()
                 val showRuntime = it.selectFirst("div.fd-infor span.fdi-duration")
                     ?.text()?.substringBefore("m")?.toIntOrNull()
                 val showPoster = it.selectFirst("img")
