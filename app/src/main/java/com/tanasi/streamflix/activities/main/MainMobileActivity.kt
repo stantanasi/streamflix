@@ -1,5 +1,7 @@
 package com.tanasi.streamflix.activities.main
 
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -28,6 +30,11 @@ class MainMobileActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainMobileBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
+            finish()
+            startActivity(Intent(this, MainTvActivity::class.java))
+        }
 
         val navHostFragment = this.supportFragmentManager
             .findFragmentById(binding.navMainFragment.id) as NavHostFragment
