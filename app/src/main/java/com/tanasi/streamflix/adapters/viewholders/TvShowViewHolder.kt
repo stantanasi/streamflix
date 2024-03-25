@@ -477,12 +477,18 @@ class TvShowViewHolder(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
                                 episode.number,
-                                episode.title
+                                episode.title ?: context.getString(
+                                    R.string.episode_number,
+                                    episode.number
+                                )
                             )
                         } ?: context.getString(
                             R.string.player_subtitle_tv_show_episode_only,
                             episode.number,
-                            episode.title
+                            episode.title ?: context.getString(
+                                R.string.episode_number,
+                                episode.number
+                            )
                         ),
                         videoType = Video.Type.Episode(
                             id = episode.id,
@@ -656,12 +662,18 @@ class TvShowViewHolder(
                                 R.string.player_subtitle_tv_show,
                                 season.number,
                                 episode.number,
-                                episode.title
+                                episode.title ?: context.getString(
+                                    R.string.episode_number,
+                                    episode.number
+                                )
                             )
                         } ?: context.getString(
                             R.string.player_subtitle_tv_show_episode_only,
                             episode.number,
-                            episode.title
+                            episode.title ?: context.getString(
+                                R.string.episode_number,
+                                episode.number
+                            )
                         ),
                         videoType = Video.Type.Episode(
                             id = episode.id,

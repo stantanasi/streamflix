@@ -638,7 +638,7 @@ object AnyMovieProvider : Provider {
                 number = it.selectFirst("span.Num")
                     ?.text()?.toIntOrNull() ?: 0,
                 title = it.selectFirst("td.MvTbTtl > a")
-                    ?.text() ?: "",
+                    ?.text(),
                 released = it.selectFirst("td.MvTbTtl > span")
                     ?.text(),
                 poster = it.selectFirst("td.MvTbImg img")

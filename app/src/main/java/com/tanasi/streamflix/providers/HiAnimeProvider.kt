@@ -506,7 +506,7 @@ object HiAnimeProvider : Provider {
                 number = it.selectFirst("div.ssli-order")
                     ?.text()?.toIntOrNull() ?: 0,
                 title = it.selectFirst("div.ep-name")
-                    ?.text() ?: "",
+                    ?.text(),
             )
         }
 

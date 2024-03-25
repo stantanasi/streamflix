@@ -549,7 +549,7 @@ object SflixProvider : Provider {
                         ?.text()?.substringAfter("Episode ")?.substringBefore(":")?.toIntOrNull()
                         ?: episodeNumber,
                     title = episodeElement.selectFirst("h3.film-name")
-                        ?.text() ?: "",
+                        ?.text(),
                     poster = episodeElement.selectFirst("img")
                         ?.attr("src"),
                 )

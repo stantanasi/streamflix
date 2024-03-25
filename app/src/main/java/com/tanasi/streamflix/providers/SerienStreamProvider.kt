@@ -206,7 +206,7 @@ object SerienStreamProvider : Provider {
                 id = it.selectFirst("a")?.attr("href")?.let { it1 -> getEpisodeIdFromLink(it1) }
                     ?: "",
                 number = it.selectFirst("meta")?.attr("content")?.toIntOrNull() ?: 0,
-                title = it.selectFirst("strong")?.text() ?: "",
+                title = it.selectFirst("strong")?.text(),
             )
         }
     }

@@ -59,7 +59,8 @@
     <string name="movie_casts">Casts</string>
     <string name="movie_you_may_also_like">You may also like</string>
 
-    <string name="seasons_episode_number">Episode %d</string>
+    <string name="season_number">Season %d</string>
+    <string name="episode_number">Episode %d</string>
 
     <string name="genre_header_name">%s Movies and TV Shows</string>
 
