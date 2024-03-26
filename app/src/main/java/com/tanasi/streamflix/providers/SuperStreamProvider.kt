@@ -17,6 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
+import retrofit2.http.Url
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import javax.crypto.Cipher
@@ -147,7 +148,59 @@ object SuperStreamProvider : Provider {
     }
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
-        TODO("Not yet implemented")
+        if (query.isEmpty()) {
+            return listOf()
+        }
+
+        val response = service.search(
+            url,
+            queryApi(
+                mapOf(
+                    "childmode" to "0",
+                    "app_version" to "11.5",
+                    "appid" to appId,
+                    "module" to "Search3",
+                    "channel" to "Website",
+                    "page" to page.toString(),
+                    "lang" to "en",
+                    "type" to "all",
+                    "keyword" to query,
+                    "pagelimit" to "20",
+                    "expired_date" to "${getExpiryDate()}",
+                    "platform" to "android",
+                )
+            )
+        )
+
+        return response.data.mapNotNull { data ->
+            when (data.boxType) {
+                1 -> Movie(
+                    id = data.id.toString(),
+                    title = data.title ?: "",
+                    overview = data.description,
+                    released = data.year?.toString(),
+                    runtime = data.runtime,
+                    quality = data.qualityTag,
+                    rating = data.imdbRating?.toDoubleOrNull(),
+                    poster = data.poster,
+                    banner = data.bannerMini,
+                )
+
+                2 -> TvShow(
+                    id = data.id.toString(),
+                    title = data.title ?: "",
+                    overview = data.description,
+                    released = data.year?.toString(),
+                    runtime = data.runtime,
+                    quality = data.qualityTag,
+                    rating = data.imdbRating?.toDoubleOrNull(),
+                    poster = data.poster,
+                    banner = data.bannerMini,
+                )
+
+                else -> null
+            }
+        }
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
@@ -352,6 +405,14 @@ object SuperStreamProvider : Provider {
         suspend fun getHome(
             @FieldMap data: Map<String, String>,
         ): Response<List<HomeResponse>>
+
+        @POST
+        @FormUrlEncoded
+        suspend fun search(
+            @Url url: String,
+            @FieldMap data: Map<String, String>,
+        ): Response<List<Show>>
+
 
 
         data class Response<T>(
