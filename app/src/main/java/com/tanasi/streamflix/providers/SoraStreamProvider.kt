@@ -513,7 +513,70 @@ object SoraStreamProvider : Provider {
     }
 
     override suspend fun getMovie(id: String): Movie {
-        TODO("Not yet implemented")
+        val movie = TMDb3.Movies.details(
+            movieId = id.toInt(),
+            appendToResponse = listOf(
+                TMDb3.Params.AppendToResponse.Movie.CREDITS,
+                TMDb3.Params.AppendToResponse.Movie.RECOMMENDATIONS,
+                TMDb3.Params.AppendToResponse.Movie.VIDEOS,
+            )
+        ).let { movie ->
+            Movie(
+                id = movie.id.toString(),
+                title = movie.title,
+                overview = movie.overview,
+                released = movie.releaseDate,
+                runtime = movie.runtime,
+                trailer = movie.videos?.results
+                    ?.sortedBy { it.publishedAt ?: "" }
+                    ?.firstOrNull { it.site == TMDb3.Video.VideoSite.YOUTUBE }
+                    ?.let { "https://www.youtube.com/watch?v=${it.key}" },
+                rating = movie.voteAverage.toDouble(),
+                poster = movie.posterPath?.original,
+                banner = movie.backdropPath?.original,
+
+                genres = movie.genres.map { genre ->
+                    Genre(
+                        genre.id.toString(),
+                        genre.name,
+                    )
+                },
+                cast = movie.credits?.cast?.map { cast ->
+                    People(
+                        id = cast.id.toString(),
+                        name = cast.name,
+                        image = cast.profilePath?.w500,
+                    )
+                } ?: listOf(),
+                recommendations = movie.recommendations?.results?.mapNotNull { multi ->
+                    when (multi.mediaType) {
+                        TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                            id = multi.id.toString(),
+                            title = multi.title ?: "",
+                            overview = multi.overview,
+//                            released = multi.releasedDate,
+                            rating = multi.voteAverage.toDouble(),
+                            poster = multi.posterPath?.w500,
+                            banner = multi.backdropPath?.original,
+                        )
+
+                        TMDb3.MultiItem.MediaType.TV -> TvShow(
+                            id = multi.id.toString(),
+                            title = multi.name ?: "",
+                            overview = multi.overview,
+//                            released = multi.firstAirDate,
+                            rating = multi.voteAverage.toDouble(),
+                            poster = multi.posterPath?.w500,
+                            banner = multi.backdropPath?.original,
+                        )
+
+                        else -> null
+                    }
+                } ?: listOf(),
+            )
+        }
+
+        return movie
     }
 
     override suspend fun getTvShow(id: String): TvShow {
