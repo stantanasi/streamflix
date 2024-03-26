@@ -382,7 +382,8 @@ object SuperStreamProvider : Provider {
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
-        TODO("Not yet implemented")
+        // TODO
+        throw Exception("Not yet implemented")
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
