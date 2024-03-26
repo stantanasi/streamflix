@@ -625,7 +625,22 @@ object TMDb3 {
         @SerializedName("logo_path") val logoPath: String? = null,
         @SerializedName("name") val name: String? = null,
         @SerializedName("origin_country") val originCountry: String? = null
-    )
+    ) {
+
+        enum class CompanyId(val id: Int) {
+            CENTURY_STUDIOS(127928),
+            COLUMBIA_PICTURES(5),
+            NETFLIX_INTERNATIONAL_PICTURES(145174),
+            NEW_LINE_CINEMA(12),
+            PARAMOUNT_PICTURES(107355),
+            TRISTAR_PICTURES(559),
+            UNIVERSAL(33),
+            WALT_DISNEY_PICTURES(2),
+            WARNER_BROS_PICTURES(174);
+
+            override fun toString() = id.toString()
+        }
+    }
 
     data class ExternalIds(
         @SerializedName("imdb_id") val imdbId: String? = null,
