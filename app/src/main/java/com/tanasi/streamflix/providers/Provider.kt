@@ -42,7 +42,8 @@ interface Provider {
             SflixProvider,
             AnyMovieProvider,
             HiAnimeProvider,
-            SerienStreamProvider
+            SerienStreamProvider,
+            SoraStreamProvider,
         )
     }
 }
