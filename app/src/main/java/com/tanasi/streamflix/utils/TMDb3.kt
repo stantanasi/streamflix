@@ -58,6 +58,73 @@ object TMDb3 {
             }
         }
 
+        object AppendToResponse {
+
+            enum class Movie(val value: String) {
+                ACCOUNT_STATES("account_states"),
+                ALTERNATIVE_TITLES("alternative_titles"),
+                CHANGES("changes"),
+                CREDITS("credits"),
+                EXTERNAL_IDS("external_ids"),
+                IMAGES("images"),
+                KEYWORDS("keywords"),
+                LISTS("lists"),
+                RECOMMENDATIONS("recommendations"),
+                RELEASES_DATES("release_dates"),
+                REVIEWS("reviews"),
+                SIMILAR("similar"),
+                TRANSLATIONS("translations"),
+                VIDEOS("videos"),
+                WATCH_PROVIDERS("watch/providers"),
+            }
+
+            enum class Person(val value: String) {
+                CHANGES("changes"),
+                COMBINED_CREDITS("combined_credits"),
+                EXTERNAL_IDS("external_ids"),
+                IMAGES("images"),
+                MOVIE_CREDITS("movie_credits"),
+                TV_CREDITS("tv_credits"),
+                TRANSLATIONS("translations"),
+
+                @Deprecated("This method is deprecated")
+                TAGGED_IMAGES("tagged_images"),
+            }
+
+            enum class Tv(val value: String) {
+                ACCOUNT_STATES("account_states"),
+                AGGREGATE_CREDITS("aggregate_credits"),
+                ALTERNATIVE_TITLES("alternative_titles"),
+                CHANGES("changes"),
+                CONTENT_RATING("content_ratings"),
+                CREDITS("credits"),
+                EPISODE_GROUPS("episode_groups"),
+                EXTERNAL_IDS("external_ids"),
+                IMAGES("images"),
+                KEYWORDS("keywords"),
+                LISTS("lists"),
+                RECOMMENDATIONS("recommendations"),
+                REVIEWS("reviews"),
+                SCREENED_THEATRICALLY("screened_theatrically"),
+                SIMILAR("similar"),
+                TRANSLATIONS("translations"),
+                VIDEOS("videos"),
+                WATCH_PROVIDERS("watch/providers"),
+            }
+
+            enum class TvSeason(val value: String) {
+                ACCOUNT_STATES("account_states"),
+                AGGREGATE_CREDITS("aggregate_credits"),
+                CHANGES("changes"),
+                CREDITS("credits"),
+                EXTERNAL_IDS("external_ids"),
+                IMAGES("images"),
+                TRANSLATIONS("translations"),
+                VIDEOS("videos"),
+                WATCH_PROVIDERS("watch/providers"),
+            }
+        }
+
         object Key {
             const val AIR_DATE_GTE = "air_date.gte"
             const val AIR_DATE_LTE = "air_date.lte"
