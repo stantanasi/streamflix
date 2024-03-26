@@ -364,6 +364,24 @@ object TMDb3 {
         }
     }
 
+    object People {
+
+        suspend fun details(
+            personId: Int,
+            appendToResponse: List<Params.AppendToResponse.Person>? = null,
+            language: String? = null,
+        ): Person.Detail {
+            val params = mapOf(
+                Params.Key.APPEND_TO_RESPONSE to appendToResponse?.joinToString(",") { it.value },
+                Params.Key.LANGUAGE to language,
+            )
+            return service.getPersonDetails(
+                personId = personId,
+                params = params.filterNotNullValues(),
+            )
+        }
+    }
+
 
     object Params {
 
@@ -655,6 +673,13 @@ object TMDb3 {
             @Path("movie_id") movieId: Int,
             @QueryMap params: Map<String, String> = emptyMap(),
         ): Movie.Detail
+
+
+        @GET("person/{person_id}")
+        suspend fun getPersonDetails(
+            @Path("person_id") personId: Int,
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): Person.Detail
     }
 
 
