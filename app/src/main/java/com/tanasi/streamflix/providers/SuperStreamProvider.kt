@@ -209,7 +209,8 @@ object SuperStreamProvider : Provider {
     }
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
-        TODO("Not yet implemented")
+        // TODO
+        throw Exception("Not yet implemented")
     }
 
     override suspend fun getMovie(id: String): Movie {
