@@ -21,6 +21,43 @@ object TMDb3 {
             val lte: T? = null,
         )
 
+        object SortBy {
+
+            enum class Movie(val value: String) {
+                ORIGINAL_TITLE_ASC("original_title.asc"),
+                ORIGINAL_TITLE_DESC("original_title.desc"),
+                POPULARITY_ASC("popularity.asc"),
+                POPULARITY_DESC("popularity.desc"),
+                PRIMARY_RELEASE_DATE_ASC("primary_release_date.asc"),
+                PRIMARY_RELEASE_DATE_DESC("primary_release_date.desc"),
+                RELEASE_DATE_ASC("release_date.asc"),
+                RELEASE_DATE_DESC("release_date.desc"),
+                REVENUE_ASC("revenue.asc"),
+                REVENUE_DESC("revenue.desc"),
+                TITLE_ASC("title.asc"),
+                TITLE_DESC("title.desc"),
+                VOTE_AVERAGE_ASC("vote_average.asc"),
+                VOTE_AVERAGE_DESC("vote_average.desc"),
+                VOTE_COUNT_ASC("vote_count.asc"),
+                VOTE_COUNT_DESC("vote_count.desc"),
+            }
+
+            enum class Tv(val value: String) {
+                FIRST_AIR_DATE_ASC("first_air_date.asc"),
+                FIRST_AIR_DATE_DESC("first_air_date.desc"),
+                NAME_ASC("name.asc"),
+                NAME_DESC("name.desc"),
+                ORIGINAL_NAME_ASC("original_name.asc"),
+                ORIGINAL_NAME_DESC("original_name.desc"),
+                POPULARITY_ASC("popularity.asc"),
+                POPULARITY_DESC("popularity.desc"),
+                VOTE_AVERAGE_ASC("vote_average.asc"),
+                VOTE_AVERAGE_DESC("vote_average.desc"),
+                VOTE_COUNT_ASC("vote_count.asc"),
+                VOTE_COUNT_DESC("vote_count.desc"),
+            }
+        }
+
         object Key {
             const val AIR_DATE_GTE = "air_date.gte"
             const val AIR_DATE_LTE = "air_date.lte"
