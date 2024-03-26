@@ -2,11 +2,46 @@ package com.tanasi.streamflix.utils
 
 import com.google.gson.annotations.SerializedName
 import com.tanasi.streamflix.BuildConfig
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 object TMDb3 {
 
     private const val URL = "https://api.themoviedb.org/3/"
     private const val API_KEY = BuildConfig.TMDB_API_KEY
+
+    private val service = ApiService.build()
+
+
+    private interface ApiService {
+
+        companion object {
+            fun build(): ApiService {
+                val client = OkHttpClient.Builder().addInterceptor { chain ->
+                    val original = chain.request()
+
+                    val requestBuilder = original.newBuilder()
+                        .url(
+                            original.url.newBuilder()
+                                .addQueryParameter("api_key", API_KEY)
+                                .build()
+                        )
+
+                    chain.proceed(requestBuilder.build())
+                }.build()
+
+                val retrofit = Retrofit.Builder()
+                    .baseUrl(URL)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                return retrofit.create(ApiService::class.java)
+            }
+        }
+    }
+
 
     data class Result<T>(
         val results: List<T>
