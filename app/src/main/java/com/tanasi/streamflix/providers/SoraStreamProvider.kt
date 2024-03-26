@@ -655,7 +655,22 @@ object SoraStreamProvider : Provider {
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
-        TODO("Not yet implemented")
+        val (tvShowId, seasonNumber) = seasonId.split("-")
+
+        val episodes = TMDb3.TvSeasons.details(
+            seriesId = tvShowId.toInt(),
+            seasonNumber = seasonNumber.toInt(),
+        ).episodes?.map {
+            Episode(
+                id = it.id.toString(),
+                number = it.episodeNumber,
+                title = it.name ?: "",
+                released = it.airDate,
+                poster = it.stillPath?.w500,
+            )
+        } ?: listOf()
+
+        return episodes
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
