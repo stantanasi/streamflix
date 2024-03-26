@@ -481,7 +481,19 @@ object SoraStreamProvider : Provider {
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
-        TODO("Not yet implemented")
+        val movies = TMDb3.MovieLists.popular(page = page).results.map { movie ->
+            Movie(
+                id = movie.id.toString(),
+                title = movie.title,
+                overview = movie.overview,
+                released = movie.releaseDate,
+                rating = movie.voteAverage.toDouble(),
+                poster = movie.posterPath?.w500,
+                banner = movie.backdropPath?.original,
+            )
+        }
+
+        return movies
     }
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
