@@ -7,6 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.QueryMap
 import java.util.Calendar
 
@@ -382,6 +383,26 @@ object TMDb3 {
         }
     }
 
+    object Search {
+
+        suspend fun multi(
+            query: String,
+            includeAdult: Boolean? = null,
+            language: String? = null,
+            page: Int? = null,
+        ): PageResult<MultiItem> {
+            val params = mapOf(
+                Params.Key.INCLUDE_ADULT to includeAdult?.toString(),
+                Params.Key.LANGUAGE to language,
+                Params.Key.PAGE to page?.toString(),
+            )
+            return service.searchMulti(
+                query = query,
+                params = params.filterNotNullValues(),
+            )
+        }
+    }
+
 
     object Params {
 
@@ -680,6 +701,13 @@ object TMDb3 {
             @Path("person_id") personId: Int,
             @QueryMap params: Map<String, String> = emptyMap(),
         ): Person.Detail
+
+
+        @GET("search/multi")
+        suspend fun searchMulti(
+            @Query("query") query: String,
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): PageResult<MultiItem>
     }
 
 
