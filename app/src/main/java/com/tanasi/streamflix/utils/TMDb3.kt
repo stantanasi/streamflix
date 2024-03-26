@@ -745,6 +745,23 @@ object TMDb3 {
         @SerializedName("provider_name") val providerName: String
     ) {
 
+        enum class WatchProviderId(val id: Int) {
+            AMAZON_PRIME_VIDEO_TIER_A(9),
+            AMAZON_PRIME_VIDEO_TIER_B(119),
+            AMAZON_VIDEO(10),
+            APPLE_ITUNES(2),
+            APPLE_TV_PLUS(350),
+            DISNEY_PLUS(337),
+            GOOGLE_PLAY(3),
+            HBO_MAX(384),
+            HULU(15),
+            MICROSOFT_STORE(68),
+            NETFLIX(8),
+            PARAMOUNT(531);
+
+            override fun toString() = id.toString()
+        }
+
         enum class WatchMonetizationType(val value: String) {
             @SerializedName("flatrate")
             FLATRATE("flatrate"),
