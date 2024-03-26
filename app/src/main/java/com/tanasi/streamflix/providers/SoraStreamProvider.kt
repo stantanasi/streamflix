@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.providers
 
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.extractors.SoraExtractor
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
@@ -781,6 +782,9 @@ object SoraStreamProvider : Provider {
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
-        TODO("Not yet implemented")
+        return when {
+            server.video != null -> server.video!!
+            else -> Extractor.extract(server.src)
+        }
     }
 }
