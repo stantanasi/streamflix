@@ -504,7 +504,7 @@ object SuperStreamProvider : Provider {
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
-        TODO("Not yet implemented")
+        return server.video ?: throw Exception("No source found")
     }
 
 
