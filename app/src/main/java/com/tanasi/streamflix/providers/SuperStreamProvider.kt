@@ -9,6 +9,9 @@ import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 object SuperStreamProvider : Provider {
 
@@ -21,6 +24,8 @@ object SuperStreamProvider : Provider {
         "L2FwaS9hcGlfY2xpZW50L2luZGV4Lw==",
         Base64.NO_WRAP
     ).toString(Charsets.UTF_8)
+
+    private val service = SuperStreamApiService.build()
 
     // We do not want content scanners to notice this scraping going on so we've hidden all constants
     // The source has its origins in China so I added some extra security with banned words
@@ -98,5 +103,29 @@ object SuperStreamProvider : Provider {
 
     override suspend fun getVideo(server: Video.Server): Video {
         TODO("Not yet implemented")
+    }
+
+
+    private interface SuperStreamApiService {
+
+        companion object {
+            fun build(): SuperStreamApiService {
+                val client = OkHttpClient.Builder().addInterceptor { chain ->
+                    val requestBuilder = chain.request().newBuilder()
+                        .addHeader("Accept", "charset=utf-8")
+                        .addHeader("Platform", "android")
+
+                    chain.proceed(requestBuilder.build())
+                }.build()
+
+                val retrofit = Retrofit.Builder()
+                    .baseUrl(url)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+
+                return retrofit.create(SuperStreamApiService::class.java)
+            }
+        }
     }
 }
