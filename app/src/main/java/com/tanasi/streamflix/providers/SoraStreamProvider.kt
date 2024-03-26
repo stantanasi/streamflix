@@ -725,7 +725,46 @@ object SoraStreamProvider : Provider {
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
-        TODO("Not yet implemented")
+        val people = TMDb3.People.details(
+            personId = id.toInt(),
+            appendToResponse = listOf(
+                TMDb3.Params.AppendToResponse.Person.COMBINED_CREDITS,
+            ),
+        ).let { person ->
+            People(
+                id = person.id.toString(),
+                name = person.name,
+                image = person.profilePath?.w500,
+
+                filmography = person.combinedCredits?.cast?.mapNotNull { multi ->
+                    when (multi.mediaType) {
+                        TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                            id = multi.id.toString(),
+                            title = multi.title ?: "",
+                            overview = multi.overview,
+//                            released = multi.releasedDate,
+                            rating = multi.voteAverage.toDouble(),
+                            poster = multi.posterPath?.w500,
+                            banner = multi.backdropPath?.original,
+                        )
+
+                        TMDb3.MultiItem.MediaType.TV -> TvShow(
+                            id = multi.id.toString(),
+                            title = multi.name ?: "",
+                            overview = multi.overview,
+//                            released = multi.firstAirDate,
+                            rating = multi.voteAverage.toDouble(),
+                            poster = multi.posterPath?.w500,
+                            banner = multi.backdropPath?.original,
+                        )
+
+                        else -> null
+                    }
+                } ?: listOf()
+            )
+        }
+
+        return people
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
