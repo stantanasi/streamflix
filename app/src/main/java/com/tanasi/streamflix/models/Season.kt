@@ -8,8 +8,8 @@ import com.tanasi.streamflix.adapters.AppAdapter
 @Entity("seasons")
 class Season(
     @PrimaryKey
-    var id: String,
-    var number: Int,
+    var id: String = "",
+    var number: Int = 0,
     var title: String? = null,
     var poster: String? = null,
 
@@ -17,8 +17,6 @@ class Season(
     @Ignore
     var episodes: List<Episode> = listOf(),
 ) : AppAdapter.Item {
-
-    constructor() : this("", 0)
 
 
     @Ignore

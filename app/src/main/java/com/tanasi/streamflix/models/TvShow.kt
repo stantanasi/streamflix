@@ -10,8 +10,8 @@ import com.tanasi.streamflix.utils.toCalendar
 @Entity("tv_shows")
 class TvShow(
     @PrimaryKey
-    var id: String,
-    var title: String,
+    var id: String = "",
+    var title: String = "",
     var overview: String? = null,
     released: String? = null,
     var runtime: Int? = null,
@@ -32,8 +32,6 @@ class TvShow(
     @Ignore
     val recommendations: List<Show> = listOf(),
 ) : Show, AppAdapter.Item {
-
-    constructor() : this("", "")
 
     var released = released?.toCalendar()
     override var isFavorite: Boolean = false

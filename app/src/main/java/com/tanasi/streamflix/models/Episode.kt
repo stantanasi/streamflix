@@ -12,8 +12,8 @@ import java.util.Calendar
 @Entity("episodes")
 class Episode(
     @PrimaryKey
-    var id: String,
-    var number: Int,
+    var id: String = "",
+    var number: Int = 0,
     var title: String? = null,
     released: String? = null,
     var poster: String? = null,
@@ -21,8 +21,6 @@ class Episode(
     var tvShow: TvShow? = null,
     var season: Season? = null,
 ) : WatchItem, AppAdapter.Item {
-
-    constructor() : this("", 0)
 
     var released = released?.toCalendar()
     override var isWatched: Boolean = false

@@ -12,8 +12,8 @@ import java.util.Calendar
 @Entity("movies")
 class Movie(
     @PrimaryKey
-    var id: String,
-    var title: String,
+    var id: String = "",
+    var title: String = "",
     var overview: String? = null,
     released: String? = null,
     var runtime: Int? = null,
@@ -32,8 +32,6 @@ class Movie(
     @Ignore
     val recommendations: List<Show> = listOf(),
 ) : Show, WatchItem, AppAdapter.Item {
-
-    constructor() : this("", "")
 
     var released = released?.toCalendar()
     override var isFavorite: Boolean = false
