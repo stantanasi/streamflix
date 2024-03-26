@@ -6,6 +6,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.QueryMap
 import java.util.Calendar
 
@@ -345,6 +346,24 @@ object TMDb3 {
         }
     }
 
+    object Movies {
+
+        suspend fun details(
+            movieId: Int,
+            appendToResponse: List<Params.AppendToResponse.Movie>? = null,
+            language: String? = null,
+        ): Movie.Detail {
+            val params = mapOf(
+                Params.Key.APPEND_TO_RESPONSE to appendToResponse?.joinToString(",") { it.value },
+                Params.Key.LANGUAGE to language,
+            )
+            return service.getMovieDetails(
+                movieId = movieId,
+                params = params.filterNotNullValues(),
+            )
+        }
+    }
+
 
     object Params {
 
@@ -629,6 +648,13 @@ object TMDb3 {
         suspend fun getTopRatedMovies(
             @QueryMap params: Map<String, String> = emptyMap(),
         ): PageResult<Movie>
+
+
+        @GET("movie/{movie_id}")
+        suspend fun getMovieDetails(
+            @Path("movie_id") movieId: Int,
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): Movie.Detail
     }
 
 
