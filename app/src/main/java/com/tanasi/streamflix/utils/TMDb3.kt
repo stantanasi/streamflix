@@ -14,6 +14,63 @@ object TMDb3 {
     private val service = ApiService.build()
 
 
+    object Params {
+
+        object Key {
+            const val AIR_DATE_GTE = "air_date.gte"
+            const val AIR_DATE_LTE = "air_date.lte"
+            const val APPEND_TO_RESPONSE = "append_to_response"
+            const val CERTIFICATION = "certification"
+            const val CERTIFICATION_COUNTRY = "certification_country"
+            const val CERTIFICATION_GTE = "certification.gte"
+            const val CERTIFICATION_LTE = "certification.lte"
+            const val FIRST_AIR_DATE_GTE = "first_air_date.gte"
+            const val FIRST_AIR_DATE_LTE = "first_air_date.lte"
+            const val FIRST_AIR_DATE_YEAR = "first_air_date_year"
+            const val INCLUDE_ADULT = "include_adult"
+            const val INCLUDE_NULL_FIRST_AIR_DATES = "include_null_first_air_dates"
+            const val INCLUDE_VIDEO = "include_video"
+            const val LANGUAGE = "language"
+            const val PAGE = "page"
+            const val PRIMARY_RELEASE_DATE_GTE = "primary_release_date.gte"
+            const val PRIMARY_RELEASE_DATE_LTE = "primary_release_date.lte"
+            const val PRIMARY_RELEASE_YEAR = "primary_release_year"
+            const val REGION = "region"
+            const val RELEASE_DATE_GTE = "release_date.gte"
+            const val RELEASE_DATE_LTE = "release_date.lte"
+            const val SCREENED_THEATRICALLY = "screened_theatrically"
+            const val SORT_BY = "sort_by"
+            const val TIMEZONE = "timezone"
+            const val VOTE_AVERAGE_GTE = "vote_average.gte"
+            const val VOTE_AVERAGE_LTE = "vote_average.lte"
+            const val VOTE_COUNT_GTE = "vote_count.gte"
+            const val VOTE_COUNT_LTE = "vote_count.lte"
+            const val WATCH_REGION = "watch_region"
+            const val WITHOUT_COMPANIES = "without_companies"
+            const val WITHOUT_GENRES = "without_genres"
+            const val WITHOUT_KEYWORDS = "without_keywords"
+            const val WITHOUT_WATCH_PROVIDERS = "without_watch_providers"
+            const val WITH_CAST = "with_cast"
+            const val WITH_COMPANIES = "with_companies"
+            const val WITH_CREW = "with_crew"
+            const val WITH_GENRES = "with_genres"
+            const val WITH_KEYWORDS = "with_keywords"
+            const val WITH_NETWORKS = "with_networks"
+            const val WITH_ORIGINAL_LANGUAGE = "with_original_language"
+            const val WITH_ORIGIN_COUNTRY = "with_origin_country"
+            const val WITH_PEOPLE = "with_people"
+            const val WITH_RELEASE_TYPE = "with_release_type"
+            const val WITH_RUNTIME_GTE = "with_runtime.gte"
+            const val WITH_RUNTIME_LTE = "with_runtime.lte"
+            const val WITH_STATUS = "with_status"
+            const val WITH_TYPE = "with_type"
+            const val WITH_WATCH_MONETIZATION_TYPES = "with_watch_monetization_types"
+            const val WITH_WATCH_PROVIDERS = "with_watch_providers"
+            const val YEAR = "year"
+        }
+    }
+
+
     private interface ApiService {
 
         companion object {
