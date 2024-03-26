@@ -403,6 +403,24 @@ object TMDb3 {
         }
     }
 
+    object Trending {
+
+        suspend fun all(
+            timeWindow: Params.TimeWindow,
+            language: String? = null,
+            page: Int? = null,
+        ): PageResult<MultiItem> {
+            val params = mapOf(
+                Params.Key.LANGUAGE to language,
+                Params.Key.PAGE to page?.toString(),
+            )
+            return service.getTrendingAll(
+                timeWindow = timeWindow.value,
+                params = params.filterNotNullValues(),
+            )
+        }
+    }
+
 
     object Params {
 
@@ -706,6 +724,13 @@ object TMDb3 {
         @GET("search/multi")
         suspend fun searchMulti(
             @Query("query") query: String,
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): PageResult<MultiItem>
+
+
+        @GET("trending/all/{time_window}")
+        suspend fun getTrendingAll(
+            @Path("time_window") timeWindow: String,
             @QueryMap params: Map<String, String> = emptyMap(),
         ): PageResult<MultiItem>
     }
