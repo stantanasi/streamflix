@@ -180,6 +180,17 @@ object TMDb3 {
                 params = params.filterNotNullValues(),
             )
         }
+
+        suspend fun tvList(
+            language: String? = null,
+        ): GenresResponse {
+            val params = mapOf(
+                Params.Key.LANGUAGE to language,
+            )
+            return service.getGenreTvList(
+                params = params.filterNotNullValues(),
+            )
+        }
     }
 
 
@@ -448,6 +459,11 @@ object TMDb3 {
 
         @GET("genre/movie/list")
         suspend fun getGenreMoviesList(
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): GenresResponse
+
+        @GET("genre/tv/list")
+        suspend fun getGenreTvList(
             @QueryMap params: Map<String, String> = emptyMap(),
         ): GenresResponse
     }
