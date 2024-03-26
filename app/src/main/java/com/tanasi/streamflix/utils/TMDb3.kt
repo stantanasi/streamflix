@@ -182,6 +182,59 @@ object TMDb3 {
             const val WITH_WATCH_PROVIDERS = "with_watch_providers"
             const val YEAR = "year"
         }
+
+
+        class WithBuilder<T : Any> {
+
+            private var value: String = ""
+
+            constructor(id: Int) {
+                value += id
+            }
+
+            constructor(id: String) {
+                value += id
+            }
+
+            constructor(any: T) {
+                value += any.toString()
+            }
+
+
+            fun and(id: Int): WithBuilder<T> {
+                value += ",$id"
+                return this
+            }
+
+            fun and(id: String): WithBuilder<T> {
+                value += ",$id"
+                return this
+            }
+
+            fun and(any: T): WithBuilder<T> {
+                value += ",$any"
+                return this
+            }
+
+
+            fun or(id: Int): WithBuilder<T> {
+                value += "|$id"
+                return this
+            }
+
+            fun or(id: String): WithBuilder<T> {
+                value += "|$id"
+                return this
+            }
+
+            fun or(any: T): WithBuilder<T> {
+                value += "|$any"
+                return this
+            }
+
+
+            override fun toString() = value
+        }
     }
 
 
