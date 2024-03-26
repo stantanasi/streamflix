@@ -783,7 +783,15 @@ object TMDb3 {
     data class Keyword(
         val id: Int,
         val name: String,
-    )
+    ) {
+
+        enum class KeywordId(val id: Int) {
+            ANIME(210024),
+            BASED_ON_ANIME(222243);
+
+            override fun toString() = id.toString()
+        }
+    }
 
     data class Video(
         @SerializedName("id") val id: String,
