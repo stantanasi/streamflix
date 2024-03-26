@@ -5,6 +5,9 @@ import com.tanasi.streamflix.BuildConfig
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.QueryMap
+import java.util.Calendar
 
 object TMDb3 {
 
@@ -12,6 +15,88 @@ object TMDb3 {
     private const val API_KEY = BuildConfig.TMDB_API_KEY
 
     private val service = ApiService.build()
+
+    object Discover {
+
+        suspend fun movie(
+            certification: String? = null,
+            certificationRange: Params.Range<String>? = null,
+            certificationCountry: String? = null,
+            includeAdult: Boolean? = null,
+            includeVideo: Boolean? = null,
+            language: String? = null,
+            page: Int? = null,
+            primaryReleaseYear: Int? = null,
+            primaryReleaseDate: Params.Range<Calendar>? = null,
+            region: String? = null,
+            releaseDate: Params.Range<Calendar>? = null,
+            sortBy: Params.SortBy.Movie? = null,
+            voteAverage: Params.Range<Float>? = null,
+            voteCount: Params.Range<Int>? = null,
+            watchRegion: String? = null,
+            withCast: Params.WithBuilder<String>? = null,
+            withCompanies: Params.WithBuilder<Company.CompanyId>? = null,
+            withCrew: Params.WithBuilder<String>? = null,
+            withGenres: Params.WithBuilder<Genre.Movie>? = null,
+            withKeywords: Params.WithBuilder<Keyword.KeywordId>? = null,
+            withOriginCountry: Params.WithBuilder<String>? = null,
+            withOriginalLanguage: Params.WithBuilder<String>? = null,
+            withPeople: Params.WithBuilder<String>? = null,
+            withReleaseType: Params.WithBuilder<Movie.ReleaseType>? = null,
+            withRuntime: Params.Range<Int>? = null,
+            withWatchMonetizationTypes: Params.WithBuilder<Provider.WatchMonetizationType>? = null,
+            withWatchProviders: Params.WithBuilder<Provider.WatchProviderId>? = null,
+            withoutCompanies: Params.WithBuilder<Company.CompanyId>? = null,
+            withoutGenres: Params.WithBuilder<Genre.Movie>? = null,
+            withoutKeywords: Params.WithBuilder<Keyword.KeywordId>? = null,
+            withoutWatchProviders: Params.WithBuilder<Provider.WatchProviderId>? = null,
+            year: Int? = null,
+        ): PageResult<Movie> {
+            val params = mapOf(
+                Params.Key.CERTIFICATION to certification,
+                Params.Key.CERTIFICATION_GTE to certificationRange?.gte,
+                Params.Key.CERTIFICATION_LTE to certificationRange?.lte,
+                Params.Key.CERTIFICATION_COUNTRY to certificationCountry,
+                Params.Key.INCLUDE_ADULT to includeAdult?.toString(),
+                Params.Key.INCLUDE_VIDEO to includeVideo?.toString(),
+                Params.Key.LANGUAGE to language,
+                Params.Key.PAGE to page?.toString(),
+                Params.Key.PRIMARY_RELEASE_YEAR to primaryReleaseYear?.toString(),
+                Params.Key.PRIMARY_RELEASE_DATE_GTE to primaryReleaseDate?.gte?.format("yyyy-MM-dd"),
+                Params.Key.PRIMARY_RELEASE_DATE_LTE to primaryReleaseDate?.lte?.format("yyyy-MM-dd"),
+                Params.Key.REGION to region,
+                Params.Key.RELEASE_DATE_GTE to releaseDate?.gte?.format("yyyy-MM-dd"),
+                Params.Key.RELEASE_DATE_LTE to releaseDate?.lte?.format("yyyy-MM-dd"),
+                Params.Key.SORT_BY to sortBy?.value,
+                Params.Key.VOTE_AVERAGE_GTE to voteAverage?.gte?.toString(),
+                Params.Key.VOTE_AVERAGE_LTE to voteAverage?.lte?.toString(),
+                Params.Key.VOTE_COUNT_GTE to voteCount?.gte?.toString(),
+                Params.Key.VOTE_COUNT_LTE to voteCount?.lte?.toString(),
+                Params.Key.WATCH_REGION to watchRegion,
+                Params.Key.WITH_CAST to withCast?.toString(),
+                Params.Key.WITH_COMPANIES to withCompanies?.toString(),
+                Params.Key.WITH_CREW to withCrew?.toString(),
+                Params.Key.WITH_GENRES to withGenres?.toString(),
+                Params.Key.WITH_KEYWORDS to withKeywords?.toString(),
+                Params.Key.WITH_ORIGIN_COUNTRY to withOriginCountry?.toString(),
+                Params.Key.WITH_ORIGINAL_LANGUAGE to withOriginalLanguage?.toString(),
+                Params.Key.WITH_PEOPLE to withPeople?.toString(),
+                Params.Key.WITH_RELEASE_TYPE to withReleaseType?.toString(),
+                Params.Key.WITH_RUNTIME_GTE to withRuntime?.gte?.toString(),
+                Params.Key.WITH_RUNTIME_LTE to withRuntime?.lte?.toString(),
+                Params.Key.WITH_WATCH_MONETIZATION_TYPES to withWatchMonetizationTypes?.toString(),
+                Params.Key.WITH_WATCH_PROVIDERS to withWatchProviders?.toString(),
+                Params.Key.WITHOUT_COMPANIES to withoutCompanies?.toString(),
+                Params.Key.WITHOUT_GENRES to withoutGenres?.toString(),
+                Params.Key.WITHOUT_KEYWORDS to withoutKeywords?.toString(),
+                Params.Key.WITHOUT_WATCH_PROVIDERS to withoutWatchProviders?.toString(),
+                Params.Key.YEAR to year?.toString(),
+            )
+            return service.getDiscoverMovies(
+                params = params.filterNotNullValues(),
+            )
+        }
+    }
 
 
     object Params {
@@ -264,6 +349,12 @@ object TMDb3 {
                 return retrofit.create(ApiService::class.java)
             }
         }
+
+
+        @GET("discover/movie")
+        suspend fun getDiscoverMovies(
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): PageResult<Movie>
     }
 
 
