@@ -6,6 +6,7 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.People
+import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.TMDb3
@@ -580,7 +581,77 @@ object SoraStreamProvider : Provider {
     }
 
     override suspend fun getTvShow(id: String): TvShow {
-        TODO("Not yet implemented")
+        val tvShow = TMDb3.TvSeries.details(
+            seriesId = id.toInt(),
+            appendToResponse = listOf(
+                TMDb3.Params.AppendToResponse.Tv.CREDITS,
+                TMDb3.Params.AppendToResponse.Tv.RECOMMENDATIONS,
+                TMDb3.Params.AppendToResponse.Tv.VIDEOS,
+            )
+        ).let { tv ->
+            TvShow(
+                id = tv.id.toString(),
+                title = tv.name,
+                overview = tv.overview,
+                released = tv.firstAirDate,
+                trailer = tv.videos?.results
+                    ?.sortedBy { it.publishedAt ?: "" }
+                    ?.firstOrNull { it.site == TMDb3.Video.VideoSite.YOUTUBE }
+                    ?.let { "https://www.youtube.com/watch?v=${it.key}" },
+                rating = tv.voteAverage.toDouble(),
+                poster = tv.posterPath?.original,
+                banner = tv.backdropPath?.original,
+
+                seasons = tv.seasons.map { season ->
+                    Season(
+                        id = "${tv.id}-${season.seasonNumber}",
+                        number = season.seasonNumber,
+                        title = season.name,
+                        poster = season.posterPath?.w500,
+                    )
+                },
+                genres = tv.genres.map { genre ->
+                    Genre(
+                        genre.id.toString(),
+                        genre.name,
+                    )
+                },
+                cast = tv.credits?.cast?.map { cast ->
+                    People(
+                        id = cast.id.toString(),
+                        name = cast.name,
+                        image = cast.profilePath?.w500,
+                    )
+                } ?: listOf(),
+                recommendations = tv.recommendations?.results?.mapNotNull { multi ->
+                    when (multi.mediaType) {
+                        TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                            id = multi.id.toString(),
+                            title = multi.title ?: "",
+                            overview = multi.overview,
+//                            released = multi.releasedDate,
+                            rating = multi.voteAverage.toDouble(),
+                            poster = multi.posterPath?.w500,
+                            banner = multi.backdropPath?.original,
+                        )
+
+                        TMDb3.MultiItem.MediaType.TV -> TvShow(
+                            id = multi.id.toString(),
+                            title = multi.name ?: "",
+                            overview = multi.overview,
+//                            released = multi.firstAirDate,
+                            rating = multi.voteAverage.toDouble(),
+                            poster = multi.posterPath?.w500,
+                            banner = multi.backdropPath?.original,
+                        )
+
+                        else -> null
+                    }
+                } ?: listOf(),
+            )
+        }
+
+        return tvShow
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
