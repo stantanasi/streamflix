@@ -437,7 +437,47 @@ object SoraStreamProvider : Provider {
     }
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
-        TODO("Not yet implemented")
+        if (query.isEmpty()) {
+            val genres = listOf(
+                TMDb3.Genres.movieList(),
+                TMDb3.Genres.tvList(),
+            ).flatMap { it.genres }.map {
+                Genre(
+                    id = it.id.toString(),
+                    name = it.name,
+                )
+            }
+
+            return genres
+        }
+
+        val results = TMDb3.Search.multi(query, page = page).results.mapNotNull { multi ->
+            when (multi.mediaType) {
+                TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                    id = multi.id.toString(),
+                    title = multi.title ?: "",
+                    overview = multi.overview,
+//                        released = multi.releasedDate,
+                    rating = multi.voteAverage.toDouble(),
+                    poster = multi.posterPath?.w500,
+                    banner = multi.backdropPath?.original,
+                )
+
+                TMDb3.MultiItem.MediaType.TV -> TvShow(
+                    id = multi.id.toString(),
+                    title = multi.name ?: "",
+                    overview = multi.overview,
+//                        released = multi.firstAirDate,
+                    rating = multi.voteAverage.toDouble(),
+                    poster = multi.posterPath?.w500,
+                    banner = multi.backdropPath?.original,
+                )
+
+                else -> null
+            }
+        }
+
+        return results
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
