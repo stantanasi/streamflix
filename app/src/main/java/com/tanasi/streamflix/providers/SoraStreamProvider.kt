@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.providers
 
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.extractors.SoraExtractor
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -13,6 +14,8 @@ import com.tanasi.streamflix.utils.TMDb3
 import com.tanasi.streamflix.utils.TMDb3.original
 import com.tanasi.streamflix.utils.TMDb3.w500
 import com.tanasi.streamflix.utils.safeSubList
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
 object SoraStreamProvider : Provider {
@@ -768,7 +771,13 @@ object SoraStreamProvider : Provider {
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
-        TODO("Not yet implemented")
+        val servers = runBlocking {
+            listOf(
+                async { SoraExtractor.invokeVidSrc(videoType) },
+            ).mapNotNull { it.await() }
+        }
+
+        return servers
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
