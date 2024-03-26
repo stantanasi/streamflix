@@ -8,6 +8,7 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.People
+import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import okhttp3.OkHttpClient
@@ -286,7 +287,58 @@ object SuperStreamProvider : Provider {
     }
 
     override suspend fun getTvShow(id: String): TvShow {
-        TODO("Not yet implemented")
+        val data = service.getTvShowById(
+            queryApi(
+                mapOf(
+                    "childmode" to "0",
+                    "uid" to "",
+                    "app_version" to "11.5",
+                    "appid" to appId,
+                    "module" to "TV_detail_1",
+                    "display_all" to "1",
+                    "channel" to "Website",
+                    "lang" to "en",
+                    "expired_date" to "${getExpiryDate()}",
+                    "platform" to "android",
+                    "tid" to id,
+                )
+            )
+        ).data
+
+        return TvShow(
+            id = data.id.toString(),
+            title = data.title ?: "",
+            overview = data.description,
+            released = data.released,
+            trailer = data.trailerUrl,
+            rating = data.imdbRating?.toDoubleOrNull(),
+            poster = data.poster,
+
+            seasons = data.season.map { number ->
+                Season(
+                    id = "$id-$number",
+                    number = number,
+                )
+            },
+            genres = data.cats?.split(",")?.map {
+                Genre(
+                    id = it,
+                    name = it.trim(),
+                )
+            } ?: listOf(),
+            directors = data.director?.split(",")?.map {
+                People(
+                    id = it,
+                    name = it.trim(),
+                )
+            } ?: listOf(),
+            cast = data.actors?.split(",")?.map {
+                People(
+                    id = it,
+                    name = it.trim(),
+                )
+            } ?: listOf(),
+        )
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
@@ -489,6 +541,13 @@ object SuperStreamProvider : Provider {
         suspend fun getMovieById(
             @FieldMap data: Map<String, String>,
         ): Response<MovieDetails>
+
+
+        @POST(".")
+        @FormUrlEncoded
+        suspend fun getTvShowById(
+            @FieldMap data: Map<String, String>,
+        ): Response<TvShow>
 
 
         data class Response<T>(
