@@ -214,7 +214,75 @@ object SuperStreamProvider : Provider {
     }
 
     override suspend fun getMovie(id: String): Movie {
-        TODO("Not yet implemented")
+        val data = service.getMovieById(
+            queryApi(
+                mapOf(
+                    "childmode" to "0",
+                    "uid" to "",
+                    "app_version" to "11.5",
+                    "appid" to appId,
+                    "module" to "Movie_detail",
+                    "channel" to "Website",
+                    "mid" to id,
+                    "lang" to "en",
+                    "expired_date" to "${getExpiryDate()}",
+                    "platform" to "android",
+                    "oss" to "",
+                    "group" to "",
+                )
+            )
+        ).data
+
+        val movie = Movie(
+            id = data.id.toString(),
+            title = data.title ?: "",
+            overview = data.description,
+            released = data.released,
+            runtime = data.runtime,
+            trailer = data.trailer,
+            quality = data.qualityTag,
+            rating = data.imdbRating?.toDoubleOrNull(),
+            poster = data.poster,
+
+            genres = data.cats?.split(",")?.map {
+                Genre(
+                    id = it,
+                    name = it.trim(),
+                )
+            } ?: listOf(),
+            directors = data.director?.split(",")?.map {
+                People(
+                    id = it,
+                    name = it.trim(),
+                )
+            } ?: listOf(),
+            cast = data.actors?.split(",")?.map {
+                People(
+                    id = it,
+                    name = it.trim(),
+                )
+            } ?: listOf(),
+            recommendations = data.recommend.map {
+                Movie(
+                    id = it.mid?.toString() ?: "",
+                    title = it.title ?: "",
+                    released = it.year?.toString(),
+                    runtime = it.runtime,
+                    quality = it.qualityTag,
+                    rating = it.imdbRating?.toDoubleOrNull(),
+                    poster = it.poster,
+
+                    genres = it.cats?.split(",")?.map { genre ->
+                        Genre(
+                            id = genre,
+                            name = genre.trim()
+                        )
+                    } ?: listOf(),
+                )
+            },
+        )
+
+        return movie
     }
 
     override suspend fun getTvShow(id: String): TvShow {
@@ -415,6 +483,12 @@ object SuperStreamProvider : Provider {
             @FieldMap data: Map<String, String>,
         ): Response<List<Show>>
 
+
+        @POST(".")
+        @FormUrlEncoded
+        suspend fun getMovieById(
+            @FieldMap data: Map<String, String>,
+        ): Response<MovieDetails>
 
 
         data class Response<T>(
