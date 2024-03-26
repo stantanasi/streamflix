@@ -690,6 +690,45 @@ object TMDb3 {
         @SerializedName("logo_path") val logoPath: String? = null
     ) {
 
+        enum class NetworkId(val id: Int) {
+            ABC(2),
+            ADULT_SWIM(80),
+            AMAZON(1024),
+            AMC(174),
+            ANIMAL_PLANET(91),
+            APPLE_TV(2552),
+            A_AND_E(129),
+            BBC_AMERICA(493),
+            BRAVO(74),
+            CBS(16),
+            COMEDY_CENTRAL(47),
+            DISNEY_PLUS(2739),
+            ESPN(29),
+            FOX(19),
+            FUJI_TV(2),
+            FX(88),
+            HBO(49),
+            HISTORY(65),
+            HULU(453),
+            LIFETIME(34),
+            NATIONAL_GEOGRAPHIC(43),
+            NBC(6),
+            NETFLIX(213),
+            NICKELODEON(13),
+            PARAMOUNT_PLUS(4330),
+            PBS(14),
+            PEACOCK(3353),
+            SHOWTIME(67),
+            SYFY(77),
+            THE_CW(71),
+            TNT(41),
+            USA(30),
+            VH1(158),
+            YOUTUBE_PREMIUM(1436);
+
+            override fun toString() = id.toString()
+        }
+
         data class NetworkImages(
             @SerializedName("logos") val logos: List<LogoImage> = emptyList()
         )
