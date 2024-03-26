@@ -125,6 +125,11 @@ object TMDb3 {
             }
         }
 
+        enum class TimeWindow(val value: String) {
+            DAY("day"),
+            WEEK("week");
+        }
+
         object Key {
             const val AIR_DATE_GTE = "air_date.gte"
             const val AIR_DATE_LTE = "air_date.lte"
