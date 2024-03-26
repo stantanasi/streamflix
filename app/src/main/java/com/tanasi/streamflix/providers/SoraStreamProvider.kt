@@ -674,7 +674,54 @@ object SoraStreamProvider : Provider {
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
-        TODO("Not yet implemented")
+        fun <T> List<T>.mix(other: List<T>): List<T> {
+            return sequence {
+                val first = iterator()
+                val second = other.iterator()
+                while (first.hasNext() && second.hasNext()) {
+                    yield(first.next())
+                    yield(second.next())
+                }
+
+                yieldAll(first)
+                yieldAll(second)
+            }.toList()
+        }
+
+        val genre = Genre(
+            id = id,
+            name = "",
+
+            shows = TMDb3.Discover.movie(
+                page = page,
+                withGenres = TMDb3.Params.WithBuilder(id),
+            ).results.map { movie ->
+                Movie(
+                    id = movie.id.toString(),
+                    title = movie.title,
+                    overview = movie.overview,
+                    released = movie.releaseDate,
+                    rating = movie.voteAverage.toDouble(),
+                    poster = movie.posterPath?.w500,
+                    banner = movie.backdropPath?.original,
+                )
+            }.mix(TMDb3.Discover.tv(
+                page = page,
+                withGenres = TMDb3.Params.WithBuilder(id)
+            ).results.map { tv ->
+                TvShow(
+                    id = tv.id.toString(),
+                    title = tv.name,
+                    overview = tv.overview,
+                    released = tv.firstAirDate,
+                    rating = tv.voteAverage.toDouble(),
+                    poster = tv.posterPath?.w500,
+                    banner = tv.backdropPath?.original,
+                )
+            })
+        )
+
+        return genre
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
