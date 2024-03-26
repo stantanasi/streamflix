@@ -11,8 +11,14 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import okhttp3.OkHttpClient
+import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 object SuperStreamProvider : Provider {
 
@@ -104,6 +110,143 @@ object SuperStreamProvider : Provider {
 
     override suspend fun getVideo(server: Video.Server): Video {
         TODO("Not yet implemented")
+    }
+
+
+    // Random 32 length string
+    private fun randomToken(): String {
+        return (0..31).joinToString("") {
+            (('0'..'9') + ('a'..'f')).random().toString()
+        }
+    }
+
+    private val token = randomToken()
+
+    private object CipherUtils {
+        private const val ALGORITHM = "DESede"
+        private const val TRANSFORMATION = "DESede/CBC/PKCS5Padding"
+        fun encrypt(str: String, key: String, iv: String): String? {
+            return try {
+                val cipher: Cipher = Cipher.getInstance(TRANSFORMATION)
+                val bArr = ByteArray(24)
+                val bytes: ByteArray = key.toByteArray()
+                var length = if (bytes.size <= 24) bytes.size else 24
+                System.arraycopy(bytes, 0, bArr, 0, length)
+                while (length < 24) {
+                    bArr[length] = 0
+                    length++
+                }
+                cipher.init(
+                    Cipher.ENCRYPT_MODE,
+                    SecretKeySpec(bArr, ALGORITHM),
+                    IvParameterSpec(iv.toByteArray())
+                )
+
+                Base64.encode(cipher.doFinal(str.toByteArray()), 2).toString(Charsets.UTF_8)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+
+        fun md5(str: String): String? {
+            return MD5Util.md5(str)?.let { HexDump.toHexString(it).lowercase() }
+        }
+
+        fun getVerify(str: String?, str2: String, str3: String): String? {
+            if (str != null) {
+                return md5(md5(str2) + str3 + str)
+            }
+            return null
+        }
+    }
+
+    private object HexDump {
+        private val HEX_DIGITS = charArrayOf(
+            '0',
+            '1',
+            '2',
+            '3',
+            '4',
+            '5',
+            '6',
+            '7',
+            '8',
+            '9',
+            'A',
+            'B',
+            'C',
+            'D',
+            'E',
+            'F'
+        )
+
+        @JvmOverloads
+        fun toHexString(bArr: ByteArray, i: Int = 0, i2: Int = bArr.size): String {
+            val cArr = CharArray(i2 * 2)
+            var i3 = 0
+            for (i4 in i until i + i2) {
+                val b = bArr[i4].toInt()
+                val i5 = i3 + 1
+                val cArr2 = HEX_DIGITS
+                cArr[i3] = cArr2[b ushr 4 and 15]
+                i3 = i5 + 1
+                cArr[i5] = cArr2[b and 15]
+            }
+            return String(cArr)
+        }
+    }
+
+    private object MD5Util {
+        fun md5(str: String): ByteArray? {
+            return this.md5(str.toByteArray())
+        }
+
+        fun md5(bArr: ByteArray?): ByteArray? {
+            return try {
+                val digest = MessageDigest.getInstance("MD5")
+                digest.update(bArr ?: return null)
+                digest.digest()
+            } catch (e: NoSuchAlgorithmException) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    private fun queryApi(query: Map<String, String>): Map<String, String> {
+        val encryptedQuery = CipherUtils.encrypt(JSONObject(query).toString(), key, iv)!!
+        val appKeyHash = CipherUtils.md5(appKey)!!
+
+        val newBody = JSONObject(
+            mapOf(
+                "app_key" to appKeyHash,
+                "verify" to CipherUtils.getVerify(
+                    encryptedQuery,
+                    appKey,
+                    key
+                ),
+                "encrypt_data" to encryptedQuery,
+            )
+        ).toString()
+        val base64Body = Base64.encode(
+            newBody.toByteArray(),
+            Base64.NO_WRAP
+        ).toString(Charsets.UTF_8)
+
+        return mapOf(
+            "data" to base64Body,
+            "appid" to "27",
+            "platform" to "android",
+            "version" to APP_VERSION_CODE,
+            // Probably best to randomize this
+            "medium" to "Website&token$token"
+        )
+    }
+
+    private fun getExpiryDate(): Long {
+        // Current time + 12 hours
+        return System.currentTimeMillis() + 60 * 60 * 12
     }
 
 
