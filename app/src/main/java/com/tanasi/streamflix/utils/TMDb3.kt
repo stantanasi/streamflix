@@ -634,6 +634,24 @@ object TMDb3 {
         }
     }
 
+    object TvSeries {
+
+        suspend fun details(
+            seriesId: Int,
+            appendToResponse: List<Params.AppendToResponse.Tv>? = null,
+            language: String? = null,
+        ): Tv.Detail {
+            val params = mapOf(
+                Params.Key.APPEND_TO_RESPONSE to appendToResponse?.joinToString(",") { it.value },
+                Params.Key.LANGUAGE to language,
+            )
+            return service.getTvDetails(
+                seriesId = seriesId,
+                params = params.filterNotNullValues(),
+            )
+        }
+    }
+
 
     object Params {
 
@@ -962,6 +980,13 @@ object TMDb3 {
         suspend fun getTopRatedTv(
             @QueryMap params: Map<String, String> = emptyMap(),
         ): PageResult<Tv>
+
+
+        @GET("tv/{series_id}")
+        suspend fun getTvDetails(
+            @Path("series_id") seriesId: Int,
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): Tv.Detail
     }
 
 
