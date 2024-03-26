@@ -652,6 +652,26 @@ object TMDb3 {
         }
     }
 
+    object TvSeasons {
+
+        suspend fun details(
+            seriesId: Int,
+            seasonNumber: Int,
+            appendToResponse: List<Params.AppendToResponse.TvSeason>? = null,
+            language: String? = null,
+        ): Season.Detail {
+            val params = mapOf(
+                Params.Key.APPEND_TO_RESPONSE to appendToResponse?.joinToString(",") { it.value },
+                Params.Key.LANGUAGE to language,
+            )
+            return service.getTvSeasonDetails(
+                seriesId = seriesId,
+                seasonNumber = seasonNumber,
+                params = params.filterNotNullValues(),
+            )
+        }
+    }
+
 
     object Params {
 
@@ -987,6 +1007,14 @@ object TMDb3 {
             @Path("series_id") seriesId: Int,
             @QueryMap params: Map<String, String> = emptyMap(),
         ): Tv.Detail
+
+
+        @GET("tv/{series_id}/season/{season_number}")
+        suspend fun getTvSeasonDetails(
+            @Path("series_id") seriesId: Int,
+            @Path("season_number") seasonNumber: Int,
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): Season.Detail
     }
 
 
