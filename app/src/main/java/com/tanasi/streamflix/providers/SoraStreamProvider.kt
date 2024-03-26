@@ -11,6 +11,7 @@ import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.TMDb3
 import com.tanasi.streamflix.utils.TMDb3.original
 import com.tanasi.streamflix.utils.TMDb3.w500
+import com.tanasi.streamflix.utils.safeSubList
 import java.util.Calendar
 
 object SoraStreamProvider : Provider {
@@ -22,10 +23,43 @@ object SoraStreamProvider : Provider {
     override suspend fun getHome(): List<Category> {
         val categories = mutableListOf<Category>()
 
+        val trending = TMDb3.Trending.all(TMDb3.Params.TimeWindow.DAY)
+
+        categories.add(
+            Category(
+                name = Category.FEATURED,
+                list = trending.results.safeSubList(0, 5).mapNotNull { multi ->
+                    when (multi.mediaType) {
+                        TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                            id = multi.id.toString(),
+                            title = multi.title ?: "",
+                            overview = multi.overview,
+//                                released = multi.releasedDate,
+                            rating = multi.voteAverage.toDouble(),
+                            poster = multi.posterPath?.w500,
+                            banner = multi.backdropPath?.original,
+                        )
+
+                        TMDb3.MultiItem.MediaType.TV -> TvShow(
+                            id = multi.id.toString(),
+                            title = multi.name ?: "",
+                            overview = multi.overview,
+//                                released = multi.firstAirDate,
+                            rating = multi.voteAverage.toDouble(),
+                            poster = multi.posterPath?.w500,
+                            banner = multi.backdropPath?.original,
+                        )
+
+                        else -> null
+                    }
+                }
+            )
+        )
+
         categories.add(
             Category(
                 name = "Trending",
-                list = TMDb3.Trending.all(TMDb3.Params.TimeWindow.DAY).results.mapNotNull { multi ->
+                list = trending.results.safeSubList(5, trending.results.size).mapNotNull { multi ->
                     when (multi.mediaType) {
                         TMDb3.MultiItem.MediaType.MOVIE -> Movie(
                             id = multi.id.toString(),
