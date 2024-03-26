@@ -27,6 +27,8 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 fun String.toCalendar(): Calendar? {
     val patterns = listOf(
@@ -209,3 +211,8 @@ fun MediaMetadata.Builder.setMediaServers(mediaServers: List<MediaServer>) = thi
 
 @Suppress("UNCHECKED_CAST")
 fun <K, V> Map<K, V?>.filterNotNullValues() = filterValues { it != null } as Map<K, V>
+
+fun <T> List<T>.safeSubList(fromIndex: Int, toIndex: Int): List<T> {
+    if (fromIndex > toIndex) return emptyList()
+    return subList(max(min(fromIndex.coerceAtLeast(0), size), 0), max(min(toIndex.coerceAtMost(size), size), 0))
+}
