@@ -377,7 +377,8 @@ object SuperStreamProvider : Provider {
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
-        TODO("Not yet implemented")
+        // TODO
+        throw Exception("Not yet implemented")
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
