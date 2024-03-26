@@ -342,7 +342,38 @@ object SuperStreamProvider : Provider {
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
-        TODO("Not yet implemented")
+        val (tvShowId, seasonNumber) = seasonId.split("-")
+
+        val response = service.getEpisodes(
+            queryApi(
+                mapOf(
+                    "childmode" to "0",
+                    "app_version" to APP_VERSION,
+                    "year" to "0",
+                    "appid" to appIdSecond,
+                    "module" to "TV_episode",
+                    "display_all" to "1",
+                    "channel" to "Website",
+                    "season" to seasonNumber,
+                    "lang" to "en",
+                    "expired_date" to "${getExpiryDate()}",
+                    "platform" to "android",
+                    "tid" to tvShowId
+                )
+            )
+        )
+
+        val episodes = response.data.map {
+            Episode(
+                id = it.id.toString(),
+                number = it.episode,
+                title = it.title,
+                released = it.released,
+                poster = it.thumbs
+            )
+        }
+
+        return episodes
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
@@ -548,6 +579,12 @@ object SuperStreamProvider : Provider {
         suspend fun getTvShowById(
             @FieldMap data: Map<String, String>,
         ): Response<TvShow>
+
+        @POST(".")
+        @FormUrlEncoded
+        suspend fun getEpisodes(
+            @FieldMap data: Map<String, String>,
+        ): Response<List<Episode>>
 
 
         data class Response<T>(
