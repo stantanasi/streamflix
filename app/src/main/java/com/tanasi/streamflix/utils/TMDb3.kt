@@ -16,6 +16,11 @@ object TMDb3 {
 
     object Params {
 
+        data class Range<T>(
+            val gte: T? = null,
+            val lte: T? = null,
+        )
+
         object Key {
             const val AIR_DATE_GTE = "air_date.gte"
             const val AIR_DATE_LTE = "air_date.lte"
