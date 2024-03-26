@@ -387,7 +387,120 @@ object SuperStreamProvider : Provider {
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
-        TODO("Not yet implemented")
+        val sources = when (videoType) {
+            is Video.Type.Movie -> {
+                service.getMovieSourceById(
+                    queryApi(
+                        mapOf(
+                            "childmode" to "0",
+                            "uid" to "",
+                            "app_version" to "11.5",
+                            "appid" to appId,
+                            "module" to "Movie_downloadurl_v3",
+                            "channel" to "Website",
+                            "mid" to id,
+                            "lang" to "",
+                            "expired_date" to "${getExpiryDate()}",
+                            "platform" to "android",
+                            "oss" to "1",
+                            "group" to "",
+                        )
+                    )
+                ).data
+            }
+
+            is Video.Type.Episode -> {
+                service.getEpisodeSources(
+                    queryApi(
+                        mapOf(
+                            "childmode" to "0",
+                            "app_version" to "11.5",
+                            "module" to "TV_downloadurl_v3",
+                            "channel" to "Website",
+                            "episode" to "${videoType.number}",
+                            "expired_date" to "${getExpiryDate()}",
+                            "platform" to "android",
+                            "tid" to id,
+                            "oss" to "1",
+                            "uid" to "",
+                            "appid" to appId,
+                            "season" to "${videoType.season.number}",
+                            "lang" to "en",
+                            "group" to "",
+                        )
+                    )
+                ).data
+            }
+        }
+
+        val fid = sources.list.firstOrNull { it.fid != null }?.fid ?: 0
+
+        val subtitles = when (videoType) {
+            is Video.Type.Movie -> {
+                service.getMovieSubtitlesById(
+                    queryApi(
+                        mapOf(
+                            "childmode" to "0",
+                            "fid" to fid.toString(),
+                            "uid" to "",
+                            "app_version" to "11.5",
+                            "appid" to appId,
+                            "module" to "Movie_srt_list_v2",
+                            "channel" to "Website",
+                            "mid" to id,
+                            "lang" to "en",
+                            "expired_date" to "${getExpiryDate()}",
+                            "platform" to "android",
+                        )
+                    )
+                ).data
+            }
+
+            is Video.Type.Episode -> {
+                service.getEpisodeSubtitles(
+                    queryApi(
+                        mapOf(
+                            "childmode" to "0",
+                            "fid" to "$fid",
+                            "app_version" to "11.5",
+                            "module" to "TV_srt_list_v2",
+                            "channel" to "Website",
+                            "episode" to "${videoType.number}",
+                            "expired_date" to "${getExpiryDate()}",
+                            "platform" to "android",
+                            "tid" to id,
+                            "uid" to "",
+                            "appid" to appId,
+                            "season" to "${videoType.season.number}",
+                            "lang" to "en",
+                        )
+                    )
+                ).data
+            }
+        }
+
+        return sources.list
+            .filter { it.path?.isNotEmpty() ?: false }
+            .mapIndexed { index, link ->
+                Video.Server(
+                    id = index.toString(),
+                    name = "${link.quality} • ${link.size}",
+                ).apply {
+                    video = Video(
+                        source = link.path ?: "",
+                        subtitles = subtitles.list.flatMap {
+                            it.subtitles
+                                .filter { subtitle -> subtitle.filePath?.isNotEmpty() ?: false }
+                                .map { subtitle ->
+                                    Video.Subtitle(
+                                        label = subtitle.language ?: "",
+                                        file = subtitle.filePath ?: "",
+                                    )
+                                }
+                        }
+                    )
+                }
+            }
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
@@ -575,6 +688,18 @@ object SuperStreamProvider : Provider {
             @FieldMap data: Map<String, String>,
         ): Response<MovieDetails>
 
+        @POST(".")
+        @FormUrlEncoded
+        suspend fun getMovieSourceById(
+            @FieldMap data: Map<String, String>,
+        ): Response<LinkResponse>
+
+        @POST(".")
+        @FormUrlEncoded
+        suspend fun getMovieSubtitlesById(
+            @FieldMap data: Map<String, String>,
+        ): Response<PrivateSubtitleData>
+
 
         @POST(".")
         @FormUrlEncoded
@@ -587,6 +712,18 @@ object SuperStreamProvider : Provider {
         suspend fun getEpisodes(
             @FieldMap data: Map<String, String>,
         ): Response<List<Episode>>
+
+        @POST(".")
+        @FormUrlEncoded
+        suspend fun getEpisodeSources(
+            @FieldMap data: Map<String, String>,
+        ): Response<LinkResponse>
+
+        @POST(".")
+        @FormUrlEncoded
+        suspend fun getEpisodeSubtitles(
+            @FieldMap data: Map<String, String>,
+        ): Response<PrivateSubtitleData>
 
 
         data class Response<T>(
