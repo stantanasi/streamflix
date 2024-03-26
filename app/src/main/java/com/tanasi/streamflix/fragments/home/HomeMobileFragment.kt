@@ -103,7 +103,8 @@ class HomeMobileFragment : Fragment() {
 
         binding.ivProviderLogo.apply {
             Glide.with(context)
-                .load(UserPreferences.currentProvider!!.logo)
+                .load(UserPreferences.currentProvider?.logo?.takeIf { it.isNotEmpty() }
+                    ?: R.drawable.ic_provider_default_logo)
                 .fitCenter()
                 .into(this)
 
