@@ -206,3 +206,6 @@ fun MediaMetadata.Builder.setMediaServers(mediaServers: List<MediaServer>) = thi
     .setExtras((this.extras ?: Bundle()).also { bundle ->
         bundle.putParcelableArray("mediaServers", mediaServers.toTypedArray())
     })
+
+@Suppress("UNCHECKED_CAST")
+fun <K, V> Map<K, V?>.filterNotNullValues() = filterValues { it != null } as Map<K, V>
