@@ -44,6 +44,7 @@ interface Provider {
             HiAnimeProvider,
             SerienStreamProvider,
             SoraStreamProvider,
+            SuperStreamProvider,
         )
     }
 }
