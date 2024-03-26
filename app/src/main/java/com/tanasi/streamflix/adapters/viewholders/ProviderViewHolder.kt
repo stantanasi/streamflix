@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
+import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemProviderTvBinding
 import com.tanasi.streamflix.databinding.ItemProviderMobileBinding
 import com.tanasi.streamflix.models.Provider
@@ -41,7 +42,8 @@ class ProviderViewHolder(
         }
 
         Glide.with(context)
-            .load(provider.logo)
+            .load(provider.logo.takeIf { it.isNotEmpty() }
+                ?: R.drawable.ic_provider_default_logo)
             .fitCenter()
             .into(binding.ivProviderLogo)
 
@@ -60,7 +62,8 @@ class ProviderViewHolder(
         }
 
         Glide.with(context)
-            .load(provider.logo)
+            .load(provider.logo.takeIf { it.isNotEmpty() }
+                ?: R.drawable.ic_provider_default_logo)
             .into(binding.ivProviderLogo)
 
         binding.tvProviderName.text = provider.name
