@@ -492,6 +492,76 @@ object TMDb3 {
                 params = params.filterNotNullValues(),
             )
         }
+
+        suspend fun popular(
+            airDate: Params.Range<Calendar>? = null,
+            firstAirDateYear: Int? = null,
+            firstAirDate: Params.Range<Calendar>? = null,
+            includeAdult: Boolean? = null,
+            includeNullFirstAirDates: Boolean? = null,
+            language: String? = null,
+            page: Int? = null,
+            screenedTheatrically: Boolean? = null,
+            sortBy: Params.SortBy.Tv? = null,
+            timezone: String? = null,
+            voteAverage: Params.Range<Float>? = null,
+            voteCount: Params.Range<Int>? = null,
+            watchRegion: String? = null,
+            withCompanies: Params.WithBuilder<Company.CompanyId>? = null,
+            withGenres: Params.WithBuilder<Genre.Tv>? = null,
+            withKeywords: Params.WithBuilder<Keyword.KeywordId>? = null,
+            withNetworks: Params.WithBuilder<Network.NetworkId>? = null,
+            withOriginCountry: Params.WithBuilder<String>? = null,
+            withOriginalLanguage: Params.WithBuilder<String>? = null,
+            withRuntime: Params.Range<Int>? = null,
+            withStatus: Params.WithBuilder<Tv.Status>? = null,
+            withWatchMonetizationTypes: Params.WithBuilder<Provider.WatchMonetizationType>? = null,
+            withWatchProviders: Params.WithBuilder<Provider.WatchProviderId>? = null,
+            withoutCompanies: Params.WithBuilder<Company.CompanyId>? = null,
+            withoutGenres: Params.WithBuilder<Genre.Movie>? = null,
+            withoutKeywords: Params.WithBuilder<Keyword.KeywordId>? = null,
+            withoutWatchProviders: Params.WithBuilder<Provider.WatchProviderId>? = null,
+            withType: Params.WithBuilder<Tv.Type>? = null,
+        ): PageResult<Tv> {
+            val params = mapOf(
+                Params.Key.AIR_DATE_GTE to airDate?.gte?.format("yyyy-MM-dd"),
+                Params.Key.AIR_DATE_LTE to airDate?.lte?.format("yyyy-MM-dd"),
+                Params.Key.FIRST_AIR_DATE_YEAR to firstAirDateYear?.toString(),
+                Params.Key.FIRST_AIR_DATE_GTE to firstAirDate?.gte?.format("yyyy-MM-dd"),
+                Params.Key.FIRST_AIR_DATE_LTE to firstAirDate?.lte?.format("yyyy-MM-dd"),
+                Params.Key.INCLUDE_ADULT to includeAdult?.toString(),
+                Params.Key.INCLUDE_NULL_FIRST_AIR_DATES to includeNullFirstAirDates?.toString(),
+                Params.Key.LANGUAGE to language,
+                Params.Key.PAGE to page?.toString(),
+                Params.Key.SCREENED_THEATRICALLY to screenedTheatrically?.toString(),
+                Params.Key.SORT_BY to sortBy?.value,
+                Params.Key.TIMEZONE to timezone,
+                Params.Key.VOTE_AVERAGE_GTE to voteAverage?.gte?.toString(),
+                Params.Key.VOTE_AVERAGE_LTE to voteAverage?.lte?.toString(),
+                Params.Key.VOTE_COUNT_GTE to voteCount?.gte?.toString(),
+                Params.Key.VOTE_COUNT_LTE to voteCount?.lte?.toString(),
+                Params.Key.WATCH_REGION to watchRegion,
+                Params.Key.WITH_COMPANIES to withCompanies?.toString(),
+                Params.Key.WITH_GENRES to withGenres?.toString(),
+                Params.Key.WITH_KEYWORDS to withKeywords?.toString(),
+                Params.Key.WITH_NETWORKS to withNetworks?.toString(),
+                Params.Key.WITH_ORIGIN_COUNTRY to withOriginCountry?.toString(),
+                Params.Key.WITH_ORIGINAL_LANGUAGE to withOriginalLanguage?.toString(),
+                Params.Key.WITH_RUNTIME_GTE to withRuntime?.gte?.toString(),
+                Params.Key.WITH_RUNTIME_LTE to withRuntime?.lte?.toString(),
+                Params.Key.WITH_STATUS to withStatus?.toString(),
+                Params.Key.WITH_WATCH_MONETIZATION_TYPES to withWatchMonetizationTypes?.toString(),
+                Params.Key.WITH_WATCH_PROVIDERS to withWatchProviders?.toString(),
+                Params.Key.WITHOUT_COMPANIES to withoutCompanies?.toString(),
+                Params.Key.WITHOUT_GENRES to withoutGenres?.toString(),
+                Params.Key.WITHOUT_KEYWORDS to withoutKeywords?.toString(),
+                Params.Key.WITHOUT_WATCH_PROVIDERS to withoutWatchProviders?.toString(),
+                Params.Key.WITH_TYPE to withType?.toString(),
+            )
+            return service.getPopularTv(
+                params = params.filterNotNullValues(),
+            )
+        }
     }
 
 
@@ -810,6 +880,11 @@ object TMDb3 {
 
         @GET("tv/airing_today")
         suspend fun getAiringTodayTv(
+            @QueryMap params: Map<String, String> = emptyMap(),
+        ): PageResult<Tv>
+
+        @GET("tv/popular")
+        suspend fun getPopularTv(
             @QueryMap params: Map<String, String> = emptyMap(),
         ): PageResult<Tv>
     }
