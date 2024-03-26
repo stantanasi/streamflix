@@ -8,7 +8,7 @@ import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Url
 
-class Streamhub : Extractor() {
+class StreamhubExtractor : Extractor() {
 
     override val name = "Streamhub"
     override val mainUrl = "https://streamhub.to"

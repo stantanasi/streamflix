@@ -12,13 +12,13 @@ abstract class Extractor {
 
     companion object {
         private val extractors = listOf(
-            Rabbitstream(),
-            Rabbitstream.Megacloud(),
-            Rabbitstream.Dokicloud(),
-            Streamhub(),
+            RabbitstreamExtractor(),
+            RabbitstreamExtractor.MegacloudExtractor(),
+            RabbitstreamExtractor.DokicloudExtractor(),
+            StreamhubExtractor(),
             VoeExtractor(),
             StreamtapeExtractor(),
-            VidozaExtractor()
+            VidozaExtractor(),
         )
 
         suspend fun extract(link: String): Video {

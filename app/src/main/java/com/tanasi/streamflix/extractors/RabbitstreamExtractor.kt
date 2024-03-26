@@ -24,7 +24,7 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-open class Rabbitstream : Extractor() {
+open class RabbitstreamExtractor : Extractor() {
 
     override val name = "Rabbitstream"
     override val mainUrl = "https://rabbitstream.net"
@@ -69,7 +69,7 @@ open class Rabbitstream : Extractor() {
     }
 
 
-    class Megacloud : Rabbitstream() {
+    class MegacloudExtractor : RabbitstreamExtractor() {
         override val name = "Megacloud"
         override val mainUrl = "https://megacloud.tv"
         override val embed = "embed-2/ajax/e-1"
@@ -150,7 +150,7 @@ open class Rabbitstream : Extractor() {
         }
     }
 
-    class Dokicloud : Rabbitstream() {
+    class DokicloudExtractor : RabbitstreamExtractor() {
         override val name = "Dokicloud"
         override val mainUrl = "https://dokicloud.one"
     }
