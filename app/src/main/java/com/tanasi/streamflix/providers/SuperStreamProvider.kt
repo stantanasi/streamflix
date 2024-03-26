@@ -14,6 +14,9 @@ import okhttp3.OkHttpClient
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.FieldMap
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.POST
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import javax.crypto.Cipher
@@ -69,7 +72,78 @@ object SuperStreamProvider : Provider {
 
 
     override suspend fun getHome(): List<Category> {
-        TODO("Not yet implemented")
+        val response = service.getHome(
+            queryApi(
+                mapOf(
+                    "childmode" to "0",
+                    "app_version" to APP_VERSION,
+                    "appid" to appIdSecond,
+                    "module" to "Home_list_type_v2",
+                    "channel" to "Website",
+                    "page" to "0",
+                    "lang" to "en",
+                    "type" to "all",
+                    "pagelimit" to "10",
+                    "expired_date" to "${getExpiryDate()}",
+                    "platform" to "android"
+                )
+            )
+        )
+
+        return response.data.map { home ->
+            Category(
+                name = home.name?.takeIf { it.isNotEmpty() } ?: Category.FEATURED,
+                list = home.list.mapNotNull { data ->
+                    when (data.boxType) {
+                        1 -> Movie(
+                            id = data.id.toString(),
+                            title = data.title ?: "",
+                            quality = data.qualityTag,
+                            rating = data.imdbRating?.toDoubleOrNull(),
+                            poster = data.poster,
+                            banner = data.bannerMini,
+                        )
+
+                        2 -> TvShow(
+                            id = data.id.toString(),
+                            title = data.title ?: "",
+                            rating = data.imdbRating?.toDoubleOrNull(),
+                            poster = data.poster,
+                            banner = data.bannerMini,
+
+                            seasons = data.seasonEpisode
+                                ?.takeIf { it.matches("S\\d+\\s* E\\d+".toRegex()) }
+                                ?.let {
+                                    val result = Regex("S(\\d+)\\s* E(\\d+)").find(it)?.groupValues
+                                    object {
+                                        val season = result?.getOrNull(1)?.toIntOrNull() ?: 0
+
+                                        val episode = result?.getOrNull(2)?.toIntOrNull() ?: 0
+                                    }
+                                }
+                                ?.let { lastEpisode ->
+                                    listOf(
+                                        Season(
+                                            id = "",
+                                            number = lastEpisode.season,
+
+                                            episodes = listOf(
+                                                Episode(
+                                                    id = "",
+                                                    number = lastEpisode.episode,
+                                                )
+                                            )
+                                        )
+                                    )
+                                }
+                                ?: listOf()
+                        )
+
+                        else -> null
+                    }
+                }
+            )
+        }
     }
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
@@ -271,6 +345,13 @@ object SuperStreamProvider : Provider {
                 return retrofit.create(SuperStreamApiService::class.java)
             }
         }
+
+
+        @POST(".")
+        @FormUrlEncoded
+        suspend fun getHome(
+            @FieldMap data: Map<String, String>,
+        ): Response<List<HomeResponse>>
 
 
         data class Response<T>(
