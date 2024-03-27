@@ -77,7 +77,7 @@ object SuperStreamProvider : Provider {
         val response = service.getHome(
             queryApi(
                 mapOf(
-                    "childmode" to "0",
+                    "childmode" to "1",
                     "app_version" to APP_VERSION,
                     "appid" to appIdSecond,
                     "module" to "Home_list_type_v2",
@@ -157,7 +157,7 @@ object SuperStreamProvider : Provider {
             url,
             queryApi(
                 mapOf(
-                    "childmode" to "0",
+                    "childmode" to "1",
                     "app_version" to "11.5",
                     "appid" to appId,
                     "module" to "Search3",
@@ -218,7 +218,7 @@ object SuperStreamProvider : Provider {
         val data = service.getMovieById(
             queryApi(
                 mapOf(
-                    "childmode" to "0",
+                    "childmode" to "1",
                     "uid" to "",
                     "app_version" to "11.5",
                     "appid" to appId,
@@ -290,7 +290,7 @@ object SuperStreamProvider : Provider {
         val data = service.getTvShowById(
             queryApi(
                 mapOf(
-                    "childmode" to "0",
+                    "childmode" to "1",
                     "uid" to "",
                     "app_version" to "11.5",
                     "appid" to appId,
@@ -347,7 +347,7 @@ object SuperStreamProvider : Provider {
         val response = service.getEpisodes(
             queryApi(
                 mapOf(
-                    "childmode" to "0",
+                    "childmode" to "1",
                     "app_version" to APP_VERSION,
                     "year" to "0",
                     "appid" to appIdSecond,
@@ -392,7 +392,7 @@ object SuperStreamProvider : Provider {
                 service.getMovieSourceById(
                     queryApi(
                         mapOf(
-                            "childmode" to "0",
+                            "childmode" to "1",
                             "uid" to "",
                             "app_version" to "11.5",
                             "appid" to appId,
@@ -413,7 +413,7 @@ object SuperStreamProvider : Provider {
                 service.getEpisodeSources(
                     queryApi(
                         mapOf(
-                            "childmode" to "0",
+                            "childmode" to "1",
                             "app_version" to "11.5",
                             "module" to "TV_downloadurl_v3",
                             "channel" to "Website",
@@ -440,7 +440,7 @@ object SuperStreamProvider : Provider {
                 service.getMovieSubtitlesById(
                     queryApi(
                         mapOf(
-                            "childmode" to "0",
+                            "childmode" to "1",
                             "fid" to fid.toString(),
                             "uid" to "",
                             "app_version" to "11.5",
@@ -460,7 +460,7 @@ object SuperStreamProvider : Provider {
                 service.getEpisodeSubtitles(
                     queryApi(
                         mapOf(
-                            "childmode" to "0",
+                            "childmode" to "1",
                             "fid" to "$fid",
                             "app_version" to "11.5",
                             "module" to "TV_srt_list_v2",
