@@ -45,8 +45,6 @@ class PlayerViewModel(
             if (servers.isEmpty()) throw Exception("No servers found")
 
             _state.postValue(State.SuccessLoadingServers(servers))
-
-            getVideo(servers.first())
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "getServers: ", e)
             _state.postValue(State.FailedLoadingServers(e))

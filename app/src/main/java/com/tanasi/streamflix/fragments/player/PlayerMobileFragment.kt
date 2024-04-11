@@ -88,6 +88,7 @@ class PlayerMobileFragment : Fragment() {
                     binding.settings.setOnServerSelected { server ->
                         viewModel.getVideo(state.servers.find { server.id == it.id }!!)
                     }
+                    viewModel.getVideo(state.servers.first())
                 }
                 is PlayerViewModel.State.FailedLoadingServers -> {
                     Toast.makeText(
