@@ -17,6 +17,8 @@ import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
 import com.tanasi.streamflix.fragments.season.SeasonTvFragmentDirections
 import com.tanasi.streamflix.fragments.season.SeasonMobileFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.ui.ShowOptionsTvDialog
@@ -241,7 +243,12 @@ class EpisodeViewHolder(
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    HomeMobileFragmentDirections.actionHomeToPlayer(
+                    HomeMobileFragmentDirections.actionHomeToTvShow(
+                        id = episode.tvShow?.id ?: "",
+                    )
+                )
+                findNavController().navigate(
+                    TvShowMobileFragmentDirections.actionTvShowToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
                         subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->
@@ -339,7 +346,12 @@ class EpisodeViewHolder(
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
-                    HomeTvFragmentDirections.actionHomeToPlayer(
+                    HomeTvFragmentDirections.actionHomeToTvShow(
+                        id = episode.tvShow?.id ?: "",
+                    )
+                )
+                findNavController().navigate(
+                    TvShowTvFragmentDirections.actionTvShowToPlayer(
                         id = episode.id,
                         title = episode.tvShow?.title ?: "",
                         subtitle = episode.season?.takeIf { it.number != 0 }?.let { season ->

@@ -89,6 +89,8 @@ class AppAdapter(
 
         MOVIE_MOBILE_ITEM,
         MOVIE_TV_ITEM,
+        MOVIE_CONTINUE_WATCHING_MOBILE_ITEM,
+        MOVIE_CONTINUE_WATCHING_TV_ITEM,
         MOVIE_GRID_MOBILE_ITEM,
         MOVIE_GRID_TV_ITEM,
 
@@ -212,6 +214,7 @@ class AppAdapter(
                 )
             )
 
+            Type.MOVIE_CONTINUE_WATCHING_MOBILE_ITEM,
             Type.MOVIE_MOBILE_ITEM -> MovieViewHolder(
                 ItemMovieMobileBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -219,6 +222,7 @@ class AppAdapter(
                     false,
                 )
             )
+            Type.MOVIE_CONTINUE_WATCHING_TV_ITEM,
             Type.MOVIE_TV_ITEM -> MovieViewHolder(
                 ItemMovieTvBinding.inflate(
                     LayoutInflater.from(parent.context),

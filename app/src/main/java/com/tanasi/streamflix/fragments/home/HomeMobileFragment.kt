@@ -132,7 +132,7 @@ class HomeMobileFragment : Fragment() {
             ).takeIf { it.list.isNotEmpty() }?.also {
                 it.list.onEach { show ->
                     when (show) {
-                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_MOBILE_ITEM
+                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_CONTINUE_WATCHING_MOBILE_ITEM
                         is Episode -> show.itemType = AppAdapter.Type.EPISODE_CONTINUE_WATCHING_MOBILE_ITEM
                     }
                 }
