@@ -7,11 +7,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.databinding.FragmentProvidersTvBinding
 import com.tanasi.streamflix.models.Provider
 import com.tanasi.streamflix.ui.SpacingItemDecoration
+import kotlinx.coroutines.launch
 
 class ProvidersTvFragment : Fragment() {
 
@@ -36,31 +40,33 @@ class ProvidersTvFragment : Fragment() {
 
         initializeProviders()
 
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                ProvidersViewModel.State.Loading -> binding.isLoading.apply {
-                    root.visibility = View.VISIBLE
-                    pbIsLoading.visibility = View.VISIBLE
-                    gIsLoadingRetry.visibility = View.GONE
-                }
-                is ProvidersViewModel.State.SuccessLoading -> {
-                    displayProviders(state.providers)
-                    binding.rvProviders.visibility = View.VISIBLE
-                    binding.isLoading.root.visibility = View.GONE
-                }
-                is ProvidersViewModel.State.FailedLoading -> {
-                    Toast.makeText(
-                        requireContext(),
-                        state.error.message ?: "",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    binding.isLoading.apply {
-                        pbIsLoading.visibility = View.GONE
-                        gIsLoadingRetry.visibility = View.VISIBLE
-                        btnIsLoadingRetry.setOnClickListener {
-                            viewModel.getProviders()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+                when (state) {
+                    ProvidersViewModel.State.Loading -> binding.isLoading.apply {
+                        root.visibility = View.VISIBLE
+                        pbIsLoading.visibility = View.VISIBLE
+                        gIsLoadingRetry.visibility = View.GONE
+                    }
+                    is ProvidersViewModel.State.SuccessLoading -> {
+                        displayProviders(state.providers)
+                        binding.rvProviders.visibility = View.VISIBLE
+                        binding.isLoading.root.visibility = View.GONE
+                    }
+                    is ProvidersViewModel.State.FailedLoading -> {
+                        Toast.makeText(
+                            requireContext(),
+                            state.error.message ?: "",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        binding.isLoading.apply {
+                            pbIsLoading.visibility = View.GONE
+                            gIsLoadingRetry.visibility = View.VISIBLE
+                            btnIsLoadingRetry.setOnClickListener {
+                                viewModel.getProviders()
+                            }
+                            binding.rvProviders.visibility = View.GONE
                         }
-                        binding.rvProviders.visibility = View.GONE
                     }
                 }
             }
