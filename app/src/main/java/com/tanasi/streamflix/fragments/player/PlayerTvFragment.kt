@@ -114,9 +114,6 @@ class PlayerTvFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_LONG
                     ).show()
-                    if (player.currentMediaItem == null) {
-                        binding.pvPlayer.controller.exoSettings.requestFocus()
-                    }
                 }
             }
         }
