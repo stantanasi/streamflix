@@ -23,9 +23,9 @@ class PlayerViewModel(
         data class SuccessLoadingServers(val servers: List<Video.Server>) : State()
         data class FailedLoadingServers(val error: Exception) : State()
 
-        data object LoadingVideo : State()
+        data class LoadingVideo(val server: Video.Server) : State()
         data class SuccessLoadingVideo(val video: Video, val server: Video.Server) : State()
-        data class FailedLoadingVideo(val error: Exception) : State()
+        data class FailedLoadingVideo(val error: Exception, val server: Video.Server) : State()
     }
 
     init {
@@ -52,7 +52,7 @@ class PlayerViewModel(
     }
 
     fun getVideo(server: Video.Server) = viewModelScope.launch(Dispatchers.IO) {
-        _state.postValue(State.LoadingVideo)
+        _state.postValue(State.LoadingVideo(server))
 
         try {
             val video = UserPreferences.currentProvider!!.getVideo(server)
@@ -62,7 +62,7 @@ class PlayerViewModel(
             _state.postValue(State.SuccessLoadingVideo(video, server))
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "getVideo: ", e)
-            _state.postValue(State.FailedLoadingVideo(e))
+            _state.postValue(State.FailedLoadingVideo(e, server))
         }
     }
 }

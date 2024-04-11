@@ -56,6 +56,8 @@ class PlayerMobileFragment : Fragment() {
     private lateinit var player: ExoPlayer
     private lateinit var mediaSession: MediaSession
 
+    private var servers = listOf<Video.Server>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -76,6 +78,7 @@ class PlayerMobileFragment : Fragment() {
             when (state) {
                 PlayerViewModel.State.LoadingServers -> {}
                 is PlayerViewModel.State.SuccessLoadingServers -> {
+                    servers = state.servers
                     player.playlistMetadata = MediaMetadata.Builder()
                         .setTitle(state.toString())
                         .setMediaServers(state.servers.map {
@@ -99,7 +102,18 @@ class PlayerMobileFragment : Fragment() {
                     findNavController().navigateUp()
                 }
 
-                PlayerViewModel.State.LoadingVideo -> {}
+                is PlayerViewModel.State.LoadingVideo -> {
+                    player.setMediaItem(
+                        MediaItem.Builder()
+                            .setUri(Uri.parse(""))
+                            .setMediaMetadata(
+                                MediaMetadata.Builder()
+                                    .setMediaServerId(state.server.id)
+                                    .build()
+                            )
+                            .build()
+                    )
+                }
                 is PlayerViewModel.State.SuccessLoadingVideo -> {
                     displayVideo(state.video, state.server)
                 }
@@ -109,6 +123,9 @@ class PlayerMobileFragment : Fragment() {
                         state.error.message ?: "",
                         Toast.LENGTH_LONG
                     ).show()
+                    servers.getOrNull(servers.indexOf(state.server) + 1)?.let {
+                        viewModel.getVideo(it)
+                    }
                 }
             }
         }
