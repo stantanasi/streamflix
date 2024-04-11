@@ -3,20 +3,20 @@ package com.tanasi.streamflix.activities.main
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.streamflix.utils.GitHub
 import com.tanasi.streamflix.utils.InAppUpdater
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
 class MainViewModel : ViewModel() {
 
-    private val _state = MutableLiveData<State>(State.CheckingUpdate)
-    val state: LiveData<State> = _state
+    private val _state = MutableStateFlow<State>(State.CheckingUpdate)
+    val state: Flow<State> = _state
 
     sealed class State {
         data object CheckingUpdate : State()
@@ -32,15 +32,15 @@ class MainViewModel : ViewModel() {
 
 
     fun checkUpdate() = viewModelScope.launch(Dispatchers.IO) {
-        _state.postValue(State.CheckingUpdate)
+        _state.emit(State.CheckingUpdate)
 
         try {
             val release = InAppUpdater.getReleaseUpdate()
 
-            _state.postValue(State.SuccessCheckingUpdate(release))
+            _state.emit(State.SuccessCheckingUpdate(release))
         } catch (e: Exception) {
             Log.e("MainViewModel", "checkUpdate: ", e)
-            _state.postValue(State.FailedUpdate(e))
+            _state.emit(State.FailedUpdate(e))
         }
     }
 
@@ -48,15 +48,15 @@ class MainViewModel : ViewModel() {
         context: Context,
         asset: GitHub.Release.Asset,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        _state.postValue(State.DownloadingUpdate)
+        _state.emit(State.DownloadingUpdate)
 
         try {
             val apk = InAppUpdater.downloadApk(context, asset)
 
-            _state.postValue(State.SuccessDownloadingUpdate(apk))
+            _state.emit(State.SuccessDownloadingUpdate(apk))
         } catch (e: Exception) {
             Log.e("MainViewModel", "downloadUpdate: ", e)
-            _state.postValue(State.FailedUpdate(e))
+            _state.emit(State.FailedUpdate(e))
         }
     }
 
@@ -64,13 +64,13 @@ class MainViewModel : ViewModel() {
         context: Context,
         apk: File,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        _state.postValue(State.InstallingUpdate)
+        _state.emit(State.InstallingUpdate)
 
         try {
             InAppUpdater.installApk(context, Uri.fromFile(apk))
         } catch (e: Exception) {
             Log.e("MainViewModel", "installUpdate: ", e)
-            _state.postValue(State.FailedUpdate(e))
+            _state.emit(State.FailedUpdate(e))
         }
     }
 }

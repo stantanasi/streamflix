@@ -9,6 +9,9 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController
@@ -21,6 +24,7 @@ import com.tanasi.streamflix.fragments.player.PlayerTvFragment
 import com.tanasi.streamflix.ui.UpdateAppTvDialog
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.getCurrentFragment
+import kotlinx.coroutines.launch
 
 class MainTvActivity : FragmentActivity() {
 
@@ -94,36 +98,38 @@ class MainTvActivity : FragmentActivity() {
             }
         }
 
-        viewModel.state.observe(this) { state ->
-            when (state) {
-                MainViewModel.State.CheckingUpdate -> {}
-                is MainViewModel.State.SuccessCheckingUpdate -> {
-                    val asset = state.release?.assets
-                        ?.find { it.contentType == "application/vnd.android.package-archive" }
-                    if (asset != null) {
-                        updateAppDialog = UpdateAppTvDialog(this, state.release).also {
-                            it.setOnUpdateClickListener { _ ->
-                                if (!it.isLoading) viewModel.downloadUpdate(this, asset)
+        lifecycleScope.launch {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+                when (state) {
+                    MainViewModel.State.CheckingUpdate -> {}
+                    is MainViewModel.State.SuccessCheckingUpdate -> {
+                        val asset = state.release?.assets
+                            ?.find { it.contentType == "application/vnd.android.package-archive" }
+                        if (asset != null) {
+                            updateAppDialog = UpdateAppTvDialog(this@MainTvActivity, state.release).also {
+                                it.setOnUpdateClickListener { _ ->
+                                    if (!it.isLoading) viewModel.downloadUpdate(this@MainTvActivity, asset)
+                                }
+                                it.show()
                             }
-                            it.show()
                         }
                     }
-                }
 
-                MainViewModel.State.DownloadingUpdate -> updateAppDialog.isLoading = true
-                is MainViewModel.State.SuccessDownloadingUpdate -> {
-                    viewModel.installUpdate(this, state.apk)
-                    updateAppDialog.hide()
-                }
+                    MainViewModel.State.DownloadingUpdate -> updateAppDialog.isLoading = true
+                    is MainViewModel.State.SuccessDownloadingUpdate -> {
+                        viewModel.installUpdate(this@MainTvActivity, state.apk)
+                        updateAppDialog.hide()
+                    }
 
-                MainViewModel.State.InstallingUpdate -> updateAppDialog.isLoading = true
+                    MainViewModel.State.InstallingUpdate -> updateAppDialog.isLoading = true
 
-                is MainViewModel.State.FailedUpdate -> {
-                    Toast.makeText(
-                        this,
-                        state.error.message ?: "",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    is MainViewModel.State.FailedUpdate -> {
+                        Toast.makeText(
+                            this@MainTvActivity,
+                            state.error.message ?: "",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
