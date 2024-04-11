@@ -108,11 +108,28 @@ class MovieViewHolder(
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> findNavController().navigate(
-                        HomeMobileFragmentDirections.actionHomeToMovie(
-                            id = movie.id
+                    is HomeMobileFragment -> {
+                        findNavController().navigate(
+                            HomeMobileFragmentDirections.actionHomeToMovie(
+                                id = movie.id
+                            )
                         )
-                    )
+                        if (movie.itemType == AppAdapter.Type.MOVIE_CONTINUE_WATCHING_MOBILE_ITEM) {
+                            findNavController().navigate(
+                                MovieMobileFragmentDirections.actionMovieToPlayer(
+                                    id = movie.id,
+                                    title = movie.title,
+                                    subtitle = movie.released?.format("yyyy") ?: "",
+                                    videoType = Video.Type.Movie(
+                                        id = movie.id,
+                                        title = movie.title,
+                                        releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",
+                                        poster = movie.poster ?: "",
+                                    ),
+                                )
+                            )
+                        }
+                    }
                     is MovieMobileFragment -> findNavController().navigate(
                         MovieMobileFragmentDirections.actionMovieToMovie(
                             id = movie.id
@@ -172,11 +189,28 @@ class MovieViewHolder(
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
-                    is HomeTvFragment -> findNavController().navigate(
-                        HomeTvFragmentDirections.actionHomeToMovie(
-                            id = movie.id
+                    is HomeTvFragment -> {
+                        findNavController().navigate(
+                            HomeTvFragmentDirections.actionHomeToMovie(
+                                id = movie.id
+                            )
                         )
-                    )
+                        if (movie.itemType == AppAdapter.Type.MOVIE_CONTINUE_WATCHING_TV_ITEM) {
+                            findNavController().navigate(
+                                MovieTvFragmentDirections.actionMovieToPlayer(
+                                    id = movie.id,
+                                    title = movie.title,
+                                    subtitle = movie.released?.format("yyyy") ?: "",
+                                    videoType = Video.Type.Movie(
+                                        id = movie.id,
+                                        title = movie.title,
+                                        releaseDate = movie.released?.format("yyyy-MM-dd") ?: "",
+                                        poster = movie.poster ?: "",
+                                    ),
+                                )
+                            )
+                        }
+                    }
                     is MovieTvFragment -> findNavController().navigate(
                         MovieTvFragmentDirections.actionMovieToMovie(
                             id = movie.id
