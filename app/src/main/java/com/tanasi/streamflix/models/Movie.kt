@@ -42,11 +42,20 @@ class Movie(
     override var watchHistory: WatchItem.WatchHistory? = null
 
 
-    fun merge(movie: Movie) {
+    fun isSame(movie: Movie): Boolean {
+        if (isFavorite != movie.isFavorite) return false
+        if (isWatched != movie.isWatched) return false
+        if (watchedDate != movie.watchedDate) return false
+        if (watchHistory != movie.watchHistory) return false
+        return true
+    }
+
+    fun merge(movie: Movie): Movie {
         this.isFavorite = movie.isFavorite
         this.isWatched = movie.isWatched
         this.watchedDate = movie.watchedDate
         this.watchHistory = movie.watchHistory
+        return this
     }
 
 

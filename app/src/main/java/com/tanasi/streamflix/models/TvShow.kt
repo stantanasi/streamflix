@@ -37,8 +37,14 @@ class TvShow(
     override var isFavorite: Boolean = false
 
 
-    fun merge(tvShow: TvShow) {
+    fun isSame(tvShow: TvShow): Boolean {
+        if (isFavorite != tvShow.isFavorite) return false
+        return true
+    }
+
+    fun merge(tvShow: TvShow): TvShow {
         this.isFavorite = tvShow.isFavorite
+        return this
     }
 
 
