@@ -14,6 +14,9 @@ interface TvShowDao {
     @Query("SELECT * FROM tv_shows WHERE id = :id")
     fun getById(id: String): TvShow?
 
+    @Query("SELECT * FROM tv_shows WHERE id = :id")
+    fun getByIdAsFlow(id: String): Flow<TvShow?>
+
     @Query("SELECT * FROM tv_shows WHERE id IN (:ids)")
     fun getByIds(ids: List<String>): Flow<List<TvShow>>
 
