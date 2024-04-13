@@ -14,6 +14,9 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE id = :id")
     fun getById(id: String): Movie?
 
+    @Query("SELECT * FROM movies WHERE id = :id")
+    fun getByIdAsFlow(id: String): Flow<Movie?>
+
     @Query("SELECT * FROM movies WHERE id IN (:ids)")
     fun getByIds(ids: List<String>): Flow<List<Movie>>
 
