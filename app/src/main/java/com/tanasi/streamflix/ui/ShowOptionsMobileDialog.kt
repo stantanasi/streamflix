@@ -13,7 +13,6 @@ import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.DialogShowOptionsMobileBinding
 import com.tanasi.streamflix.fragments.home.HomeMobileFragment
 import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
-import com.tanasi.streamflix.fragments.season.SeasonMobileFragment
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
@@ -117,9 +116,6 @@ class ShowOptionsMobileDialog(
                 }
                 database.episodeDao().save(episode)
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is SeasonMobileFragment -> fragment.refresh(episode)
-                }
                 hide()
             }
 
@@ -135,9 +131,6 @@ class ShowOptionsMobileDialog(
                 episode.watchHistory = null
                 database.episodeDao().save(episode)
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is SeasonMobileFragment -> fragment.refresh(episode)
-                }
                 hide()
             }
 
