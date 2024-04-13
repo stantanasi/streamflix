@@ -107,14 +107,16 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionShowWatched.apply {
             setOnClickListener {
-                episode.isWatched = !episode.isWatched
-                if (episode.isWatched) {
-                    episode.watchedDate = Calendar.getInstance()
-                    episode.watchHistory = null
-                } else {
-                    episode.watchedDate = null
-                }
-                database.episodeDao().save(episode)
+                database.episodeDao().save(episode.copy().apply {
+                    merge(episode)
+                    isWatched = !isWatched
+                    if (isWatched) {
+                        watchedDate = Calendar.getInstance()
+                        watchHistory = null
+                    } else {
+                        watchedDate = null
+                    }
+                })
 
                 hide()
             }
@@ -128,8 +130,10 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                episode.watchHistory = null
-                database.episodeDao().save(episode)
+                database.episodeDao().save(episode.copy().apply {
+                    merge(episode)
+                    watchHistory = null
+                })
 
                 hide()
             }
@@ -160,8 +164,10 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionShowFavorite.apply {
             setOnClickListener {
-                movie.isFavorite = !movie.isFavorite
-                database.movieDao().save(movie)
+                database.movieDao().save(movie.copy().apply {
+                    merge(movie)
+                    isFavorite = !isFavorite
+                })
 
                 hide()
             }
@@ -175,14 +181,16 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionShowWatched.apply {
             setOnClickListener {
-                movie.isWatched = !movie.isWatched
-                if (movie.isWatched) {
-                    movie.watchedDate = Calendar.getInstance()
-                    movie.watchHistory = null
-                } else {
-                    movie.watchedDate = null
-                }
-                database.movieDao().save(movie)
+                database.movieDao().save(movie.copy().apply {
+                    merge(movie)
+                    isWatched = !isWatched
+                    if (isWatched) {
+                        watchedDate = Calendar.getInstance()
+                        watchHistory = null
+                    } else {
+                        watchedDate = null
+                    }
+                })
 
                 hide()
             }
@@ -196,8 +204,10 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                movie.watchHistory = null
-                database.movieDao().save(movie)
+                database.movieDao().save(movie.copy().apply {
+                    merge(movie)
+                    watchHistory = null
+                })
 
                 hide()
             }
@@ -228,8 +238,10 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionShowFavorite.apply {
             setOnClickListener {
-                tvShow.isFavorite = !tvShow.isFavorite
-                database.tvShowDao().save(tvShow)
+                database.tvShowDao().save(tvShow.copy().apply {
+                    merge(tvShow)
+                    isFavorite = !isFavorite
+                })
 
                 hide()
             }
