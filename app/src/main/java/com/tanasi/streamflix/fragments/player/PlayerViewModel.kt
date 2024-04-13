@@ -1,13 +1,13 @@
 package com.tanasi.streamflix.fragments.player
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
@@ -15,8 +15,8 @@ class PlayerViewModel(
     id: String,
 ) : ViewModel() {
 
-    private val _state = MutableLiveData<State>(State.LoadingServers)
-    val state: LiveData<State> = _state
+    private val _state = MutableStateFlow<State>(State.LoadingServers)
+    val state: Flow<State> = _state
 
     sealed class State {
         data object LoadingServers : State()
@@ -37,32 +37,32 @@ class PlayerViewModel(
         videoType: Video.Type,
         id: String,
     ) = viewModelScope.launch(Dispatchers.IO) {
-        _state.postValue(State.LoadingServers)
+        _state.emit(State.LoadingServers)
 
         try {
             val servers = UserPreferences.currentProvider!!.getServers(id, videoType)
 
             if (servers.isEmpty()) throw Exception("No servers found")
 
-            _state.postValue(State.SuccessLoadingServers(servers))
+            _state.emit(State.SuccessLoadingServers(servers))
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "getServers: ", e)
-            _state.postValue(State.FailedLoadingServers(e))
+            _state.emit(State.FailedLoadingServers(e))
         }
     }
 
     fun getVideo(server: Video.Server) = viewModelScope.launch(Dispatchers.IO) {
-        _state.postValue(State.LoadingVideo(server))
+        _state.emit(State.LoadingVideo(server))
 
         try {
             val video = UserPreferences.currentProvider!!.getVideo(server)
 
             if (video.source.isEmpty()) throw Exception("No source found")
 
-            _state.postValue(State.SuccessLoadingVideo(video, server))
+            _state.emit(State.SuccessLoadingVideo(video, server))
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "getVideo: ", e)
-            _state.postValue(State.FailedLoadingVideo(e, server))
+            _state.emit(State.FailedLoadingVideo(e, server))
         }
     }
 }
