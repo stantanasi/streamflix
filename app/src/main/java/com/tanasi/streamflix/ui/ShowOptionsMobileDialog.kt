@@ -118,7 +118,6 @@ class ShowOptionsMobileDialog(
                 database.episodeDao().save(episode)
 
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
                     is SeasonMobileFragment -> fragment.refresh(episode)
                 }
                 hide()
@@ -133,13 +132,10 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                if (episode.watchHistory == null) return@setOnClickListener
-
                 episode.watchHistory = null
                 database.episodeDao().save(episode)
 
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
                     is SeasonMobileFragment -> fragment.refresh(episode)
                 }
                 hide()
@@ -174,9 +170,6 @@ class ShowOptionsMobileDialog(
                 movie.isFavorite = !movie.isFavorite
                 database.movieDao().save(movie)
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                }
                 hide()
             }
 
@@ -198,9 +191,6 @@ class ShowOptionsMobileDialog(
                 }
                 database.movieDao().save(movie)
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                }
                 hide()
             }
 
@@ -213,14 +203,9 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                if (movie.watchHistory == null) return@setOnClickListener
-
                 movie.watchHistory = null
                 database.movieDao().save(movie)
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                }
                 hide()
             }
 
@@ -253,9 +238,6 @@ class ShowOptionsMobileDialog(
                 tvShow.isFavorite = !tvShow.isFavorite
                 database.tvShowDao().save(tvShow)
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                }
                 hide()
             }
 

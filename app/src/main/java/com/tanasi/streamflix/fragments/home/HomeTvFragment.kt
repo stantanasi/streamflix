@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.tvprovider.media.tv.TvContractCompat
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
@@ -20,15 +22,16 @@ import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.WatchItem
 import com.tanasi.streamflix.utils.WatchNextUtils
+import com.tanasi.streamflix.utils.viewModelsFactory
+import kotlinx.coroutines.launch
 
 class HomeTvFragment : Fragment() {
 
     private var _binding: FragmentHomeTvBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<HomeViewModel>()
-
-    private lateinit var database: AppDatabase
+    private val database by lazy { AppDatabase.getInstance(requireContext()) }
+    private val viewModel by viewModelsFactory { HomeViewModel(database) }
 
     private val appAdapter = AppAdapter()
 
@@ -43,8 +46,6 @@ class HomeTvFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        database = AppDatabase.getInstance(requireContext())
 
         WatchNextUtils.programs(requireContext())
             .forEach { program ->
@@ -113,31 +114,33 @@ class HomeTvFragment : Fragment() {
 
         initializeHome()
 
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                HomeViewModel.State.Loading -> binding.isLoading.apply {
-                    root.visibility = View.VISIBLE
-                    pbIsLoading.visibility = View.VISIBLE
-                    gIsLoadingRetry.visibility = View.GONE
-                }
-                is HomeViewModel.State.SuccessLoading -> {
-                    displayHome(state.categories)
-                    binding.vgvHome.visibility = View.VISIBLE
-                    binding.isLoading.root.visibility = View.GONE
-                }
-                is HomeViewModel.State.FailedLoading -> {
-                    Toast.makeText(
-                        requireContext(),
-                        state.error.message ?: "",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    binding.isLoading.apply {
-                        pbIsLoading.visibility = View.GONE
-                        gIsLoadingRetry.visibility = View.VISIBLE
-                        btnIsLoadingRetry.setOnClickListener {
-                            viewModel.getHome()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+                when (state) {
+                    HomeViewModel.State.Loading -> binding.isLoading.apply {
+                        root.visibility = View.VISIBLE
+                        pbIsLoading.visibility = View.VISIBLE
+                        gIsLoadingRetry.visibility = View.GONE
+                    }
+                    is HomeViewModel.State.SuccessLoading -> {
+                        displayHome(state.categories)
+                        binding.vgvHome.visibility = View.VISIBLE
+                        binding.isLoading.root.visibility = View.GONE
+                    }
+                    is HomeViewModel.State.FailedLoading -> {
+                        Toast.makeText(
+                            requireContext(),
+                            state.error.message ?: "",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        binding.isLoading.apply {
+                            pbIsLoading.visibility = View.GONE
+                            gIsLoadingRetry.visibility = View.VISIBLE
+                            btnIsLoadingRetry.setOnClickListener {
+                                viewModel.getHome()
+                            }
+                            binding.vgvHome.visibility = View.GONE
                         }
-                        binding.vgvHome.visibility = View.GONE
                     }
                 }
             }
@@ -157,14 +160,6 @@ class HomeTvFragment : Fragment() {
             .into(binding.ivHomeBackground)
     }
 
-    fun refresh() {
-        appAdapter.onSaveInstanceState(binding.vgvHome)
-        when (val state = viewModel.state.value) {
-            is HomeViewModel.State.SuccessLoading -> displayHome(state.categories)
-            else -> {}
-        }
-    }
-
     private fun initializeHome() {
         binding.vgvHome.apply {
             adapter = appAdapter
@@ -175,72 +170,54 @@ class HomeTvFragment : Fragment() {
     }
 
     private fun displayHome(categories: List<Category>) {
-        appAdapter.submitList(listOfNotNull(
-            categories
-                .find { it.name == Category.FEATURED }
-                ?.also { it.itemType = AppAdapter.Type.CATEGORY_TV_SWIPER },
-
-            Category(
-                name = getString(R.string.home_continue_watching),
-                list = listOf(
-                    database.movieDao().getWatchingMovies(),
-                    database.episodeDao().getWatchingEpisodes().onEach { episode ->
-                        episode.tvShow = episode.tvShow?.let { database.tvShowDao().getById(it.id) }
-                        episode.season = episode.season?.let { database.seasonDao().getById(it.id) }
-                    },
-                ).flatten().sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
-            ).takeIf { it.list.isNotEmpty() }?.also {
-                it.list.onEach { show ->
-                    when (show) {
-                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_CONTINUE_WATCHING_TV_ITEM
-                        is Episode -> show.itemType = AppAdapter.Type.EPISODE_CONTINUE_WATCHING_TV_ITEM
-                    }
-                }
-                it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-                it.itemType = AppAdapter.Type.CATEGORY_TV_ITEM
-            },
-
-            Category(
-                name = getString(R.string.home_favorite_movies),
-                list = database.movieDao().getFavorites()
-                    .reversed(),
-            ).takeIf { it.list.isNotEmpty() }?.also {
-                it.list.onEach { show ->
-                    when (show) {
-                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_TV_ITEM
-                        is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
-                    }
-                }
-                it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-                it.itemType = AppAdapter.Type.CATEGORY_TV_ITEM
-            },
-
-            Category(
-                name = getString(R.string.home_favorite_tv_shows),
-                list = database.tvShowDao().getFavorites()
-                    .reversed(),
-            ).takeIf { it.list.isNotEmpty() }?.also {
-                it.list.onEach { show ->
-                    when (show) {
-                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_TV_ITEM
-                        is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
-                    }
-                }
-                it.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-                it.itemType = AppAdapter.Type.CATEGORY_TV_ITEM
-            },
-        ) + categories
-            .filter { it.name != Category.FEATURED && it.list.isNotEmpty() }
-            .onEach { category ->
-                category.list.onEach { show ->
-                    when (show) {
-                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_TV_ITEM
-                        is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
-                    }
-                }
-                category.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
-                category.itemType = AppAdapter.Type.CATEGORY_TV_ITEM
+        categories
+            .find { it.name == Category.FEATURED }
+            ?.also {
+                it.selectedIndex = appAdapter.items
+                    .filterIsInstance<Category>()
+                    .find { item -> item.name == Category.FEATURED }
+                    ?.selectedIndex
+                    ?: 0
             }
+
+        categories
+            .find { it.name == Category.CONTINUE_WATCHING }
+            ?.also {
+                it.name = getString(R.string.home_continue_watching)
+                it.list.forEach { show ->
+                    when (show) {
+                        is Episode -> show.itemType = AppAdapter.Type.EPISODE_CONTINUE_WATCHING_TV_ITEM
+                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_CONTINUE_WATCHING_TV_ITEM
+                    }
+                }
+            }
+
+        categories
+            .find { it.name == Category.FAVORITE_MOVIES }
+            ?.also { it.name = getString(R.string.home_favorite_movies) }
+
+        categories
+            .find { it.name == Category.FAVORITE_TV_SHOWS }
+            ?.also { it.name = getString(R.string.home_favorite_tv_shows) }
+
+        appAdapter.submitList(
+            categories
+                .filter { it.list.isNotEmpty() }
+                .onEach { category ->
+                    if (category.name != getString(R.string.home_continue_watching)) {
+                        category.list.forEach { show ->
+                            when (show) {
+                                is Movie -> show.itemType = AppAdapter.Type.MOVIE_TV_ITEM
+                                is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_TV_ITEM
+                            }
+                        }
+                    }
+                    category.itemSpacing = resources.getDimension(R.dimen.home_spacing).toInt()
+                    category.itemType = when (category.name) {
+                        Category.FEATURED -> AppAdapter.Type.CATEGORY_TV_SWIPER
+                        else -> AppAdapter.Type.CATEGORY_TV_ITEM
+                    }
+                }
         )
     }
 }
