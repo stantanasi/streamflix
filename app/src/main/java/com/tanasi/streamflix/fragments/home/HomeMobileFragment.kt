@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.NavMainGraphDirections
 import com.tanasi.streamflix.R
@@ -90,7 +91,9 @@ class HomeMobileFragment : Fragment() {
 
     private fun initializeHome() {
         binding.rvHome.apply {
-            adapter = appAdapter
+            adapter = appAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
             addItemDecoration(
                 SpacingItemDecoration(20.dp(requireContext()))
             )

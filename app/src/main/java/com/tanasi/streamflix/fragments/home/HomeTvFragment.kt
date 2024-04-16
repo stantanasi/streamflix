@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.tvprovider.media.tv.TvContractCompat
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
@@ -162,7 +163,9 @@ class HomeTvFragment : Fragment() {
 
     private fun initializeHome() {
         binding.vgvHome.apply {
-            adapter = appAdapter
+            adapter = appAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
             setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
         }
 

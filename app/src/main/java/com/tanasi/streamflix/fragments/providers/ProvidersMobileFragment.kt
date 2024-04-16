@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.databinding.FragmentProvidersMobileBinding
 import com.tanasi.streamflix.models.Provider
@@ -79,7 +80,9 @@ class ProvidersMobileFragment : Fragment() {
 
     private fun initializeProviders() {
         binding.rvProviders.apply {
-            adapter = appAdapter
+            adapter = appAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
             addItemDecoration(
                 SpacingItemDecoration(32.dp(requireContext()))
             )

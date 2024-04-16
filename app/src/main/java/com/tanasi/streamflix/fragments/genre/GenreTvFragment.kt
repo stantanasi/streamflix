@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
@@ -93,7 +94,9 @@ class GenreTvFragment : Fragment() {
         binding.tvGenreName.text = getString(R.string.genre_header_name, args.name)
 
         binding.vgvGenre.apply {
-            adapter = appAdapter
+            adapter = appAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
             setItemSpacing(requireContext().resources.getDimension(R.dimen.genre_spacing).toInt())
         }
     }
