@@ -122,11 +122,6 @@ class HomeMobileFragment : Fragment() {
                         is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_SWIPER_MOBILE_ITEM
                     }
                 }
-                it.selectedIndex = appAdapter.items
-                    .filterIsInstance<Category>()
-                    .find { item -> item.name == Category.FEATURED }
-                    ?.selectedIndex
-                    ?: 0
             }
 
         categories
