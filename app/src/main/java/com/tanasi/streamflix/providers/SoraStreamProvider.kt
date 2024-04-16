@@ -731,8 +731,8 @@ object SoraStreamProvider : Provider {
     override suspend fun getPeople(id: String, page: Int): People {
         val people = TMDb3.People.details(
             personId = id.toInt(),
-            appendToResponse = listOf(
-                TMDb3.Params.AppendToResponse.Person.COMBINED_CREDITS,
+            appendToResponse = listOfNotNull(
+                if (page > 1) null else TMDb3.Params.AppendToResponse.Person.COMBINED_CREDITS,
             ),
         ).let { person ->
             People(
