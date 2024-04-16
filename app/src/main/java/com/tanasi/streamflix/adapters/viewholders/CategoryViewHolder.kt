@@ -90,6 +90,11 @@ class CategoryViewHolder(
 
 
     private fun displayMobileSwiper(binding: ContentCategorySwiperMobileBinding) {
+        val handler = Handler(Looper.getMainLooper())
+        handler.postDelayed(8_000) {
+            binding.vpCategorySwiper.currentItem += 1
+        }
+
         binding.vpCategorySwiper.apply {
             adapter = AppAdapter().apply {
                 submitList(category.list)
@@ -113,6 +118,10 @@ class CategoryViewHolder(
             override fun onPageSelected(position: Int) {
                 binding.llDotsIndicator.children.forEachIndexed { index, view ->
                     view.isSelected = (position == index)
+                }
+                handler.removeCallbacksAndMessages(null)
+                handler.postDelayed(8_000) {
+                    binding.vpCategorySwiper.currentItem += 1
                 }
             }
         })
