@@ -6,18 +6,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentTvShowsTvBinding
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.utils.viewModelsFactory
+import kotlinx.coroutines.launch
 
 class TvShowsTvFragment : Fragment() {
 
     private var _binding: FragmentTvShowsTvBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<TvShowsViewModel>()
+    private val database by lazy { AppDatabase.getInstance(requireContext()) }
+    private val viewModel by viewModelsFactory { TvShowsViewModel(database) }
 
     private val appAdapter = AppAdapter()
 
@@ -35,36 +42,38 @@ class TvShowsTvFragment : Fragment() {
 
         initializeTvShows()
 
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                TvShowsViewModel.State.Loading -> binding.isLoading.apply {
-                    root.visibility = View.VISIBLE
-                    pbIsLoading.visibility = View.VISIBLE
-                    gIsLoadingRetry.visibility = View.GONE
-                }
-                TvShowsViewModel.State.LoadingMore -> appAdapter.isLoading = true
-                is TvShowsViewModel.State.SuccessLoading -> {
-                    displayTvShows(state.tvShows, state.hasMore)
-                    appAdapter.isLoading = false
-                    binding.vgvTvShows.visibility = View.VISIBLE
-                    binding.isLoading.root.visibility = View.GONE
-                }
-                is TvShowsViewModel.State.FailedLoading -> {
-                    Toast.makeText(
-                        requireContext(),
-                        state.error.message ?: "",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    if (appAdapter.isLoading) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+                when (state) {
+                    TvShowsViewModel.State.Loading -> binding.isLoading.apply {
+                        root.visibility = View.VISIBLE
+                        pbIsLoading.visibility = View.VISIBLE
+                        gIsLoadingRetry.visibility = View.GONE
+                    }
+                    TvShowsViewModel.State.LoadingMore -> appAdapter.isLoading = true
+                    is TvShowsViewModel.State.SuccessLoading -> {
+                        displayTvShows(state.tvShows, state.hasMore)
                         appAdapter.isLoading = false
-                    } else {
-                        binding.isLoading.apply {
-                            pbIsLoading.visibility = View.GONE
-                            gIsLoadingRetry.visibility = View.VISIBLE
-                            btnIsLoadingRetry.setOnClickListener {
-                                viewModel.getTvShows()
+                        binding.vgvTvShows.visibility = View.VISIBLE
+                        binding.isLoading.root.visibility = View.GONE
+                    }
+                    is TvShowsViewModel.State.FailedLoading -> {
+                        Toast.makeText(
+                            requireContext(),
+                            state.error.message ?: "",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        if (appAdapter.isLoading) {
+                            appAdapter.isLoading = false
+                        } else {
+                            binding.isLoading.apply {
+                                pbIsLoading.visibility = View.GONE
+                                gIsLoadingRetry.visibility = View.VISIBLE
+                                btnIsLoadingRetry.setOnClickListener {
+                                    viewModel.getTvShows()
+                                }
+                                binding.vgvTvShows.visibility = View.GONE
                             }
-                            binding.vgvTvShows.visibility = View.GONE
                         }
                     }
                 }
@@ -80,7 +89,9 @@ class TvShowsTvFragment : Fragment() {
 
     private fun initializeTvShows() {
         binding.vgvTvShows.apply {
-            adapter = appAdapter
+            adapter = appAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
             setItemSpacing(
                 requireContext().resources.getDimension(R.dimen.tv_shows_spacing).toInt()
             )

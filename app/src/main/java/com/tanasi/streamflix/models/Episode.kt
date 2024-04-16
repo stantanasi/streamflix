@@ -29,10 +29,18 @@ class Episode(
     override var watchHistory: WatchItem.WatchHistory? = null
 
 
-    fun merge(episode: Episode) {
+    fun isSame(episode: Episode): Boolean {
+        if (isWatched != episode.isWatched) return false
+        if (watchedDate != episode.watchedDate) return false
+        if (watchHistory != episode.watchHistory) return false
+        return true
+    }
+
+    fun merge(episode: Episode): Episode {
         this.isWatched = episode.isWatched
         this.watchedDate = episode.watchedDate
         this.watchHistory = episode.watchHistory
+        return this
     }
 
 

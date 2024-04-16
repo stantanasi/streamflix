@@ -3,7 +3,7 @@ package com.tanasi.streamflix.models
 import com.tanasi.streamflix.adapters.AppAdapter
 
 class Category(
-    val name: String,
+    var name: String,
     val list: List<AppAdapter.Item>,
 ) : AppAdapter.Item {
 
@@ -48,5 +48,8 @@ class Category(
 
     companion object {
         const val FEATURED = "Featured"
+        const val CONTINUE_WATCHING = "Continue Watching"
+        const val FAVORITE_MOVIES = "Favorite movies"
+        const val FAVORITE_TV_SHOWS = "Favorite TV shows"
     }
 }

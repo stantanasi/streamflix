@@ -1,19 +1,51 @@
 package com.tanasi.streamflix.fragments.movies
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 
-class MoviesViewModel : ViewModel() {
+class MoviesViewModel(database: AppDatabase) : ViewModel() {
 
-    private val _state = MutableLiveData<State>(State.Loading)
-    val state: LiveData<State> = _state
+    private val _state = MutableStateFlow<State>(State.Loading)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val state: Flow<State> = combine(
+        _state,
+        _state.transformLatest { state ->
+            when (state) {
+                is State.SuccessLoading -> {
+                    database.movieDao().getByIds(state.movies.map { it.id })
+                        .collect { emit(it) }
+                }
+                else -> emit(emptyList<Movie>())
+            }
+        },
+    ) { state, moviesDb ->
+        when (state) {
+            is State.SuccessLoading -> {
+                State.SuccessLoading(
+                    movies = state.movies.map { movie ->
+                        moviesDb.find { it.id == movie.id }
+                            ?.takeIf { !movie.isSame(it) }
+                            ?.let { movie.copy().merge(it) }
+                            ?: movie
+                    },
+                    hasMore = state.hasMore
+                )
+            }
+            else -> state
+        }
+    }
 
     private var page = 1
 
@@ -30,31 +62,31 @@ class MoviesViewModel : ViewModel() {
 
 
     fun getMovies() = viewModelScope.launch(Dispatchers.IO) {
-        _state.postValue(State.Loading)
+        _state.emit(State.Loading)
 
         try {
             val movies = UserPreferences.currentProvider!!.getMovies()
 
             page = 1
 
-            _state.postValue(State.SuccessLoading(movies, true))
+            _state.emit(State.SuccessLoading(movies, true))
         } catch (e: Exception) {
             Log.e("MoviesViewModel", "getMovies: ", e)
-            _state.postValue(State.FailedLoading(e))
+            _state.emit(State.FailedLoading(e))
         }
     }
 
     fun loadMoreMovies() = viewModelScope.launch(Dispatchers.IO) {
-        val currentState = state.value
+        val currentState = _state.first()
         if (currentState is State.SuccessLoading) {
-            _state.postValue(State.LoadingMore)
+            _state.emit(State.LoadingMore)
 
             try {
                 val movies = UserPreferences.currentProvider!!.getMovies(page + 1)
 
                 page += 1
 
-                _state.postValue(
+                _state.emit(
                     State.SuccessLoading(
                         movies = currentState.movies + movies,
                         hasMore = movies.isNotEmpty(),
@@ -62,7 +94,7 @@ class MoviesViewModel : ViewModel() {
                 )
             } catch (e: Exception) {
                 Log.e("MoviesViewModel", "loadMoreMovies: ", e)
-                _state.postValue(State.FailedLoading(e))
+                _state.emit(State.FailedLoading(e))
             }
         }
     }

@@ -8,6 +8,9 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.tanasi.streamflix.R
@@ -15,6 +18,7 @@ import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ActivityMainMobileBinding
 import com.tanasi.streamflix.ui.UpdateAppMobileDialog
 import com.tanasi.streamflix.utils.UserPreferences
+import kotlinx.coroutines.launch
 
 class MainMobileActivity : FragmentActivity() {
 
@@ -64,36 +68,38 @@ class MainMobileActivity : FragmentActivity() {
             }
         }
 
-        viewModel.state.observe(this) { state ->
-            when (state) {
-                MainViewModel.State.CheckingUpdate -> {}
-                is MainViewModel.State.SuccessCheckingUpdate -> {
-                    val asset = state.release?.assets
-                        ?.find { it.contentType == "application/vnd.android.package-archive" }
-                    if (asset != null) {
-                        updateAppDialog = UpdateAppMobileDialog(this, state.release).also {
-                            it.setOnUpdateClickListener { _ ->
-                                if (!it.isLoading) viewModel.downloadUpdate(this, asset)
+        lifecycleScope.launch {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+                when (state) {
+                    MainViewModel.State.CheckingUpdate -> {}
+                    is MainViewModel.State.SuccessCheckingUpdate -> {
+                        val asset = state.release?.assets
+                            ?.find { it.contentType == "application/vnd.android.package-archive" }
+                        if (asset != null) {
+                            updateAppDialog = UpdateAppMobileDialog(this@MainMobileActivity, state.release).also {
+                                it.setOnUpdateClickListener { _ ->
+                                    if (!it.isLoading) viewModel.downloadUpdate(this@MainMobileActivity, asset)
+                                }
+                                it.show()
                             }
-                            it.show()
                         }
                     }
-                }
 
-                MainViewModel.State.DownloadingUpdate -> updateAppDialog.isLoading = true
-                is MainViewModel.State.SuccessDownloadingUpdate -> {
-                    viewModel.installUpdate(this, state.apk)
-                    updateAppDialog.hide()
-                }
+                    MainViewModel.State.DownloadingUpdate -> updateAppDialog.isLoading = true
+                    is MainViewModel.State.SuccessDownloadingUpdate -> {
+                        viewModel.installUpdate(this@MainMobileActivity, state.apk)
+                        updateAppDialog.hide()
+                    }
 
-                MainViewModel.State.InstallingUpdate -> updateAppDialog.isLoading = true
+                    MainViewModel.State.InstallingUpdate -> updateAppDialog.isLoading = true
 
-                is MainViewModel.State.FailedUpdate -> {
-                    Toast.makeText(
-                        this,
-                        state.error.message ?: "",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    is MainViewModel.State.FailedUpdate -> {
+                        Toast.makeText(
+                            this@MainMobileActivity,
+                            state.error.message ?: "",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }

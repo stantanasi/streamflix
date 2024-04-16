@@ -7,22 +7,21 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.database.AppDatabase
-import com.tanasi.streamflix.databinding.ItemEpisodeTvBinding
-import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingTvBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingMobileBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingTvBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeMobileBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeTvBinding
+import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeTvFragment
 import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
-import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
-import com.tanasi.streamflix.fragments.season.SeasonTvFragmentDirections
 import com.tanasi.streamflix.fragments.season.SeasonMobileFragmentDirections
+import com.tanasi.streamflix.fragments.season.SeasonTvFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.ui.ShowOptionsTvDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
+import com.tanasi.streamflix.ui.ShowOptionsTvDialog
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
 
@@ -33,7 +32,6 @@ class EpisodeViewHolder(
 ) {
 
     private val context = itemView.context
-    private val database = AppDatabase.getInstance(context)
     private lateinit var episode: Episode
 
     fun bind(episode: Episode) {
@@ -49,10 +47,6 @@ class EpisodeViewHolder(
 
 
     private fun displayMobileItem(binding: ItemEpisodeMobileBinding) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -138,10 +132,6 @@ class EpisodeViewHolder(
     }
 
     private fun displayTvItem(binding: ItemEpisodeTvBinding) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -236,10 +226,6 @@ class EpisodeViewHolder(
     }
 
     private fun displayContinueWatchingMobileItem(binding: ItemEpisodeContinueWatchingMobileBinding) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -339,10 +325,6 @@ class EpisodeViewHolder(
     }
 
     private fun displayContinueWatchingTvItem(binding: ItemEpisodeContinueWatchingTvBinding) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(

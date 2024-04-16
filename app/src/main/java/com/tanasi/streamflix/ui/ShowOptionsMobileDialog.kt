@@ -13,7 +13,6 @@ import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.DialogShowOptionsMobileBinding
 import com.tanasi.streamflix.fragments.home.HomeMobileFragment
 import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
-import com.tanasi.streamflix.fragments.season.SeasonMobileFragment
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
@@ -50,10 +49,6 @@ class ShowOptionsMobileDialog(
 
 
     private fun displayEpisode(episode: Episode) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         Glide.with(context)
             .load(episode.poster ?: episode.tvShow?.poster)
             .fitCenter()
@@ -108,19 +103,17 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionShowWatched.apply {
             setOnClickListener {
-                episode.isWatched = !episode.isWatched
-                if (episode.isWatched) {
-                    episode.watchedDate = Calendar.getInstance()
-                    episode.watchHistory = null
-                } else {
-                    episode.watchedDate = null
-                }
-                database.episodeDao().save(episode)
+                database.episodeDao().save(episode.copy().apply {
+                    merge(episode)
+                    isWatched = !isWatched
+                    if (isWatched) {
+                        watchedDate = Calendar.getInstance()
+                        watchHistory = null
+                    } else {
+                        watchedDate = null
+                    }
+                })
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                    is SeasonMobileFragment -> fragment.refresh(episode)
-                }
                 hide()
             }
 
@@ -133,15 +126,11 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                if (episode.watchHistory == null) return@setOnClickListener
+                database.episodeDao().save(episode.copy().apply {
+                    merge(episode)
+                    watchHistory = null
+                })
 
-                episode.watchHistory = null
-                database.episodeDao().save(episode)
-
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                    is SeasonMobileFragment -> fragment.refresh(episode)
-                }
                 hide()
             }
 
@@ -153,10 +142,6 @@ class ShowOptionsMobileDialog(
     }
 
     private fun displayMovie(movie: Movie) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         Glide.with(context)
             .load(movie.poster)
             .fitCenter()
@@ -171,12 +156,11 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionShowFavorite.apply {
             setOnClickListener {
-                movie.isFavorite = !movie.isFavorite
-                database.movieDao().save(movie)
+                database.movieDao().save(movie.copy().apply {
+                    merge(movie)
+                    isFavorite = !isFavorite
+                })
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                }
                 hide()
             }
 
@@ -189,18 +173,17 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionShowWatched.apply {
             setOnClickListener {
-                movie.isWatched = !movie.isWatched
-                if (movie.isWatched) {
-                    movie.watchedDate = Calendar.getInstance()
-                    movie.watchHistory = null
-                } else {
-                    movie.watchedDate = null
-                }
-                database.movieDao().save(movie)
+                database.movieDao().save(movie.copy().apply {
+                    merge(movie)
+                    isWatched = !isWatched
+                    if (isWatched) {
+                        watchedDate = Calendar.getInstance()
+                        watchHistory = null
+                    } else {
+                        watchedDate = null
+                    }
+                })
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                }
                 hide()
             }
 
@@ -213,14 +196,11 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
-                if (movie.watchHistory == null) return@setOnClickListener
+                database.movieDao().save(movie.copy().apply {
+                    merge(movie)
+                    watchHistory = null
+                })
 
-                movie.watchHistory = null
-                database.movieDao().save(movie)
-
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                }
                 hide()
             }
 
@@ -232,10 +212,6 @@ class ShowOptionsMobileDialog(
     }
 
     private fun displayTvShow(tvShow: TvShow) {
-        database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
-            tvShow.merge(tvShowDb)
-        }
-
         Glide.with(context)
             .load(tvShow.poster)
             .fitCenter()
@@ -250,12 +226,11 @@ class ShowOptionsMobileDialog(
 
         binding.btnOptionShowFavorite.apply {
             setOnClickListener {
-                tvShow.isFavorite = !tvShow.isFavorite
-                database.tvShowDao().save(tvShow)
+                database.tvShowDao().save(tvShow.copy().apply {
+                    merge(tvShow)
+                    isFavorite = !isFavorite
+                })
 
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeMobileFragment -> fragment.refresh()
-                }
                 hide()
             }
 

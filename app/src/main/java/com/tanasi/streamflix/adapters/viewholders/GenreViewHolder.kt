@@ -6,10 +6,10 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.databinding.ItemGenreGridTvBinding
 import com.tanasi.streamflix.databinding.ItemGenreGridMobileBinding
-import com.tanasi.streamflix.fragments.search.SearchTvFragmentDirections
+import com.tanasi.streamflix.databinding.ItemGenreGridTvBinding
 import com.tanasi.streamflix.fragments.search.SearchMobileFragmentDirections
+import com.tanasi.streamflix.fragments.search.SearchTvFragmentDirections
 import com.tanasi.streamflix.models.Genre
 
 

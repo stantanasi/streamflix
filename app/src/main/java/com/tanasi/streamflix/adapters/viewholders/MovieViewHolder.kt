@@ -13,49 +13,49 @@ import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
-import com.tanasi.streamflix.databinding.ContentMovieTvBinding
-import com.tanasi.streamflix.databinding.ContentMovieCastsTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieCastsMobileBinding
+import com.tanasi.streamflix.databinding.ContentMovieCastsTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieMobileBinding
-import com.tanasi.streamflix.databinding.ContentMovieRecommendationsTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsMobileBinding
-import com.tanasi.streamflix.databinding.ItemMovieTvBinding
-import com.tanasi.streamflix.databinding.ItemMovieGridTvBinding
+import com.tanasi.streamflix.databinding.ContentMovieRecommendationsTvBinding
+import com.tanasi.streamflix.databinding.ContentMovieTvBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridMobileBinding
+import com.tanasi.streamflix.databinding.ItemMovieGridTvBinding
 import com.tanasi.streamflix.databinding.ItemMovieMobileBinding
-import com.tanasi.streamflix.fragments.genre.GenreTvFragment
-import com.tanasi.streamflix.fragments.genre.GenreTvFragmentDirections
+import com.tanasi.streamflix.databinding.ItemMovieTvBinding
 import com.tanasi.streamflix.fragments.genre.GenreMobileFragment
 import com.tanasi.streamflix.fragments.genre.GenreMobileFragmentDirections
-import com.tanasi.streamflix.fragments.home.HomeTvFragment
-import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
+import com.tanasi.streamflix.fragments.genre.GenreTvFragment
+import com.tanasi.streamflix.fragments.genre.GenreTvFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeMobileFragment
 import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
-import com.tanasi.streamflix.fragments.movie.MovieTvFragment
-import com.tanasi.streamflix.fragments.movie.MovieTvFragmentDirections
+import com.tanasi.streamflix.fragments.home.HomeTvFragment
+import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
 import com.tanasi.streamflix.fragments.movie.MovieMobileFragment
 import com.tanasi.streamflix.fragments.movie.MovieMobileFragmentDirections
-import com.tanasi.streamflix.fragments.movies.MoviesTvFragment
-import com.tanasi.streamflix.fragments.movies.MoviesTvFragmentDirections
+import com.tanasi.streamflix.fragments.movie.MovieTvFragment
+import com.tanasi.streamflix.fragments.movie.MovieTvFragmentDirections
 import com.tanasi.streamflix.fragments.movies.MoviesMobileFragment
 import com.tanasi.streamflix.fragments.movies.MoviesMobileFragmentDirections
-import com.tanasi.streamflix.fragments.people.PeopleTvFragment
-import com.tanasi.streamflix.fragments.people.PeopleTvFragmentDirections
+import com.tanasi.streamflix.fragments.movies.MoviesTvFragment
+import com.tanasi.streamflix.fragments.movies.MoviesTvFragmentDirections
 import com.tanasi.streamflix.fragments.people.PeopleMobileFragment
 import com.tanasi.streamflix.fragments.people.PeopleMobileFragmentDirections
-import com.tanasi.streamflix.fragments.search.SearchTvFragment
-import com.tanasi.streamflix.fragments.search.SearchTvFragmentDirections
+import com.tanasi.streamflix.fragments.people.PeopleTvFragment
+import com.tanasi.streamflix.fragments.people.PeopleTvFragmentDirections
 import com.tanasi.streamflix.fragments.search.SearchMobileFragment
 import com.tanasi.streamflix.fragments.search.SearchMobileFragmentDirections
-import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragment
-import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
+import com.tanasi.streamflix.fragments.search.SearchTvFragment
+import com.tanasi.streamflix.fragments.search.SearchTvFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragment
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragment
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.ui.ShowOptionsTvDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
+import com.tanasi.streamflix.ui.ShowOptionsTvDialog
 import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.format
@@ -101,10 +101,6 @@ class MovieViewHolder(
 
 
     private fun displayMobileItem(binding: ItemMovieMobileBinding) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -182,10 +178,6 @@ class MovieViewHolder(
     }
 
     private fun displayTvItem(binding: ItemMovieTvBinding) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -278,10 +270,6 @@ class MovieViewHolder(
     }
 
     private fun displayGridMobileItem(binding: ItemMovieGridMobileBinding) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -347,10 +335,6 @@ class MovieViewHolder(
     }
 
     private fun displayGridTvItem(binding: ItemMovieGridTvBinding) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {

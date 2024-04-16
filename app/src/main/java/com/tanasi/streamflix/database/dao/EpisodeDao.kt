@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.tanasi.streamflix.models.Episode
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface EpisodeDao {
@@ -16,14 +17,20 @@ interface EpisodeDao {
     @Query("SELECT * FROM episodes WHERE id IN (:ids)")
     fun getByIds(ids: List<String>): List<Episode>
 
+    @Query("SELECT * FROM episodes WHERE id IN (:ids)")
+    fun getByIdsAsFlow(ids: List<String>): Flow<List<Episode>>
+
     @Query("SELECT * FROM episodes WHERE tvShow = :tvShowId ORDER BY season, number")
     fun getByTvShowId(tvShowId: String): List<Episode>
+
+    @Query("SELECT * FROM episodes WHERE tvShow = :tvShowId ORDER BY season, number")
+    fun getByTvShowIdAsFlow(tvShowId: String): Flow<List<Episode>>
 
     @Query("SELECT * FROM episodes WHERE season = :seasonId ORDER BY season, number")
     fun getBySeasonId(seasonId: String): List<Episode>
 
     @Query("SELECT * FROM episodes WHERE lastEngagementTimeUtcMillis IS NOT NULL ORDER BY lastEngagementTimeUtcMillis DESC")
-    fun getWatchingEpisodes(): List<Episode>
+    fun getWatchingEpisodes(): Flow<List<Episode>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(episode: Episode)

@@ -6,19 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentMoviesMobileBinding
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.dp
+import com.tanasi.streamflix.utils.viewModelsFactory
+import kotlinx.coroutines.launch
 
 class MoviesMobileFragment : Fragment() {
 
     private var _binding: FragmentMoviesMobileBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel by viewModels<MoviesViewModel>()
+    private val database by lazy { AppDatabase.getInstance(requireContext()) }
+    private val viewModel by viewModelsFactory { MoviesViewModel(database) }
 
     private val appAdapter = AppAdapter()
 
@@ -36,33 +43,35 @@ class MoviesMobileFragment : Fragment() {
 
         initializeMovies()
 
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                MoviesViewModel.State.Loading -> binding.isLoading.apply {
-                    root.visibility = View.VISIBLE
-                    pbIsLoading.visibility = View.VISIBLE
-                    gIsLoadingRetry.visibility = View.GONE
-                }
-                MoviesViewModel.State.LoadingMore -> appAdapter.isLoading = true
-                is MoviesViewModel.State.SuccessLoading -> {
-                    displayMovies(state.movies, state.hasMore)
-                    appAdapter.isLoading = false
-                    binding.isLoading.root.visibility = View.GONE
-                }
-                is MoviesViewModel.State.FailedLoading -> {
-                    Toast.makeText(
-                        requireContext(),
-                        state.error.message ?: "",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    if (appAdapter.isLoading) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+                when (state) {
+                    MoviesViewModel.State.Loading -> binding.isLoading.apply {
+                        root.visibility = View.VISIBLE
+                        pbIsLoading.visibility = View.VISIBLE
+                        gIsLoadingRetry.visibility = View.GONE
+                    }
+                    MoviesViewModel.State.LoadingMore -> appAdapter.isLoading = true
+                    is MoviesViewModel.State.SuccessLoading -> {
+                        displayMovies(state.movies, state.hasMore)
                         appAdapter.isLoading = false
-                    } else {
-                        binding.isLoading.apply {
-                            pbIsLoading.visibility = View.GONE
-                            gIsLoadingRetry.visibility = View.VISIBLE
-                            btnIsLoadingRetry.setOnClickListener {
-                                viewModel.getMovies()
+                        binding.isLoading.root.visibility = View.GONE
+                    }
+                    is MoviesViewModel.State.FailedLoading -> {
+                        Toast.makeText(
+                            requireContext(),
+                            state.error.message ?: "",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        if (appAdapter.isLoading) {
+                            appAdapter.isLoading = false
+                        } else {
+                            binding.isLoading.apply {
+                                pbIsLoading.visibility = View.GONE
+                                gIsLoadingRetry.visibility = View.VISIBLE
+                                btnIsLoadingRetry.setOnClickListener {
+                                    viewModel.getMovies()
+                                }
                             }
                         }
                     }
@@ -79,7 +88,9 @@ class MoviesMobileFragment : Fragment() {
 
     private fun initializeMovies() {
         binding.rvMovies.apply {
-            adapter = appAdapter
+            adapter = appAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
             addItemDecoration(
                 SpacingItemDecoration(10.dp(requireContext()))
             )

@@ -5,8 +5,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.databinding.ItemProviderTvBinding
 import com.tanasi.streamflix.databinding.ItemProviderMobileBinding
+import com.tanasi.streamflix.databinding.ItemProviderTvBinding
 import com.tanasi.streamflix.models.Provider
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.toActivity

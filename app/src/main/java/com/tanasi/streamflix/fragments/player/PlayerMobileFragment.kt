@@ -11,6 +11,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -36,6 +39,7 @@ import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -49,9 +53,8 @@ class PlayerMobileFragment : Fragment() {
         get() = ContentExoControllerMobileBinding.bind(this.findViewById(R.id.cl_exo_controller))
 
     private val args by navArgs<PlayerMobileFragmentArgs>()
+    private val database by lazy { AppDatabase.getInstance(requireContext()) }
     private val viewModel by viewModelsFactory { PlayerViewModel(args.videoType, args.id) }
-
-    private lateinit var database: AppDatabase
 
     private lateinit var player: ExoPlayer
     private lateinit var mediaSession: MediaSession
@@ -70,61 +73,61 @@ class PlayerMobileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        database = AppDatabase.getInstance(requireContext())
-
         initializeVideo()
 
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                PlayerViewModel.State.LoadingServers -> {}
-                is PlayerViewModel.State.SuccessLoadingServers -> {
-                    servers = state.servers
-                    player.playlistMetadata = MediaMetadata.Builder()
-                        .setTitle(state.toString())
-                        .setMediaServers(state.servers.map {
-                            MediaServer(
-                                id = it.id,
-                                name = it.name,
-                            )
-                        })
-                        .build()
-                    binding.settings.setOnServerSelected { server ->
-                        viewModel.getVideo(state.servers.find { server.id == it.id }!!)
-                    }
-                    viewModel.getVideo(state.servers.first())
-                }
-                is PlayerViewModel.State.FailedLoadingServers -> {
-                    Toast.makeText(
-                        requireContext(),
-                        state.error.message ?: "",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    findNavController().navigateUp()
-                }
-
-                is PlayerViewModel.State.LoadingVideo -> {
-                    player.setMediaItem(
-                        MediaItem.Builder()
-                            .setUri(Uri.parse(""))
-                            .setMediaMetadata(
-                                MediaMetadata.Builder()
-                                    .setMediaServerId(state.server.id)
-                                    .build()
-                            )
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+                when (state) {
+                    PlayerViewModel.State.LoadingServers -> {}
+                    is PlayerViewModel.State.SuccessLoadingServers -> {
+                        servers = state.servers
+                        player.playlistMetadata = MediaMetadata.Builder()
+                            .setTitle(state.toString())
+                            .setMediaServers(state.servers.map {
+                                MediaServer(
+                                    id = it.id,
+                                    name = it.name,
+                                )
+                            })
                             .build()
-                    )
-                }
-                is PlayerViewModel.State.SuccessLoadingVideo -> {
-                    displayVideo(state.video, state.server)
-                }
-                is PlayerViewModel.State.FailedLoadingVideo -> {
-                    Toast.makeText(
-                        requireContext(),
-                        state.error.message ?: "",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    servers.getOrNull(servers.indexOf(state.server) + 1)?.let {
-                        viewModel.getVideo(it)
+                        binding.settings.setOnServerSelected { server ->
+                            viewModel.getVideo(state.servers.find { server.id == it.id }!!)
+                        }
+                        viewModel.getVideo(state.servers.first())
+                    }
+                    is PlayerViewModel.State.FailedLoadingServers -> {
+                        Toast.makeText(
+                            requireContext(),
+                            state.error.message ?: "",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        findNavController().navigateUp()
+                    }
+
+                    is PlayerViewModel.State.LoadingVideo -> {
+                        player.setMediaItem(
+                            MediaItem.Builder()
+                                .setUri(Uri.parse(""))
+                                .setMediaMetadata(
+                                    MediaMetadata.Builder()
+                                        .setMediaServerId(state.server.id)
+                                        .build()
+                                )
+                                .build()
+                        )
+                    }
+                    is PlayerViewModel.State.SuccessLoadingVideo -> {
+                        displayVideo(state.video, state.server)
+                    }
+                    is PlayerViewModel.State.FailedLoadingVideo -> {
+                        Toast.makeText(
+                            requireContext(),
+                            state.error.message ?: "",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        servers.getOrNull(servers.indexOf(state.server) + 1)?.let {
+                            viewModel.getVideo(it)
+                        }
                     }
                 }
             }

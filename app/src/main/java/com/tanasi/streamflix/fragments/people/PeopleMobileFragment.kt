@@ -6,10 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentPeopleMobileBinding
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.People
@@ -17,6 +22,7 @@ import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.viewModelsFactory
+import kotlinx.coroutines.launch
 
 class PeopleMobileFragment : Fragment() {
 
@@ -24,7 +30,8 @@ class PeopleMobileFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val args by navArgs<PeopleMobileFragmentArgs>()
-    private val viewModel by viewModelsFactory { PeopleViewModel(args.id) }
+    private val database by lazy { AppDatabase.getInstance(requireContext()) }
+    private val viewModel by viewModelsFactory { PeopleViewModel(args.id, database) }
 
     private val appAdapter = AppAdapter()
 
@@ -42,33 +49,35 @@ class PeopleMobileFragment : Fragment() {
 
         initializePeople()
 
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                PeopleViewModel.State.Loading -> binding.isLoading.apply {
-                    root.visibility = View.VISIBLE
-                    pbIsLoading.visibility = View.VISIBLE
-                    gIsLoadingRetry.visibility = View.GONE
-                }
-                PeopleViewModel.State.LoadingMore -> appAdapter.isLoading = true
-                is PeopleViewModel.State.SuccessLoading -> {
-                    displayPeople(state.people, state.hasMore)
-                    appAdapter.isLoading = false
-                    binding.isLoading.root.visibility = View.GONE
-                }
-                is PeopleViewModel.State.FailedLoading -> {
-                    Toast.makeText(
-                        requireContext(),
-                        state.error.message ?: "",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    if (appAdapter.isLoading) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+                when (state) {
+                    PeopleViewModel.State.Loading -> binding.isLoading.apply {
+                        root.visibility = View.VISIBLE
+                        pbIsLoading.visibility = View.VISIBLE
+                        gIsLoadingRetry.visibility = View.GONE
+                    }
+                    PeopleViewModel.State.LoadingMore -> appAdapter.isLoading = true
+                    is PeopleViewModel.State.SuccessLoading -> {
+                        displayPeople(state.people, state.hasMore)
                         appAdapter.isLoading = false
-                    } else {
-                        binding.isLoading.apply {
-                            pbIsLoading.visibility = View.GONE
-                            gIsLoadingRetry.visibility = View.VISIBLE
-                            btnIsLoadingRetry.setOnClickListener {
-                                viewModel.getPeople(args.id)
+                        binding.isLoading.root.visibility = View.GONE
+                    }
+                    is PeopleViewModel.State.FailedLoading -> {
+                        Toast.makeText(
+                            requireContext(),
+                            state.error.message ?: "",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        if (appAdapter.isLoading) {
+                            appAdapter.isLoading = false
+                        } else {
+                            binding.isLoading.apply {
+                                pbIsLoading.visibility = View.GONE
+                                gIsLoadingRetry.visibility = View.VISIBLE
+                                btnIsLoadingRetry.setOnClickListener {
+                                    viewModel.getPeople(args.id)
+                                }
                             }
                         }
                     }
@@ -85,7 +94,9 @@ class PeopleMobileFragment : Fragment() {
 
     private fun initializePeople() {
         binding.rvPeopleFilmography.apply {
-            adapter = appAdapter
+            adapter = appAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
             addItemDecoration(
                 SpacingItemDecoration(10.dp(requireContext()))
             )

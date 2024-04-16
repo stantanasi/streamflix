@@ -6,7 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
@@ -15,6 +19,7 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.viewModelsFactory
+import kotlinx.coroutines.launch
 
 class SeasonTvFragment : Fragment() {
 
@@ -22,9 +27,24 @@ class SeasonTvFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val args by navArgs<SeasonTvFragmentArgs>()
-    private val viewModel by viewModelsFactory { SeasonViewModel(args.seasonId) }
-
-    private lateinit var database: AppDatabase
+    private val database by lazy { AppDatabase.getInstance(requireContext()) }
+    private val viewModel by viewModelsFactory {
+        SeasonViewModel(
+            args.seasonId,
+            TvShow(
+                id = args.tvShowId,
+                title = args.tvShowTitle,
+                poster = args.tvShowPoster,
+                banner = args.tvShowBanner,
+            ),
+            Season(
+                id = args.seasonId,
+                number = args.seasonNumber,
+                title = args.seasonTitle,
+            ),
+            database,
+        )
+    }
 
     private val appAdapter = AppAdapter()
 
@@ -40,34 +60,34 @@ class SeasonTvFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        database = AppDatabase.getInstance(requireContext())
-
         initializeSeason()
 
-        viewModel.state.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                SeasonViewModel.State.LoadingEpisodes -> binding.isLoading.apply {
-                    root.visibility = View.VISIBLE
-                    pbIsLoading.visibility = View.VISIBLE
-                    gIsLoadingRetry.visibility = View.GONE
-                }
-                is SeasonViewModel.State.SuccessLoadingEpisodes -> {
-                    displaySeason(state.episodes)
-                    binding.isLoading.root.visibility = View.GONE
-                }
-                is SeasonViewModel.State.FailedLoadingEpisodes -> {
-                    Toast.makeText(
-                        requireContext(),
-                        state.error.message ?: "",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    binding.isLoading.apply {
-                        pbIsLoading.visibility = View.GONE
-                        gIsLoadingRetry.visibility = View.VISIBLE
-                        btnIsLoadingRetry.setOnClickListener {
-                            viewModel.getSeasonEpisodes(args.seasonId)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+                when (state) {
+                    SeasonViewModel.State.LoadingEpisodes -> binding.isLoading.apply {
+                        root.visibility = View.VISIBLE
+                        pbIsLoading.visibility = View.VISIBLE
+                        gIsLoadingRetry.visibility = View.GONE
+                    }
+                    is SeasonViewModel.State.SuccessLoadingEpisodes -> {
+                        displaySeason(state.episodes)
+                        binding.isLoading.root.visibility = View.GONE
+                    }
+                    is SeasonViewModel.State.FailedLoadingEpisodes -> {
+                        Toast.makeText(
+                            requireContext(),
+                            state.error.message ?: "",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        binding.isLoading.apply {
+                            pbIsLoading.visibility = View.GONE
+                            gIsLoadingRetry.visibility = View.VISIBLE
+                            btnIsLoadingRetry.setOnClickListener {
+                                viewModel.getSeasonEpisodes(args.seasonId)
+                            }
+                            btnIsLoadingRetry.requestFocus()
                         }
-                        btnIsLoadingRetry.requestFocus()
                     }
                 }
             }
@@ -80,43 +100,21 @@ class SeasonTvFragment : Fragment() {
     }
 
 
-    fun refresh(episode: Episode) {
-        appAdapter.notifyItemChanged(appAdapter.items.indexOf(episode))
-    }
-
-
     private fun initializeSeason() {
         binding.tvSeasonTitle.text = args.seasonTitle
 
         binding.hgvEpisodes.apply {
-            adapter = appAdapter
+            adapter = appAdapter.apply {
+                stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            }
             setItemSpacing(resources.getDimension(R.dimen.season_episodes_spacing).toInt())
         }
     }
 
     private fun displaySeason(episodes: List<Episode>) {
-        database.episodeDao().getByIds(episodes.map { it.id }).forEach { episodeDb ->
-            episodes.find { it.id == episodeDb.id }
-                ?.merge(episodeDb)
-        }
-
         appAdapter.submitList(episodes.onEach { episode ->
-            episode.tvShow = TvShow(
-                id = args.tvShowId,
-                title = args.tvShowTitle,
-                poster = args.tvShowPoster,
-                banner = args.tvShowBanner,
-            )
-            episode.season = Season(
-                id = args.seasonId,
-                number = args.seasonNumber,
-                title = args.seasonTitle,
-            )
-
             episode.itemType = AppAdapter.Type.EPISODE_TV_ITEM
         })
-
-        database.episodeDao().insertAll(episodes)
 
         val episodeIndex = episodes
             .filter { it.watchHistory != null }
