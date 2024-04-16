@@ -116,6 +116,7 @@ class AppAdapter(
         TV_SHOW_TV_ITEM,
         TV_SHOW_GRID_MOBILE_ITEM,
         TV_SHOW_GRID_TV_ITEM,
+        TV_SHOW_SWIPER_MOBILE_ITEM,
 
         TV_SHOW_MOBILE,
         TV_SHOW_TV,
@@ -368,6 +369,13 @@ class AppAdapter(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
+                )
+            )
+            Type.TV_SHOW_SWIPER_MOBILE_ITEM -> TvShowViewHolder(
+                ItemCategorySwiperMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
                 )
             )
 
