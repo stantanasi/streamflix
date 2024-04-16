@@ -31,6 +31,7 @@ import com.tanasi.streamflix.databinding.ContentTvShowSeasonsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsTvBinding
 import com.tanasi.streamflix.databinding.ContentTvShowTvBinding
 import com.tanasi.streamflix.databinding.ItemCategoryMobileBinding
+import com.tanasi.streamflix.databinding.ItemCategorySwiperMobileBinding
 import com.tanasi.streamflix.databinding.ItemCategoryTvBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingMobileBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingTvBinding
@@ -93,6 +94,7 @@ class AppAdapter(
         MOVIE_CONTINUE_WATCHING_TV_ITEM,
         MOVIE_GRID_MOBILE_ITEM,
         MOVIE_GRID_TV_ITEM,
+        MOVIE_SWIPER_MOBILE_ITEM,
 
         MOVIE_MOBILE,
         MOVIE_TV,
@@ -114,6 +116,7 @@ class AppAdapter(
         TV_SHOW_TV_ITEM,
         TV_SHOW_GRID_MOBILE_ITEM,
         TV_SHOW_GRID_TV_ITEM,
+        TV_SHOW_SWIPER_MOBILE_ITEM,
 
         TV_SHOW_MOBILE,
         TV_SHOW_TV,
@@ -244,6 +247,13 @@ class AppAdapter(
                     false,
                 )
             )
+            Type.MOVIE_SWIPER_MOBILE_ITEM -> MovieViewHolder(
+                ItemCategorySwiperMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            )
 
             Type.MOVIE_MOBILE -> MovieViewHolder(
                 ContentMovieMobileBinding.inflate(
@@ -359,6 +369,13 @@ class AppAdapter(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
+                )
+            )
+            Type.TV_SHOW_SWIPER_MOBILE_ITEM -> TvShowViewHolder(
+                ItemCategorySwiperMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
                 )
             )
 

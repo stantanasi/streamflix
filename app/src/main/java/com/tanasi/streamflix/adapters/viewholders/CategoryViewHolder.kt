@@ -7,24 +7,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.os.postDelayed
+import androidx.core.view.children
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
-import com.bumptech.glide.Glide
+import androidx.viewpager2.widget.ViewPager2
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.databinding.ContentCategorySwiperMobileBinding
 import com.tanasi.streamflix.databinding.ContentCategorySwiperTvBinding
 import com.tanasi.streamflix.databinding.ItemCategoryMobileBinding
 import com.tanasi.streamflix.databinding.ItemCategoryTvBinding
-import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeTvFragment
 import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Show
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.ui.OnSwipeTouchListener
 import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
@@ -43,6 +42,11 @@ class CategoryViewHolder(
         get() = when (_binding) {
             is ItemCategoryMobileBinding -> _binding.rvCategory
             is ItemCategoryTvBinding -> _binding.hgvCategory
+            is ContentCategorySwiperMobileBinding -> _binding.vpCategorySwiper.javaClass
+                .getDeclaredField("mRecyclerView").let {
+                    it.isAccessible = true
+                    it.get(_binding.vpCategorySwiper) as RecyclerView
+                }
             else -> null
         }
 
@@ -86,160 +90,67 @@ class CategoryViewHolder(
 
 
     private fun displayMobileSwiper(binding: ContentCategorySwiperMobileBinding) {
-        val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
-
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(8_000) {
-            category.selectedIndex = (category.selectedIndex + 1) % category.list.size
-            bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
+            binding.vpCategorySwiper.currentItem += 1
         }
 
-        binding.root.apply {
-            setOnTouchListener(object : OnSwipeTouchListener(context) {
-                override fun onSwipeRight() {
-                    handler.removeCallbacksAndMessages(null)
-                    category.selectedIndex = when {
-                        (category.selectedIndex) <= 0 -> category.list.lastIndex
-                        else -> (category.selectedIndex - 1) % category.list.size
-                    }
-                    bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
-                }
-
-                override fun onSwipeLeft() {
-                    handler.removeCallbacksAndMessages(null)
-                    category.selectedIndex = (category.selectedIndex + 1) % category.list.size
-                    bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
-                }
-            })
-        }
-
-        Glide.with(context)
-            .load(
-                when (selected) {
-                    is Movie -> selected.banner
-                    is TvShow -> selected.banner
-                }
-            )
-            .centerCrop()
-            .into(binding.ivSwiperBackground)
-
-        binding.tvSwiperTitle.text = when (selected) {
-            is Movie -> selected.title
-            is TvShow -> selected.title
-        }
-
-        binding.tvSwiperTvShowLastEpisode.apply {
-            text = when (selected) {
-                is TvShow -> selected.seasons.lastOrNull()?.let { season ->
-                    season.episodes.lastOrNull()?.let { episode ->
-                        if (season.number != 0) {
-                            context.getString(
-                                R.string.tv_show_item_season_number_episode_number,
-                                season.number,
-                                episode.number
-                            )
-                        } else {
-                            context.getString(
-                                R.string.tv_show_item_episode_number,
-                                episode.number
-                            )
-                        }
-                    }
-                } ?: context.getString(R.string.tv_show_item_type)
-                else -> context.getString(R.string.movie_item_type)
-            }
-        }
-
-        binding.tvSwiperQuality.apply {
-            text = when (selected) {
-                is Movie -> selected.quality
-                is TvShow -> selected.quality
-            }
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
-        }
-
-        binding.tvSwiperReleased.apply {
-            text = when (selected) {
-                is Movie -> selected.released?.format("yyyy")
-                is TvShow -> selected.released?.format("yyyy")
-            }
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
-        }
-
-        binding.tvSwiperRating.apply {
-            text = when (selected) {
-                is Movie -> selected.rating?.let { String.format("%.1f", it) } ?: "N/A"
-                is TvShow -> selected.rating?.let { String.format("%.1f", it) } ?: "N/A"
-            }
-            visibility = when {
-                text.isNullOrEmpty() -> View.GONE
-                else -> View.VISIBLE
-            }
-        }
-
-        binding.ivSwiperRatingIcon.visibility = binding.tvSwiperRating.visibility
-
-        binding.tvSwiperOverview.apply {
-            setOnClickListener {
-                maxLines = when (maxLines) {
-                    2 -> Int.MAX_VALUE
-                    else -> 2
-                }
-            }
-
-            text = when (selected) {
-                is Movie -> selected.overview
-                is TvShow -> selected.overview
-            }
-        }
-
-        binding.btnSwiperWatchNow.apply {
-            setOnClickListener {
-                handler.removeCallbacksAndMessages(null)
-                findNavController().navigate(
-                    when (selected) {
-                        is Movie -> HomeMobileFragmentDirections.actionHomeToMovie(selected.id)
-                        is TvShow -> HomeMobileFragmentDirections.actionHomeToTvShow(selected.id)
-                    }
-                )
-            }
-        }
-
-        binding.pbSwiperProgress.apply {
-            val watchHistory = when (selected) {
-                is Movie -> selected.watchHistory
-                is TvShow -> null
-            }
-
-            progress = when {
-                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
-                else -> 0
-            }
-            visibility = when {
-                watchHistory != null -> View.VISIBLE
-                else -> View.GONE
+        val items = listOf(
+            listOf(category.list.lastOrNull()),
+            category.list,
+            listOf(category.list.firstOrNull()),
+        ).flatten().filterNotNull()
+        binding.vpCategorySwiper.apply {
+            adapter = AppAdapter().apply {
+                submitList(category.list)
+                post { (adapter as AppAdapter).submitList(items) }
             }
         }
 
         binding.llDotsIndicator.apply {
             removeAllViews()
-            repeat(category.list.size) { index ->
+            repeat(category.list.size) {
                 val view = View(context).apply {
                     layoutParams = LinearLayout.LayoutParams(15, 15).apply {
                         setMargins(10, 0, 10, 0)
                     }
                     setBackgroundResource(R.drawable.bg_dot_indicator)
-                    isSelected = (category.selectedIndex == index)
                 }
                 addView(view)
             }
         }
+
+        binding.vpCategorySwiper.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val indicatorPosition = when (position) {
+                    0 -> category.list.lastIndex
+                    items.lastIndex -> 0
+                    else -> position - 1
+                }
+                binding.llDotsIndicator.children.forEachIndexed { index, view ->
+                    view.isSelected = (indicatorPosition == index)
+                }
+                handler.removeCallbacksAndMessages(null)
+                handler.postDelayed(8_000) {
+                    binding.vpCategorySwiper.currentItem += 1
+                }
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                    when (binding.vpCategorySwiper.currentItem) {
+                        0 -> binding.vpCategorySwiper.setCurrentItem(
+                            items.lastIndex - 1,
+                            false
+                        )
+                        items.lastIndex -> binding.vpCategorySwiper.setCurrentItem(
+                            1,
+                            false
+                        )
+                    }
+                }
+            }
+        })
     }
 
     private fun displayTvSwiper(binding: ContentCategorySwiperTvBinding) {

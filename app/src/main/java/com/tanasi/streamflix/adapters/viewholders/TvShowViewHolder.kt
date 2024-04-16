@@ -21,6 +21,7 @@ import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsTvBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowSeasonsTvBinding
 import com.tanasi.streamflix.databinding.ContentTvShowTvBinding
+import com.tanasi.streamflix.databinding.ItemCategorySwiperMobileBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridBinding
 import com.tanasi.streamflix.databinding.ItemTvShowGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemTvShowMobileBinding
@@ -93,6 +94,7 @@ class TvShowViewHolder(
             is ItemTvShowTvBinding -> displayTvItem(_binding)
             is ItemTvShowGridMobileBinding -> displayGridMobileItem(_binding)
             is ItemTvShowGridBinding -> displayGridTvItem(_binding)
+            is ItemCategorySwiperMobileBinding -> displaySwiperMobileItem(_binding)
 
             is ContentTvShowMobileBinding -> displayTvShowMobile(_binding)
             is ContentTvShowTvBinding -> displayTvShowTv(_binding)
@@ -382,6 +384,85 @@ class TvShowViewHolder(
         } ?: context.getString(R.string.tv_show_item_type)
 
         binding.tvTvShowTitle.text = tvShow.title
+    }
+
+
+    private fun displaySwiperMobileItem(binding: ItemCategorySwiperMobileBinding) {
+        Glide.with(context)
+            .load(tvShow.banner)
+            .centerCrop()
+            .into(binding.ivSwiperBackground)
+
+        binding.tvSwiperTitle.text = tvShow.title
+
+        binding.tvSwiperTvShowLastEpisode.apply {
+            text = tvShow.seasons.lastOrNull()?.let { season ->
+                season.episodes.lastOrNull()?.let { episode ->
+                    if (season.number != 0) {
+                        context.getString(
+                            R.string.tv_show_item_season_number_episode_number,
+                            season.number,
+                            episode.number
+                        )
+                    } else {
+                        context.getString(
+                            R.string.tv_show_item_episode_number,
+                            episode.number
+                        )
+                    }
+                }
+            } ?: context.getString(R.string.tv_show_item_type)
+        }
+
+        binding.tvSwiperQuality.apply {
+            text = tvShow.quality
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvSwiperReleased.apply {
+            text = tvShow.released?.format("yyyy")
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvSwiperRating.apply {
+            text = tvShow.rating?.let { String.format("%.1f", it) } ?: "N/A"
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.ivSwiperRatingIcon.visibility = binding.tvSwiperRating.visibility
+
+        binding.tvSwiperOverview.apply {
+            setOnClickListener {
+                maxLines = when (maxLines) {
+                    2 -> Int.MAX_VALUE
+                    else -> 2
+                }
+            }
+
+            text = tvShow.overview
+        }
+
+        binding.btnSwiperWatchNow.apply {
+            setOnClickListener {
+                handler.removeCallbacksAndMessages(null)
+                findNavController().navigate(
+                    HomeMobileFragmentDirections.actionHomeToTvShow(
+                        id = tvShow.id,
+                    )
+                )
+            }
+        }
+
+        binding.pbSwiperProgress.visibility = View.GONE
     }
 
 
