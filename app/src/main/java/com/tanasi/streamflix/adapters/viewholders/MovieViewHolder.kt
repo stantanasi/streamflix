@@ -19,6 +19,7 @@ import com.tanasi.streamflix.databinding.ContentMovieMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieTvBinding
+import com.tanasi.streamflix.databinding.ItemCategorySwiperMobileBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridMobileBinding
 import com.tanasi.streamflix.databinding.ItemMovieGridTvBinding
 import com.tanasi.streamflix.databinding.ItemMovieMobileBinding
@@ -89,6 +90,7 @@ class MovieViewHolder(
             is ItemMovieTvBinding -> displayTvItem(_binding)
             is ItemMovieGridMobileBinding -> displayGridMobileItem(_binding)
             is ItemMovieGridTvBinding -> displayGridTvItem(_binding)
+            is ItemCategorySwiperMobileBinding -> displaySwiperMobileItem(_binding)
 
             is ContentMovieMobileBinding -> displayMovieMobile(_binding)
             is ContentMovieTvBinding -> displayMovieTv(_binding)
@@ -406,6 +408,77 @@ class MovieViewHolder(
             ?: context.getString(R.string.movie_item_type)
 
         binding.tvMovieTitle.text = movie.title
+    }
+
+    private fun displaySwiperMobileItem(binding: ItemCategorySwiperMobileBinding) {
+        Glide.with(context)
+            .load(movie.banner)
+            .centerCrop()
+            .into(binding.ivSwiperBackground)
+
+        binding.tvSwiperTitle.text = movie.title
+
+        binding.tvSwiperTvShowLastEpisode.text = context.getString(R.string.movie_item_type)
+
+        binding.tvSwiperQuality.apply {
+            text = movie.quality
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvSwiperReleased.apply {
+            text = movie.released?.format("yyyy")
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.tvSwiperRating.apply {
+            text = movie.rating?.let { String.format("%.1f", it) } ?: "N/A"
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.ivSwiperRatingIcon.visibility = binding.tvSwiperRating.visibility
+
+        binding.tvSwiperOverview.apply {
+            setOnClickListener {
+                maxLines = when (maxLines) {
+                    2 -> Int.MAX_VALUE
+                    else -> 2
+                }
+            }
+
+            text = movie.overview
+        }
+
+        binding.btnSwiperWatchNow.apply {
+            setOnClickListener {
+                findNavController().navigate(
+                    HomeMobileFragmentDirections.actionHomeToMovie(
+                        id = movie.id,
+                    )
+                )
+            }
+        }
+
+        binding.pbSwiperProgress.apply {
+            val watchHistory = movie.watchHistory
+
+            progress = when {
+                watchHistory != null -> (watchHistory.lastPlaybackPositionMillis * 100 / watchHistory.durationMillis.toDouble()).toInt()
+                else -> 0
+            }
+            visibility = when {
+                watchHistory != null -> View.VISIBLE
+                else -> View.GONE
+            }
+        }
     }
 
 
