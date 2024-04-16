@@ -55,10 +55,6 @@ class ShowOptionsTvDialog(
 
 
     private fun displayEpisode(episode: Episode) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         Glide.with(context)
             .load(episode.poster ?: episode.tvShow?.poster)
             .fallback(R.drawable.glide_fallback_cover)
@@ -153,10 +149,6 @@ class ShowOptionsTvDialog(
     }
 
     private fun displayMovie(movie: Movie) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         Glide.with(context)
             .load(movie.poster)
             .fallback(R.drawable.glide_fallback_cover)
@@ -228,10 +220,6 @@ class ShowOptionsTvDialog(
     }
 
     private fun displayTvShow(tvShow: TvShow) {
-        database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
-            tvShow.merge(tvShowDb)
-        }
-
         Glide.with(context)
             .load(tvShow.poster)
             .fallback(R.drawable.glide_fallback_cover)

@@ -107,10 +107,6 @@ class TvShowViewHolder(
 
 
     private fun displayMobileItem(binding: ItemTvShowMobileBinding) {
-        database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
-            tvShow.merge(tvShowDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -248,10 +244,6 @@ class TvShowViewHolder(
     }
 
     private fun displayGridMobileItem(binding: ItemTvShowGridMobileBinding) {
-        database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
-            tvShow.merge(tvShowDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -453,7 +445,7 @@ class TvShowViewHolder(
 
         binding.tvTvShowOverview.text = tvShow.overview
 
-        val episodes = database.episodeDao().getByTvShowId(tvShow.id)
+        val episodes = tvShow.seasons.flatMap { it.episodes }
         val episode = episodes
             .filter { it.watchHistory != null }
             .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
@@ -462,7 +454,6 @@ class TvShowViewHolder(
                 .takeIf { it != -1 && it + 1 < episodes.size }
                 ?.let { episodes.getOrNull(it + 1) }
             ?: episodes.firstOrNull()
-        episode?.season = episode?.season?.let { database.seasonDao().getById(it.id) }
 
         binding.btnTvShowWatchEpisode.apply {
             setOnClickListener {
@@ -638,7 +629,7 @@ class TvShowViewHolder(
 
         binding.tvTvShowOverview.text = tvShow.overview
 
-        val episodes = database.episodeDao().getByTvShowId(tvShow.id)
+        val episodes = tvShow.seasons.flatMap { it.episodes }
         val episode = episodes
             .filter { it.watchHistory != null }
             .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }

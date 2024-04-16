@@ -49,10 +49,6 @@ class ShowOptionsMobileDialog(
 
 
     private fun displayEpisode(episode: Episode) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         Glide.with(context)
             .load(episode.poster ?: episode.tvShow?.poster)
             .fitCenter()
@@ -146,10 +142,6 @@ class ShowOptionsMobileDialog(
     }
 
     private fun displayMovie(movie: Movie) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         Glide.with(context)
             .load(movie.poster)
             .fitCenter()
@@ -220,10 +212,6 @@ class ShowOptionsMobileDialog(
     }
 
     private fun displayTvShow(tvShow: TvShow) {
-        database.tvShowDao().getById(tvShow.id)?.let { tvShowDb ->
-            tvShow.merge(tvShowDb)
-        }
-
         Glide.with(context)
             .load(tvShow.poster)
             .fitCenter()

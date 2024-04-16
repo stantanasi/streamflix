@@ -13,7 +13,6 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
-import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ContentCategorySwiperMobileBinding
 import com.tanasi.streamflix.databinding.ContentCategorySwiperTvBinding
 import com.tanasi.streamflix.databinding.ItemCategoryMobileBinding
@@ -38,7 +37,6 @@ class CategoryViewHolder(
 ) {
 
     private val context = itemView.context
-    private val database = AppDatabase.getInstance(context)
     private lateinit var category: Category
 
     val childRecyclerView: RecyclerView?
@@ -89,12 +87,6 @@ class CategoryViewHolder(
 
     private fun displayMobileSwiper(binding: ContentCategorySwiperMobileBinding) {
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
-        when (selected) {
-            is Movie -> database.movieDao().getById(selected.id)?.let { movieDb ->
-                selected.merge(movieDb)
-            }
-            is TvShow -> {}
-        }
 
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(8_000) {
@@ -252,12 +244,6 @@ class CategoryViewHolder(
 
     private fun displayTvSwiper(binding: ContentCategorySwiperTvBinding) {
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
-        when (selected) {
-            is Movie -> database.movieDao().getById(selected.id)?.let { movieDb ->
-                selected.merge(movieDb)
-            }
-            is TvShow -> {}
-        }
 
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(8_000) {

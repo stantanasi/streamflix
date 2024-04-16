@@ -101,10 +101,6 @@ class MovieViewHolder(
 
 
     private fun displayMobileItem(binding: ItemMovieMobileBinding) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -182,10 +178,6 @@ class MovieViewHolder(
     }
 
     private fun displayTvItem(binding: ItemMovieTvBinding) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -278,10 +270,6 @@ class MovieViewHolder(
     }
 
     private fun displayGridMobileItem(binding: ItemMovieGridMobileBinding) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
@@ -347,10 +335,6 @@ class MovieViewHolder(
     }
 
     private fun displayGridTvItem(binding: ItemMovieGridTvBinding) {
-        database.movieDao().getById(movie.id)?.let { movieDb ->
-            movie.merge(movieDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {

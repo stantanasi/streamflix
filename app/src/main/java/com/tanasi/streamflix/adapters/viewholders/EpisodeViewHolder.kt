@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ItemEpisodeTvBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingTvBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingMobileBinding
@@ -33,7 +32,6 @@ class EpisodeViewHolder(
 ) {
 
     private val context = itemView.context
-    private val database = AppDatabase.getInstance(context)
     private lateinit var episode: Episode
 
     fun bind(episode: Episode) {
@@ -49,10 +47,6 @@ class EpisodeViewHolder(
 
 
     private fun displayMobileItem(binding: ItemEpisodeMobileBinding) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -138,10 +132,6 @@ class EpisodeViewHolder(
     }
 
     private fun displayTvItem(binding: ItemEpisodeTvBinding) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -236,10 +226,6 @@ class EpisodeViewHolder(
     }
 
     private fun displayContinueWatchingMobileItem(binding: ItemEpisodeContinueWatchingMobileBinding) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
@@ -339,10 +325,6 @@ class EpisodeViewHolder(
     }
 
     private fun displayContinueWatchingTvItem(binding: ItemEpisodeContinueWatchingTvBinding) {
-        database.episodeDao().getById(episode.id)?.let { episodeDb ->
-            episode.merge(episodeDb)
-        }
-
         binding.root.apply {
             setOnClickListener {
                 findNavController().navigate(
