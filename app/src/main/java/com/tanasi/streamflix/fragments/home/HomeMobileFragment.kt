@@ -116,6 +116,12 @@ class HomeMobileFragment : Fragment() {
         categories
             .find { it.name == Category.FEATURED }
             ?.also {
+                it.list.forEach { show ->
+                    when (show) {
+                        is Movie -> show.itemType = AppAdapter.Type.MOVIE_SWIPER_MOBILE_ITEM
+                        is TvShow -> show.itemType = AppAdapter.Type.TV_SHOW_SWIPER_MOBILE_ITEM
+                    }
+                }
                 it.selectedIndex = appAdapter.items
                     .filterIsInstance<Category>()
                     .find { item -> item.name == Category.FEATURED }
@@ -147,7 +153,7 @@ class HomeMobileFragment : Fragment() {
             categories
                 .filter { it.list.isNotEmpty() }
                 .onEach { category ->
-                    if (category.name != getString(R.string.home_continue_watching)) {
+                    if (category.name != Category.FEATURED && category.name != getString(R.string.home_continue_watching)) {
                         category.list.onEach { show ->
                             when (show) {
                                 is Movie -> show.itemType = AppAdapter.Type.MOVIE_MOBILE_ITEM
