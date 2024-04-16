@@ -68,7 +68,7 @@ object SoraExtractor {
         companion object {
             fun build(): Service {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("http://localhost/")
+                    .baseUrl("https://api.themoviedb.org/3/")
                     .addConverterFactory(JsoupConverterFactory.create())
                     .build()
 
