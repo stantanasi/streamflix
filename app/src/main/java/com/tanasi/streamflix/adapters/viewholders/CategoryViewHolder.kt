@@ -95,9 +95,15 @@ class CategoryViewHolder(
             binding.vpCategorySwiper.currentItem += 1
         }
 
+        val items = listOf(
+            listOf(category.list.lastOrNull()),
+            category.list,
+            listOf(category.list.firstOrNull()),
+        ).flatten().filterNotNull()
         binding.vpCategorySwiper.apply {
             adapter = AppAdapter().apply {
                 submitList(category.list)
+                post { (adapter as AppAdapter).submitList(items) }
             }
         }
 
@@ -116,12 +122,32 @@ class CategoryViewHolder(
 
         binding.vpCategorySwiper.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
+                val indicatorPosition = when (position) {
+                    0 -> category.list.lastIndex
+                    items.lastIndex -> 0
+                    else -> position - 1
+                }
                 binding.llDotsIndicator.children.forEachIndexed { index, view ->
-                    view.isSelected = (position == index)
+                    view.isSelected = (indicatorPosition == index)
                 }
                 handler.removeCallbacksAndMessages(null)
                 handler.postDelayed(8_000) {
                     binding.vpCategorySwiper.currentItem += 1
+                }
+            }
+
+            override fun onPageScrollStateChanged(state: Int) {
+                if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                    when (binding.vpCategorySwiper.currentItem) {
+                        0 -> binding.vpCategorySwiper.setCurrentItem(
+                            items.lastIndex - 1,
+                            false
+                        )
+                        items.lastIndex -> binding.vpCategorySwiper.setCurrentItem(
+                            1,
+                            false
+                        )
+                    }
                 }
             }
         })
