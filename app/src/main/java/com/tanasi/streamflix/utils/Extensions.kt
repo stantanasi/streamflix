@@ -20,8 +20,8 @@ import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Tracks
 import androidx.navigation.fragment.NavHostFragment
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.activities.main.MainTvActivity
 import com.tanasi.streamflix.activities.main.MainMobileActivity
+import com.tanasi.streamflix.activities.main.MainTvActivity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.parcelize.Parcelize

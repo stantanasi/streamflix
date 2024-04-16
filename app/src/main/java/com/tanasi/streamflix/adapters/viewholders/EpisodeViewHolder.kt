@@ -7,21 +7,21 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.databinding.ItemEpisodeTvBinding
-import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingTvBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingMobileBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingTvBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeMobileBinding
+import com.tanasi.streamflix.databinding.ItemEpisodeTvBinding
+import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
 import com.tanasi.streamflix.fragments.home.HomeTvFragment
 import com.tanasi.streamflix.fragments.home.HomeTvFragmentDirections
-import com.tanasi.streamflix.fragments.home.HomeMobileFragmentDirections
-import com.tanasi.streamflix.fragments.season.SeasonTvFragmentDirections
 import com.tanasi.streamflix.fragments.season.SeasonMobileFragmentDirections
+import com.tanasi.streamflix.fragments.season.SeasonTvFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
 import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.ui.ShowOptionsTvDialog
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
+import com.tanasi.streamflix.ui.ShowOptionsTvDialog
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
 

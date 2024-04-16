@@ -6,10 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.databinding.ItemSeasonTvBinding
 import com.tanasi.streamflix.databinding.ItemSeasonMobileBinding
-import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
+import com.tanasi.streamflix.databinding.ItemSeasonTvBinding
 import com.tanasi.streamflix.fragments.tv_show.TvShowMobileFragmentDirections
+import com.tanasi.streamflix.fragments.tv_show.TvShowTvFragmentDirections
 import com.tanasi.streamflix.models.Season
 
 class SeasonViewHolder(

@@ -39,7 +39,6 @@ import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.coroutines.launch
-import kotlinx.parcelize.Parcelize
 import java.util.Calendar
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
