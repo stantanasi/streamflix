@@ -26,7 +26,7 @@ object AnyMovieProvider : Provider {
 
     override val name = "AnyMovie"
     override val logo = "https://anymovie.cc/wp-content/uploads/2023/08/AM-LOGO-1.png"
-    override val url = "https://anymovie.cc/"
+    val url = "https://anymovie.cc/"
 
     private val service = AllMoviesForYouService.build()
 

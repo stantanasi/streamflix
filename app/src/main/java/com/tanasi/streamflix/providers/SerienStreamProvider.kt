@@ -35,7 +35,7 @@ object SerienStreamProvider : Provider {
     override val name = "SerienStream (German)"
     override val logo =
         "https://s.to/public/img/logo-sto-serienstream-sx-to-serien-online-streaming-vod.png"
-    override val url = "https://serienstream.to/"
+    val url = "https://serienstream.to/"
 
     private val service = BurningSeriesService.build()
 

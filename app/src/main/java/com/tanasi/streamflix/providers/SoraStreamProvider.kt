@@ -23,7 +23,6 @@ object SoraStreamProvider : Provider {
 
     override val name = "SoraStream"
     override val logo = ""
-    override val url = ""
 
     override suspend fun getHome(): List<Category> {
         val categories = mutableListOf<Category>()
