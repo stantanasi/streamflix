@@ -3,6 +3,7 @@ package com.tanasi.streamflix.extractors
 import android.util.Base64
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.OpenSubtitles
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.http.GET
@@ -27,6 +28,7 @@ object SoraExtractor {
 
         val doc = service.get(iframedoc, referer = url)
 
+        val imdbId = doc.select("body").attr("data-i").toIntOrNull()
         val srcrcp = Regex("src: '(//vidsrc\\.net/srcrcp/.*?)'")
             .find(doc.toString())?.groupValues?.get(1)
             ?: throw Exception("Can't retrieve source")
@@ -47,7 +49,18 @@ object SoraExtractor {
         ).apply {
             video = Video(
                 source = source,
-                subtitles = emptyList(),
+                subtitles = if (imdbId != null) {
+                    listOf(
+                        OpenSubtitles.search(imdbId, "eng").sortedBy { it.subDownloadsCnt },
+                        OpenSubtitles.search(imdbId, "fre").sortedBy { it.subDownloadsCnt },
+                        OpenSubtitles.search(imdbId, "ger").sortedBy { it.subDownloadsCnt },
+                    ).flatten().map {
+                        Video.Subtitle(
+                            label = it.languageName ?: it.subFileName ?: "",
+                            file = "https://vidsrc.stream/sub/ops-${it.idSubtitleFile}.vtt",
+                        )
+                    }
+                } else emptyList(),
                 referer = iframedoc,
             )
         }
