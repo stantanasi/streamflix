@@ -14,7 +14,7 @@ object SoraExtractor {
     private val service = Service.build()
 
     suspend fun invokeVidSrc(videoType: Video.Type): Video.Server? {
-        val vidSrcAPI = "https://vidsrc.me"
+        val vidSrcAPI = "https://vidsrc.net"
 
         val url = when (videoType) {
             is Video.Type.Episode -> "$vidSrcAPI/embed/tv?tmdb=${videoType.tvShow.id}&season=${videoType.season.number}&episode=${videoType.number}"
