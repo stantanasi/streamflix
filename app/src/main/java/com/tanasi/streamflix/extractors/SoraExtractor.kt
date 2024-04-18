@@ -54,6 +54,7 @@ object SoraExtractor {
                         OpenSubtitles.search(imdbId, "eng").sortedBy { it.subDownloadsCnt },
                         OpenSubtitles.search(imdbId, "fre").sortedBy { it.subDownloadsCnt },
                         OpenSubtitles.search(imdbId, "ger").sortedBy { it.subDownloadsCnt },
+                        OpenSubtitles.search(imdbId, "por").sortedBy { it.subDownloadsCnt },
                     ).flatten().map {
                         Video.Subtitle(
                             label = it.languageName ?: it.subFileName ?: "",
