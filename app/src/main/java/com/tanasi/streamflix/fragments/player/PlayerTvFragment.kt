@@ -18,7 +18,10 @@ import androidx.media3.common.MediaItem.SubtitleConfiguration
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.PlayerView
@@ -35,6 +38,7 @@ import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.models.WatchItem
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.filterNotNullValues
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
@@ -62,6 +66,7 @@ class PlayerTvFragment : Fragment() {
     private val viewModel by viewModelsFactory { PlayerViewModel(args.videoType, args.id) }
 
     private lateinit var player: ExoPlayer
+    private lateinit var dataSourceFactory: HttpDataSource.Factory
     private lateinit var mediaSession: MediaSession
 
     private var servers = listOf<Video.Server>()
@@ -164,18 +169,21 @@ class PlayerTvFragment : Fragment() {
 
 
     private fun initializeVideo() {
-        player = ExoPlayer.Builder(requireContext()).build().also { player ->
-            player.setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(C.USAGE_MEDIA)
-                    .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
-                    .build(),
-                true,
-            )
+        dataSourceFactory = DefaultHttpDataSource.Factory()
+        player = ExoPlayer.Builder(requireContext())
+            .setMediaSourceFactory(DefaultMediaSourceFactory(dataSourceFactory))
+            .build().also { player ->
+                player.setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(C.USAGE_MEDIA)
+                        .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
+                        .build(),
+                    true,
+                )
 
-            mediaSession = MediaSession.Builder(requireContext(), player)
-                .build()
-        }
+                mediaSession = MediaSession.Builder(requireContext(), player)
+                    .build()
+            }
 
         binding.pvPlayer.player = player
         binding.settings.player = player
@@ -199,6 +207,10 @@ class PlayerTvFragment : Fragment() {
 
     private fun displayVideo(video: Video, server: Video.Server) {
         val currentPosition = player.currentPosition
+
+        dataSourceFactory.setDefaultRequestProperties(mapOf(
+            "Referer" to video.referer,
+        ).filterNotNullValues())
 
         player.setMediaItem(
             MediaItem.Builder()

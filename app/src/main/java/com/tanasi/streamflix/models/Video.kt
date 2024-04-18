@@ -5,8 +5,8 @@ import kotlinx.parcelize.Parcelize
 
 class Video(
     val source: String,
-
     val subtitles: List<Subtitle> = listOf(),
+    val referer: String? = null,
 ) {
 
     sealed class Type : Parcelable {
