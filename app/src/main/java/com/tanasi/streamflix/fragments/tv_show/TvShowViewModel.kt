@@ -32,7 +32,9 @@ class TvShowViewModel(id: String, private val database: AppDatabase) : ViewModel
                     }
 
                     if (episodes.isEmpty() && state.tvShow.seasons.isNotEmpty()) {
-                        getSeason(TvShow(id, ""), state.tvShow.seasons.first())
+                        val firstSeason = state.tvShow.seasons.firstOrNull { it.number != 0 }
+                            ?: state.tvShow.seasons.first()
+                        getSeason(TvShow(id, ""), firstSeason)
                     } else {
                         val season = state.tvShow.seasons.let { seasons ->
                             seasons

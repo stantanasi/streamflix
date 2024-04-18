@@ -534,6 +534,7 @@ class TvShowViewHolder(
             ?: episodes.indexOfLast { it.isWatched }
                 .takeIf { it != -1 && it + 1 < episodes.size }
                 ?.let { episodes.getOrNull(it + 1) }
+            ?: tvShow.seasons.firstOrNull { it.number != 0 }?.episodes?.firstOrNull()
             ?: episodes.firstOrNull()
 
         binding.btnTvShowWatchEpisode.apply {
@@ -718,8 +719,8 @@ class TvShowViewHolder(
             ?: episodes.indexOfLast { it.isWatched }
                 .takeIf { it != -1 && it + 1 < episodes.size }
                 ?.let { episodes.getOrNull(it + 1) }
+            ?: tvShow.seasons.firstOrNull { it.number != 0 }?.episodes?.firstOrNull()
             ?: episodes.firstOrNull()
-        episode?.season = episode?.season?.let { database.seasonDao().getById(it.id) }
 
         binding.btnTvShowWatchEpisode.apply {
             setOnClickListener {
