@@ -27,9 +27,9 @@ object SoraExtractor {
 
         val doc = service.get(iframedoc, referer = url)
 
-        val index = doc.select("body").attr("data-i")
-        val hash = doc.select("div#hidden").attr("data-h")
-        val srcrcp = deobfstr(hash, index)
+        val srcrcp = Regex("src: '(//vidsrc\\.net/srcrcp/.*?)'")
+            .find(doc.toString())?.groupValues?.get(1)
+            ?: throw Exception("Can't retrieve source")
 
         val script = service.get(
             if (srcrcp.startsWith("//")) "https:$srcrcp" else srcrcp,
@@ -48,18 +48,9 @@ object SoraExtractor {
             video = Video(
                 source = source,
                 subtitles = emptyList(),
+                referer = iframedoc,
             )
         }
-    }
-
-
-    private fun deobfstr(hash: String, index: String): String {
-        var result = ""
-        for (i in hash.indices step 2) {
-            val j = hash.substring(i, i + 2)
-            result += (j.toInt(16) xor index[(i / 2) % index.length].code).toChar()
-        }
-        return result
     }
 
 
