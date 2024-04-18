@@ -16,7 +16,11 @@ object OpenSubtitles {
         imdbId: Int,
         languageId: String,
     ): List<Subtitle> {
-        return service.search(imdbId, languageId)
+        return try {
+            service.search(imdbId, languageId)
+        } catch (_: Exception) {
+            emptyList()
+        }
     }
 
 
