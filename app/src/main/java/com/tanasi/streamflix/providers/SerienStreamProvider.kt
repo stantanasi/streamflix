@@ -109,7 +109,6 @@ object SerienStreamProvider : Provider {
         return categories
     }
 
-    var resultsCount = 0
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
         if (query.isEmpty()) {
             val document = service.getSeriesListWithCategories()
@@ -165,17 +164,18 @@ object SerienStreamProvider : Provider {
                 ?: "",
             rating = imdbDocument.selectFirst("div[data-testid='hero-rating-bar__aggregate-rating__score'] span")
                 ?.text()?.toDoubleOrNull() ?: 0.0,
-            cast = document.select(".cast li[itemprop='actor']")
-                .map {
-                    People(
-                        id = it.selectFirst("span")?.text() ?: "",
-                        name = it.selectFirst("span")?.text() ?: ""
-                    )
-                },
+
             directors = document.select(".cast li[itemprop='director']")
                 .map {
                     People(
-                        id = it.selectFirst("span")?.text() ?: "",
+                        id = it.selectFirst("a")?.attr("href")?.replace("/serien/", "") ?: "",
+                        name = it.selectFirst("span")?.text() ?: ""
+                    )
+                },
+            cast = document.select(".cast li[itemprop='actor']")
+                .map {
+                    People(
+                        id = it.selectFirst("a")?.attr("href")?.replace("/serien/", "") ?: "",
                         name = it.selectFirst("span")?.text() ?: ""
                     )
                 },
@@ -236,7 +236,21 @@ object SerienStreamProvider : Provider {
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
-        throw Exception("Not yet implemented")
+        val document = service.getPeople(id)
+        return People(
+            id = id,
+            name = document.selectFirst("h1")?.text() ?: "",
+            filmography = document.select(".seriesListContainer > div")
+                .map {
+                    TvShow(
+                        id = it.selectFirst("a")?.attr("href")
+                            ?.let { it1 -> getTvShowIdFromLink(it1) }
+                            ?: "",
+                        title = it.selectFirst("h3")?.text() ?: "",
+                        poster = url + it.selectFirst("img")?.attr("data-src")
+                    )
+                }
+        )
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
@@ -306,6 +320,9 @@ object SerienStreamProvider : Provider {
             @Path("genreName") genreName: String,
             @Path("page") page: Int
         ): Document
+
+        @GET("serien/{peopleId}")
+        suspend fun getPeople(@Path("peopleId") peopleId: String): Document
 
         @GET("serie/stream/{tvShowName}")
         suspend fun getTvShow(@Path("tvShowName") tvShowName: String): Document
