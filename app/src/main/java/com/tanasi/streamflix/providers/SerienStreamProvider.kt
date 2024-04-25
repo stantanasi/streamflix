@@ -63,13 +63,6 @@ object SerienStreamProvider : Provider {
         return justTvShowId + "/" + justTvShowSeason + "/" + justTvShowEpisode
     }
 
-    suspend fun getPosterUrlFromTvShowLink(seriesLink: String): String {
-        val seriesId = getTvShowIdFromLink(seriesLink)
-        val document = service.getTvShow(seriesId)
-        val posterPath = document.selectFirst("img")?.attr("data-src")
-        return url + posterPath
-    }
-
     override suspend fun getHome(): List<Category> {
         val document = service.getHome()
         val categories = mutableListOf<Category>()
