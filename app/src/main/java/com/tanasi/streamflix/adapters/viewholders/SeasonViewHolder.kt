@@ -52,6 +52,7 @@ class SeasonViewHolder(
             clipToOutline = true
             Glide.with(context)
                 .load(season.poster)
+                .fallback(R.drawable.glide_fallback_cover)
                 .centerCrop()
                 .into(this)
         }
