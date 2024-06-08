@@ -7,6 +7,7 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.tanasi.streamflix.BuildConfig
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.StringConverterFactory
 import retrofit2.Retrofit
@@ -34,22 +35,16 @@ open class RabbitstreamExtractor : Extractor() {
     override suspend fun extract(link: String): Video {
         val service = Service.build(mainUrl)
 
-        val keys = service.getSourceEncryptedKey(key).rabbitstream.keys
+        val sourceId = link.substringAfterLast("/").substringBefore("?")
 
         val response = service.getSources(
-            url = "$mainUrl/$embed/getSources",
-            id = link.substringAfterLast("/").substringBefore("?"),
-            v = keys.v,
-            h = keys.h,
-            b = keys.b,
-            userAgent = keys.agent,
-            referer = mainUrl,
+            url = BuildConfig.RABBITSTREAM_SOURCE_API + sourceId,
         )
 
         val sources = when (response) {
             is Service.Sources -> response
             is Service.Sources.Encrypted -> response.decrypt(
-                key = keys.key,
+                key = service.getSourceEncryptedKey(key).rabbitstream.keys.key,
             )
         }
 
@@ -70,6 +65,7 @@ open class RabbitstreamExtractor : Extractor() {
 
 
     class MegacloudExtractor : RabbitstreamExtractor() {
+
         override val name = "Megacloud"
         override val mainUrl = "https://megacloud.tv"
         override val embed = "embed-2/ajax/e-1"
@@ -204,12 +200,6 @@ open class RabbitstreamExtractor : Extractor() {
         )
         suspend fun getSources(
             @Url url: String,
-            @Query("id") id: String,
-            @Query("v") v: String,
-            @Query("h") h: String,
-            @Query("b") b: String,
-            @Header("user-agent") userAgent: String,
-            @Header("referer") referer: String,
         ): SourcesResponse
 
         @GET

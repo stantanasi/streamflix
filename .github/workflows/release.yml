@@ -21,8 +21,10 @@ jobs:
       - name: Access Secrets
         env:
           TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          RABBITSTREAM_SOURCE_API: ${{ secrets.RABBITSTREAM_SOURCE_API }}
         run: |
           echo TMDB_API_KEY=$TMDB_API_KEY >> local.properties
+          echo RABBITSTREAM_SOURCE_API=$RABBITSTREAM_SOURCE_API >> local.properties
 
       - name: Make Gradle executable
         run: chmod +x ./gradlew
