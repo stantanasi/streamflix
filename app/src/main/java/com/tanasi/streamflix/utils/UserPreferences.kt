@@ -19,6 +19,18 @@ object UserPreferences {
         )
     }
 
+    enum class AppLayout {
+        AUTO,
+        MOBILE,
+        TV
+    }
+
+
+    var appLayout: AppLayout?
+        get() = Key.APP_LAYOUT.getInt()?.let { AppLayout.entries[it] }
+        set(value) {
+            Key.APP_LAYOUT.setInt(value?.ordinal ?: AppLayout.AUTO.ordinal)
+        }
 
     var currentProvider: Provider?
         get() = providers.find { it.name == Key.CURRENT_PROVIDER.getString() }
@@ -67,6 +79,7 @@ object UserPreferences {
 
 
     private enum class Key {
+        APP_LAYOUT,
         CURRENT_PROVIDER,
         CAPTION_TEXT_SIZE,
         CAPTION_STYLE_FONT_COLOR,
