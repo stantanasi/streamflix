@@ -11,6 +11,13 @@ body:
       placeholder: Short and explicit description of your incident...
     validations:
       required: true
+  - type: input
+    attributes:
+      label: Provider
+      description: On which provider does the error occur?
+      placeholder: SFlix, SoraStream...
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Reproduction steps
@@ -22,13 +29,6 @@ body:
         4. See error
     validations:
       required: true
-  - type: input
-    attributes:
-      label: App version
-      description: What version of our app are you running?
-      placeholder: Latest
-    validations:
-      required: false
   - type: input
     attributes:
       label: Operating system
