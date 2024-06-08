@@ -21,6 +21,7 @@ import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ActivityMainTvBinding
 import com.tanasi.streamflix.databinding.ContentHeaderMenuMainTvBinding
 import com.tanasi.streamflix.fragments.player.PlayerTvFragment
+import com.tanasi.streamflix.ui.AppLayoutTvDialog
 import com.tanasi.streamflix.ui.UpdateAppTvDialog
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.getCurrentFragment
@@ -41,17 +42,32 @@ class MainTvActivity : FragmentActivity() {
         _binding = ActivityMainTvBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
-            finish()
-            startActivity(Intent(this, MainMobileActivity::class.java))
-        }
-
         val navHostFragment = this.supportFragmentManager
             .findFragmentById(binding.navMainFragment.id) as NavHostFragment
         val navController = navHostFragment.navController
 
         UserPreferences.setup(this)
         AppDatabase.setup(this)
+
+        when (val appLayout = UserPreferences.appLayout) {
+            null,
+            UserPreferences.AppLayout.AUTO -> {
+                if (!packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
+                    finish()
+                    startActivity(Intent(this, MainMobileActivity::class.java))
+                }
+                if (appLayout == null) {
+                    AppLayoutTvDialog(this)
+                        .show()
+                }
+            }
+            UserPreferences.AppLayout.MOBILE -> {
+                finish()
+                startActivity(Intent(this, MainMobileActivity::class.java))
+            }
+            UserPreferences.AppLayout.TV -> {}
+        }
+
         UserPreferences.currentProvider?.let {
             navController.navigate(R.id.home)
         }

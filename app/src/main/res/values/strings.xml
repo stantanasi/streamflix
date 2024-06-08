@@ -12,6 +12,12 @@
     <string name="update_later">Maybe Later</string>
     <string name="update">Update</string>
 
+    <string name="app_layout">App layout</string>
+    <string name="app_layout_auto">Auto</string>
+    <string name="app_layout_mobile">Mobile layout</string>
+    <string name="app_layout_tv">TV layout</string>
+    <string name="app_layout_apply">Apply</string>
+
     <string name="providers_choose_title">Choose a provider</string>
 
     <string name="main_menu_change_provider">Change provider</string>
