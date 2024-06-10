@@ -129,6 +129,7 @@ class MainMobileActivity : FragmentActivity() {
                     R.id.movies,
                     R.id.tv_shows -> binding.bnvMain.findViewById<View>(R.id.home).performClick()
                     else -> navController.navigateUp()
+                        .takeIf { !it }?.let { finish() }
                 }
             }
         })

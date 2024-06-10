@@ -173,6 +173,7 @@ class MainTvActivity : FragmentActivity() {
                             else -> false
                         }.takeIf { !it }?.let {
                             navController.navigateUp()
+                                .takeIf { !it }?.let { finish() }
                         }
                     }
                 }
