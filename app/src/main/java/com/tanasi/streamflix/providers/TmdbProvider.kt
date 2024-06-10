@@ -2,7 +2,7 @@ package com.tanasi.streamflix.providers
 
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
-import com.tanasi.streamflix.extractors.SoraExtractor
+import com.tanasi.streamflix.extractors.VidsrcToExtractor
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -15,14 +15,13 @@ import com.tanasi.streamflix.utils.TMDb3
 import com.tanasi.streamflix.utils.TMDb3.original
 import com.tanasi.streamflix.utils.TMDb3.w500
 import com.tanasi.streamflix.utils.safeSubList
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
 object TmdbProvider : Provider {
 
     override val name = "TMDb"
-    override val logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/1280px-Tmdb.new.logo.svg.png"
+    override val logo =
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/1280px-Tmdb.new.logo.svg.png"
 
     override suspend fun getHome(): List<Category> {
         val categories = mutableListOf<Category>()
@@ -771,11 +770,9 @@ object TmdbProvider : Provider {
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
-        val servers = runBlocking {
-            listOf(
-                async { SoraExtractor.invokeVidSrc(videoType) },
-            ).mapNotNull { it.await() }
-        }
+        val servers = listOf(
+            VidsrcToExtractor().server(videoType),
+        )
 
         return servers
     }

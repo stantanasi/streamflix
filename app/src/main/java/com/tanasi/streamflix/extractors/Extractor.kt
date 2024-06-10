@@ -19,6 +19,10 @@ abstract class Extractor {
             VoeExtractor(),
             StreamtapeExtractor(),
             VidozaExtractor(),
+            VidsrcToExtractor(),
+            VidplayExtractor(),
+            VidplayExtractor.MyCloud(),
+            VidplayExtractor.VidplayOnline(),
         )
 
         suspend fun extract(link: String): Video {

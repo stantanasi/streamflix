@@ -3,7 +3,7 @@ package com.tanasi.streamflix.models
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
-class Video(
+data class Video(
     val source: String,
     val subtitles: List<Subtitle> = listOf(),
     val referer: String? = null,
@@ -43,12 +43,12 @@ class Video(
         }
     }
 
-    class Subtitle(
+    data class Subtitle(
         val label: String,
         val file: String,
     )
 
-    class Server(
+    data class Server(
         val id: String,
         val name: String,
         val src: String = "",
