@@ -42,7 +42,7 @@ interface Provider {
             AnyMovieProvider,
             HiAnimeProvider,
             SerienStreamProvider,
-            SoraStreamProvider,
+            TmdbProvider,
             SuperStreamProvider,
         )
     }

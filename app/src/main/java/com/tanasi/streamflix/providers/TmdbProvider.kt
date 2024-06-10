@@ -19,10 +19,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 
-object SoraStreamProvider : Provider {
+object TmdbProvider : Provider {
 
-    override val name = "SoraStream"
-    override val logo = ""
+    override val name = "TMDb"
+    override val logo = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/1280px-Tmdb.new.logo.svg.png"
 
     override suspend fun getHome(): List<Category> {
         val categories = mutableListOf<Category>()
