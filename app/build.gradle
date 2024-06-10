@@ -51,13 +51,13 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
     implementation project(path: ':navigation')
 
-    implementation 'androidx.core:core-ktx:1.13.0'
+    implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'com.github.bumptech.glide:glide:5.0.0-rc01'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.16.0'
@@ -77,15 +77,15 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
     implementation 'org.jsoup:jsoup:1.17.2'
 
-    implementation 'androidx.fragment:fragment-ktx:1.6.2'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.fragment:fragment-ktx:1.7.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.1'
 
     implementation 'androidx.tvprovider:tvprovider:1.1.0-alpha01'
 
     implementation "androidx.room:room-runtime:2.6.1"
     implementation "androidx.room:room-ktx:2.6.1"
-    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'com.google.android.material:material:1.12.0'
     annotationProcessor "androidx.room:room-compiler:2.6.1"
     ksp "androidx.room:room-compiler:2.6.1"
 }
