@@ -50,6 +50,7 @@ class VidsrcToExtractor : Extractor() {
             if (finalUrl == embedRes.result.url) throw Exception("finalUrl == embedUrl")
 
             when (source.title) {
+                "F2Cloud",
                 "Vidplay" -> VidplayExtractor.Any(finalUrl.substringBefore("/e/"))
                     .extract(finalUrl)
 //                    "Filemoon" -> FileMoon().getUrl(finalUrl, referer, subtitleCallback, callback)
