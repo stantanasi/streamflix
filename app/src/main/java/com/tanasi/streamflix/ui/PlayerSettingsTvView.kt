@@ -963,6 +963,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                             TextSize(R.string.player_settings_caption_style_text_size_0_5, 0.5F),
                             TextSize(R.string.player_settings_caption_style_text_size_0_75, 0.75F),
                             DEFAULT,
+                            TextSize(R.string.player_settings_caption_style_text_size_1_25, 1.25F),
+                            TextSize(R.string.player_settings_caption_style_text_size_1_5, 1.5F),
                             TextSize(R.string.player_settings_caption_style_text_size_2, 2F),
                             TextSize(R.string.player_settings_caption_style_text_size_3, 3F),
                         )

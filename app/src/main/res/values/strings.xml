@@ -101,6 +101,8 @@
     <string name="player_settings_caption_style_text_size_0_5">50%</string>
     <string name="player_settings_caption_style_text_size_0_75">75%</string>
     <string name="player_settings_caption_style_text_size_1">100%</string>
+    <string name="player_settings_caption_style_text_size_1_25">125%</string>
+    <string name="player_settings_caption_style_text_size_1_5">150%</string>
     <string name="player_settings_caption_style_text_size_2">200%</string>
     <string name="player_settings_caption_style_text_size_3">300%</string>
     <string name="player_settings_caption_style_font_opacity_title">Font opacity</string>
