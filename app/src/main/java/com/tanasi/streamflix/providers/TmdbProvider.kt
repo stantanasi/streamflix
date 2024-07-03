@@ -37,7 +37,7 @@ object TmdbProvider : Provider {
                             id = multi.id.toString(),
                             title = multi.title ?: "",
                             overview = multi.overview,
-//                                released = multi.releasedDate,
+                            released = multi.releaseDate,
                             rating = multi.voteAverage.toDouble(),
                             poster = multi.posterPath?.w500,
                             banner = multi.backdropPath?.original,
@@ -47,7 +47,7 @@ object TmdbProvider : Provider {
                             id = multi.id.toString(),
                             title = multi.name ?: "",
                             overview = multi.overview,
-//                                released = multi.firstAirDate,
+                            released = multi.firstAirDate,
                             rating = multi.voteAverage.toDouble(),
                             poster = multi.posterPath?.w500,
                             banner = multi.backdropPath?.original,
@@ -68,7 +68,7 @@ object TmdbProvider : Provider {
                             id = multi.id.toString(),
                             title = multi.title ?: "",
                             overview = multi.overview,
-//                            released = multi.releasedDate,
+                            released = multi.releaseDate,
                             rating = multi.voteAverage.toDouble(),
                             poster = multi.posterPath?.w500,
                             banner = multi.backdropPath?.original,
@@ -78,7 +78,7 @@ object TmdbProvider : Provider {
                             id = multi.id.toString(),
                             title = multi.name ?: "",
                             overview = multi.overview,
-//                            released = multi.firstAirDate,
+                            released = multi.firstAirDate,
                             rating = multi.voteAverage.toDouble(),
                             poster = multi.posterPath?.w500,
                             banner = multi.backdropPath?.original,
@@ -460,7 +460,7 @@ object TmdbProvider : Provider {
                     id = multi.id.toString(),
                     title = multi.title ?: "",
                     overview = multi.overview,
-//                        released = multi.releasedDate,
+                    released = multi.releaseDate,
                     rating = multi.voteAverage.toDouble(),
                     poster = multi.posterPath?.w500,
                     banner = multi.backdropPath?.original,
@@ -470,7 +470,7 @@ object TmdbProvider : Provider {
                     id = multi.id.toString(),
                     title = multi.name ?: "",
                     overview = multi.overview,
-//                        released = multi.firstAirDate,
+                    released = multi.firstAirDate,
                     rating = multi.voteAverage.toDouble(),
                     poster = multi.posterPath?.w500,
                     banner = multi.backdropPath?.original,
@@ -557,7 +557,7 @@ object TmdbProvider : Provider {
                             id = multi.id.toString(),
                             title = multi.title ?: "",
                             overview = multi.overview,
-//                            released = multi.releasedDate,
+                            released = multi.releaseDate,
                             rating = multi.voteAverage.toDouble(),
                             poster = multi.posterPath?.w500,
                             banner = multi.backdropPath?.original,
@@ -567,7 +567,7 @@ object TmdbProvider : Provider {
                             id = multi.id.toString(),
                             title = multi.name ?: "",
                             overview = multi.overview,
-//                            released = multi.firstAirDate,
+                            released = multi.firstAirDate,
                             rating = multi.voteAverage.toDouble(),
                             poster = multi.posterPath?.w500,
                             banner = multi.backdropPath?.original,
@@ -631,7 +631,7 @@ object TmdbProvider : Provider {
                             id = multi.id.toString(),
                             title = multi.title ?: "",
                             overview = multi.overview,
-//                            released = multi.releasedDate,
+                            released = multi.releaseDate,
                             rating = multi.voteAverage.toDouble(),
                             poster = multi.posterPath?.w500,
                             banner = multi.backdropPath?.original,
@@ -641,7 +641,7 @@ object TmdbProvider : Provider {
                             id = multi.id.toString(),
                             title = multi.name ?: "",
                             overview = multi.overview,
-//                            released = multi.firstAirDate,
+                            released = multi.firstAirDate,
                             rating = multi.voteAverage.toDouble(),
                             poster = multi.posterPath?.w500,
                             banner = multi.backdropPath?.original,
@@ -738,31 +738,40 @@ object TmdbProvider : Provider {
                 name = person.name,
                 image = person.profilePath?.w500,
 
-                filmography = person.combinedCredits?.cast?.mapNotNull { multi ->
-                    when (multi.mediaType) {
-                        TMDb3.MultiItem.MediaType.MOVIE -> Movie(
-                            id = multi.id.toString(),
-                            title = multi.title ?: "",
-                            overview = multi.overview,
-//                            released = multi.releasedDate,
-                            rating = multi.voteAverage.toDouble(),
-                            poster = multi.posterPath?.w500,
-                            banner = multi.backdropPath?.original,
-                        )
+                filmography = person.combinedCredits?.cast
+                    ?.mapNotNull { multi ->
+                        when (multi.mediaType) {
+                            TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                                id = multi.id.toString(),
+                                title = multi.title ?: "",
+                                overview = multi.overview,
+                                released = multi.releaseDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
 
-                        TMDb3.MultiItem.MediaType.TV -> TvShow(
-                            id = multi.id.toString(),
-                            title = multi.name ?: "",
-                            overview = multi.overview,
-//                            released = multi.firstAirDate,
-                            rating = multi.voteAverage.toDouble(),
-                            poster = multi.posterPath?.w500,
-                            banner = multi.backdropPath?.original,
-                        )
+                            TMDb3.MultiItem.MediaType.TV -> TvShow(
+                                id = multi.id.toString(),
+                                title = multi.name ?: "",
+                                overview = multi.overview,
+                                released = multi.firstAirDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
 
-                        else -> null
+                            else -> null
+                        }
                     }
-                } ?: listOf()
+                    ?.sortedBy {
+                        when (it) {
+                            is Movie -> it.released
+                            is TvShow -> it.released
+                        }
+                    }
+                    ?.reversed()
+                    ?: listOf()
             )
         }
 

@@ -1059,6 +1059,9 @@ object TMDb3 {
         @SerializedName("vote_average") val voteAverage: Float,
         @SerializedName("name") val name: String? = null,
         @SerializedName("media_type") val mediaType: MediaType,
+
+        @SerializedName("release_date") val releaseDate: String? = null,
+        @SerializedName("first_air_date") val firstAirDate: String? = null,
     ) {
 
         enum class MediaType {
