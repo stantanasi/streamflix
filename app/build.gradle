@@ -77,9 +77,9 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
     implementation 'org.jsoup:jsoup:1.17.2'
 
-    implementation 'androidx.fragment:fragment-ktx:1.7.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.1'
+    implementation 'androidx.fragment:fragment-ktx:1.8.1'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.3'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3'
 
     implementation 'androidx.tvprovider:tvprovider:1.1.0-alpha01'
 
