@@ -109,10 +109,7 @@ class PeopleViewModel(private val id: String, database: AppDatabase) : ViewModel
 
                 _state.emit(
                     State.SuccessLoading(
-                        people = People(
-                            id = currentState.people.id,
-                            name = currentState.people.name,
-
+                        people = currentState.people.copy(
                             filmography = currentState.people.filmography + people.filmography
                         ),
                         hasMore = people.filmography.isNotEmpty(),
