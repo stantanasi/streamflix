@@ -25,12 +25,16 @@ object TmdbProvider : Provider {
     override suspend fun getHome(): List<Category> {
         val categories = mutableListOf<Category>()
 
-        val trending = TMDb3.Trending.all(TMDb3.Params.TimeWindow.DAY)
+        val trending = listOf(
+            TMDb3.Trending.all(TMDb3.Params.TimeWindow.DAY, page = 1),
+            TMDb3.Trending.all(TMDb3.Params.TimeWindow.DAY, page = 2),
+            TMDb3.Trending.all(TMDb3.Params.TimeWindow.DAY, page = 3),
+        ).flatMap { it.results }
 
         categories.add(
             Category(
                 name = Category.FEATURED,
-                list = trending.results.safeSubList(0, 5).mapNotNull { multi ->
+                list = trending.safeSubList(0, 5).mapNotNull { multi ->
                     when (multi) {
                         is TMDb3.Movie -> Movie(
                             id = multi.id.toString(),
@@ -61,7 +65,7 @@ object TmdbProvider : Provider {
         categories.add(
             Category(
                 name = "Trending",
-                list = trending.results.safeSubList(5, trending.results.size).mapNotNull { multi ->
+                list = trending.safeSubList(5, trending.size).mapNotNull { multi ->
                     when (multi) {
                         is TMDb3.Movie -> Movie(
                             id = multi.id.toString(),
@@ -92,34 +96,44 @@ object TmdbProvider : Provider {
         categories.add(
             Category(
                 name = "Popular Movies",
-                list = TMDb3.MovieLists.popular().results.map { movie ->
-                    Movie(
-                        id = movie.id.toString(),
-                        title = movie.title,
-                        overview = movie.overview,
-                        released = movie.releaseDate,
-                        rating = movie.voteAverage.toDouble(),
-                        poster = movie.posterPath?.w500,
-                        banner = movie.backdropPath?.original,
-                    )
-                }
+                list = listOf(
+                    TMDb3.MovieLists.popular(page = 1),
+                    TMDb3.MovieLists.popular(page = 2),
+                    TMDb3.MovieLists.popular(page = 3),
+                ).flatMap { it.results }
+                    .map { movie ->
+                        Movie(
+                            id = movie.id.toString(),
+                            title = movie.title,
+                            overview = movie.overview,
+                            released = movie.releaseDate,
+                            rating = movie.voteAverage.toDouble(),
+                            poster = movie.posterPath?.w500,
+                            banner = movie.backdropPath?.original,
+                        )
+                    }
             )
         )
 
         categories.add(
             Category(
                 name = "Popular TV Shows",
-                list = TMDb3.TvSeriesLists.popular().results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
+                list = listOf(
+                    TMDb3.TvSeriesLists.popular(page = 1),
+                    TMDb3.TvSeriesLists.popular(page = 2),
+                    TMDb3.TvSeriesLists.popular(page = 3),
+                ).flatMap { it.results }
+                    .map { tv ->
+                        TvShow(
+                            id = tv.id.toString(),
+                            title = tv.name,
+                            overview = tv.overview,
+                            released = tv.firstAirDate,
+                            rating = tv.voteAverage.toDouble(),
+                            poster = tv.posterPath?.w500,
+                            banner = tv.backdropPath?.original,
+                        )
+                    }
             )
         )
 
