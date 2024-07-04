@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.models.Category
+import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.UserPreferences
@@ -85,7 +86,13 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
                     Category(
                         name = Category.CONTINUE_WATCHING,
                         list = continueWatching
-                            .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis },
+                            .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
+                            .distinctBy {
+                                when (it) {
+                                    is Episode -> it.tvShow?.id
+                                    else -> false
+                                }
+                            },
                     ),
 
                     Category(
