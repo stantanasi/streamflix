@@ -15,7 +15,6 @@ import com.tanasi.streamflix.utils.TMDb3
 import com.tanasi.streamflix.utils.TMDb3.original
 import com.tanasi.streamflix.utils.TMDb3.w500
 import com.tanasi.streamflix.utils.safeSubList
-import java.util.Calendar
 
 object TmdbProvider : Provider {
 
@@ -126,313 +125,331 @@ object TmdbProvider : Provider {
 
         categories.add(
             Category(
-                name = "Airing Today TV Shows",
-                list = TMDb3.TvSeriesLists.airingToday().results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Netflix",
-                list = TMDb3.Discover.tv(
-                    withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.NETFLIX),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Amazon",
-                list = TMDb3.Discover.tv(
-                    withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.AMAZON),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Disney+",
-                list = TMDb3.Discover.tv(
-                    withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.DISNEY_PLUS),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Hulu",
-                list = TMDb3.Discover.tv(
-                    withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.HULU),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Apple TV+",
-                list = TMDb3.Discover.tv(
-                    withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.APPLE_TV),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "HBO",
-                list = TMDb3.Discover.tv(
-                    withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.HBO),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Paramount+",
-                list = TMDb3.Discover.tv(
-                    withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.PARAMOUNT_PLUS),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Peacock",
-                list = TMDb3.Discover.tv(
-                    withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.PEACOCK),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Top Rated Movies",
-                list = TMDb3.MovieLists.topRated().results.map { movie ->
-                    Movie(
-                        id = movie.id.toString(),
-                        title = movie.title,
-                        overview = movie.overview,
-                        released = movie.releaseDate,
-                        rating = movie.voteAverage.toDouble(),
-                        poster = movie.posterPath?.w500,
-                        banner = movie.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Top Rated TV Shows",
-                list = TMDb3.TvSeriesLists.topRated().results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Korean Shows",
-                list = TMDb3.Discover.tv(
-                    withOriginalLanguage = TMDb3.Params.WithBuilder("ko")
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "Airing Today Anime",
-                list = TMDb3.Discover.tv(
-                    airDate = TMDb3.Params.Range(
-                        gte = Calendar.getInstance(),
-                        lte = Calendar.getInstance().apply {
-                            add(Calendar.WEEK_OF_YEAR, 1)
+                name = "Popular Anime",
+                list = listOf(
+                    TMDb3.Discover.movie(
+                        withKeywords = TMDb3.Params.WithBuilder(TMDb3.Keyword.KeywordId.ANIME)
+                            .or(TMDb3.Keyword.KeywordId.BASED_ON_ANIME),
+                    ),
+                    TMDb3.Discover.tv(
+                        withKeywords = TMDb3.Params.WithBuilder(TMDb3.Keyword.KeywordId.ANIME)
+                            .or(TMDb3.Keyword.KeywordId.BASED_ON_ANIME),
+                    ),
+                ).flatMap { it.results }
+                    .sortedByDescending {
+                        when (it) {
+                            is TMDb3.Movie -> it.popularity
+                            is TMDb3.Person -> it.popularity
+                            is TMDb3.Tv -> it.popularity
                         }
+                    }
+                    .mapNotNull { multi ->
+                        when (multi) {
+                            is TMDb3.Movie -> Movie(
+                                id = multi.id.toString(),
+                                title = multi.title,
+                                overview = multi.overview,
+                                released = multi.releaseDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            is TMDb3.Tv -> TvShow(
+                                id = multi.id.toString(),
+                                title = multi.name,
+                                overview = multi.overview,
+                                released = multi.firstAirDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            else -> null
+                        }
+                    },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Popular on Netflix",
+                list = listOf(
+                    TMDb3.Discover.movie(
+                        watchRegion = "US",
+                        withWatchProviders = TMDb3.Params.WithBuilder(TMDb3.Provider.WatchProviderId.NETFLIX),
                     ),
-                    withKeywords = TMDb3.Params.WithBuilder(TMDb3.Keyword.KeywordId.ANIME)
-                        .or(TMDb3.Keyword.KeywordId.BASED_ON_ANIME),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
-            )
-        )
-
-        categories.add(
-            Category(
-                name = "On The Air Anime",
-                list = TMDb3.Discover.tv(
-                    airDate = TMDb3.Params.Range(
-                        gte = Calendar.getInstance(),
-                        lte = Calendar.getInstance()
+                    TMDb3.Discover.tv(
+                        withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.NETFLIX),
                     ),
-                    withKeywords = TMDb3.Params.WithBuilder(TMDb3.Keyword.KeywordId.ANIME)
-                        .or(TMDb3.Keyword.KeywordId.BASED_ON_ANIME),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
+                ).flatMap { it.results }
+                    .sortedByDescending {
+                        when (it) {
+                            is TMDb3.Movie -> it.popularity
+                            is TMDb3.Person -> it.popularity
+                            is TMDb3.Tv -> it.popularity
+                        }
+                    }
+                    .mapNotNull { multi ->
+                        when (multi) {
+                            is TMDb3.Movie -> Movie(
+                                id = multi.id.toString(),
+                                title = multi.title,
+                                overview = multi.overview,
+                                released = multi.releaseDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            is TMDb3.Tv -> TvShow(
+                                id = multi.id.toString(),
+                                title = multi.name,
+                                overview = multi.overview,
+                                released = multi.firstAirDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            else -> null
+                        }
+                    },
             )
         )
 
         categories.add(
             Category(
-                name = "Anime",
-                list = TMDb3.Discover.tv(
-                    withKeywords = TMDb3.Params.WithBuilder(TMDb3.Keyword.KeywordId.ANIME)
-                        .or(TMDb3.Keyword.KeywordId.BASED_ON_ANIME),
-                ).results.map { tv ->
-                    TvShow(
-                        id = tv.id.toString(),
-                        title = tv.name,
-                        overview = tv.overview,
-                        released = tv.firstAirDate,
-                        rating = tv.voteAverage.toDouble(),
-                        poster = tv.posterPath?.w500,
-                        banner = tv.backdropPath?.original,
-                    )
-                }
+                name = "Popular on Amazon",
+                list = listOf(
+                    TMDb3.Discover.movie(
+                        watchRegion = "US",
+                        withWatchProviders = TMDb3.Params.WithBuilder(TMDb3.Provider.WatchProviderId.AMAZON_VIDEO),
+                    ),
+                    TMDb3.Discover.tv(
+                        withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.AMAZON),
+                    ),
+                ).flatMap { it.results }
+                    .sortedByDescending {
+                        when (it) {
+                            is TMDb3.Movie -> it.popularity
+                            is TMDb3.Person -> it.popularity
+                            is TMDb3.Tv -> it.popularity
+                        }
+                    }
+                    .mapNotNull { multi ->
+                        when (multi) {
+                            is TMDb3.Movie -> Movie(
+                                id = multi.id.toString(),
+                                title = multi.title,
+                                overview = multi.overview,
+                                released = multi.releaseDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            is TMDb3.Tv -> TvShow(
+                                id = multi.id.toString(),
+                                title = multi.name,
+                                overview = multi.overview,
+                                released = multi.firstAirDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            else -> null
+                        }
+                    },
             )
         )
 
         categories.add(
             Category(
-                name = "Anime Movies",
-                list = TMDb3.Discover.movie(
-                    withKeywords = TMDb3.Params.WithBuilder(TMDb3.Keyword.KeywordId.ANIME)
-                        .or(TMDb3.Keyword.KeywordId.BASED_ON_ANIME),
-                ).results.map { movie ->
-                    Movie(
-                        id = movie.id.toString(),
-                        title = movie.title,
-                        overview = movie.overview,
-                        released = movie.releaseDate,
-                        rating = movie.voteAverage.toDouble(),
-                        poster = movie.posterPath?.w500,
-                        banner = movie.backdropPath?.original,
-                    )
-                }
+                name = "Popular on Disney+",
+                list = listOf(
+                    TMDb3.Discover.movie(
+                        watchRegion = "US",
+                        withWatchProviders = TMDb3.Params.WithBuilder(TMDb3.Provider.WatchProviderId.DISNEY_PLUS),
+                    ),
+                    TMDb3.Discover.tv(
+                        withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.DISNEY_PLUS),
+                    ),
+                ).flatMap { it.results }
+                    .sortedByDescending {
+                        when (it) {
+                            is TMDb3.Movie -> it.popularity
+                            is TMDb3.Person -> it.popularity
+                            is TMDb3.Tv -> it.popularity
+                        }
+                    }
+                    .mapNotNull { multi ->
+                        when (multi) {
+                            is TMDb3.Movie -> Movie(
+                                id = multi.id.toString(),
+                                title = multi.title,
+                                overview = multi.overview,
+                                released = multi.releaseDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            is TMDb3.Tv -> TvShow(
+                                id = multi.id.toString(),
+                                title = multi.name,
+                                overview = multi.overview,
+                                released = multi.firstAirDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            else -> null
+                        }
+                    },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Popular on Hulu",
+                list = listOf(
+                    TMDb3.Discover.movie(
+                        watchRegion = "US",
+                        withWatchProviders = TMDb3.Params.WithBuilder(TMDb3.Provider.WatchProviderId.HULU),
+                    ),
+                    TMDb3.Discover.tv(
+                        withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.HULU),
+                    ),
+                ).flatMap { it.results }
+                    .sortedByDescending {
+                        when (it) {
+                            is TMDb3.Movie -> it.popularity
+                            is TMDb3.Person -> it.popularity
+                            is TMDb3.Tv -> it.popularity
+                        }
+                    }
+                    .mapNotNull { multi ->
+                        when (multi) {
+                            is TMDb3.Movie -> Movie(
+                                id = multi.id.toString(),
+                                title = multi.title,
+                                overview = multi.overview,
+                                released = multi.releaseDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            is TMDb3.Tv -> TvShow(
+                                id = multi.id.toString(),
+                                title = multi.name,
+                                overview = multi.overview,
+                                released = multi.firstAirDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            else -> null
+                        }
+                    },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Popular on Apple TV+",
+                list = listOf(
+                    TMDb3.Discover.movie(
+                        watchRegion = "US",
+                        withWatchProviders = TMDb3.Params.WithBuilder(TMDb3.Provider.WatchProviderId.APPLE_TV_PLUS),
+                    ),
+                    TMDb3.Discover.tv(
+                        withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.APPLE_TV),
+                    ),
+                ).flatMap { it.results }
+                    .sortedByDescending {
+                        when (it) {
+                            is TMDb3.Movie -> it.popularity
+                            is TMDb3.Person -> it.popularity
+                            is TMDb3.Tv -> it.popularity
+                        }
+                    }
+                    .mapNotNull { multi ->
+                        when (multi) {
+                            is TMDb3.Movie -> Movie(
+                                id = multi.id.toString(),
+                                title = multi.title,
+                                overview = multi.overview,
+                                released = multi.releaseDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            is TMDb3.Tv -> TvShow(
+                                id = multi.id.toString(),
+                                title = multi.name,
+                                overview = multi.overview,
+                                released = multi.firstAirDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            else -> null
+                        }
+                    },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Popular on HBO",
+                list = listOf(
+                    TMDb3.Discover.movie(
+                        watchRegion = "US",
+                        withWatchProviders = TMDb3.Params.WithBuilder(TMDb3.Provider.WatchProviderId.HBO_MAX),
+                    ),
+                    TMDb3.Discover.tv(
+                        withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.HBO),
+                    ),
+                ).flatMap { it.results }
+                    .sortedByDescending {
+                        when (it) {
+                            is TMDb3.Movie -> it.popularity
+                            is TMDb3.Person -> it.popularity
+                            is TMDb3.Tv -> it.popularity
+                        }
+                    }
+                    .mapNotNull { multi ->
+                        when (multi) {
+                            is TMDb3.Movie -> Movie(
+                                id = multi.id.toString(),
+                                title = multi.title,
+                                overview = multi.overview,
+                                released = multi.releaseDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            is TMDb3.Tv -> TvShow(
+                                id = multi.id.toString(),
+                                title = multi.name,
+                                overview = multi.overview,
+                                released = multi.firstAirDate,
+                                rating = multi.voteAverage.toDouble(),
+                                poster = multi.posterPath?.w500,
+                                banner = multi.backdropPath?.original,
+                            )
+
+                            else -> null
+                        }
+                    },
             )
         )
 
