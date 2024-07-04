@@ -475,12 +475,15 @@ object TmdbProvider : Provider {
             val genres = listOf(
                 TMDb3.Genres.movieList(),
                 TMDb3.Genres.tvList(),
-            ).flatMap { it.genres }.map {
-                Genre(
-                    id = it.id.toString(),
-                    name = it.name,
-                )
-            }
+            ).flatMap { it.genres }
+                .distinctBy { it.id }
+                .sortedBy { it.name }
+                .map {
+                    Genre(
+                        id = it.id.toString(),
+                        name = it.name,
+                    )
+                }
 
             return genres
         }
