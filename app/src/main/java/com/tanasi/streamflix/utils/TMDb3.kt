@@ -1061,7 +1061,7 @@ object TMDb3 {
         val genres: List<Genre>,
     )
 
-    sealed class MultiItem(open val mediaType: MediaType) {
+    sealed class MultiItem {
 
         enum class MediaType {
             @SerializedName("movie")
@@ -1163,8 +1163,7 @@ object TMDb3 {
         @SerializedName("vote_count") val voteCount: Int,
         @SerializedName("video") val video: Boolean,
         @SerializedName("vote_average") val voteAverage: Float,
-        @SerializedName("media_type") override val mediaType: MediaType = MediaType.MOVIE,
-    ) : MultiItem(mediaType) {
+    ) : MultiItem() {
 
         enum class ReleaseType(val value: Int) {
             @SerializedName("1")
@@ -1272,8 +1271,7 @@ object TMDb3 {
         @SerializedName("vote_count") val voteCount: Int,
         @SerializedName("name") val name: String,
         @SerializedName("original_name") val originalName: String,
-        @SerializedName("media_type") override val mediaType: MediaType = MediaType.TV,
-    ) : MultiItem(mediaType) {
+    ) : MultiItem() {
 
         enum class Status(val value: String, val id: Int) {
             @SerializedName("Returning Series")
@@ -1444,8 +1442,7 @@ object TMDb3 {
         @SerializedName("name") val name: String,
         @SerializedName("profile_path") val profilePath: String? = null,
         @SerializedName("popularity") val popularity: Float,
-        @SerializedName("media_type") override val mediaType: MediaType = MediaType.MOVIE,
-    ) : MultiItem(mediaType) {
+    ) : MultiItem() {
 
         enum class Gender(val value: Int) {
             @SerializedName("0")
