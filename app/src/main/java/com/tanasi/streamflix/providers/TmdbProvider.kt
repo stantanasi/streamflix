@@ -32,10 +32,10 @@ object TmdbProvider : Provider {
             Category(
                 name = Category.FEATURED,
                 list = trending.results.safeSubList(0, 5).mapNotNull { multi ->
-                    when (multi.mediaType) {
-                        TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                    when (multi) {
+                        is TMDb3.Movie -> Movie(
                             id = multi.id.toString(),
-                            title = multi.title ?: "",
+                            title = multi.title,
                             overview = multi.overview,
                             released = multi.releaseDate,
                             rating = multi.voteAverage.toDouble(),
@@ -43,9 +43,9 @@ object TmdbProvider : Provider {
                             banner = multi.backdropPath?.original,
                         )
 
-                        TMDb3.MultiItem.MediaType.TV -> TvShow(
+                        is TMDb3.Tv -> TvShow(
                             id = multi.id.toString(),
-                            title = multi.name ?: "",
+                            title = multi.name,
                             overview = multi.overview,
                             released = multi.firstAirDate,
                             rating = multi.voteAverage.toDouble(),
@@ -63,10 +63,10 @@ object TmdbProvider : Provider {
             Category(
                 name = "Trending",
                 list = trending.results.safeSubList(5, trending.results.size).mapNotNull { multi ->
-                    when (multi.mediaType) {
-                        TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                    when (multi) {
+                        is TMDb3.Movie -> Movie(
                             id = multi.id.toString(),
-                            title = multi.title ?: "",
+                            title = multi.title,
                             overview = multi.overview,
                             released = multi.releaseDate,
                             rating = multi.voteAverage.toDouble(),
@@ -74,9 +74,9 @@ object TmdbProvider : Provider {
                             banner = multi.backdropPath?.original,
                         )
 
-                        TMDb3.MultiItem.MediaType.TV -> TvShow(
+                        is TMDb3.Tv -> TvShow(
                             id = multi.id.toString(),
-                            title = multi.name ?: "",
+                            title = multi.name,
                             overview = multi.overview,
                             released = multi.firstAirDate,
                             rating = multi.voteAverage.toDouble(),
@@ -455,10 +455,10 @@ object TmdbProvider : Provider {
         }
 
         val results = TMDb3.Search.multi(query, page = page).results.mapNotNull { multi ->
-            when (multi.mediaType) {
-                TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+            when (multi) {
+                is TMDb3.Movie -> Movie(
                     id = multi.id.toString(),
-                    title = multi.title ?: "",
+                    title = multi.title,
                     overview = multi.overview,
                     released = multi.releaseDate,
                     rating = multi.voteAverage.toDouble(),
@@ -466,9 +466,9 @@ object TmdbProvider : Provider {
                     banner = multi.backdropPath?.original,
                 )
 
-                TMDb3.MultiItem.MediaType.TV -> TvShow(
+                is TMDb3.Tv -> TvShow(
                     id = multi.id.toString(),
-                    title = multi.name ?: "",
+                    title = multi.name,
                     overview = multi.overview,
                     released = multi.firstAirDate,
                     rating = multi.voteAverage.toDouble(),
@@ -552,10 +552,10 @@ object TmdbProvider : Provider {
                     )
                 } ?: listOf(),
                 recommendations = movie.recommendations?.results?.mapNotNull { multi ->
-                    when (multi.mediaType) {
-                        TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                    when (multi) {
+                        is TMDb3.Movie -> Movie(
                             id = multi.id.toString(),
-                            title = multi.title ?: "",
+                            title = multi.title,
                             overview = multi.overview,
                             released = multi.releaseDate,
                             rating = multi.voteAverage.toDouble(),
@@ -563,9 +563,9 @@ object TmdbProvider : Provider {
                             banner = multi.backdropPath?.original,
                         )
 
-                        TMDb3.MultiItem.MediaType.TV -> TvShow(
+                        is TMDb3.Tv -> TvShow(
                             id = multi.id.toString(),
-                            title = multi.name ?: "",
+                            title = multi.name,
                             overview = multi.overview,
                             released = multi.firstAirDate,
                             rating = multi.voteAverage.toDouble(),
@@ -626,10 +626,10 @@ object TmdbProvider : Provider {
                     )
                 } ?: listOf(),
                 recommendations = tv.recommendations?.results?.mapNotNull { multi ->
-                    when (multi.mediaType) {
-                        TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                    when (multi) {
+                        is TMDb3.Movie -> Movie(
                             id = multi.id.toString(),
-                            title = multi.title ?: "",
+                            title = multi.title,
                             overview = multi.overview,
                             released = multi.releaseDate,
                             rating = multi.voteAverage.toDouble(),
@@ -637,9 +637,9 @@ object TmdbProvider : Provider {
                             banner = multi.backdropPath?.original,
                         )
 
-                        TMDb3.MultiItem.MediaType.TV -> TvShow(
+                        is TMDb3.Tv -> TvShow(
                             id = multi.id.toString(),
-                            title = multi.name ?: "",
+                            title = multi.name,
                             overview = multi.overview,
                             released = multi.firstAirDate,
                             rating = multi.voteAverage.toDouble(),
@@ -740,10 +740,10 @@ object TmdbProvider : Provider {
 
                 filmography = person.combinedCredits?.cast
                     ?.mapNotNull { multi ->
-                        when (multi.mediaType) {
-                            TMDb3.MultiItem.MediaType.MOVIE -> Movie(
+                        when (multi) {
+                            is TMDb3.Movie -> Movie(
                                 id = multi.id.toString(),
-                                title = multi.title ?: "",
+                                title = multi.title,
                                 overview = multi.overview,
                                 released = multi.releaseDate,
                                 rating = multi.voteAverage.toDouble(),
@@ -751,9 +751,9 @@ object TmdbProvider : Provider {
                                 banner = multi.backdropPath?.original,
                             )
 
-                            TMDb3.MultiItem.MediaType.TV -> TvShow(
+                            is TMDb3.Tv -> TvShow(
                                 id = multi.id.toString(),
-                                title = multi.name ?: "",
+                                title = multi.name,
                                 overview = multi.overview,
                                 released = multi.firstAirDate,
                                 rating = multi.voteAverage.toDouble(),

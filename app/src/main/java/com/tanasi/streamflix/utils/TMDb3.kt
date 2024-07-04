@@ -1,5 +1,11 @@
 package com.tanasi.streamflix.utils
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonDeserializer
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
 import com.tanasi.streamflix.BuildConfig
 import okhttp3.OkHttpClient
@@ -9,6 +15,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.QueryMap
+import java.lang.reflect.Type
 import java.util.Calendar
 
 object TMDb3 {
@@ -929,7 +936,16 @@ object TMDb3 {
                 val retrofit = Retrofit.Builder()
                     .baseUrl(URL)
                     .client(client)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(
+                        GsonConverterFactory.create(
+                            GsonBuilder()
+                                .registerTypeAdapter(
+                                    MultiItem::class.java,
+                                    MultiItem.Deserializer()
+                                )
+                                .create()
+                        )
+                    )
                     .build()
 
                 return retrofit.create(ApiService::class.java)
@@ -1045,24 +1061,7 @@ object TMDb3 {
         val genres: List<Genre>,
     )
 
-    data class MultiItem(
-        @SerializedName("poster_path") val posterPath: String?,
-        @SerializedName("adult") val adult: Boolean = false,
-        @SerializedName("overview") val overview: String,
-        @SerializedName("genre_ids") val genresIds: List<Int>,
-        @SerializedName("id") val id: Int,
-        @SerializedName("original_language") val originalLanguage: String,
-        @SerializedName("title") val title: String? = null,
-        @SerializedName("backdrop_path") val backdropPath: String?,
-        @SerializedName("popularity") val popularity: Float,
-        @SerializedName("vote_count") val voteCount: Int,
-        @SerializedName("vote_average") val voteAverage: Float,
-        @SerializedName("name") val name: String? = null,
-        @SerializedName("media_type") val mediaType: MediaType,
-
-        @SerializedName("release_date") val releaseDate: String? = null,
-        @SerializedName("first_air_date") val firstAirDate: String? = null,
-    ) {
+    sealed class MultiItem(open val mediaType: MediaType) {
 
         enum class MediaType {
             @SerializedName("movie")
@@ -1073,6 +1072,23 @@ object TMDb3 {
 
             @SerializedName("tv")
             TV,
+        }
+
+        class Deserializer : JsonDeserializer<MultiItem> {
+            override fun deserialize(
+                json: JsonElement?,
+                typeOfT: Type?,
+                context: JsonDeserializationContext?
+            ): MultiItem? {
+                val jsonObject = json?.asJsonObject ?: JsonObject()
+
+                return when (jsonObject.get("media_type")?.asString ?: "") {
+                    "movie" -> Gson().fromJson(json, Movie::class.java)
+                    "person" -> Gson().fromJson(json, Person::class.java)
+                    "tv" -> Gson().fromJson(json, Tv::class.java)
+                    else -> null
+                }
+            }
         }
     }
 
@@ -1147,7 +1163,8 @@ object TMDb3 {
         @SerializedName("vote_count") val voteCount: Int,
         @SerializedName("video") val video: Boolean,
         @SerializedName("vote_average") val voteAverage: Float,
-    ) {
+        @SerializedName("media_type") override val mediaType: MediaType = MediaType.MOVIE,
+    ) : MultiItem(mediaType) {
 
         enum class ReleaseType(val value: Int) {
             @SerializedName("1")
@@ -1255,7 +1272,8 @@ object TMDb3 {
         @SerializedName("vote_count") val voteCount: Int,
         @SerializedName("name") val name: String,
         @SerializedName("original_name") val originalName: String,
-    ) {
+        @SerializedName("media_type") override val mediaType: MediaType = MediaType.TV,
+    ) : MultiItem(mediaType) {
 
         enum class Status(val value: String, val id: Int) {
             @SerializedName("Returning Series")
@@ -1425,8 +1443,9 @@ object TMDb3 {
         @SerializedName("known_for_department") val knownForDepartment: Department? = null,
         @SerializedName("name") val name: String,
         @SerializedName("profile_path") val profilePath: String? = null,
-        @SerializedName("popularity") val popularity: Float
-    ) {
+        @SerializedName("popularity") val popularity: Float,
+        @SerializedName("media_type") override val mediaType: MediaType = MediaType.MOVIE,
+    ) : MultiItem(mediaType) {
 
         enum class Gender(val value: Int) {
             @SerializedName("0")
