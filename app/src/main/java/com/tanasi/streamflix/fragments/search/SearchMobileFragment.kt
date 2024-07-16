@@ -99,7 +99,11 @@ class SearchMobileFragment : Fragment() {
         binding.etSearch.apply {
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
-                    EditorInfo.IME_ACTION_SEARCH -> {
+                    EditorInfo.IME_ACTION_GO,
+                    EditorInfo.IME_ACTION_SEARCH,
+                    EditorInfo.IME_ACTION_SEND,
+                    EditorInfo.IME_ACTION_NEXT,
+                    EditorInfo.IME_ACTION_DONE -> {
                         viewModel.search(text.toString())
                         hideKeyboard()
                         true
