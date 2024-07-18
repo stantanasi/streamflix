@@ -44,6 +44,7 @@ import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.coroutines.launch
+import okhttp3.internal.userAgent
 import java.util.Calendar
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -100,6 +101,7 @@ class PlayerMobileFragment : Fragment() {
                         }
                         viewModel.getVideo(state.servers.first())
                     }
+
                     is PlayerViewModel.State.FailedLoadingServers -> {
                         Toast.makeText(
                             requireContext(),
@@ -121,9 +123,11 @@ class PlayerMobileFragment : Fragment() {
                                 .build()
                         )
                     }
+
                     is PlayerViewModel.State.SuccessLoadingVideo -> {
                         displayVideo(state.video, state.server)
                     }
+
                     is PlayerViewModel.State.FailedLoadingVideo -> {
                         Toast.makeText(
                             requireContext(),
@@ -209,9 +213,12 @@ class PlayerMobileFragment : Fragment() {
     private fun displayVideo(video: Video, server: Video.Server) {
         val currentPosition = player.currentPosition
 
-        dataSourceFactory.setDefaultRequestProperties(mapOf(
-            "Referer" to video.referer,
-        ).filterNotNullValues())
+        dataSourceFactory.setDefaultRequestProperties(
+            mapOf(
+                "Referer" to video.referer,
+                "User-Agent" to userAgent,
+            ).filterNotNullValues()
+        )
 
         player.setMediaItem(
             MediaItem.Builder()
@@ -250,6 +257,7 @@ class PlayerMobileFragment : Fragment() {
                                 durationMillis = player.duration,
                             )
                         }
+
                         player.hasFinished() -> {
                             watchItem?.isWatched = true
                             watchItem?.watchedDate = Calendar.getInstance()
@@ -261,6 +269,7 @@ class PlayerMobileFragment : Fragment() {
                         is Video.Type.Movie -> {
                             database.movieDao().update(watchItem as Movie)
                         }
+
                         is Video.Type.Episode -> {
                             if (player.hasFinished()) {
                                 database.episodeDao().resetProgressionFromEpisode(videoType.id)
