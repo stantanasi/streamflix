@@ -21,6 +21,7 @@ abstract class Extractor {
             VidozaExtractor(),
             VidsrcToExtractor(),
             VidplayExtractor(),
+            FilemoonExtractor(),
             VidplayExtractor.MyCloud(),
             VidplayExtractor.VidplayOnline(),
         )

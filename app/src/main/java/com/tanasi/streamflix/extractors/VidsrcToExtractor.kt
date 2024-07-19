@@ -53,7 +53,10 @@ class VidsrcToExtractor : Extractor() {
                 "F2Cloud",
                 "Vidplay" -> VidplayExtractor.Any(finalUrl.substringBefore("/e/"))
                     .extract(finalUrl)
-//                    "Filemoon" -> FileMoon().getUrl(finalUrl, referer, subtitleCallback, callback)
+
+                "Filemoon" -> FilemoonExtractor.Any(finalUrl.substringBefore("/e/"))
+                    .extract(finalUrl)
+
                 else -> Extractor.extract(finalUrl)
             }
         }
