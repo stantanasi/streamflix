@@ -425,8 +425,7 @@ object TmdbProvider : Provider {
                 name = "Popular on HBO",
                 list = listOf(
                     TMDb3.Discover.movie(
-                        watchRegion = "US",
-                        withWatchProviders = TMDb3.Params.WithBuilder(TMDb3.Provider.WatchProviderId.HBO_MAX),
+                        withCompanies = TMDb3.Params.WithBuilder(TMDb3.Company.CompanyId.HBO_FILMS),
                     ),
                     TMDb3.Discover.tv(
                         withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.HBO),

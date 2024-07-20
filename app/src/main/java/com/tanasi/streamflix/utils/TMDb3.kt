@@ -1677,7 +1677,8 @@ object TMDb3 {
             TRISTAR_PICTURES(559),
             UNIVERSAL(33),
             WALT_DISNEY_PICTURES(2),
-            WARNER_BROS_PICTURES(174);
+            WARNER_BROS_PICTURES(174),
+            HBO_FILMS(7429);
 
             override fun toString() = id.toString()
         }
