@@ -2,6 +2,7 @@ package com.tanasi.streamflix.providers
 
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
+import com.tanasi.streamflix.extractors.MyFileStorageExtractor
 import com.tanasi.streamflix.extractors.VidsrcToExtractor
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
@@ -795,6 +796,7 @@ object TmdbProvider : Provider {
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         val servers = listOf(
             VidsrcToExtractor().server(videoType),
+            MyFileStorageExtractor().nowTvServer(videoType),
         )
 
         return servers

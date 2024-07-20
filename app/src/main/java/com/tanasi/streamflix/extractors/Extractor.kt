@@ -24,6 +24,7 @@ abstract class Extractor {
             FilemoonExtractor(),
             VidplayExtractor.MyCloud(),
             VidplayExtractor.VidplayOnline(),
+            MyFileStorageExtractor(),
         )
 
         suspend fun extract(link: String): Video {
