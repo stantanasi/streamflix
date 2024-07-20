@@ -424,44 +424,25 @@ object TmdbProvider : Provider {
             Category(
                 name = "Popular on HBO",
                 list = listOf(
-                    TMDb3.Discover.movie(
-                        withCompanies = TMDb3.Params.WithBuilder(TMDb3.Company.CompanyId.HBO_FILMS),
+                    TMDb3.Discover.tv(
+                        withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.HBO),
+                        page = 1,
                     ),
                     TMDb3.Discover.tv(
                         withNetworks = TMDb3.Params.WithBuilder(TMDb3.Network.NetworkId.HBO),
+                        page = 2,
                     ),
                 ).flatMap { it.results }
-                    .sortedByDescending {
-                        when (it) {
-                            is TMDb3.Movie -> it.popularity
-                            is TMDb3.Person -> it.popularity
-                            is TMDb3.Tv -> it.popularity
-                        }
-                    }
-                    .mapNotNull { multi ->
-                        when (multi) {
-                            is TMDb3.Movie -> Movie(
-                                id = multi.id.toString(),
-                                title = multi.title,
-                                overview = multi.overview,
-                                released = multi.releaseDate,
-                                rating = multi.voteAverage.toDouble(),
-                                poster = multi.posterPath?.w500,
-                                banner = multi.backdropPath?.original,
-                            )
-
-                            is TMDb3.Tv -> TvShow(
-                                id = multi.id.toString(),
-                                title = multi.name,
-                                overview = multi.overview,
-                                released = multi.firstAirDate,
-                                rating = multi.voteAverage.toDouble(),
-                                poster = multi.posterPath?.w500,
-                                banner = multi.backdropPath?.original,
-                            )
-
-                            else -> null
-                        }
+                    .map { tv ->
+                        TvShow(
+                            id = tv.id.toString(),
+                            title = tv.name,
+                            overview = tv.overview,
+                            released = tv.firstAirDate,
+                            rating = tv.voteAverage.toDouble(),
+                            poster = tv.posterPath?.w500,
+                            banner = tv.backdropPath?.original,
+                        )
                     },
             )
         )
