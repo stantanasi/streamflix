@@ -2,6 +2,7 @@ package com.tanasi.streamflix.providers
 
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
+import com.tanasi.streamflix.extractors.MoflixExtractor
 import com.tanasi.streamflix.extractors.MyFileStorageExtractor
 import com.tanasi.streamflix.extractors.VidsrcToExtractor
 import com.tanasi.streamflix.models.Category
@@ -797,6 +798,7 @@ object TmdbProvider : Provider {
         val servers = listOf(
             VidsrcToExtractor().server(videoType),
             MyFileStorageExtractor().nowTvServer(videoType),
+            MoflixExtractor().server(videoType),
         )
 
         return servers

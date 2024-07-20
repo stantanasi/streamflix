@@ -25,6 +25,7 @@ abstract class Extractor {
             VidplayExtractor.MyCloud(),
             VidplayExtractor.VidplayOnline(),
             MyFileStorageExtractor(),
+            MoflixExtractor(),
         )
 
         suspend fun extract(link: String): Video {
