@@ -131,7 +131,7 @@ class PlayerMobileFragment : Fragment() {
                     is PlayerViewModel.State.FailedLoadingVideo -> {
                         Toast.makeText(
                             requireContext(),
-                            state.error.message ?: "",
+                            "${state.server.name}: ${state.error.message}",
                             Toast.LENGTH_LONG
                         ).show()
                         servers.getOrNull(servers.indexOf(state.server) + 1)?.let {
