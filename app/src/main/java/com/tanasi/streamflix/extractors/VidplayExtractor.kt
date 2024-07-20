@@ -25,7 +25,7 @@ open class VidplayExtractor : Extractor() {
         val id = link.substringBefore("?").substringAfterLast("/")
         val encodeId = encodeId(id, service.getKeys(key))
         val mediaUrl = callFutoken(encodeId, link, service.getFutoken(link))
-            ?: throw Exception("Media URL null")
+            ?: throw Exception("Media URL is null")
         val response = service.getSources(mediaUrl, link)
 
         val video = Video(

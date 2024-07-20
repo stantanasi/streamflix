@@ -47,13 +47,13 @@ class MoflixExtractor : Extractor() {
         val res = service.getResponse(link, referer = mainUrl)
         
         val frames = (res.episode ?: res.title)?.videos?.filter { it.category.equals("full", true) }
-            ?: throw Exception("No source found")
+            ?: throw Exception("No frames found")
         
         val video = retry(frames.size) { attempt ->
             val iframe = frames[attempt - 1]
 
             val response = service.get(
-                iframe.src ?: throw Exception("Moflix: src is null"),
+                iframe.src ?: throw Exception("src is null"),
                 referer = mainUrl
             )
             val host = URI(iframe.src).let { "${it.scheme}://${it.host}" }
@@ -67,16 +67,16 @@ class MoflixExtractor : Extractor() {
             }
 
             val m3u8 = Regex("file:\\s*\"(.*?m3u8.*?)\"").find(
-                script ?: throw Exception("Moflix: Script is null")
+                script ?: throw Exception("Script is null")
             )?.groupValues?.getOrNull(1)
-                ?: throw Exception("Moflix: Can't find m3u8")
+                ?: throw Exception("Can't find m3u8")
 
             suspend fun String.haveDub(referer: String) : Boolean {
                 return service.get(this, referer=referer).text().contains("TYPE=AUDIO")
             }
 
             if (!m3u8.haveDub("$host/"))
-                throw Exception("Moflix: Video don't have dub")
+                throw Exception("Video don't have dub")
 
             Video(
                 m3u8,

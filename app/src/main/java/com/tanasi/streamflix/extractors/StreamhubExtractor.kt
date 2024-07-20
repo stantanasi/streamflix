@@ -20,10 +20,10 @@ class StreamhubExtractor : Extractor() {
 
         val packedJS = Regex("(eval\\(function\\(p,a,c,k,e,d\\)(.|\\n)*?)</script>")
             .find(source.toString())?.let { it.groupValues[1] }
-            ?: throw Exception("No sources found")
+            ?: throw Exception("Packed JS not found")
 
         val unPacked = JsUnpacker(packedJS).unpack()
-            ?: throw Exception("No sources found")
+            ?: throw Exception("Unpacked is null")
 
         val sources = Regex("src:\"(.*?)\"")
             .findAll(Regex("\\{sources:\\[(.*?)]")

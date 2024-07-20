@@ -10,6 +10,7 @@ import retrofit2.http.Url
 
 
 open class FilemoonExtractor : Extractor() {
+
     override val name = "Filemoon"
     override val mainUrl = "https://filemoon.site"
 
@@ -19,9 +20,9 @@ open class FilemoonExtractor : Extractor() {
         val source = service.getSource(linkJustParameter)
         val packedJS = Regex("(eval\\(function\\(p,a,c,k,e,d\\)(.|\\n)*?)</script>")
             .find(source.toString())?.let { it.groupValues[1] }
-            ?: throw Exception("No sources found")
+            ?: throw Exception("Packed JS not found")
         val unPacked = JsUnpacker(packedJS).unpack()
-            ?: throw Exception("No sources found")
+            ?: throw Exception("Unpacked is null")
 
         val sources = Regex("""file:"(.*?)"""")
             .findAll(

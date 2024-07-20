@@ -51,7 +51,7 @@ class MyFileStorageExtractor : Extractor() {
 
             if (!url.isSuccess()) {
                 url = link
-                if (!url.isSuccess()) throw Exception("404")
+                if (!url.isSuccess()) throw Exception("404 not found")
             }
         }
 

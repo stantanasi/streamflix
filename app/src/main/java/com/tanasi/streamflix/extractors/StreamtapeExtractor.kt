@@ -21,7 +21,7 @@ class StreamtapeExtractor : Extractor() {
         val source = service.getSource(linkJustParameter)
 
         val requestVideoParamters = source.html().split(linkVideoId)[10].split("').substring(")[0]
-        val finalVideoUrl = mainUrl + "/get_video?id=" + linkVideoId + requestVideoParamters
+        val finalVideoUrl = "$mainUrl/get_video?id=$linkVideoId$requestVideoParamters"
 
         val video = Video(
             source = finalVideoUrl,
