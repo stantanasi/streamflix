@@ -4,6 +4,7 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.extractors.MoflixExtractor
 import com.tanasi.streamflix.extractors.MyFileStorageExtractor
+import com.tanasi.streamflix.extractors.VidsrcNetExtractor
 import com.tanasi.streamflix.extractors.VidsrcToExtractor
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
@@ -799,6 +800,7 @@ object TmdbProvider : Provider {
             VidsrcToExtractor().server(videoType),
             MyFileStorageExtractor().nowTvServer(videoType),
             MoflixExtractor().server(videoType),
+            VidsrcNetExtractor().server(videoType),
         )
 
         return servers

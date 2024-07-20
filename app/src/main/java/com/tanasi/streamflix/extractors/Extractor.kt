@@ -26,14 +26,20 @@ abstract class Extractor {
             VidplayExtractor.VidplayOnline(),
             MyFileStorageExtractor(),
             MoflixExtractor(),
+            VidsrcNetExtractor(),
         )
 
         suspend fun extract(link: String): Video {
             val urlRegex = Regex("^(https?://)?(www\\.)?")
             val compareUrl = link.lowercase().replace(urlRegex, "")
+
             for (extractor in extractors) {
-                if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, "")) ||
-                    compareUrl.startsWith(
+                if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, ""))) {
+                    return extractor.extract(link)
+                }
+            }
+            for (extractor in extractors) {
+                if (compareUrl.startsWith(
                         extractor.mainUrl.replace(
                             Regex("^(https?://)?(www\\.)?(.*?)(\\.[a-z]+)"),
                             "$3"
