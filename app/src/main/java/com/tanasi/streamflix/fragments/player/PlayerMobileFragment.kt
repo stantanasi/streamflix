@@ -42,6 +42,7 @@ import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.filterNotNullValues
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
+import com.tanasi.streamflix.utils.toSubtitleMimeType
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.coroutines.launch
 import okhttp3.internal.userAgent
@@ -227,10 +228,10 @@ class PlayerMobileFragment : Fragment() {
         player.setMediaItem(
             MediaItem.Builder()
                 .setUri(Uri.parse(video.source))
-                .setSubtitleConfigurations(video.subtitles.map {
-                    MediaItem.SubtitleConfiguration.Builder(Uri.parse(it.file))
-                        .setMimeType(MimeTypes.TEXT_VTT)
-                        .setLabel(it.label)
+                .setSubtitleConfigurations(video.subtitles.map { subtitle ->
+                    MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitle.file))
+                        .setMimeType(subtitle.file.toSubtitleMimeType())
+                        .setLabel(subtitle.label)
                         .build()
                 })
                 .setMediaMetadata(

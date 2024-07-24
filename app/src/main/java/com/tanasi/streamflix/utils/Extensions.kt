@@ -17,6 +17,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.media3.common.Format
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.Tracks
 import androidx.navigation.fragment.NavHostFragment
 import com.tanasi.streamflix.R
@@ -246,4 +247,14 @@ inline fun <T1, T2, T3, T4, T5, T6, R> combine(
         args[4] as T5,
         args[5] as T6,
     )
+}
+
+
+fun String.toSubtitleMimeType(): String {
+    return when {
+        endsWith("vtt", true) -> MimeTypes.TEXT_VTT
+        endsWith("srt", true) -> MimeTypes.APPLICATION_SUBRIP
+        endsWith("xml", true) || endsWith("ttml", true) -> MimeTypes.APPLICATION_TTML
+        else -> MimeTypes.APPLICATION_SUBRIP
+    }
 }
