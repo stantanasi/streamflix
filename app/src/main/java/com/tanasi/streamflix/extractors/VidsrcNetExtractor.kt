@@ -55,31 +55,7 @@ class VidsrcNetExtractor : Extractor() {
 
         return Video(
             source = decrypt(encryptedSource),
-            subtitles = if (imdbId != null) {
-                listOf(
-                    OpenSubtitles.search(
-                        imdbId = imdbId.toString(),
-                        subLanguageId = "eng",
-                    ).sortedBy { it.subDownloadsCnt },
-                    OpenSubtitles.search(
-                        imdbId = imdbId.toString(),
-                        subLanguageId = "fre",
-                    ).sortedBy { it.subDownloadsCnt },
-                    OpenSubtitles.search(
-                        imdbId = imdbId.toString(),
-                        subLanguageId = "ger",
-                    ).sortedBy { it.subDownloadsCnt },
-                    OpenSubtitles.search(
-                        imdbId = imdbId.toString(),
-                        subLanguageId = "por",
-                    ).sortedBy { it.subDownloadsCnt },
-                ).flatten().map {
-                    Video.Subtitle(
-                        label = it.languageName ?: it.subFileName ?: "",
-                        file = "https://vidsrc.stream/sub/ops-${it.idSubtitleFile}.vtt",
-                    )
-                }
-            } else emptyList(),
+            subtitles = emptyList(),
             referer = iframedoc,
         )
     }
