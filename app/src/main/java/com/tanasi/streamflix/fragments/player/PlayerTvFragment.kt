@@ -16,7 +16,6 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaItem.SubtitleConfiguration
 import androidx.media3.common.MediaMetadata
-import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
@@ -144,6 +143,12 @@ class PlayerTvFragment : Fragment() {
                             viewModel.getVideo(it)
                         }
                     }
+
+                    PlayerViewModel.State.LoadingSubtitles -> {}
+                    is PlayerViewModel.State.SuccessLoadingSubtitles -> {
+                        binding.settings.openSubtitles = state.subtitles
+                    }
+                    is PlayerViewModel.State.FailedLoadingSubtitles -> {}
                 }
             }
         }
