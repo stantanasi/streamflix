@@ -57,10 +57,22 @@ class VidsrcNetExtractor : Extractor() {
             source = decrypt(encryptedSource),
             subtitles = if (imdbId != null) {
                 listOf(
-                    OpenSubtitles.search(imdbId, "eng").sortedBy { it.subDownloadsCnt },
-                    OpenSubtitles.search(imdbId, "fre").sortedBy { it.subDownloadsCnt },
-                    OpenSubtitles.search(imdbId, "ger").sortedBy { it.subDownloadsCnt },
-                    OpenSubtitles.search(imdbId, "por").sortedBy { it.subDownloadsCnt },
+                    OpenSubtitles.search(
+                        imdbId = imdbId.toString(),
+                        subLanguageId = "eng",
+                    ).sortedBy { it.subDownloadsCnt },
+                    OpenSubtitles.search(
+                        imdbId = imdbId.toString(),
+                        subLanguageId = "fre",
+                    ).sortedBy { it.subDownloadsCnt },
+                    OpenSubtitles.search(
+                        imdbId = imdbId.toString(),
+                        subLanguageId = "ger",
+                    ).sortedBy { it.subDownloadsCnt },
+                    OpenSubtitles.search(
+                        imdbId = imdbId.toString(),
+                        subLanguageId = "por",
+                    ).sortedBy { it.subDownloadsCnt },
                 ).flatten().map {
                     Video.Subtitle(
                         label = it.languageName ?: it.subFileName ?: "",
