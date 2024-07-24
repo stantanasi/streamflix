@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.utils
 
 import com.google.gson.annotations.SerializedName
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -28,8 +29,18 @@ object OpenSubtitles {
 
         companion object {
             fun build(): Service {
+                val client = OkHttpClient.Builder()
+                    .addInterceptor { chain ->
+                        val requestBuilder = chain.request().newBuilder()
+                            .addHeader("User-Agent", "TemporaryUserAgent")
+
+                        chain.proceed(requestBuilder.build())
+                    }
+                    .build()
+
                 val retrofit = Retrofit.Builder()
                     .baseUrl(URL)
+                    .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
