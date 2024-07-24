@@ -201,6 +201,10 @@ class PlayerMobileFragment : Fragment() {
             setStyle(UserPreferences.captionStyle)
         }
 
+        binding.pvPlayer.controller.btnExoBack.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
         binding.pvPlayer.controller.tvExoTitle.text = args.title
 
         binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
