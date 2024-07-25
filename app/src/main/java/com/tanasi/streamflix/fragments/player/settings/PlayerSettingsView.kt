@@ -3,9 +3,12 @@ package com.tanasi.streamflix.fragments.player.settings
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
+import android.net.Uri
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
@@ -22,6 +25,7 @@ import com.tanasi.streamflix.utils.getRgb
 import com.tanasi.streamflix.utils.mediaServerId
 import com.tanasi.streamflix.utils.mediaServers
 import com.tanasi.streamflix.utils.setAlpha
+import com.tanasi.streamflix.utils.setRgb
 import com.tanasi.streamflix.utils.trackFormats
 import kotlin.math.roundToInt
 
@@ -88,6 +92,217 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
         SPEED,
         SERVERS,
     }
+
+    protected var onQualitySelected: ((Settings.Quality) -> Unit) =
+        fun(quality) {
+            val player = player ?: return
+
+            when (quality) {
+                is Settings.Quality.Auto -> {
+                    player.trackSelectionParameters = player.trackSelectionParameters
+                        .buildUpon()
+                        .setMaxVideoBitrate(Int.MAX_VALUE)
+                        .setForceHighestSupportedBitrate(false)
+                        .build()
+                    UserPreferences.qualityHeight = null
+                }
+
+                is Settings.Quality.VideoTrackInformation -> {
+                    player.trackSelectionParameters = player.trackSelectionParameters
+                        .buildUpon()
+                        .setMaxVideoBitrate(quality.bitrate)
+                        .setForceHighestSupportedBitrate(true)
+                        .build()
+                    UserPreferences.qualityHeight = quality.height
+                }
+            }
+        }
+
+    protected var onSubtitleSelected: ((Settings.Subtitle) -> Unit) =
+        fun(subtitle) {
+            val player = player ?: return
+
+            when (subtitle) {
+                is Settings.Subtitle.None -> {
+                    player.trackSelectionParameters = player.trackSelectionParameters
+                        .buildUpon()
+                        .clearOverridesOfType(C.TRACK_TYPE_TEXT)
+                        .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
+                        .build()
+                    UserPreferences.subtitleName = null
+                }
+
+                is Settings.Subtitle.TextTrackInformation -> {
+                    player.trackSelectionParameters = player.trackSelectionParameters
+                        .buildUpon()
+                        .setOverrideForType(
+                            TrackSelectionOverride(
+                                subtitle.trackGroup.mediaTrackGroup,
+                                listOf(subtitle.trackIndex)
+                            )
+                        )
+                        .setTrackTypeDisabled(subtitle.trackGroup.type, false)
+                        .build()
+                    UserPreferences.subtitleName = subtitle.name
+                }
+
+                else -> {}
+            }
+        }
+
+    protected var onCaptionStyleChanged: ((CaptionStyleCompat) -> Unit) =
+        fun(captionStyle) {
+            val subtitleView = subtitleView ?: return
+
+            UserPreferences.captionStyle = captionStyle
+            subtitleView.setStyle(UserPreferences.captionStyle)
+        }
+
+    protected var onFontColorSelected: ((Settings.Subtitle.Style.FontColor) -> Unit) =
+        fun(fontColor) {
+            onCaptionStyleChanged.invoke(
+                CaptionStyleCompat(
+                    UserPreferences.captionStyle.foregroundColor.setRgb(fontColor.color),
+                    UserPreferences.captionStyle.backgroundColor,
+                    UserPreferences.captionStyle.windowColor,
+                    UserPreferences.captionStyle.edgeType,
+                    UserPreferences.captionStyle.edgeColor,
+                    null
+                )
+            )
+        }
+
+    protected var onTextSizeSelected: ((Settings.Subtitle.Style.TextSize) -> Unit) =
+        fun(textSize) {
+            val subtitleView = subtitleView ?: return
+
+            UserPreferences.captionTextSize = textSize.value
+            subtitleView.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
+        }
+
+    protected var onFontOpacitySelected: ((Settings.Subtitle.Style.FontOpacity) -> Unit) =
+        fun(fontOpacity) {
+            onCaptionStyleChanged.invoke(
+                CaptionStyleCompat(
+                    UserPreferences.captionStyle.foregroundColor.setAlpha(fontOpacity.alpha),
+                    UserPreferences.captionStyle.backgroundColor,
+                    UserPreferences.captionStyle.windowColor,
+                    UserPreferences.captionStyle.edgeType,
+                    UserPreferences.captionStyle.edgeColor,
+                    null
+                )
+            )
+        }
+
+    protected var onEdgeStyleSelected: ((Settings.Subtitle.Style.EdgeStyle) -> Unit) =
+        fun(edgeStyle) {
+            onCaptionStyleChanged.invoke(
+                CaptionStyleCompat(
+                    UserPreferences.captionStyle.foregroundColor,
+                    UserPreferences.captionStyle.backgroundColor,
+                    UserPreferences.captionStyle.windowColor,
+                    edgeStyle.type,
+                    UserPreferences.captionStyle.edgeColor,
+                    null
+                )
+            )
+        }
+
+    protected var onBackgroundColorSelected: ((Settings.Subtitle.Style.BackgroundColor) -> Unit) =
+        fun(backgroundColor) {
+            onCaptionStyleChanged.invoke(
+                CaptionStyleCompat(
+                    UserPreferences.captionStyle.foregroundColor,
+                    UserPreferences.captionStyle.backgroundColor.setRgb(backgroundColor.color),
+                    UserPreferences.captionStyle.windowColor,
+                    UserPreferences.captionStyle.edgeType,
+                    UserPreferences.captionStyle.edgeColor,
+                    null
+                )
+            )
+        }
+
+    protected var onBackgroundOpacitySelected: ((Settings.Subtitle.Style.BackgroundOpacity) -> Unit) =
+        fun(backgroundOpacity) {
+            onCaptionStyleChanged.invoke(
+                CaptionStyleCompat(
+                    UserPreferences.captionStyle.foregroundColor,
+                    UserPreferences.captionStyle.backgroundColor.setAlpha(backgroundOpacity.alpha),
+                    UserPreferences.captionStyle.windowColor,
+                    UserPreferences.captionStyle.edgeType,
+                    UserPreferences.captionStyle.edgeColor,
+                    null
+                )
+            )
+        }
+
+    protected var onWindowColorSelected: ((Settings.Subtitle.Style.WindowColor) -> Unit) =
+        fun(windowColor) {
+            onCaptionStyleChanged.invoke(
+                CaptionStyleCompat(
+                    UserPreferences.captionStyle.foregroundColor,
+                    UserPreferences.captionStyle.backgroundColor,
+                    UserPreferences.captionStyle.windowColor.setRgb(windowColor.color),
+                    UserPreferences.captionStyle.edgeType,
+                    UserPreferences.captionStyle.edgeColor,
+                    null
+                )
+            )
+        }
+
+    protected var onWindowOpacitySelected: ((Settings.Subtitle.Style.WindowOpacity) -> Unit) =
+        fun(windowOpacity) {
+            onCaptionStyleChanged.invoke(
+                CaptionStyleCompat(
+                    UserPreferences.captionStyle.foregroundColor,
+                    UserPreferences.captionStyle.backgroundColor,
+                    UserPreferences.captionStyle.windowColor.setAlpha(windowOpacity.alpha),
+                    UserPreferences.captionStyle.edgeType,
+                    UserPreferences.captionStyle.edgeColor,
+                    null
+                )
+            )
+        }
+
+    protected var onOpenSubtitleSelected: ((Settings.Subtitle.OpenSubtitles.Subtitle) -> Unit) =
+        fun(subtitle) {
+            val player = player ?: return
+
+            val openSubtitle = subtitle.subtitle
+            val currentPosition = player.currentPosition
+            val currentSubtitleConfigurations =
+                player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
+                    MediaItem.SubtitleConfiguration.Builder(it.uri)
+                        .setMimeType(it.mimeType)
+                        .setLabel(it.label)
+                        .setSelectionFlags(0)
+                        .build()
+                } ?: listOf()
+
+            player.setMediaItem(
+                MediaItem.Builder()
+                    .setUri(player.currentMediaItem?.localConfiguration?.uri)
+                    .setSubtitleConfigurations(
+                        currentSubtitleConfigurations
+                                + MediaItem.SubtitleConfiguration.Builder(Uri.parse("https://vidsrc.stream/sub/ops-${openSubtitle.idSubtitleFile}.vtt"))
+                            .setMimeType(MimeTypes.TEXT_VTT)
+                            .setLabel(openSubtitle.subFileName)
+                            .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                            .build()
+                    )
+                    .setMediaMetadata(player.mediaMetadata)
+                    .build()
+            )
+            player.seekTo(currentPosition)
+        }
+
+    protected var onSpeedSelected: ((Settings.Speed) -> Unit) =
+        fun(speed) {
+            val player = player ?: return
+
+            player.playbackParameters = player.playbackParameters
+                .withSpeed(speed.value)
+        }
 
     protected var onServerSelected: ((Settings.Server) -> Unit)? = null
     fun setOnServerSelectedListener(onServerSelected: (server: Settings.Server) -> Unit) {

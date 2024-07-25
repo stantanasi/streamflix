@@ -2,27 +2,17 @@ package com.tanasi.streamflix.fragments.player.settings
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.net.Uri
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
-import androidx.media3.common.TrackSelectionOverride
-import androidx.media3.ui.CaptionStyleCompat
-import androidx.media3.ui.SubtitleView
 import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingMobileBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsMobileBinding
-import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.margin
-import com.tanasi.streamflix.utils.setAlpha
-import com.tanasi.streamflix.utils.setRgb
 
 class PlayerSettingsMobileView @JvmOverloads constructor(
     context: Context,
@@ -165,9 +155,6 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun displaySettings(item: Item) {
-            val player = settingsView.player ?: return
-            val subtitleView = settingsView.subtitleView ?: return
-
             binding.root.apply {
                 when (item) {
                     Settings.Subtitle.Style,
@@ -187,26 +174,8 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                         }
 
                         is Settings.Quality -> {
-                            when (item) {
-                                is Settings.Quality.Auto -> {
-                                    player.trackSelectionParameters = player.trackSelectionParameters
-                                        .buildUpon()
-                                        .setMaxVideoBitrate(Int.MAX_VALUE)
-                                        .setForceHighestSupportedBitrate(false)
-                                        .build()
-                                    UserPreferences.qualityHeight = null
-                                    settingsView.hide()
-                                }
-                                is Settings.Quality.VideoTrackInformation -> {
-                                    player.trackSelectionParameters = player.trackSelectionParameters
-                                        .buildUpon()
-                                        .setMaxVideoBitrate(item.bitrate)
-                                        .setForceHighestSupportedBitrate(true)
-                                        .build()
-                                    UserPreferences.qualityHeight = item.height
-                                    settingsView.hide()
-                                }
-                            }
+                            settingsView.onQualitySelected.invoke(item)
+                            settingsView.hide()
                         }
 
                         is Settings.Subtitle -> {
@@ -214,27 +183,10 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                                 Settings.Subtitle.Style -> {
                                     settingsView.displaySettings(Setting.CAPTION_STYLE)
                                 }
-                                is Settings.Subtitle.None -> {
-                                    player.trackSelectionParameters = player.trackSelectionParameters
-                                        .buildUpon()
-                                        .clearOverridesOfType(C.TRACK_TYPE_TEXT)
-                                        .setIgnoredTextSelectionFlags(C.SELECTION_FLAG_FORCED.inv())
-                                        .build()
-                                    UserPreferences.subtitleName = null
-                                    settingsView.hide()
-                                }
+
+                                is Settings.Subtitle.None,
                                 is Settings.Subtitle.TextTrackInformation -> {
-                                    player.trackSelectionParameters = player.trackSelectionParameters
-                                        .buildUpon()
-                                        .setOverrideForType(
-                                            TrackSelectionOverride(
-                                                item.trackGroup.mediaTrackGroup,
-                                                listOf(item.trackIndex)
-                                            )
-                                        )
-                                        .setTrackTypeDisabled(item.trackGroup.type, false)
-                                        .build()
-                                    UserPreferences.subtitleName = item.name
+                                    settingsView.onSubtitleSelected.invoke(item)
                                     settingsView.hide()
                                 }
 
@@ -247,14 +199,8 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                         is Settings.Subtitle.Style -> {
                             when (item) {
                                 Settings.Subtitle.Style.ResetStyle -> {
-                                    UserPreferences.also {
-                                        it.captionTextSize = Settings.Subtitle.Style.TextSize.DEFAULT.value
-                                        it.captionStyle = Settings.Subtitle.Style.DEFAULT
-                                    }
-                                    subtitleView.also {
-                                        it.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
-                                        it.setStyle(UserPreferences.captionStyle)
-                                    }
+                                    settingsView.onTextSizeSelected.invoke(Settings.Subtitle.Style.TextSize.DEFAULT)
+                                    settingsView.onCaptionStyleChanged.invoke(Settings.Subtitle.Style.DEFAULT)
                                     settingsView.hide()
                                 }
                                 Settings.Subtitle.Style.FontColor -> {
@@ -285,132 +231,52 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                         }
 
                         is Settings.Subtitle.Style.FontColor -> {
-                            UserPreferences.captionStyle = CaptionStyleCompat(
-                                UserPreferences.captionStyle.foregroundColor.setRgb(item.color),
-                                UserPreferences.captionStyle.backgroundColor,
-                                UserPreferences.captionStyle.windowColor,
-                                UserPreferences.captionStyle.edgeType,
-                                UserPreferences.captionStyle.edgeColor,
-                                null
-                            )
-                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.onFontColorSelected.invoke(item)
                             settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.TextSize -> {
-                            UserPreferences.captionTextSize = item.value
-                            subtitleView.setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
+                            settingsView.onTextSizeSelected.invoke(item)
                             settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.FontOpacity -> {
-                            UserPreferences.captionStyle = CaptionStyleCompat(
-                                UserPreferences.captionStyle.foregroundColor.setAlpha(item.alpha),
-                                UserPreferences.captionStyle.backgroundColor,
-                                UserPreferences.captionStyle.windowColor,
-                                UserPreferences.captionStyle.edgeType,
-                                UserPreferences.captionStyle.edgeColor,
-                                null
-                            )
-                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.onFontOpacitySelected.invoke(item)
                             settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.EdgeStyle -> {
-                            UserPreferences.captionStyle = CaptionStyleCompat(
-                                UserPreferences.captionStyle.foregroundColor,
-                                UserPreferences.captionStyle.backgroundColor,
-                                UserPreferences.captionStyle.windowColor,
-                                item.type,
-                                UserPreferences.captionStyle.edgeColor,
-                                null
-                            )
-                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.onEdgeStyleSelected.invoke(item)
                             settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.BackgroundColor -> {
-                            UserPreferences.captionStyle = CaptionStyleCompat(
-                                UserPreferences.captionStyle.foregroundColor,
-                                UserPreferences.captionStyle.backgroundColor.setRgb(item.color),
-                                UserPreferences.captionStyle.windowColor,
-                                UserPreferences.captionStyle.edgeType,
-                                UserPreferences.captionStyle.edgeColor,
-                                null
-                            )
-                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.onBackgroundColorSelected.invoke(item)
                             settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.BackgroundOpacity -> {
-                            UserPreferences.captionStyle = CaptionStyleCompat(
-                                UserPreferences.captionStyle.foregroundColor,
-                                UserPreferences.captionStyle.backgroundColor.setAlpha(item.alpha),
-                                UserPreferences.captionStyle.windowColor,
-                                UserPreferences.captionStyle.edgeType,
-                                UserPreferences.captionStyle.edgeColor,
-                                null
-                            )
-                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.onBackgroundOpacitySelected.invoke(item)
                             settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.WindowColor -> {
-                            UserPreferences.captionStyle = CaptionStyleCompat(
-                                UserPreferences.captionStyle.foregroundColor,
-                                UserPreferences.captionStyle.backgroundColor,
-                                UserPreferences.captionStyle.windowColor.setRgb(item.color),
-                                UserPreferences.captionStyle.edgeType,
-                                UserPreferences.captionStyle.edgeColor,
-                                null
-                            )
-                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.onWindowColorSelected.invoke(item)
                             settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.Style.WindowOpacity -> {
-                            UserPreferences.captionStyle = CaptionStyleCompat(
-                                UserPreferences.captionStyle.foregroundColor,
-                                UserPreferences.captionStyle.backgroundColor,
-                                UserPreferences.captionStyle.windowColor.setAlpha(item.alpha),
-                                UserPreferences.captionStyle.edgeType,
-                                UserPreferences.captionStyle.edgeColor,
-                                null
-                            )
-                            subtitleView.setStyle(UserPreferences.captionStyle)
+                            settingsView.onWindowOpacitySelected.invoke(item)
                             settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
                         is Settings.Subtitle.OpenSubtitles.Subtitle -> {
-                            val subtitle = item.subtitle
-                            val currentPosition = player.currentPosition
-                            val currentSubtitleConfigurations = player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
-                                MediaItem.SubtitleConfiguration.Builder(it.uri)
-                                    .setMimeType(it.mimeType)
-                                    .setLabel(it.label)
-                                    .setSelectionFlags(0)
-                                    .build()
-                            } ?: listOf()
-                            player.setMediaItem(
-                                MediaItem.Builder()
-                                    .setUri(player.currentMediaItem?.localConfiguration?.uri)
-                                    .setSubtitleConfigurations(currentSubtitleConfigurations
-                                            + MediaItem.SubtitleConfiguration.Builder(Uri.parse("https://vidsrc.stream/sub/ops-${subtitle.idSubtitleFile}.vtt"))
-                                        .setMimeType(MimeTypes.TEXT_VTT)
-                                        .setLabel(subtitle.subFileName)
-                                        .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                                        .build()
-                                    )
-                                    .setMediaMetadata(player.mediaMetadata)
-                                    .build()
-                            )
-                            player.seekTo(currentPosition)
+                            settingsView.onOpenSubtitleSelected.invoke(item)
                             settingsView.hide()
                         }
 
                         is Settings.Speed -> {
-                            player.playbackParameters = player.playbackParameters
-                                .withSpeed(item.value)
+                            settingsView.onSpeedSelected.invoke(item)
                             settingsView.hide()
                         }
 
