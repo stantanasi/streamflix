@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.OpenSubtitles
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -26,10 +27,15 @@ class PlayerViewModel(
         data class LoadingVideo(val server: Video.Server) : State()
         data class SuccessLoadingVideo(val video: Video, val server: Video.Server) : State()
         data class FailedLoadingVideo(val error: Exception, val server: Video.Server) : State()
+
+        data object LoadingSubtitles : State()
+        data class SuccessLoadingSubtitles(val subtitles: List<OpenSubtitles.Subtitle>) : State()
+        data class FailedLoadingSubtitles(val error: Exception) : State()
     }
 
     init {
         getServers(videoType, id)
+        getSubtitles(videoType)
     }
 
 
@@ -63,6 +69,29 @@ class PlayerViewModel(
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "getVideo: ", e)
             _state.emit(State.FailedLoadingVideo(e, server))
+        }
+    }
+
+    private fun getSubtitles(videoType: Video.Type) = viewModelScope.launch(Dispatchers.IO) {
+        _state.emit(State.LoadingSubtitles)
+
+        try {
+            val subtitles = when (videoType) {
+                is Video.Type.Episode -> OpenSubtitles.search(
+                    query = videoType.tvShow.title,
+                    season = videoType.season.number,
+                    episode = videoType.number,
+                )
+
+                is Video.Type.Movie -> OpenSubtitles.search(
+                    query = videoType.title
+                )
+            }.sortedWith(compareBy({ it.languageName }, { it.subDownloadsCnt }))
+
+            _state.emit(State.SuccessLoadingSubtitles(subtitles))
+        } catch (e: Exception) {
+            Log.e("PlayerViewModel", "getSubtitles: ", e)
+            _state.emit(State.FailedLoadingSubtitles(e))
         }
     }
 }

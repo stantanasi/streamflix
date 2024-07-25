@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Color
+import android.net.Uri
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +12,8 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.media3.common.C
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
@@ -22,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingTvBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsTvBinding
+import com.tanasi.streamflix.utils.OpenSubtitles
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.findClosest
@@ -79,6 +83,14 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             field = value
         }
     var subtitleView: SubtitleView? = null
+    var openSubtitles: List<OpenSubtitles.Subtitle> = listOf()
+        set(value) {
+            Settings.Subtitle.OpenSubtitles.list.clear()
+            Settings.Subtitle.OpenSubtitles.list.addAll(value.map {
+                Settings.Subtitle.OpenSubtitles.Subtitle(it)
+            })
+            field = value
+        }
 
     private var onServerSelected: ((Settings.Server) -> Unit)? = null
 
@@ -96,6 +108,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
     private val backgroundOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.BackgroundOpacity.list)
     private val windowColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowColor.list)
     private val windowOpacityAdapter = SettingsAdapter(this, Settings.Subtitle.Style.WindowOpacity.list)
+    private val openSubtitlesAdapter = SettingsAdapter(this, Settings.Subtitle.OpenSubtitles.list)
     private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
     private val serversAdapter = SettingsAdapter(this, Settings.Server.list)
 
@@ -115,6 +128,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             Setting.CAPTION_STYLE_BACKGROUND_OPACITY,
             Setting.CAPTION_STYLE_WINDOW_COLOR,
             Setting.CAPTION_STYLE_WINDOW_OPACITY -> displaySettings(Setting.CAPTION_STYLE)
+            Setting.OPEN_SUBTITLES -> displaySettings(Setting.SUBTITLES)
         }
         return true
     }
@@ -150,6 +164,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                 Setting.CAPTION_STYLE_BACKGROUND_OPACITY -> context.getString(R.string.player_settings_caption_style_background_opacity_title)
                 Setting.CAPTION_STYLE_WINDOW_COLOR -> context.getString(R.string.player_settings_caption_style_window_color_title)
                 Setting.CAPTION_STYLE_WINDOW_OPACITY -> context.getString(R.string.player_settings_caption_style_window_opacity_title)
+                Setting.OPEN_SUBTITLES -> context.getString(R.string.player_settings_open_subtitles_title)
                 Setting.SPEED -> context.getString(R.string.player_settings_speed_title)
                 Setting.SERVERS -> context.getString(R.string.player_settings_servers_title)
             }
@@ -168,6 +183,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             Setting.CAPTION_STYLE_BACKGROUND_OPACITY -> backgroundOpacityAdapter
             Setting.CAPTION_STYLE_WINDOW_COLOR -> windowColorAdapter
             Setting.CAPTION_STYLE_WINDOW_OPACITY -> windowOpacityAdapter
+            Setting.OPEN_SUBTITLES -> openSubtitlesAdapter
             Setting.SPEED -> speedAdapter
             Setting.SERVERS -> serversAdapter
         }
@@ -197,6 +213,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
         CAPTION_STYLE_BACKGROUND_OPACITY,
         CAPTION_STYLE_WINDOW_COLOR,
         CAPTION_STYLE_WINDOW_OPACITY,
+        OPEN_SUBTITLES,
         SPEED,
         SERVERS,
     }
@@ -237,7 +254,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                 when (item) {
                     Settings.Subtitle.Style,
                     Settings.Subtitle.Style.ResetStyle -> margin(bottom = 16.dp(context))
-                    else -> margin(bottom = 0)
+                    Settings.Subtitle.OpenSubtitles -> margin(top = 16.dp(context))
+                    else -> margin(bottom = 0, top = 0)
                 }
                 setOnClickListener {
                     when (item) {
@@ -300,6 +318,10 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                                         .build()
                                     UserPreferences.subtitleName = item.name
                                     settingsView.hide()
+                                }
+
+                                Settings.Subtitle.OpenSubtitles -> {
+                                    settingsView.displaySettings(Setting.OPEN_SUBTITLES)
                                 }
                             }
                         }
@@ -441,6 +463,33 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                             settingsView.displaySettings(Setting.CAPTION_STYLE)
                         }
 
+                        is Settings.Subtitle.OpenSubtitles.Subtitle -> {
+                            val subtitle = item.subtitle
+                            val currentPosition = player.currentPosition
+                            val currentSubtitleConfigurations = player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
+                                MediaItem.SubtitleConfiguration.Builder(it.uri)
+                                    .setMimeType(it.mimeType)
+                                    .setLabel(it.label)
+                                    .setSelectionFlags(0)
+                                    .build()
+                            } ?: listOf()
+                            player.setMediaItem(
+                                MediaItem.Builder()
+                                    .setUri(player.currentMediaItem?.localConfiguration?.uri)
+                                    .setSubtitleConfigurations(currentSubtitleConfigurations
+                                            + MediaItem.SubtitleConfiguration.Builder(Uri.parse("https://vidsrc.stream/sub/ops-${subtitle.idSubtitleFile}.vtt"))
+                                        .setMimeType(MimeTypes.TEXT_VTT)
+                                        .setLabel(subtitle.subFileName)
+                                        .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                                        .build()
+                                    )
+                                    .setMediaMetadata(player.mediaMetadata)
+                                    .build()
+                            )
+                            player.seekTo(currentPosition)
+                            settingsView.hide()
+                        }
+
                         is Settings.Speed -> {
                             player.playbackParameters = player.playbackParameters
                                 .withSpeed(item.value)
@@ -466,9 +515,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                                 ContextCompat.getDrawable(
                                     context,
                                     when (Settings.Subtitle.selected) {
-                                        Settings.Subtitle.Style,
-                                        is Settings.Subtitle.None -> R.drawable.ic_settings_subtitle_off
                                         is Settings.Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
+                                        else -> R.drawable.ic_settings_subtitle_off
                                     }
                                 )
                             )
@@ -549,6 +597,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_label)
                         is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
                         is Settings.Subtitle.TextTrackInformation -> item.name
+                        Settings.Subtitle.OpenSubtitles -> context.getString(R.string.player_settings_open_subtitles_label)
                     }
 
                     is Settings.Subtitle.Style -> when (item) {
@@ -579,6 +628,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
                     is Settings.Subtitle.Style.WindowOpacity -> context.getString(item.stringId)
 
+                    is Settings.Subtitle.OpenSubtitles.Subtitle -> item.subtitle.subFileName
+
                     is Settings.Speed -> context.getString(item.stringId)
 
                     is Settings.Server -> item.name
@@ -604,9 +655,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                             )
                         }
                         Settings.Subtitle -> when (val selected = Settings.Subtitle.selected) {
-                            Settings.Subtitle.Style,
-                            is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
                             is Settings.Subtitle.TextTrackInformation -> selected.name
+                            else -> context.getString(R.string.player_settings_subtitles_off)
                         }
                         Settings.Speed -> context.getString(Settings.Speed.selected.stringId)
                         Settings.Server -> Settings.Server.selected?.name ?: ""
@@ -629,6 +679,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         Settings.Subtitle.Style.WindowOpacity -> context.getString(Settings.Subtitle.Style.WindowOpacity.selected.stringId)
                     }
 
+                    is Settings.Subtitle.OpenSubtitles.Subtitle -> item.subtitle.languageName
+
                     else -> ""
                 }
                 visibility = when {
@@ -645,7 +697,6 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                     }
 
                     is Settings.Subtitle -> when (item) {
-                        Settings.Subtitle.Style -> View.GONE
                         is Settings.Subtitle.None -> when {
                             item.isSelected -> View.VISIBLE
                             else -> View.GONE
@@ -654,6 +705,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                             item.isSelected -> View.VISIBLE
                             else -> View.GONE
                         }
+                        else -> View.GONE
                     }
 
                     is Settings.Subtitle.Style.FontColor -> when {
@@ -718,6 +770,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         Settings.Subtitle.Style -> View.VISIBLE
                         is Settings.Subtitle.None -> View.GONE
                         is Settings.Subtitle.TextTrackInformation -> View.GONE
+                        Settings.Subtitle.OpenSubtitles -> View.VISIBLE
                     }
 
                     is Settings.Subtitle.Style -> when (item) {
@@ -854,6 +907,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                             }
                             .sortedBy { it.name }
                     )
+                    list.add(OpenSubtitles)
 
                     list.filterIsInstance<TextTrackInformation>()
                         .find { it.name == UserPreferences.subtitleName }
@@ -1243,6 +1297,17 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             ) : Subtitle() {
                 val isSelected: Boolean
                     get() = trackGroup.isTrackSelected(trackIndex)
+            }
+
+            sealed class OpenSubtitles : Item {
+
+                companion object : Settings.Subtitle() {
+                    val list = mutableListOf<Subtitle>()
+                }
+
+                class Subtitle(
+                    val subtitle: com.tanasi.streamflix.utils.OpenSubtitles.Subtitle
+                ) : OpenSubtitles()
             }
         }
 

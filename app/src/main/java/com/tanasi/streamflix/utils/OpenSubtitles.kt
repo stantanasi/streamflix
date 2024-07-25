@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.utils
 
 import com.google.gson.annotations.SerializedName
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -13,13 +14,35 @@ object OpenSubtitles {
     private val service = Service.build()
 
     suspend fun search(
-        imdbId: Int,
-        languageId: String,
+        imdbId: String? = null,
+        query: String? = null,
+        season: Int? = null,
+        episode: Int? = null,
+        subLanguageId: String? = null,
     ): List<Subtitle> {
-        return try {
-            service.search(imdbId, languageId)
-        } catch (_: Exception) {
-            emptyList()
+        val params = mapOf(
+            Params.Key.IMDB_ID to imdbId,
+            Params.Key.QUERY to query,
+            Params.Key.SEASON to season?.toString(),
+            Params.Key.EPISODE to episode?.toString(),
+            Params.Key.SUB_LANGUAGE_ID to subLanguageId,
+        )
+        return service.search(
+            params = params
+                .filterNotNullValues()
+                .map { "${it.key}-${it.value}" }
+                .joinToString("/")
+        )
+    }
+
+    object Params {
+
+        object Key {
+            const val IMDB_ID = "imdbid"
+            const val QUERY = "query"
+            const val EPISODE = "episode"
+            const val SEASON = "season"
+            const val SUB_LANGUAGE_ID = "sublanguageid"
         }
     }
 
@@ -28,8 +51,18 @@ object OpenSubtitles {
 
         companion object {
             fun build(): Service {
+                val client = OkHttpClient.Builder()
+                    .addInterceptor { chain ->
+                        val requestBuilder = chain.request().newBuilder()
+                            .addHeader("User-Agent", "TemporaryUserAgent")
+
+                        chain.proceed(requestBuilder.build())
+                    }
+                    .build()
+
                 val retrofit = Retrofit.Builder()
                     .baseUrl(URL)
+                    .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 
@@ -38,10 +71,9 @@ object OpenSubtitles {
         }
 
 
-        @GET("search/imdbid-{imdbId}/sublanguageid-{languageId}")
+        @GET("search/{params}")
         suspend fun search(
-            @Path("imdbId") imdbId: Int,
-            @Path("languageId") languageId: String,
+            @Path("params", encoded = true) params: String,
         ): List<Subtitle>
     }
 
