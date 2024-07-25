@@ -268,7 +268,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
         fun(subtitle) {
             val player = player ?: return
 
-            val openSubtitle = subtitle.subtitle
+            val openSubtitle = subtitle.openSubtitle
             val currentPosition = player.currentPosition
             val currentSubtitleConfigurations =
                 player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
@@ -839,7 +839,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                 }
 
                 class Subtitle(
-                    val subtitle: com.tanasi.streamflix.utils.OpenSubtitles.Subtitle
+                    val openSubtitle: com.tanasi.streamflix.utils.OpenSubtitles.Subtitle
                 ) : OpenSubtitles()
             }
         }

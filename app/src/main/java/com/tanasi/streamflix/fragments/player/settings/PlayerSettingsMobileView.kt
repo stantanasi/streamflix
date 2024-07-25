@@ -412,7 +412,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
 
                     is Settings.Subtitle.Style.WindowOpacity -> context.getString(item.stringId)
 
-                    is Settings.Subtitle.OpenSubtitles.Subtitle -> item.subtitle.subFileName
+                    is Settings.Subtitle.OpenSubtitles.Subtitle -> item.openSubtitle.subFileName
 
                     is Settings.Speed -> context.getString(item.stringId)
 
@@ -463,7 +463,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                         Settings.Subtitle.Style.WindowOpacity -> context.getString(Settings.Subtitle.Style.WindowOpacity.selected.stringId)
                     }
 
-                    is Settings.Subtitle.OpenSubtitles.Subtitle -> item.subtitle.languageName
+                    is Settings.Subtitle.OpenSubtitles.Subtitle -> item.openSubtitle.languageName
 
                     else -> ""
                 }
