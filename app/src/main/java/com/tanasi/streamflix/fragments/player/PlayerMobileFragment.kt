@@ -96,7 +96,7 @@ class PlayerMobileFragment : Fragment() {
                                 )
                             })
                             .build()
-                        binding.settings.setOnServerSelected { server ->
+                        binding.settings.setOnServerSelectedListener { server ->
                             viewModel.getVideo(state.servers.find { server.id == it.id }!!)
                         }
                         viewModel.getVideo(state.servers.first())
