@@ -79,6 +79,8 @@
     <string name="player_settings_quality_auto">Auto</string>
     <string name="player_settings_quality_auto_selected">Auto • %dp</string>
     <string name="player_settings_quality">%dp</string>
+    <string name="player_settings_audio_title">Audio</string>
+    <string name="player_settings_audio_label">Audio</string>
     <string name="player_settings_subtitles_title">Subtitles/closed captions</string>
     <string name="player_settings_subtitles_label">Captions</string>
     <string name="player_settings_subtitles_off">Off</string>

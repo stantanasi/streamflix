@@ -28,6 +28,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
     private val settingsAdapter = SettingsAdapter(this, Settings.list)
     private val qualityAdapter = SettingsAdapter(this, Settings.Quality.list)
+    private val audioAdapter = SettingsAdapter(this, Settings.Audio.list)
     private val subtitlesAdapter = SettingsAdapter(this, Settings.Subtitle.list)
     private val captionStyleAdapter = SettingsAdapter(this, Settings.Subtitle.Style.list)
     private val fontColorAdapter = SettingsAdapter(this, Settings.Subtitle.Style.FontColor.list)
@@ -46,6 +47,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
         when (currentSettings) {
             Setting.MAIN -> hide()
             Setting.QUALITY,
+            Setting.AUDIO,
             Setting.SUBTITLES,
             Setting.SPEED,
             Setting.SERVERS -> displaySettings(Setting.MAIN)
@@ -84,6 +86,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             text = when (setting) {
                 Setting.MAIN -> context.getString(R.string.player_settings_title)
                 Setting.QUALITY -> context.getString(R.string.player_settings_quality_title)
+                Setting.AUDIO -> context.getString(R.string.player_settings_audio_title)
                 Setting.SUBTITLES -> context.getString(R.string.player_settings_subtitles_title)
                 Setting.CAPTION_STYLE -> context.getString(R.string.player_settings_caption_style_title)
                 Setting.CAPTION_STYLE_FONT_COLOR -> context.getString(R.string.player_settings_caption_style_font_color_title)
@@ -103,6 +106,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
         binding.rvSettings.adapter = when (setting) {
             Setting.MAIN -> settingsAdapter
             Setting.QUALITY -> qualityAdapter
+            Setting.AUDIO -> audioAdapter
             Setting.SUBTITLES -> subtitlesAdapter
             Setting.CAPTION_STYLE -> captionStyleAdapter
             Setting.CAPTION_STYLE_FONT_COLOR -> fontColorAdapter
@@ -165,6 +169,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         is Settings -> {
                             when (item) {
                                 Settings.Quality -> settingsView.displaySettings(Setting.QUALITY)
+                                Settings.Audio -> settingsView.displaySettings(Setting.AUDIO)
                                 Settings.Subtitle -> settingsView.displaySettings(Setting.SUBTITLES)
                                 Settings.Speed -> settingsView.displaySettings(Setting.SPEED)
                                 Settings.Server -> settingsView.displaySettings(Setting.SERVERS)
@@ -173,6 +178,11 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
                         is Settings.Quality -> {
                             settingsView.onQualitySelected.invoke(item)
+                            settingsView.hide()
+                        }
+
+                        is Settings.Audio -> {
+                            settingsView.onAudioSelected.invoke(item)
                             settingsView.hide()
                         }
 
@@ -293,6 +303,9 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                             Settings.Quality -> setImageDrawable(
                                 ContextCompat.getDrawable(context, R.drawable.ic_settings_quality)
                             )
+                            Settings.Audio -> setImageDrawable(
+                                ContextCompat.getDrawable(context, R.drawable.ic_settings_audio)
+                            )
                             Settings.Subtitle -> setImageDrawable(
                                 ContextCompat.getDrawable(
                                     context,
@@ -352,9 +365,14 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                 text = when (item) {
                     is Settings -> when (item) {
                         Settings.Quality -> context.getString(R.string.player_settings_quality_label)
+                        Settings.Audio -> context.getString(R.string.player_settings_audio_label)
                         Settings.Subtitle -> context.getString(R.string.player_settings_subtitles_label)
                         Settings.Speed -> context.getString(R.string.player_settings_speed_label)
                         Settings.Server -> context.getString(R.string.player_settings_servers_label)
+                    }
+
+                    is Settings.Audio -> when (item) {
+                        is Settings.Audio.AudioTrackInformation -> item.name
                     }
 
                     is Settings.Quality -> when (item) {
@@ -436,6 +454,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                                 selected.height
                             )
                         }
+                        Settings.Audio -> Settings.Audio.selected?.name
                         Settings.Subtitle -> when (val selected = Settings.Subtitle.selected) {
                             is Settings.Subtitle.TextTrackInformation -> selected.name
                             else -> context.getString(R.string.player_settings_subtitles_off)
@@ -474,6 +493,11 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             binding.ivSettingIsSelected.apply {
                 visibility = when (item) {
                     is Settings.Quality -> when {
+                        item.isSelected -> View.VISIBLE
+                        else -> View.GONE
+                    }
+
+                    is Settings.Audio -> when {
                         item.isSelected -> View.VISIBLE
                         else -> View.GONE
                     }

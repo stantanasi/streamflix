@@ -42,6 +42,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
             value?.let {
                 Settings.Server.init(it)
                 Settings.Quality.init(it, resources)
+                Settings.Audio.init(it, resources)
                 Settings.Subtitle.init(it, resources)
                 Settings.Speed.refresh(it)
             }
@@ -56,6 +57,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                     }
                     if (events.contains(Player.EVENT_TRACKS_CHANGED)) {
                         Settings.Quality.init(value, resources)
+                        Settings.Audio.init(value, resources)
                         Settings.Subtitle.init(value, resources)
                     }
                     if (events.contains(Player.EVENT_PLAYBACK_PARAMETERS_CHANGED)) {
@@ -78,6 +80,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
     protected enum class Setting {
         MAIN,
         QUALITY,
+        AUDIO,
         SUBTITLES,
         CAPTION_STYLE,
         CAPTION_STYLE_FONT_COLOR,
@@ -116,6 +119,23 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                     UserPreferences.qualityHeight = quality.height
                 }
             }
+        }
+
+    protected var onAudioSelected: ((Settings.Audio) -> Unit) =
+        fun(audio) {
+            val player = player ?: return
+            if (audio !is Settings.Audio.AudioTrackInformation) return
+
+            player.trackSelectionParameters = player.trackSelectionParameters
+                .buildUpon()
+                .setOverrideForType(
+                    TrackSelectionOverride(
+                        audio.trackGroup.mediaTrackGroup,
+                        listOf(audio.trackIndex)
+                    )
+                )
+                .setTrackTypeDisabled(audio.trackGroup.type, false)
+                .build()
         }
 
     protected var onSubtitleSelected: ((Settings.Subtitle) -> Unit) =
@@ -317,6 +337,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
         companion object {
             val list = listOf(
                 Quality,
+                Audio,
                 Subtitle,
                 Speed,
                 Server,
@@ -393,6 +414,51 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                     get() = player.videoFormat?.let { it.bitrate == bitrate } ?: false
                 override val isSelected: Boolean
                     get() = player.trackSelectionParameters.maxVideoBitrate == bitrate
+            }
+        }
+
+        sealed class Audio : Item {
+
+            companion object : Settings() {
+                val list = mutableListOf<AudioTrackInformation>()
+
+                val selected: AudioTrackInformation?
+                    get() = list.find { it.isSelected }
+
+                fun init(player: ExoPlayer, resources: Resources) {
+                    list.clear()
+                    list.addAll(
+                        player.currentTracks.groups
+                            .filter { it.type == C.TRACK_TYPE_AUDIO }
+                            .flatMap { trackGroup ->
+                                trackGroup.trackFormats
+                                    .filter { it.selectionFlags and C.SELECTION_FLAG_FORCED == 0 }
+                                    .filter { it.label != null }
+                                    .mapIndexed { trackIndex, trackFormat ->
+                                        AudioTrackInformation(
+                                            name = DefaultTrackNameProvider(resources)
+                                                .getTrackName(trackFormat),
+
+                                            trackGroup = trackGroup,
+                                            trackIndex = trackIndex,
+                                        )
+                                    }
+                            }
+                            .sortedBy { it.name }
+                    )
+                }
+            }
+
+            abstract val isSelected: Boolean
+
+            class AudioTrackInformation(
+                val name: String,
+
+                val trackGroup: Tracks.Group,
+                val trackIndex: Int,
+            ) : Audio() {
+                override val isSelected: Boolean
+                    get() = trackGroup.isTrackSelected(trackIndex)
             }
         }
 
