@@ -27,10 +27,14 @@ class MoflixExtractor : Extractor() {
             src = when (videoType) {
                 is Video.Type.Episode -> {
                     val id = Base64.encode("tmdb|series|${videoType.tvShow.id}".toByteArray(), Base64.NO_WRAP).toString(Charsets.UTF_8)
-                    val mediaId = service.getResponse(
-                        "$mainUrl/api/v1/titles/$id?loader=titlePage",
-                        referer = mainUrl
-                    ).title?.id
+                    val mediaId = try {
+                        service.getResponse(
+                            "$mainUrl/api/v1/titles/$id?loader=titlePage",
+                            referer = mainUrl
+                        ).title?.id
+                    } catch (_: Exception) {
+                        id
+                    }
                     "$mainUrl/api/v1/titles/$mediaId/seasons/${videoType.season.number}/episodes/${videoType.number}?loader=episodePage"
                 }
                 is Video.Type.Movie -> {
