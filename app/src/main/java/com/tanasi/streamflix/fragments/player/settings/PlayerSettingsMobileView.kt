@@ -1,4 +1,4 @@
-package com.tanasi.streamflix.ui
+package com.tanasi.streamflix.fragments.player.settings
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -23,8 +23,8 @@ import androidx.media3.ui.DefaultTrackNameProvider
 import androidx.media3.ui.SubtitleView
 import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.databinding.ItemSettingTvBinding
-import com.tanasi.streamflix.databinding.ViewPlayerSettingsTvBinding
+import com.tanasi.streamflix.databinding.ItemSettingMobileBinding
+import com.tanasi.streamflix.databinding.ViewPlayerSettingsMobileBinding
 import com.tanasi.streamflix.utils.OpenSubtitles
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.dp
@@ -39,13 +39,13 @@ import com.tanasi.streamflix.utils.setRgb
 import com.tanasi.streamflix.utils.trackFormats
 import kotlin.math.roundToInt
 
-class PlayerSettingsTvView @JvmOverloads constructor(
+class PlayerSettingsMobileView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    val binding = ViewPlayerSettingsTvBinding.inflate(
+    val binding = ViewPlayerSettingsMobileBinding.inflate(
         LayoutInflater.from(context),
         this,
         true
@@ -112,27 +112,6 @@ class PlayerSettingsTvView @JvmOverloads constructor(
     private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
     private val serversAdapter = SettingsAdapter(this, Settings.Server.list)
 
-    fun onBackPressed(): Boolean {
-        when (currentSettings) {
-            Setting.MAIN -> hide()
-            Setting.QUALITY,
-            Setting.SUBTITLES,
-            Setting.SPEED,
-            Setting.SERVERS -> displaySettings(Setting.MAIN)
-            Setting.CAPTION_STYLE -> displaySettings(Setting.SUBTITLES)
-            Setting.CAPTION_STYLE_FONT_COLOR,
-            Setting.CAPTION_STYLE_TEXT_SIZE,
-            Setting.CAPTION_STYLE_FONT_OPACITY,
-            Setting.CAPTION_STYLE_EDGE_STYLE,
-            Setting.CAPTION_STYLE_BACKGROUND_COLOR,
-            Setting.CAPTION_STYLE_BACKGROUND_OPACITY,
-            Setting.CAPTION_STYLE_WINDOW_COLOR,
-            Setting.CAPTION_STYLE_WINDOW_OPACITY -> displaySettings(Setting.CAPTION_STYLE)
-            Setting.OPEN_SUBTITLES -> displaySettings(Setting.SUBTITLES)
-        }
-        return true
-    }
-
     override fun focusSearch(focused: View, direction: Int): View {
         return when {
             binding.rvSettings.hasFocus() -> focused
@@ -170,6 +149,37 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             }
         }
 
+        binding.btnSettingsBack.apply {
+            setOnClickListener {
+                when (setting) {
+                    Setting.MAIN -> hide()
+                    Setting.QUALITY,
+                    Setting.SUBTITLES,
+                    Setting.SPEED,
+                    Setting.SERVERS -> displaySettings(Setting.MAIN)
+                    Setting.CAPTION_STYLE -> displaySettings(Setting.SUBTITLES)
+                    Setting.CAPTION_STYLE_FONT_COLOR,
+                    Setting.CAPTION_STYLE_TEXT_SIZE,
+                    Setting.CAPTION_STYLE_FONT_OPACITY,
+                    Setting.CAPTION_STYLE_EDGE_STYLE,
+                    Setting.CAPTION_STYLE_BACKGROUND_COLOR,
+                    Setting.CAPTION_STYLE_BACKGROUND_OPACITY,
+                    Setting.CAPTION_STYLE_WINDOW_COLOR,
+                    Setting.CAPTION_STYLE_WINDOW_OPACITY -> displaySettings(Setting.CAPTION_STYLE)
+                    Setting.OPEN_SUBTITLES -> displaySettings(Setting.SUBTITLES)
+                }
+            }
+
+            visibility = when (setting) {
+                Setting.MAIN -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
+
+        binding.btnSettingsClose.setOnClickListener {
+            hide()
+        }
+
         binding.rvSettings.adapter = when (setting) {
             Setting.MAIN -> settingsAdapter
             Setting.QUALITY -> qualityAdapter
@@ -187,7 +197,6 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             Setting.SPEED -> speedAdapter
             Setting.SERVERS -> serversAdapter
         }
-        binding.rvSettings.requestFocus()
     }
 
     fun hide() {
@@ -220,14 +229,14 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
 
     private class SettingsAdapter(
-        private val settingsView: PlayerSettingsTvView,
+        private val settingsView: PlayerSettingsMobileView,
         private val items: List<Item>,
     ) : RecyclerView.Adapter<SettingViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             SettingViewHolder(
                 settingsView,
-                ItemSettingTvBinding.inflate(
+                ItemSettingMobileBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
@@ -242,8 +251,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
     }
 
     private class SettingViewHolder(
-        private val settingsView: PlayerSettingsTvView,
-        val binding: ItemSettingTvBinding,
+        private val settingsView: PlayerSettingsMobileView,
+        val binding: ItemSettingMobileBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun displaySettings(item: Item) {
@@ -253,8 +262,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             binding.root.apply {
                 when (item) {
                     Settings.Subtitle.Style,
-                    Settings.Subtitle.Style.ResetStyle -> margin(bottom = 16.dp(context))
-                    Settings.Subtitle.OpenSubtitles -> margin(top = 16.dp(context))
+                    Settings.Subtitle.Style.ResetStyle -> margin(bottom = 8.dp(context))
+                    Settings.Subtitle.OpenSubtitles -> margin(top = 8.dp(context))
                     else -> margin(bottom = 0, top = 0)
                 }
                 setOnClickListener {

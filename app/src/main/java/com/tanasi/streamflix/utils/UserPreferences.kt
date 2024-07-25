@@ -6,7 +6,7 @@ import androidx.media3.ui.CaptionStyleCompat
 import com.tanasi.streamflix.BuildConfig
 import com.tanasi.streamflix.providers.Provider
 import com.tanasi.streamflix.providers.Provider.Companion.providers
-import com.tanasi.streamflix.ui.PlayerSettingsTvView
+import com.tanasi.streamflix.fragments.player.settings.PlayerSettingsTvView
 
 object UserPreferences {
 
