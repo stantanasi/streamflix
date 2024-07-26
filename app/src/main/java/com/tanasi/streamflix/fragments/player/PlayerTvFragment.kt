@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.player
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -210,6 +211,14 @@ class PlayerTvFragment : Fragment() {
 
         binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
 
+        binding.pvPlayer.controller.btnExoExternalPlayer.setOnClickListener {
+            Toast.makeText(
+                requireContext(),
+                requireContext().getString(R.string.player_external_player_error_video),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
         binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10_000)
 
         binding.pvPlayer.controller.exoSettings.setOnClickListener {
@@ -243,6 +252,24 @@ class PlayerTvFragment : Fragment() {
                 )
                 .build()
         )
+
+        binding.pvPlayer.controller.btnExoExternalPlayer.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(Uri.parse(video.source), "video/*")
+
+                putExtra("title", when (val videoType = args.videoType as Video.Type) {
+                    is Video.Type.Movie -> videoType.title
+                    is Video.Type.Episode -> "${videoType.tvShow.title} • S${videoType.season.number} E${videoType.number}"
+                })
+                putExtra("position", currentPosition)
+            }
+            startActivity(
+                Intent.createChooser(
+                    intent,
+                    requireContext().getString(R.string.player_external_player_title)
+                )
+            )
+        }
 
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
