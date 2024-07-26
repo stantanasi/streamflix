@@ -248,7 +248,11 @@ class PlayerTvFragment : Fragment() {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 binding.pvPlayer.keepScreenOn = isPlaying
 
-                if (!isPlaying) {
+                val hasUri = player.currentMediaItem?.localConfiguration?.uri
+                    ?.toString()?.isNotEmpty()
+                    ?: false
+
+                if (!isPlaying && hasUri) {
                     val watchItem = when (val videoType = args.videoType as Video.Type) {
                         is Video.Type.Movie -> database.movieDao().getById(videoType.id)
                         is Video.Type.Episode -> database.episodeDao().getById(videoType.id)
