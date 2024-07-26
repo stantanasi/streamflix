@@ -90,10 +90,10 @@ class MainMobileActivity : FragmentActivity() {
                 when (state) {
                     MainViewModel.State.CheckingUpdate -> {}
                     is MainViewModel.State.SuccessCheckingUpdate -> {
-                        val asset = state.release?.assets
+                        val asset = state.newReleases.firstOrNull()?.assets
                             ?.find { it.contentType == "application/vnd.android.package-archive" }
                         if (asset != null) {
-                            updateAppDialog = UpdateAppMobileDialog(this@MainMobileActivity, state.release).also {
+                            updateAppDialog = UpdateAppMobileDialog(this@MainMobileActivity, state.newReleases).also {
                                 it.setOnUpdateClickListener { _ ->
                                     if (!it.isLoading) viewModel.downloadUpdate(this@MainMobileActivity, asset)
                                 }

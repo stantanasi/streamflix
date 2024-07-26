@@ -12,7 +12,7 @@ import com.tanasi.streamflix.utils.GitHub
 
 class UpdateAppTvDialog(
     context: Context,
-    release: GitHub.Release
+    newReleases: List<GitHub.Release>,
 ) : Dialog(context) {
 
     private val binding = DialogUpdateAppTvBinding.inflate(LayoutInflater.from(context))
@@ -31,12 +31,14 @@ class UpdateAppTvDialog(
 
         binding.tvUpdateCurrentVersion.text = BuildConfig.VERSION_NAME
 
-        binding.tvUpdateNewVersion.text = release.tagName.substringAfter("v")
+        binding.tvUpdateNewVersion.text = newReleases.first().tagName.substringAfter("v")
 
-        binding.tvUpdateReleaseNotes.text = release.body?.replace(
-            Regex("^- ([a-z0-9]+: )?(.*?)(#\\d+ )?\$", RegexOption.MULTILINE),
-            "- $2"
-        )
+        binding.tvUpdateReleaseNotes.text = newReleases.map {
+            it.body?.replace(
+                Regex("^- ([a-z0-9]+: )?(.*?)(#\\d+ )?\$", RegexOption.MULTILINE),
+                "- $2"
+            )
+        }.joinToString("\n")
 
         binding.btnUpdateReleaseNotes.setOnClickListener {
             binding.tvUpdateReleaseNotes.isVisible = !binding.tvUpdateReleaseNotes.isVisible
