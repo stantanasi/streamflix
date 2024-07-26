@@ -74,6 +74,9 @@
     <string name="player_subtitle_tv_show_episode_only">E%d • %s</string>
     <string name="player_external_player_title">Play using</string>
     <string name="player_external_player_error_video">Video not load yet</string>
+    <string name="player_aspect_ratio_fit">Fit to screen</string>
+    <string name="player_aspect_ratio_fill">Stretch</string>
+    <string name="player_aspect_ratio_zoom">Zoom</string>
     <string name="player_settings_title">Settings</string>
     <string name="player_settings_quality_title">Quality for current video</string>
     <string name="player_settings_quality_label">Quality</string>
