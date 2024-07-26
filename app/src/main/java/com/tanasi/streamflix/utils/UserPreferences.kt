@@ -2,8 +2,10 @@ package com.tanasi.streamflix.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.CaptionStyleCompat
 import com.tanasi.streamflix.BuildConfig
+import com.tanasi.streamflix.R
 import com.tanasi.streamflix.fragments.player.settings.PlayerSettingsView
 import com.tanasi.streamflix.providers.Provider
 import com.tanasi.streamflix.providers.Provider.Companion.providers
@@ -41,6 +43,22 @@ object UserPreferences {
             ?: PlayerSettingsView.Settings.Subtitle.Style.TextSize.DEFAULT.value
         set(value) {
             Key.CAPTION_TEXT_SIZE.setFloat(value)
+        }
+
+    enum class PlayerResize(
+        val stringRes: Int,
+        val resizeMode: Int,
+    ) {
+        Fit(R.string.player_aspect_ratio_fit, AspectRatioFrameLayout.RESIZE_MODE_FIT),
+        Fill(R.string.player_aspect_ratio_fill, AspectRatioFrameLayout.RESIZE_MODE_FILL),
+        Zoom(R.string.player_aspect_ratio_zoom, AspectRatioFrameLayout.RESIZE_MODE_ZOOM),
+    }
+
+    var playerResize: PlayerResize
+        get() = PlayerResize.entries.find { it.resizeMode == Key.PLAYER_RESIZE.getInt() }
+            ?: PlayerResize.Fit
+        set(value) {
+            Key.PLAYER_RESIZE.setInt(value.resizeMode)
         }
 
     var captionStyle: CaptionStyleCompat
@@ -81,6 +99,7 @@ object UserPreferences {
     private enum class Key {
         APP_LAYOUT,
         CURRENT_PROVIDER,
+        PLAYER_RESIZE,
         CAPTION_TEXT_SIZE,
         CAPTION_STYLE_FONT_COLOR,
         CAPTION_STYLE_BACKGROUND_COLOR,
