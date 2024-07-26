@@ -40,7 +40,7 @@
         android:textColor="#FFFFFF"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_exo_external_player"
         app:layout_constraintStart_toEndOf="@id/btn_exo_back"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Title" />
@@ -54,10 +54,23 @@
         android:layout_marginEnd="16dp"
         android:textSize="12sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_exo_external_player"
         app:layout_constraintStart_toEndOf="@id/btn_exo_back"
         app:layout_constraintTop_toBottomOf="@id/tv_exo_title"
         tools:text="Description" />
+
+    <ImageView
+        android:id="@+id/btn_exo_external_player"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:padding="8dp"
+        android:src="@drawable/exo_styled_controls_external_player"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@id/tv_exo_subtitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_exo_title"
+        tools:ignore="ContentDescription,UseAppTint" />
 
     <ImageView
         android:id="@id/exo_rew"
