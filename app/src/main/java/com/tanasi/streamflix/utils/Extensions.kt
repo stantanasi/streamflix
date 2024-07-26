@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -23,12 +24,18 @@ import androidx.navigation.fragment.NavHostFragment
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.activities.main.MainMobileActivity
 import com.tanasi.streamflix.activities.main.MainTvActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.parcelize.Parcelize
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -254,7 +261,6 @@ inline fun <T1, T2, T3, T4, T5, T6, R> combine(
     )
 }
 
-
 fun String.toSubtitleMimeType(): String {
     return when {
         endsWith("vtt", true) -> MimeTypes.TEXT_VTT
@@ -268,4 +274,19 @@ inline fun <reified T: Enum<T>> T.next(): T {
     val values = enumValues<T>()
     val nextOrdinal = (ordinal + 1) % values.size
     return values[nextOrdinal]
+}
+
+fun <T> CoroutineScope.asyncOrNull(
+    context: CoroutineContext = EmptyCoroutineContext,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
+    block: suspend CoroutineScope.() -> T
+): Deferred<T?> {
+    return async(context, start) {
+        try {
+            block()
+        } catch (e: Exception) {
+            Log.e("Extensions", "asyncOrNull: ", e)
+            null
+        }
+    }
 }
