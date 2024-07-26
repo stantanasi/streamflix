@@ -8,9 +8,34 @@ import retrofit2.http.Path
 
 object GitHub {
 
-    val service = ApiService.build()
+    private val service = ApiService.build()
 
-    interface ApiService {
+
+    object Releases {
+
+        suspend fun getReleases(
+            owner: String,
+            repo: String,
+        ): List<Release> {
+            return service.getReleases(
+                owner = owner,
+                repo = repo,
+            )
+        }
+
+        suspend fun getLatestRelease(
+            owner: String,
+            repo: String,
+        ): Release {
+            return service.getLatestRelease(
+                owner = owner,
+                repo = repo,
+            )
+        }
+    }
+
+
+    private interface ApiService {
 
         companion object {
             fun build(): ApiService {
