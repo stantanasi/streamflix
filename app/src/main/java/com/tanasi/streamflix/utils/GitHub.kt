@@ -23,6 +23,12 @@ object GitHub {
             }
         }
 
+        @GET("repos/{owner}/{repo}/releases")
+        suspend fun getReleases(
+            @Path("owner") owner: String,
+            @Path("repo") repo: String,
+        ): List<Release>
+
         @GET("repos/{owner}/{repo}/releases/latest")
         suspend fun getLatestRelease(
             @Path("owner") owner: String,
