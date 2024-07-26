@@ -20,7 +20,7 @@ class MainViewModel : ViewModel() {
 
     sealed class State {
         data object CheckingUpdate : State()
-        data class SuccessCheckingUpdate(val release: GitHub.Release?) : State()
+        data class SuccessCheckingUpdate(val newReleases: List<GitHub.Release>) : State()
 
         data object DownloadingUpdate : State()
         data class SuccessDownloadingUpdate(val apk: File) : State()
@@ -35,9 +35,9 @@ class MainViewModel : ViewModel() {
         _state.emit(State.CheckingUpdate)
 
         try {
-            val release = InAppUpdater.getReleaseUpdate()
+            val newReleases = InAppUpdater.getNewReleases()
 
-            _state.emit(State.SuccessCheckingUpdate(release))
+            _state.emit(State.SuccessCheckingUpdate(newReleases))
         } catch (e: Exception) {
             Log.e("MainViewModel", "checkUpdate: ", e)
             _state.emit(State.FailedUpdate(e))
