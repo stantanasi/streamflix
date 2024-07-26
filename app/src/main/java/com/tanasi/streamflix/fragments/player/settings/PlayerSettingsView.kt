@@ -603,16 +603,37 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                         get() = value == UserPreferences.captionTextSize
 
                     companion object : Style() {
-                        val DEFAULT = TextSize(R.string.player_settings_caption_style_text_size_1, 1F)
+                        val DEFAULT = TextSize(
+                            R.string.player_settings_caption_style_text_size_1,
+                            1F
+                        )
 
                         val list = listOf(
-                            TextSize(R.string.player_settings_caption_style_text_size_0_5, 0.5F),
-                            TextSize(R.string.player_settings_caption_style_text_size_0_75, 0.75F),
+                            TextSize(
+                                R.string.player_settings_caption_style_text_size_0_5,
+                                0.5F
+                            ),
+                            TextSize(
+                                R.string.player_settings_caption_style_text_size_0_75,
+                                0.75F
+                            ),
                             DEFAULT,
-                            TextSize(R.string.player_settings_caption_style_text_size_1_25, 1.25F),
-                            TextSize(R.string.player_settings_caption_style_text_size_1_5, 1.5F),
-                            TextSize(R.string.player_settings_caption_style_text_size_2, 2F),
-                            TextSize(R.string.player_settings_caption_style_text_size_3, 3F),
+                            TextSize(
+                                R.string.player_settings_caption_style_text_size_1_25,
+                                1.25F
+                            ),
+                            TextSize(
+                                R.string.player_settings_caption_style_text_size_1_5,
+                                1.5F
+                            ),
+                            TextSize(
+                                R.string.player_settings_caption_style_text_size_2,
+                                2F
+                            ),
+                            TextSize(
+                                R.string.player_settings_caption_style_text_size_3,
+                                3F
+                            ),
                         )
 
                         val selected: TextSize

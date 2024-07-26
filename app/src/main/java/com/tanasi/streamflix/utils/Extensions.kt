@@ -75,11 +75,13 @@ fun FragmentActivity.getCurrentFragment(): Fragment? = when (this) {
             .findFragmentById(R.id.nav_main_fragment) as NavHostFragment
         navHostFragment.childFragmentManager.fragments.firstOrNull()
     }
+
     is MainTvActivity -> {
         val navHostFragment = this.supportFragmentManager
             .findFragmentById(R.id.nav_main_fragment) as NavHostFragment
         navHostFragment.childFragmentManager.fragments.firstOrNull()
     }
+
     else -> null
 }
 
@@ -219,7 +221,10 @@ fun <K, V> Map<K, V?>.filterNotNullValues() = filterValues { it != null } as Map
 
 fun <T> List<T>.safeSubList(fromIndex: Int, toIndex: Int): List<T> {
     if (fromIndex > toIndex) return emptyList()
-    return subList(max(min(fromIndex.coerceAtLeast(0), size), 0), max(min(toIndex.coerceAtMost(size), size), 0))
+    return subList(
+        max(min(fromIndex.coerceAtLeast(0), size), 0),
+        max(min(toIndex.coerceAtMost(size), size), 0)
+    )
 }
 
 inline fun <T1, T2, T3, T4, T5, T6, R> combine(
