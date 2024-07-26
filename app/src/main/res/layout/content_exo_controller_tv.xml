@@ -146,6 +146,27 @@
             tools:text="00:00:00" />
 
         <ImageView
+            android:id="@id/btn_exo_aspect_ratio"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="7dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="7dp"
+            android:background="@drawable/bg_btn_exoplayer_tv"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusLeft="@id/btn_exo_aspect_ratio"
+            android:nextFocusRight="@id/exo_settings"
+            android:padding="12dp"
+            android:src="@drawable/exo_styled_controls_aspect_ratio"
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/exo_settings"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
+
+
+        <ImageView
             android:id="@id/exo_settings"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -154,7 +175,7 @@
             android:background="@drawable/bg_btn_exoplayer_tv"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:nextFocusLeft="@id/exo_settings"
+            android:nextFocusLeft="@id/btn_exo_aspect_ratio"
             android:nextFocusRight="@id/exo_settings"
             android:padding="12dp"
             android:src="@drawable/exo_styled_controls_settings"
