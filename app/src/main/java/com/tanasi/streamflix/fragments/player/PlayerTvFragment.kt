@@ -39,6 +39,7 @@ import com.tanasi.streamflix.models.WatchItem
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.filterNotNullValues
+import com.tanasi.streamflix.utils.next
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.toSubtitleMimeType
@@ -202,6 +203,7 @@ class PlayerTvFragment : Fragment() {
         binding.settings.player = player
         binding.settings.subtitleView = binding.pvPlayer.subtitleView
 
+        binding.pvPlayer.resizeMode = UserPreferences.playerResize.resizeMode
         binding.pvPlayer.subtitleView?.apply {
             setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
             setStyle(UserPreferences.captionStyle)
@@ -220,6 +222,18 @@ class PlayerTvFragment : Fragment() {
         }
 
         binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10_000)
+
+        binding.pvPlayer.controller.btnExoAspectRatio.setOnClickListener {
+            UserPreferences.playerResize = UserPreferences.playerResize.next()
+            binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
+
+            Toast.makeText(
+                requireContext(),
+                requireContext().getString(UserPreferences.playerResize.stringRes),
+                Toast.LENGTH_SHORT
+            ).show()
+            binding.pvPlayer.resizeMode = UserPreferences.playerResize.resizeMode
+        }
 
         binding.pvPlayer.controller.exoSettings.setOnClickListener {
             binding.settings.show()
