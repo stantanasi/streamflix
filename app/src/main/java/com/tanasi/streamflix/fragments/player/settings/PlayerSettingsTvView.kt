@@ -161,7 +161,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                 when (item) {
                     Settings.Subtitle.Style,
                     Settings.Subtitle.Style.ResetStyle -> margin(bottom = 16.dp(context))
-                    Settings.Subtitle.OpenSubtitles -> margin(top = 16.dp(context))
+                    Settings.Subtitle.LocalSubtitles -> margin(top = 16.dp(context))
                     else -> margin(bottom = 0, top = 0)
                 }
                 setOnClickListener {

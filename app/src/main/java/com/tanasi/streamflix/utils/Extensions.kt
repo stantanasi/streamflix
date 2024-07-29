@@ -1,11 +1,14 @@
 package com.tanasi.streamflix.utils
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
+import android.provider.OpenableColumns
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -31,6 +34,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.parcelize.Parcelize
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -290,3 +294,18 @@ fun <T> CoroutineScope.asyncOrNull(
         }
     }
 }
+
+fun Uri.getFileName(context: Context): String? {
+    return when (this.scheme) {
+        ContentResolver.SCHEME_CONTENT -> context.contentResolver.getContentFileName(this)
+        else -> this.path?.let { File(it) }?.name
+    }
+}
+
+private fun ContentResolver.getContentFileName(uri: Uri): String? = runCatching {
+    this.query(uri, null, null, null, null)?.use { cursor ->
+        cursor.moveToFirst()
+        return@use cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME).takeIf { it != -1 }
+            ?.let { cursor.getString(it) }
+    }
+}.getOrNull()

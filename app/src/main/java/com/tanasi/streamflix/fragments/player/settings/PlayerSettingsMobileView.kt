@@ -163,7 +163,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                 when (item) {
                     Settings.Subtitle.Style,
                     Settings.Subtitle.Style.ResetStyle -> margin(bottom = 8.dp(context))
-                    Settings.Subtitle.OpenSubtitles -> margin(top = 8.dp(context))
+                    Settings.Subtitle.LocalSubtitles -> margin(top = 8.dp(context))
                     else -> margin(bottom = 0, top = 0)
                 }
                 setOnClickListener {
