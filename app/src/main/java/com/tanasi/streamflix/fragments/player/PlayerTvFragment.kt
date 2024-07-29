@@ -236,6 +236,7 @@ class PlayerTvFragment : Fragment() {
         }
 
         binding.pvPlayer.controller.exoSettings.setOnClickListener {
+            binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
             binding.settings.show()
         }
     }
