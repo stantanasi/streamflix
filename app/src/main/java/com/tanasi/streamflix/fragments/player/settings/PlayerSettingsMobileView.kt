@@ -200,6 +200,11 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                                     settingsView.hide()
                                 }
 
+                                Settings.Subtitle.LocalSubtitles -> {
+                                    settingsView.onLocalSubtitlesClicked?.invoke()
+                                    settingsView.hide()
+                                }
+
                                 Settings.Subtitle.OpenSubtitles -> {
                                     settingsView.displaySettings(Setting.OPEN_SUBTITLES)
                                 }
@@ -399,6 +404,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                         Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_label)
                         is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
                         is Settings.Subtitle.TextTrackInformation -> item.name
+                        Settings.Subtitle.LocalSubtitles -> context.getString(R.string.player_settings_local_subtitles_label)
                         Settings.Subtitle.OpenSubtitles -> context.getString(R.string.player_settings_open_subtitles_label)
                     }
 
@@ -578,6 +584,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                         Settings.Subtitle.Style -> View.VISIBLE
                         is Settings.Subtitle.None -> View.GONE
                         is Settings.Subtitle.TextTrackInformation -> View.GONE
+                        Settings.Subtitle.LocalSubtitles -> View.VISIBLE
                         Settings.Subtitle.OpenSubtitles -> View.VISIBLE
                     }
 

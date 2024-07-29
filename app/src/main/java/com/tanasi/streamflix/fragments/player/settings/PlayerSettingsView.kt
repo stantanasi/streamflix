@@ -284,6 +284,11 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
             )
         }
 
+    protected var onLocalSubtitlesClicked: (() -> Unit)? = null
+    fun setOnLocalSubtitlesClickedListener(onLocalSubtitlesClicked: () -> Unit) {
+        this.onLocalSubtitlesClicked = onLocalSubtitlesClicked
+    }
+
     protected var onOpenSubtitleSelected: ((Settings.Subtitle.OpenSubtitles.Subtitle) -> Unit) =
         fun(subtitle) {
             val player = player ?: return
@@ -499,6 +504,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                             }
                             .sortedBy { it.name }
                     )
+                    list.add(LocalSubtitles)
                     list.add(OpenSubtitles)
 
                     list.filterIsInstance<TextTrackInformation>()
@@ -911,6 +917,8 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                 val isSelected: Boolean
                     get() = trackGroup.isTrackSelected(trackIndex)
             }
+
+            data object LocalSubtitles : Subtitle()
 
             sealed class OpenSubtitles : Item {
 

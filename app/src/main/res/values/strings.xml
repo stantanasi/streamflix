@@ -160,6 +160,7 @@
     <string name="player_settings_caption_style_window_opacity_1">100%</string>
     <string name="player_settings_open_subtitles_title">OpenSubtitles</string>
     <string name="player_settings_open_subtitles_label">OpenSubtitles</string>
+    <string name="player_settings_local_subtitles_label">Load from files</string>
     <string name="player_settings_speed_title">Video speed</string>
     <string name="player_settings_speed_label">Speed</string>
     <string name="player_settings_speed_0_25">× 0.25</string>
