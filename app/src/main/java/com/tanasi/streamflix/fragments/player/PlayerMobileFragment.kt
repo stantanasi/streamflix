@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -19,7 +20,10 @@ import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
@@ -40,6 +44,7 @@ import com.tanasi.streamflix.models.WatchItem
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.filterNotNullValues
+import com.tanasi.streamflix.utils.getFileName
 import com.tanasi.streamflix.utils.next
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
@@ -64,10 +69,47 @@ class PlayerMobileFragment : Fragment() {
     private val viewModel by viewModelsFactory { PlayerViewModel(args.videoType, args.id) }
 
     private lateinit var player: ExoPlayer
-    private lateinit var dataSourceFactory: HttpDataSource.Factory
+    private lateinit var httpDataSource: HttpDataSource.Factory
+    private lateinit var dataSourceFactory: DataSource.Factory
     private lateinit var mediaSession: MediaSession
 
     private var servers = listOf<Video.Server>()
+
+    private val pickLocalSubtitle = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri == null) return@registerForActivityResult
+        requireContext().contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        )
+
+        val fileName = uri.getFileName(requireContext()) ?: uri.toString()
+
+        val currentPosition = player.currentPosition
+        val currentSubtitleConfigurations = player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
+            MediaItem.SubtitleConfiguration.Builder(it.uri)
+                .setMimeType(it.mimeType)
+                .setLabel(it.label)
+                .setSelectionFlags(0)
+                .build()
+        } ?: listOf()
+        player.setMediaItem(
+            MediaItem.Builder()
+                .setUri(player.currentMediaItem?.localConfiguration?.uri)
+                .setSubtitleConfigurations(currentSubtitleConfigurations
+                        + MediaItem.SubtitleConfiguration.Builder(uri)
+                    .setMimeType(fileName.toSubtitleMimeType())
+                    .setLabel(fileName)
+                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                    .build()
+                )
+                .setMediaMetadata(player.mediaMetadata)
+                .build()
+        )
+        player.seekTo(currentPosition)
+        player.play()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,7 +126,7 @@ class PlayerMobileFragment : Fragment() {
         initializeVideo()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { state ->
+            viewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).collect { state ->
                 when (state) {
                     PlayerViewModel.State.LoadingServers -> {}
                     is PlayerViewModel.State.SuccessLoadingServers -> {
@@ -182,7 +224,8 @@ class PlayerMobileFragment : Fragment() {
         }
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
 
-        dataSourceFactory = DefaultHttpDataSource.Factory()
+        httpDataSource = DefaultHttpDataSource.Factory()
+        dataSourceFactory = DefaultDataSource.Factory(requireContext(), httpDataSource)
         player = ExoPlayer.Builder(requireContext())
             .setSeekBackIncrementMs(10_000)
             .setSeekForwardIncrementMs(10_000)
@@ -242,12 +285,28 @@ class PlayerMobileFragment : Fragment() {
             binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
             binding.settings.show()
         }
+
+        binding.settings.setOnLocalSubtitlesClickedListener {
+            pickLocalSubtitle.launch(
+                arrayOf(
+                    "text/plain",
+                    "text/str",
+                    "application/octet-stream",
+                    MimeTypes.TEXT_UNKNOWN,
+                    MimeTypes.TEXT_VTT,
+                    MimeTypes.TEXT_SSA,
+                    MimeTypes.APPLICATION_TTML,
+                    MimeTypes.APPLICATION_MP4VTT,
+                    MimeTypes.APPLICATION_SUBRIP,
+                )
+            )
+        }
     }
 
     private fun displayVideo(video: Video, server: Video.Server) {
         val currentPosition = player.currentPosition
 
-        dataSourceFactory.setDefaultRequestProperties(
+        httpDataSource.setDefaultRequestProperties(
             mapOf(
                 "Referer" to video.referer,
                 "User-Agent" to userAgent,
