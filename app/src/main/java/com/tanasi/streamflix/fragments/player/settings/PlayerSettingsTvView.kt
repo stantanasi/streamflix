@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSettingTvBinding
 import com.tanasi.streamflix.databinding.ViewPlayerSettingsTvBinding
+import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.margin
 
@@ -42,6 +43,10 @@ class PlayerSettingsTvView @JvmOverloads constructor(
     private val openSubtitlesAdapter = SettingsAdapter(this, Settings.Subtitle.OpenSubtitles.list)
     private val speedAdapter = SettingsAdapter(this, Settings.Speed.list)
     private val serversAdapter = SettingsAdapter(this, Settings.Server.list)
+
+    init {
+        binding.rvSettings.addItemDecoration(SpacingItemDecoration(6.dp(context)))
+    }
 
     fun onBackPressed(): Boolean {
         when (currentSettings) {
@@ -160,8 +165,8 @@ class PlayerSettingsTvView @JvmOverloads constructor(
             binding.root.apply {
                 when (item) {
                     Settings.Subtitle.Style,
-                    Settings.Subtitle.Style.ResetStyle -> margin(bottom = 16.dp(context))
-                    Settings.Subtitle.LocalSubtitles -> margin(top = 16.dp(context))
+                    Settings.Subtitle.Style.ResetStyle -> margin(bottom = 6.dp(context))
+                    Settings.Subtitle.LocalSubtitles -> margin(top = 6.dp(context))
                     else -> margin(bottom = 0, top = 0)
                 }
                 setOnClickListener {

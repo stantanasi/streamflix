@@ -9,7 +9,9 @@
     android:background="@drawable/bg_item_setting"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:minHeight="52dp">
+    android:minHeight="52dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
     <ImageView
         android:id="@+id/iv_setting_icon"
