@@ -73,6 +73,7 @@
         android:focusableInTouchMode="true"
         android:nextFocusLeft="@id/exo_play_pause"
         android:nextFocusRight="@id/exo_play_pause"
+        android:nextFocusDown="@id/exo_settings"
         android:padding="2dp"
         android:src="@drawable/exo_styled_controls_play"
         android:tint="#FFFFFF"

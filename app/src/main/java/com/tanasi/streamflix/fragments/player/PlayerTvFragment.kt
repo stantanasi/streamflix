@@ -345,6 +345,14 @@ class PlayerTvFragment : Fragment() {
         }
 
         player.addListener(object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                super.onPlaybackStateChanged(playbackState)
+
+                if (playbackState == Player.STATE_READY) {
+                    binding.pvPlayer.controller.exoPlayPause.nextFocusDownId = -1
+                }
+            }
+
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 binding.pvPlayer.keepScreenOn = isPlaying
 
