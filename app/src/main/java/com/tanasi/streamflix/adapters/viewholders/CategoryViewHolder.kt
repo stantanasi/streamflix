@@ -96,10 +96,10 @@ class CategoryViewHolder(
         }
 
         val items = listOf(
-            listOf(category.list.lastOrNull()),
+            listOfNotNull(category.list.lastOrNull()),
             category.list,
-            listOf(category.list.firstOrNull()),
-        ).flatten().filterNotNull()
+            listOfNotNull(category.list.firstOrNull()),
+        ).flatten()
         binding.vpCategorySwiper.apply {
             adapter = AppAdapter().apply {
                 submitList(category.list)
