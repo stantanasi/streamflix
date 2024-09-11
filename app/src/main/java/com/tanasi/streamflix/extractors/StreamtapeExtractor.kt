@@ -2,10 +2,13 @@ package com.tanasi.streamflix.extractors
 
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.models.Video
+import okhttp3.ResponseBody
 import org.jsoup.nodes.Document
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Headers
+import retrofit2.http.Streaming
 import retrofit2.http.Url
 
 class StreamtapeExtractor : Extractor() {
@@ -23,8 +26,12 @@ class StreamtapeExtractor : Extractor() {
         val requestVideoParamters = source.html().split(linkVideoId)[10].split("').substring(")[0]
         val finalVideoUrl = "$mainUrl/get_video?id=$linkVideoId$requestVideoParamters"
 
+        val response = service.getVideo(finalVideoUrl)
+        val sourceUrl = (response.raw() as okhttp3.Response).networkResponse?.request?.url?.toString()
+            ?: throw Exception("Can't retrieve URL")
+
         val video = Video(
-            source = finalVideoUrl,
+            source = sourceUrl,
             subtitles = listOf()
         )
         return video
@@ -45,5 +52,10 @@ class StreamtapeExtractor : Extractor() {
         @GET
         @Headers("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
         suspend fun getSource(@Url url: String): Document
+
+        @GET
+        @Streaming
+        @Headers("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+        suspend fun getVideo(@Url url: String): Response<ResponseBody>
     }
 }
