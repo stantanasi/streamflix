@@ -71,18 +71,12 @@ class ShowOptionsTvDialog(
                 R.string.episode_item_info,
                 season.number,
                 episode.number,
-                episode.title ?: context.getString(
-                    R.string.episode_number,
-                    episode.number
-                )
+               ""
             )
         } ?: context.getString(
             R.string.episode_item_info_episode_only,
             episode.number,
-            episode.title ?: context.getString(
-                R.string.episode_number,
-                episode.number
-            )
+            ""
         )
 
 
