@@ -62,6 +62,7 @@ import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
+import java.util.Locale
 
 class MovieViewHolder(
     private val _binding: ViewBinding
@@ -437,7 +438,7 @@ class MovieViewHolder(
         }
 
         binding.tvSwiperRating.apply {
-            text = movie.rating?.let { String.format("%.1f", it) } ?: "N/A"
+            text = movie.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: "N/A"
             visibility = when {
                 text.isNullOrEmpty() -> View.GONE
                 else -> View.VISIBLE
@@ -495,7 +496,7 @@ class MovieViewHolder(
 
         binding.tvMovieTitle.text = movie.title
 
-        binding.tvMovieRating.text = movie.rating?.let { String.format("%.1f", it) } ?: "N/A"
+        binding.tvMovieRating.text = movie.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: "N/A"
 
         binding.tvMovieQuality.apply {
             text = movie.quality
@@ -616,7 +617,7 @@ class MovieViewHolder(
 
         binding.tvMovieTitle.text = movie.title
 
-        binding.tvMovieRating.text = movie.rating?.let { String.format("%.1f", it) } ?: "N/A"
+        binding.tvMovieRating.text = movie.rating?.let { String.format(Locale.ROOT, "%.1f", it) } ?: "N/A"
 
         binding.tvMovieQuality.apply {
             text = movie.quality

@@ -28,6 +28,7 @@ import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
+import java.util.Locale
 
 class CategoryViewHolder(
     private val _binding: ViewBinding
@@ -221,8 +222,8 @@ class CategoryViewHolder(
 
         binding.tvSwiperRating.apply {
             text = when (selected) {
-                is Movie -> selected.rating?.let { String.format("%.1f", it) }
-                is TvShow -> selected.rating?.let { String.format("%.1f", it) }
+                is Movie -> selected.rating?.let { String.format(Locale.ROOT, "%.1f", it) }
+                is TvShow -> selected.rating?.let { String.format(Locale.ROOT, "%.1f", it) }
             }
             visibility = when {
                 text.isNullOrEmpty() -> View.GONE
