@@ -3,12 +3,9 @@ package com.tanasi.streamflix.fragments.player.settings
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
-import android.net.Uri
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MimeTypes
 import androidx.media3.common.Player
 import androidx.media3.common.TrackSelectionOverride
 import androidx.media3.common.Tracks
@@ -289,37 +286,10 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
         this.onLocalSubtitlesClicked = onLocalSubtitlesClicked
     }
 
-    protected var onOpenSubtitleSelected: ((Settings.Subtitle.OpenSubtitles.Subtitle) -> Unit) =
-        fun(subtitle) {
-            val player = player ?: return
-
-            val openSubtitle = subtitle.openSubtitle
-            val currentPosition = player.currentPosition
-            val currentSubtitleConfigurations =
-                player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
-                    MediaItem.SubtitleConfiguration.Builder(it.uri)
-                        .setMimeType(it.mimeType)
-                        .setLabel(it.label)
-                        .setSelectionFlags(0)
-                        .build()
-                } ?: listOf()
-
-            player.setMediaItem(
-                MediaItem.Builder()
-                    .setUri(player.currentMediaItem?.localConfiguration?.uri)
-                    .setSubtitleConfigurations(
-                        currentSubtitleConfigurations
-                                + MediaItem.SubtitleConfiguration.Builder(Uri.parse("https://vidsrc.stream/sub/ops-${openSubtitle.idSubtitleFile}.vtt"))
-                            .setMimeType(MimeTypes.TEXT_VTT)
-                            .setLabel(openSubtitle.subFileName)
-                            .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                            .build()
-                    )
-                    .setMediaMetadata(player.mediaMetadata)
-                    .build()
-            )
-            player.seekTo(currentPosition)
-        }
+    protected var onOpenSubtitleSelected: ((Settings.Subtitle.OpenSubtitles.Subtitle) -> Unit)? = null
+    fun setOnOpenSubtitleSelectedListener(onOpenSubtitleSelected: (Settings.Subtitle.OpenSubtitles.Subtitle) -> Unit) {
+        this.onOpenSubtitleSelected = onOpenSubtitleSelected
+    }
 
     protected var onSpeedSelected: ((Settings.Speed) -> Unit) =
         fun(speed) {
