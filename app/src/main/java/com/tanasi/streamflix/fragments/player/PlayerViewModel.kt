@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.fragments.player
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,6 +32,16 @@ class PlayerViewModel(
         data object LoadingSubtitles : State()
         data class SuccessLoadingSubtitles(val subtitles: List<OpenSubtitles.Subtitle>) : State()
         data class FailedLoadingSubtitles(val error: Exception) : State()
+
+        data object DownloadingOpenSubtitle : State()
+        data class SuccessDownloadingOpenSubtitle(
+            val subtitle: OpenSubtitles.Subtitle,
+            val uri: Uri
+        ) : State()
+        data class FailedDownloadingOpenSubtitle(
+            val error: Exception,
+            val subtitle: OpenSubtitles.Subtitle
+        ) : State()
     }
 
     init {
@@ -92,6 +103,19 @@ class PlayerViewModel(
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "getSubtitles: ", e)
             _state.emit(State.FailedLoadingSubtitles(e))
+        }
+    }
+
+    fun downloadSubtitle(subtitle: OpenSubtitles.Subtitle) = viewModelScope.launch(Dispatchers.IO) {
+        _state.emit(State.DownloadingOpenSubtitle)
+
+        try {
+            val uri = OpenSubtitles.download(subtitle)
+
+            _state.emit(State.SuccessDownloadingOpenSubtitle(subtitle, uri))
+        } catch (e: Exception) {
+            Log.e("PlayerViewModel", "downloadSubtitle: ", e)
+            _state.emit(State.FailedDownloadingOpenSubtitle(e, subtitle))
         }
     }
 }
