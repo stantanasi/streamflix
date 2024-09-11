@@ -54,10 +54,7 @@ class ShowOptionsMobileDialog(
             .fitCenter()
             .into(binding.ivOptionsShowPoster)
 
-        binding.tvOptionsShowTitle.text = episode.title ?: context.getString(
-            R.string.episode_number,
-            episode.number
-        )
+        binding.tvOptionsShowTitle.text = episode.tvShow?.title ?: ""
 
         binding.tvShowSubtitle.text = episode.season?.takeIf { it.number != 0 }?.let { season ->
             context.getString(
