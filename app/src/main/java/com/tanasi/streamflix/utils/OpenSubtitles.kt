@@ -1,17 +1,62 @@
 package com.tanasi.streamflix.utils
 
+import android.net.Uri
+import androidx.core.net.toUri
 import com.google.gson.annotations.SerializedName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.net.URL
+import java.util.zip.GZIPInputStream
 
 object OpenSubtitles {
 
     private const val URL = "https://rest.opensubtitles.org/"
 
     private val service = Service.build()
+
+    suspend fun download(
+        subtitle: Subtitle,
+    ): Uri = withContext(Dispatchers.IO) {
+        val zip = File.createTempFile(
+            "${File(subtitle.subFileName).nameWithoutExtension}-",
+            ".${File(subtitle.subDownloadLink).extension}"
+        )
+
+        URL(subtitle.subDownloadLink).openStream().use { input ->
+            FileOutputStream(zip).use { output -> input.copyTo(output) }
+        }
+
+        val subtitleFile = File("${zip.parent}${File.separator}${subtitle.subFileName}")
+
+        if (subtitleFile.exists()) {
+            subtitleFile.delete()
+        }
+
+        FileInputStream(zip).use { fileInputStream ->
+            GZIPInputStream(fileInputStream).use { gzipInputStream ->
+                FileOutputStream(subtitleFile).use { fileOutputStream ->
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+
+                    while (gzipInputStream.read(buffer).also { bytesRead = it } != -1) {
+                        fileOutputStream.write(buffer, 0, bytesRead)
+                    }
+                }
+            }
+        }
+
+        zip.delete()
+
+        subtitleFile.toUri()
+    }
 
     suspend fun search(
         imdbId: String? = null,
@@ -84,7 +129,7 @@ object OpenSubtitles {
         @SerializedName("MovieByteSize") val movieByteSize: String? = null,
         @SerializedName("MovieTimeMS") val movieTimeMS: String? = null,
         @SerializedName("IDSubtitleFile") val idSubtitleFile: String? = null,
-        @SerializedName("SubFileName") val subFileName: String? = null,
+        @SerializedName("SubFileName") val subFileName: String = "",
         @SerializedName("SubActualCD") val subActualCD: String? = null,
         @SerializedName("SubSize") val subSize: String? = null,
         @SerializedName("SubHash") val subHash: String? = null,
@@ -130,7 +175,7 @@ object OpenSubtitles {
         @SerializedName("SubForeignPartsOnly") val subForeignPartsOnly: String? = null,
         @SerializedName("SubFromTrusted") val subFromTrusted: String? = null,
         @SerializedName("QueryCached") val queryCached: Int? = null,
-        @SerializedName("SubDownloadLink") val subDownloadLink: String? = null,
+        @SerializedName("SubDownloadLink") val subDownloadLink: String = "",
         @SerializedName("ZipDownloadLink") val zipDownloadLink: String? = null,
         @SerializedName("SubtitlesLink") val subtitlesLink: String? = null,
         @SerializedName("QueryNumber") val queryNumber: String? = null,

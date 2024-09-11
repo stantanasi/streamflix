@@ -190,6 +190,42 @@ class PlayerMobileFragment : Fragment() {
                         binding.settings.openSubtitles = state.subtitles
                     }
                     is PlayerViewModel.State.FailedLoadingSubtitles -> {}
+
+                    PlayerViewModel.State.DownloadingOpenSubtitle -> {}
+                    is PlayerViewModel.State.SuccessDownloadingOpenSubtitle -> {
+                        val fileName = state.uri.getFileName(requireContext()) ?: state.uri.toString()
+
+                        val currentPosition = player.currentPosition
+                        val currentSubtitleConfigurations = player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
+                            MediaItem.SubtitleConfiguration.Builder(it.uri)
+                                .setMimeType(it.mimeType)
+                                .setLabel(it.label)
+                                .setSelectionFlags(0)
+                                .build()
+                        } ?: listOf()
+                        player.setMediaItem(
+                            MediaItem.Builder()
+                                .setUri(player.currentMediaItem?.localConfiguration?.uri)
+                                .setSubtitleConfigurations(currentSubtitleConfigurations
+                                        + MediaItem.SubtitleConfiguration.Builder(state.uri)
+                                    .setMimeType(fileName.toSubtitleMimeType())
+                                    .setLabel(fileName)
+                                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                                    .build()
+                                )
+                                .setMediaMetadata(player.mediaMetadata)
+                                .build()
+                        )
+                        player.seekTo(currentPosition)
+                        player.play()
+                    }
+                    is PlayerViewModel.State.FailedDownloadingOpenSubtitle -> {
+                        Toast.makeText(
+                            requireContext(),
+                            "${state.subtitle.subFileName}: ${state.error.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
@@ -302,6 +338,10 @@ class PlayerMobileFragment : Fragment() {
                     MimeTypes.APPLICATION_SUBRIP,
                 )
             )
+        }
+
+        binding.settings.setOnOpenSubtitleSelectedListener { subtitle ->
+            viewModel.downloadSubtitle(subtitle.openSubtitle)
         }
     }
 

@@ -289,7 +289,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                         }
 
                         is Settings.Subtitle.OpenSubtitles.Subtitle -> {
-                            settingsView.onOpenSubtitleSelected.invoke(item)
+                            settingsView.onOpenSubtitleSelected?.invoke(item)
                             settingsView.hide()
                         }
 
