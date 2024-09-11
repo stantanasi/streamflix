@@ -101,6 +101,8 @@ class ShowOptionsTvDialog(
                 is HomeTvFragment -> View.VISIBLE
                 else -> View.GONE
             }
+
+            requestFocus()
         }
 
         binding.btnOptionShowFavorite.visibility = View.GONE
@@ -174,6 +176,8 @@ class ShowOptionsTvDialog(
                 else -> context.getString(R.string.option_show_favorite)
             }
             visibility = View.VISIBLE
+
+            requestFocus()
         }
 
         binding.btnOptionShowWatched.apply {
@@ -245,6 +249,8 @@ class ShowOptionsTvDialog(
                 else -> context.getString(R.string.option_show_favorite)
             }
             visibility = View.VISIBLE
+
+            requestFocus()
         }
 
         binding.btnOptionShowWatched.visibility = View.GONE
