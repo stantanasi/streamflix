@@ -408,7 +408,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                     is Settings.Subtitle -> when (item) {
                         Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_label)
                         is Settings.Subtitle.None -> context.getString(R.string.player_settings_subtitles_off)
-                        is Settings.Subtitle.TextTrackInformation -> item.name
+                        is Settings.Subtitle.TextTrackInformation -> item.label
                         Settings.Subtitle.LocalSubtitles -> context.getString(R.string.player_settings_local_subtitles_label)
                         Settings.Subtitle.OpenSubtitles -> context.getString(R.string.player_settings_open_subtitles_label)
                     }
@@ -469,7 +469,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
                         }
                         Settings.Audio -> Settings.Audio.selected?.name
                         Settings.Subtitle -> when (val selected = Settings.Subtitle.selected) {
-                            is Settings.Subtitle.TextTrackInformation -> selected.name
+                            is Settings.Subtitle.TextTrackInformation -> selected.label
                             else -> context.getString(R.string.player_settings_subtitles_off)
                         }
                         Settings.Speed -> context.getString(Settings.Speed.selected.stringId)
@@ -478,6 +478,7 @@ class PlayerSettingsMobileView @JvmOverloads constructor(
 
                     is Settings.Subtitle -> when (item) {
                         Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_sub_label)
+                        is Settings.Subtitle.TextTrackInformation -> item.language?.replaceFirstChar { it.titlecase() } ?: ""
                         else -> ""
                     }
 

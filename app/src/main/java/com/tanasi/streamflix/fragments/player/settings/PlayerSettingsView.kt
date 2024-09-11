@@ -160,7 +160,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                         )
                         .setTrackTypeDisabled(subtitle.trackGroup.type, false)
                         .build()
-                    UserPreferences.subtitleName = subtitle.name
+                    UserPreferences.subtitleName = (subtitle.language ?: subtitle.label).substringBefore(" ")
                 }
 
                 else -> {}
@@ -466,19 +466,21 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                                         TextTrackInformation(
                                             name = DefaultTrackNameProvider(resources)
                                                 .getTrackName(trackFormat),
+                                            label = trackFormat.label ?: "",
+                                            language = trackFormat.language,
 
                                             trackGroup = trackGroup,
                                             trackIndex = trackIndex,
                                         )
                                     }
                             }
-                            .sortedBy { it.name }
+                            .sortedBy { it.label }
                     )
                     list.add(LocalSubtitles)
                     list.add(OpenSubtitles)
 
                     list.filterIsInstance<TextTrackInformation>()
-                        .find { it.name == UserPreferences.subtitleName }
+                        .find { (it.language ?: it.label).startsWith(UserPreferences.subtitleName ?: "") }
                         ?.let {
                             player.trackSelectionParameters = player.trackSelectionParameters
                                 .buildUpon()
@@ -880,6 +882,8 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
 
             class TextTrackInformation(
                 val name: String,
+                val label: String,
+                val language: String?,
 
                 val trackGroup: Tracks.Group,
                 val trackIndex: Int,
