@@ -797,10 +797,10 @@ object TmdbProvider : Provider {
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         val servers = listOf(
-            VidsrcToExtractor().server(videoType),
+            VidsrcNetExtractor().server(videoType),
             MyFileStorageExtractor().nowTvServer(videoType),
             MoflixExtractor().server(videoType),
-            VidsrcNetExtractor().server(videoType),
+            VidsrcToExtractor().server(videoType),
         )
 
         return servers
