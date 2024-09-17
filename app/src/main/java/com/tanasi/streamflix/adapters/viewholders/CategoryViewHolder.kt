@@ -91,7 +91,7 @@ class CategoryViewHolder(
 
     private fun displayMobileSwiper(binding: ContentCategorySwiperMobileBinding) {
         val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed(8_000) {
+        handler.postDelayed(16_000) {
             binding.vpCategorySwiper.currentItem += 1
         }
 
@@ -131,7 +131,7 @@ class CategoryViewHolder(
                     view.isSelected = (indicatorPosition == index)
                 }
                 handler.removeCallbacksAndMessages(null)
-                handler.postDelayed(8_000) {
+                handler.postDelayed(16_000) {
                     binding.vpCategorySwiper.currentItem += 1
                 }
             }
@@ -157,7 +157,7 @@ class CategoryViewHolder(
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
 
         val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed(8_000) {
+        handler.postDelayed(16_000) {
             category.selectedIndex = (category.selectedIndex + 1) % category.list.size
             if (binding.btnSwiperWatchNow.hasFocus()) {
                 when (val fragment = context.toActivity()?.getCurrentFragment()) {
