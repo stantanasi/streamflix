@@ -103,7 +103,7 @@ class TvShowViewModel(id: String, private val database: AppDatabase) : ViewModel
             is State.SuccessLoading -> {
                 State.SuccessLoading(
                     tvShow = state.tvShow.copy(
-                        seasons = state.tvShow.seasons
+                        seasons = (state.tvShow.seasons
                             .takeIf { seasons -> seasons.flatMap { it.episodes } != episodesDb }
                             ?.map { season ->
                                 season.copy(
@@ -112,7 +112,15 @@ class TvShowViewModel(id: String, private val database: AppDatabase) : ViewModel
                                         .onEach { it.season = season }
                                 )
                             }
-                            ?: state.tvShow.seasons,
+                            ?: state.tvShow.seasons)
+                            .sortedWith { season1, season2 ->
+                                when {
+                                    season1.number == 0 && season2.number == 0 -> 0
+                                    season1.number == 0 -> 1
+                                    season2.number == 0 -> -1
+                                    else -> season1.number.compareTo(season2.number)
+                                }
+                            },
                         recommendations = state.tvShow.recommendations.map { show ->
                             when (show) {
                                 is Movie -> moviesDb.find { it.id == show.id }
