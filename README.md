@@ -43,6 +43,8 @@ With no registration or payment required, you can binge-watch hundreds of thousa
 
 New titles are updated on the app daily to make sure fun never ends on Streamflix.
 
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/stantanasi)
+
 ### Features
 
 - 100% free and no ads!
@@ -89,7 +91,7 @@ git clone https://github.com/stantanasi/streamflix.git
 
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
