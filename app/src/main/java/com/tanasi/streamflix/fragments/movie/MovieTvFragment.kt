@@ -102,7 +102,7 @@ class MovieTvFragment : Fragment() {
 
             movie.takeIf { it.cast.isNotEmpty() }
                 ?.copy()
-                ?.apply { itemType = AppAdapter.Type.MOVIE_CASTS_TV },
+                ?.apply { itemType = AppAdapter.Type.MOVIE_CAST_TV },
 
             movie.takeIf { it.recommendations.isNotEmpty() }
                 ?.copy()

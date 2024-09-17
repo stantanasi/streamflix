@@ -105,7 +105,7 @@ class MovieMobileFragment : Fragment() {
 
             movie.takeIf { it.cast.isNotEmpty() }
                 ?.copy()
-                ?.apply { itemType = AppAdapter.Type.MOVIE_CASTS_MOBILE },
+                ?.apply { itemType = AppAdapter.Type.MOVIE_CAST_MOBILE },
 
             movie.takeIf { it.recommendations.isNotEmpty() }
                 ?.copy()

@@ -54,7 +54,7 @@
     <string name="tv_show_watch_episode">Watch E%d</string>
     <string name="tv_show_trailer">Trailer</string>
     <string name="tv_show_seasons">Seasons</string>
-    <string name="tv_show_casts">Casts</string>
+    <string name="tv_show_cast">Cast</string>
     <string name="tv_show_you_may_also_like">You may also like</string>
 
     <string name="movie_item_type">Movie</string>
@@ -62,7 +62,7 @@
     <string name="movie_runtime_minutes">%d min</string>
     <string name="movie_watch_now">Watch Now</string>
     <string name="movie_trailer">Trailer</string>
-    <string name="movie_casts">Casts</string>
+    <string name="movie_cast">Cast</string>
     <string name="movie_you_may_also_like">You may also like</string>
 
     <string name="season_number">Season %d</string>

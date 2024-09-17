@@ -16,14 +16,14 @@ import com.tanasi.streamflix.adapters.viewholders.SeasonViewHolder
 import com.tanasi.streamflix.adapters.viewholders.TvShowViewHolder
 import com.tanasi.streamflix.databinding.ContentCategorySwiperMobileBinding
 import com.tanasi.streamflix.databinding.ContentCategorySwiperTvBinding
-import com.tanasi.streamflix.databinding.ContentMovieCastsMobileBinding
-import com.tanasi.streamflix.databinding.ContentMovieCastsTvBinding
+import com.tanasi.streamflix.databinding.ContentMovieCastMobileBinding
+import com.tanasi.streamflix.databinding.ContentMovieCastTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsMobileBinding
 import com.tanasi.streamflix.databinding.ContentMovieRecommendationsTvBinding
 import com.tanasi.streamflix.databinding.ContentMovieTvBinding
-import com.tanasi.streamflix.databinding.ContentTvShowCastsMobileBinding
-import com.tanasi.streamflix.databinding.ContentTvShowCastsTvBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastMobileBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastTvBinding
 import com.tanasi.streamflix.databinding.ContentTvShowMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsTvBinding
@@ -98,8 +98,8 @@ class AppAdapter(
 
         MOVIE_MOBILE,
         MOVIE_TV,
-        MOVIE_CASTS_MOBILE,
-        MOVIE_CASTS_TV,
+        MOVIE_CAST_MOBILE,
+        MOVIE_CAST_TV,
         MOVIE_RECOMMENDATIONS_MOBILE,
         MOVIE_RECOMMENDATIONS_TV,
 
@@ -122,8 +122,8 @@ class AppAdapter(
         TV_SHOW_TV,
         TV_SHOW_SEASONS_MOBILE,
         TV_SHOW_SEASONS_TV,
-        TV_SHOW_CASTS_MOBILE,
-        TV_SHOW_CASTS_TV,
+        TV_SHOW_CAST_MOBILE,
+        TV_SHOW_CAST_TV,
         TV_SHOW_RECOMMENDATIONS_MOBILE,
         TV_SHOW_RECOMMENDATIONS_TV,
     }
@@ -269,15 +269,15 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.MOVIE_CASTS_MOBILE -> MovieViewHolder(
-                ContentMovieCastsMobileBinding.inflate(
+            Type.MOVIE_CAST_MOBILE -> MovieViewHolder(
+                ContentMovieCastMobileBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
-            Type.MOVIE_CASTS_TV -> MovieViewHolder(
-                ContentMovieCastsTvBinding.inflate(
+            Type.MOVIE_CAST_TV -> MovieViewHolder(
+                ContentMovieCastTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
@@ -407,15 +407,15 @@ class AppAdapter(
                     false,
                 )
             )
-            Type.TV_SHOW_CASTS_MOBILE -> TvShowViewHolder(
-                ContentTvShowCastsMobileBinding.inflate(
+            Type.TV_SHOW_CAST_MOBILE -> TvShowViewHolder(
+                ContentTvShowCastMobileBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,
                 )
             )
-            Type.TV_SHOW_CASTS_TV -> TvShowViewHolder(
-                ContentTvShowCastsTvBinding.inflate(
+            Type.TV_SHOW_CAST_TV -> TvShowViewHolder(
+                ContentTvShowCastTvBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false,

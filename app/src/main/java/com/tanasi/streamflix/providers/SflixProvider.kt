@@ -380,7 +380,7 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             cast = document.select("div.elements > .row > div > .row-line")
-                .find { it.select(".type").text().contains("Casts") }
+                .find { it.select(".type").text().contains("Cast") }
                 ?.select("a")?.map {
                     People(
                         id = it.attr("href").substringAfter("/cast/"),
@@ -482,7 +482,7 @@ object SflixProvider : Provider {
                     )
                 } ?: listOf(),
             cast = document.select("div.elements > .row > div > .row-line")
-                .find { it.select(".type").text().contains("Casts") }
+                .find { it.select(".type").text().contains("Cast") }
                 ?.select("a")?.map {
                     People(
                         id = it.attr("href").substringAfter("/cast/"),

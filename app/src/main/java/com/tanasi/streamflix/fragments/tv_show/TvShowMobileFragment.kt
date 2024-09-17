@@ -109,7 +109,7 @@ class TvShowMobileFragment : Fragment() {
 
             tvShow.takeIf { it.cast.isNotEmpty() }
                 ?.copy()
-                ?.apply { itemType = AppAdapter.Type.TV_SHOW_CASTS_MOBILE },
+                ?.apply { itemType = AppAdapter.Type.TV_SHOW_CAST_MOBILE },
 
             tvShow.takeIf { it.recommendations.isNotEmpty() }
                 ?.copy()

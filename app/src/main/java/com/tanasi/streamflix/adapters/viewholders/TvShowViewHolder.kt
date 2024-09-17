@@ -13,8 +13,8 @@ import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
-import com.tanasi.streamflix.databinding.ContentTvShowCastsMobileBinding
-import com.tanasi.streamflix.databinding.ContentTvShowCastsTvBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastMobileBinding
+import com.tanasi.streamflix.databinding.ContentTvShowCastTvBinding
 import com.tanasi.streamflix.databinding.ContentTvShowMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsMobileBinding
 import com.tanasi.streamflix.databinding.ContentTvShowRecommendationsTvBinding
@@ -80,8 +80,8 @@ class TvShowViewHolder(
         get() = when (_binding) {
             is ContentTvShowSeasonsMobileBinding -> _binding.rvTvShowSeasons
             is ContentTvShowSeasonsTvBinding -> _binding.hgvTvShowSeasons
-            is ContentTvShowCastsMobileBinding -> _binding.rvTvShowCasts
-            is ContentTvShowCastsTvBinding -> _binding.hgvTvShowCasts
+            is ContentTvShowCastMobileBinding -> _binding.rvTvShowCast
+            is ContentTvShowCastTvBinding -> _binding.hgvTvShowCast
             is ContentTvShowRecommendationsMobileBinding -> _binding.rvTvShowRecommendations
             is ContentTvShowRecommendationsTvBinding -> _binding.hgvTvShowRecommendations
             else -> null
@@ -101,8 +101,8 @@ class TvShowViewHolder(
             is ContentTvShowTvBinding -> displayTvShowTv(_binding)
             is ContentTvShowSeasonsMobileBinding -> displaySeasonsMobile(_binding)
             is ContentTvShowSeasonsTvBinding -> displaySeasonsTv(_binding)
-            is ContentTvShowCastsMobileBinding -> displayCastsMobile(_binding)
-            is ContentTvShowCastsTvBinding -> displayCastsTv(_binding)
+            is ContentTvShowCastMobileBinding -> displayCastMobile(_binding)
+            is ContentTvShowCastTvBinding -> displayCastTv(_binding)
             is ContentTvShowRecommendationsMobileBinding -> displayRecommendationsMobile(_binding)
             is ContentTvShowRecommendationsTvBinding -> displayRecommendationsTv(_binding)
         }
@@ -862,8 +862,8 @@ class TvShowViewHolder(
         }
     }
 
-    private fun displayCastsMobile(binding: ContentTvShowCastsMobileBinding) {
-        binding.rvTvShowCasts.apply {
+    private fun displayCastMobile(binding: ContentTvShowCastMobileBinding) {
+        binding.rvTvShowCast.apply {
             adapter = AppAdapter().apply {
                 submitList(tvShow.cast.onEach {
                     it.itemType = AppAdapter.Type.PEOPLE_MOBILE_ITEM
@@ -875,8 +875,8 @@ class TvShowViewHolder(
         }
     }
 
-    private fun displayCastsTv(binding: ContentTvShowCastsTvBinding) {
-        binding.hgvTvShowCasts.apply {
+    private fun displayCastTv(binding: ContentTvShowCastTvBinding) {
+        binding.hgvTvShowCast.apply {
             setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
             adapter = AppAdapter().apply {
                 submitList(tvShow.cast.onEach {
