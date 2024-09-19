@@ -157,16 +157,11 @@ class CategoryViewHolder(
     private fun displayTvSwiper(binding: ContentCategorySwiperTvBinding) {
         val selected = category.list.getOrNull(category.selectedIndex) as? Show ?: return
 
-        val handler = Handler(Looper.getMainLooper())
-        handler.postDelayed(8_000) {
-            category.selectedIndex = (category.selectedIndex + 1) % category.list.size
-            when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                is HomeTvFragment -> when (val it = category.list[category.selectedIndex]) {
-                    is Movie -> fragment.updateBackground(it.banner, null)
-                    is TvShow -> fragment.updateBackground(it.banner, null)
-                }
+        when (val fragment = context.toActivity()?.getCurrentFragment()) {
+            is HomeTvFragment -> when (selected) {
+                is Movie -> fragment.updateBackground(selected.banner, null)
+                is TvShow -> fragment.updateBackground(selected.banner, null)
             }
-            bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
         }
 
         binding.tvSwiperTitle.text = when (selected) {
@@ -251,7 +246,9 @@ class CategoryViewHolder(
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     when (event.keyCode) {
                         KeyEvent.KEYCODE_DPAD_RIGHT -> {
-                            handler.removeCallbacksAndMessages(null)
+                            when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                                is HomeTvFragment -> fragment.resetSwiperSchedule()
+                            }
                             category.selectedIndex = (category.selectedIndex + 1) % category.list.size
                             when (val fragment = context.toActivity()?.getCurrentFragment()) {
                                 is HomeTvFragment -> when (val it = category.list[category.selectedIndex]) {
@@ -267,7 +264,6 @@ class CategoryViewHolder(
                 false
             }
             setOnClickListener {
-                handler.removeCallbacksAndMessages(null)
                 findNavController().navigate(
                     when (selected) {
                         is Movie -> HomeTvFragmentDirections.actionHomeToMovie(selected.id)
