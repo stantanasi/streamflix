@@ -119,12 +119,10 @@ class MainTvActivity : FragmentActivity() {
                 when (state) {
                     MainViewModel.State.CheckingUpdate -> {}
                     is MainViewModel.State.SuccessCheckingUpdate -> {
-                        val asset = state.newReleases.firstOrNull()?.assets
-                            ?.find { it.contentType == "application/vnd.android.package-archive" }
-                        if (asset != null) {
+                        if (state.asset != null) {
                             updateAppDialog = UpdateAppTvDialog(this@MainTvActivity, state.newReleases).also {
                                 it.setOnUpdateClickListener { _ ->
-                                    if (!it.isLoading) viewModel.downloadUpdate(this@MainTvActivity, asset)
+                                    if (!it.isLoading) viewModel.downloadUpdate(this@MainTvActivity, state.asset)
                                 }
                                 it.show()
                             }
