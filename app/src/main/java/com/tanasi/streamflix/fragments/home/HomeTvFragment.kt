@@ -1,6 +1,8 @@
 package com.tanasi.streamflix.fragments.home
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +26,7 @@ import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.WatchItem
 import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.viewModelsFactory
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 
 class HomeTvFragment : Fragment() {
@@ -35,6 +38,8 @@ class HomeTvFragment : Fragment() {
     private val viewModel by viewModelsFactory { HomeViewModel(database) }
 
     private val appAdapter = AppAdapter()
+
+    private val swiperHandler = Handler(Looper.getMainLooper())
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -148,6 +153,11 @@ class HomeTvFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        super.onStop()
+        swiperHandler.removeCallbacksAndMessages(null)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         appAdapter.onSaveInstanceState(binding.vgvHome)
@@ -185,6 +195,7 @@ class HomeTvFragment : Fragment() {
                     .find { item -> item.name == Category.FEATURED }
                     ?.selectedIndex
                     ?: 0
+                resetSwiperSchedule()
             }
 
         categories
@@ -226,5 +237,29 @@ class HomeTvFragment : Fragment() {
                     }
                 }
         )
+    }
+
+    fun resetSwiperSchedule() {
+        swiperHandler.removeCallbacksAndMessages(null)
+        swiperHandler.postDelayed(object : Runnable {
+            override fun run() {
+                val position = appAdapter.items
+                    .filterIsInstance<Category>()
+                    .find { it.name == Category.FEATURED }
+                    ?.let { category ->
+                        category.selectedIndex = (category.selectedIndex + 1) % category.list.size
+                        appAdapter.items.indexOf(category)
+                    }
+                    ?.takeIf { it != -1 }
+
+                if (position == null) {
+                    swiperHandler.removeCallbacksAndMessages(null)
+                    return
+                }
+
+                appAdapter.notifyItemChanged(position)
+                swiperHandler.postDelayed(this, 8_000)
+            }
+        }, 8_000)
     }
 }
