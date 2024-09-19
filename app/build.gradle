@@ -14,8 +14,8 @@ android {
         applicationId "com.tanasi.streamflix"
         minSdk 21
         targetSdk 34
-        versionCode 28
-        versionName "1.6.11"
+        versionCode 29
+        versionName "1.6.12"
 
         def properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -54,8 +54,8 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.8.0'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.8.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.8.1'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.8.1'
     implementation project(path: ':navigation')
 
     implementation 'androidx.core:core-ktx:1.13.1'
@@ -79,8 +79,8 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.17.2'
 
     implementation 'androidx.fragment:fragment-ktx:1.8.3'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.5'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.5'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.6'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6'
 
     implementation 'androidx.tvprovider:tvprovider:1.1.0-alpha01'
 
