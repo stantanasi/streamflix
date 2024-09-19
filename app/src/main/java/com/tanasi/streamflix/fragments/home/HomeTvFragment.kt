@@ -258,8 +258,8 @@ class HomeTvFragment : Fragment() {
                 }
 
                 appAdapter.notifyItemChanged(position)
-                swiperHandler.postDelayed(this, 8_000)
+                swiperHandler.postDelayed(this, 12_000)
             }
-        }, 8_000)
+        }, 12_000)
     }
 }
