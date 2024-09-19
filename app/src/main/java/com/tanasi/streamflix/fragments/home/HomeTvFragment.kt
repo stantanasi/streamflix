@@ -155,10 +155,14 @@ class HomeTvFragment : Fragment() {
     }
 
 
-    fun updateBackground(uri: String?) {
+    private var swiperHasLastFocus: Boolean = false
+    fun updateBackground(uri: String?, swiperHasFocus: Boolean? = false) {
+        if (swiperHasFocus == null && !swiperHasLastFocus) return
+
         Glide.with(requireContext())
             .load(uri)
             .into(binding.ivHomeBackground)
+        swiperHasLastFocus = swiperHasFocus ?: swiperHasLastFocus
     }
 
     private fun initializeHome() {

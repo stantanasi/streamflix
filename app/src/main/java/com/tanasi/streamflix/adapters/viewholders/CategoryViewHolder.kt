@@ -160,12 +160,10 @@ class CategoryViewHolder(
         val handler = Handler(Looper.getMainLooper())
         handler.postDelayed(8_000) {
             category.selectedIndex = (category.selectedIndex + 1) % category.list.size
-            if (binding.btnSwiperWatchNow.hasFocus()) {
-                when (val fragment = context.toActivity()?.getCurrentFragment()) {
-                    is HomeTvFragment -> when (val it = category.list[category.selectedIndex]) {
-                        is Movie -> fragment.updateBackground(it.banner)
-                        is TvShow -> fragment.updateBackground(it.banner)
-                    }
+            when (val fragment = context.toActivity()?.getCurrentFragment()) {
+                is HomeTvFragment -> when (val it = category.list[category.selectedIndex]) {
+                    is Movie -> fragment.updateBackground(it.banner, null)
+                    is TvShow -> fragment.updateBackground(it.banner, null)
                 }
             }
             bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
@@ -243,8 +241,8 @@ class CategoryViewHolder(
                 if (hasFocus) {
                     when (val fragment = context.toActivity()?.getCurrentFragment()) {
                         is HomeTvFragment -> when (selected) {
-                            is Movie -> fragment.updateBackground(selected.banner)
-                            is TvShow -> fragment.updateBackground(selected.banner)
+                            is Movie -> fragment.updateBackground(selected.banner, true)
+                            is TvShow -> fragment.updateBackground(selected.banner, true)
                         }
                     }
                 }
@@ -257,8 +255,8 @@ class CategoryViewHolder(
                             category.selectedIndex = (category.selectedIndex + 1) % category.list.size
                             when (val fragment = context.toActivity()?.getCurrentFragment()) {
                                 is HomeTvFragment -> when (val it = category.list[category.selectedIndex]) {
-                                    is Movie -> fragment.updateBackground(it.banner)
-                                    is TvShow -> fragment.updateBackground(it.banner)
+                                    is Movie -> fragment.updateBackground(it.banner, true)
+                                    is TvShow -> fragment.updateBackground(it.banner, true)
                                 }
                             }
                             bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
