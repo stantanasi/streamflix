@@ -130,6 +130,14 @@ class EpisodeViewHolder(
             R.string.episode_number,
             episode.number
         )
+
+        binding.tvEpisodeReleased.apply {
+            text = episode.released?.let { " • ${it.format("yyyy-MM-dd")}" }
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
     }
 
     private fun displayTvItem(binding: ItemEpisodeTvBinding) {
