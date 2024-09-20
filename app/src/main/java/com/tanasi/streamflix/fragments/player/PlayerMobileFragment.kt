@@ -366,6 +366,7 @@ class PlayerMobileFragment : Fragment() {
                     MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitle.file))
                         .setMimeType(subtitle.file.toSubtitleMimeType())
                         .setLabel(subtitle.label)
+                        .setSelectionFlags(if (subtitle.default) C.SELECTION_FLAG_DEFAULT else 0)
                         .build()
                 })
                 .setMediaMetadata(

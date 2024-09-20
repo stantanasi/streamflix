@@ -478,21 +478,6 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                     )
                     list.add(LocalSubtitles)
                     list.add(OpenSubtitles)
-
-                    list.filterIsInstance<TextTrackInformation>()
-                        .find { (it.language ?: it.label).startsWith(UserPreferences.subtitleName ?: "") }
-                        ?.let {
-                            player.trackSelectionParameters = player.trackSelectionParameters
-                                .buildUpon()
-                                .setOverrideForType(
-                                    TrackSelectionOverride(
-                                        it.trackGroup.mediaTrackGroup,
-                                        listOf(it.trackIndex)
-                                    )
-                                )
-                                .setTrackTypeDisabled(it.trackGroup.type, false)
-                                .build()
-                        }
                 }
             }
 

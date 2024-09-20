@@ -76,6 +76,10 @@ class PlayerViewModel(
 
             if (video.source.isEmpty()) throw Exception("No source found")
 
+            video.subtitles
+                .firstOrNull { it.label.startsWith(UserPreferences.subtitleName ?: "") }
+                ?.default = true
+
             _state.emit(State.SuccessLoadingVideo(video, server))
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "getVideo: ", e)

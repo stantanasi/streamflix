@@ -46,6 +46,7 @@ data class Video(
     data class Subtitle(
         val label: String,
         val file: String,
+        var default: Boolean = false,
     )
 
     data class Server(
