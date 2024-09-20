@@ -22,6 +22,7 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.ui.ShowOptionsTvDialog
+import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity
 
@@ -129,6 +130,14 @@ class EpisodeViewHolder(
             R.string.episode_number,
             episode.number
         )
+
+        binding.tvEpisodeReleased.apply {
+            text = episode.released?.let { " • ${it.format("yyyy-MM-dd")}" }
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
     }
 
     private fun displayTvItem(binding: ItemEpisodeTvBinding) {
@@ -223,6 +232,14 @@ class EpisodeViewHolder(
             R.string.episode_number,
             episode.number
         )
+
+        binding.tvEpisodeReleased.apply {
+            text = episode.released?.format("EEEE - MMMM dd, yyyy")
+            visibility = when {
+                text.isNullOrEmpty() -> View.GONE
+                else -> View.VISIBLE
+            }
+        }
     }
 
     private fun displayContinueWatchingMobileItem(binding: ItemEpisodeContinueWatchingMobileBinding) {
