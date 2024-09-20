@@ -476,7 +476,7 @@ class PlayerSettingsTvView @JvmOverloads constructor(
 
                     is Settings.Subtitle -> when (item) {
                         Settings.Subtitle.Style -> context.getString(R.string.player_settings_caption_style_sub_label)
-                        is Settings.Subtitle.TextTrackInformation -> item.language?.replaceFirstChar { it.titlecase() } ?: ""
+                        is Settings.Subtitle.TextTrackInformation -> item.language ?: ""
                         else -> ""
                     }
 

@@ -467,14 +467,14 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                                             name = DefaultTrackNameProvider(resources)
                                                 .getTrackName(trackFormat),
                                             label = trackFormat.label ?: "",
-                                            language = trackFormat.language,
+                                            language = trackFormat.language?.replaceFirstChar { it.titlecase() },
 
                                             trackGroup = trackGroup,
                                             trackIndex = trackIndex,
                                         )
                                     }
                             }
-                            .sortedBy { it.label }
+                            .sortedBy { it.language ?: it.label }
                     )
                     list.add(LocalSubtitles)
                     list.add(OpenSubtitles)
