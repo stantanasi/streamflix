@@ -41,10 +41,10 @@ class MainViewModel : ViewModel() {
                 ?.filter { it.contentType == "application/vnd.android.package-archive" }
                 ?.find {
                     when (BuildConfig.APP_LAYOUT) {
-                        "mobile" -> Regex("streamflix-v\\d+\\.\\d+\\.\\d+-mobile\\.apk")
-                        "tv" -> Regex("streamflix-v\\d+\\.\\d+\\.\\d+-tv\\.apk")
-                        else -> Regex("streamflix-v\\d+\\.\\d+\\.\\d+\\.apk")
-                    }.matches(it.name)
+                        "mobile" -> it.name.endsWith("-mobile.apk")
+                        "tv" -> it.name.endsWith("-tv.apk")
+                        else -> !it.name.endsWith("-mobile.apk") && !it.name.endsWith("-tv.apk")
+                    }
                 }
 
             _state.emit(State.SuccessCheckingUpdate(newReleases, asset))
