@@ -104,43 +104,45 @@ open class RabbitstreamExtractor : Extractor() {
             return video
         }
 
-        private suspend fun extractRealKey(source: String): Pair<String, String> {
+        private suspend fun extractRealKey(sources: String): Pair<String, String> {
             val rawKeys = getKeys()
+            val sourcesArray = sources.toCharArray()
 
-            var secret = ""
-            var encryptedSource = source
-            var totalInc = 0
-            for (i in 0 until rawKeys[0]) {
-                val start = rawKeys[(i + 1) * 2]
-                val inc = rawKeys[(i + 1) * 2 - 1]
-
-                val from = start + totalInc
-                val to = from + inc
-
-                secret += source.slice(from until to)
-                encryptedSource = encryptedSource.replace(
-                    source.substring(from, to),
-                    ""
-                )
-                totalInc += inc
+            var extractedKey = ""
+            var currentIndex = 0
+            for (index in rawKeys) {
+                val start = index[0] + currentIndex
+                val end = start + index[1]
+                for (i in start until end) {
+                    extractedKey += sourcesArray[i].toString()
+                    sourcesArray[i] = ' '
+                }
+                currentIndex += index[1]
             }
 
-            return secret to encryptedSource
+            return extractedKey to sourcesArray.joinToString("").replace(" ", "")
         }
 
-        private suspend fun getKeys(): List<Int> {
+        private suspend fun getKeys(): List<List<Int>> {
             val service = Service.build(mainUrl)
             val script = service.getScript(scriptUrl, Date().time / 1000)
 
-            val keys = Regex("const \\w{1,2}=new URLSearchParams.+?;(?=function)")
-                .findAll(script).toList().lastOrNull()?.let { match ->
-                    match.value
-                        .substring(0, match.value.length - 1)
-                        .split("=")
-                        .drop(1)
-                        .mapNotNull { pair -> pair.split(",").first().replace("0x", "").toIntOrNull(16) }
-                }
-                ?: throw Exception("Can't retrieve encryption key")
+            fun matchingKey(value: String): String {
+                return Regex(",$value=((?:0x)?([0-9a-fA-F]+))").find(script)?.groupValues?.get(1)
+                    ?.removePrefix("0x")
+                    ?: throw Exception("Failed to match the key")
+            }
+
+            val keys = Regex("case\\s*0x[0-9a-f]+:(?![^;]*=partKey)\\s*\\w+\\s*=\\s*(\\w+)\\s*,\\s*\\w+\\s*=\\s*(\\w+);")
+                .findAll(script).toList().map { match ->
+                    val matchKey1 = matchingKey(match.groupValues[1])
+                    val matchKey2 = matchingKey(match.groupValues[2])
+                    try {
+                        listOf(matchKey1.toInt(16), matchKey2.toInt(16))
+                    } catch (e: NumberFormatException) {
+                        emptyList()
+                    }
+                }.filter { it.isNotEmpty() }
 
             return keys
         }

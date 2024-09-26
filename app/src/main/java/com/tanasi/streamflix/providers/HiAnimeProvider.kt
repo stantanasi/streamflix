@@ -645,8 +645,6 @@ object HiAnimeProvider : Provider {
                 )
             }
 
-        if (servers.isEmpty()) throw Exception("No links found")
-
         return servers
     }
 
