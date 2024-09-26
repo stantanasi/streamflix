@@ -26,18 +26,22 @@ class ProvidersViewModel : ViewModel() {
     }
 
 
-    fun getProviders() = viewModelScope.launch(Dispatchers.IO) {
+    fun getProviders(language: String? = null) = viewModelScope.launch(Dispatchers.IO) {
         _state.emit(State.Loading)
 
         try {
-            val providers = providers.map {
-                Provider(
-                    name = it.name,
-                    logo = it.logo,
+            val providers = providers
+                .filter { language == null || it.language == language }
+                .sortedBy { it.name }
+                .map {
+                    Provider(
+                        name = it.name,
+                        logo = it.logo,
+                        language = it.language,
 
-                    provider = it,
-                )
-            }.sortedBy { it.name }
+                        provider = it,
+                    )
+                }
 
             _state.emit(State.SuccessLoading(providers))
         } catch (e: Exception) {
