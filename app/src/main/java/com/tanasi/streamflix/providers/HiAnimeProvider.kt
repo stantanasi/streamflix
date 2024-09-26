@@ -25,6 +25,7 @@ object HiAnimeProvider : Provider {
 
     override val name = "HiAnime"
     override val logo = "https://hianime.to/images/logo.png"
+    override val language = "en"
     val url = "https://hianime.to/"
 
     private val service = HiAnimeService.build()

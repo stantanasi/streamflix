@@ -29,6 +29,7 @@ object SuperStreamProvider : Provider {
 
     override val name = "SuperStream"
     override val logo = ""
+    override val language = "en"
     val url = Base64.decode(
         "aHR0cHM6Ly9zaG93Ym94LnNoZWd1Lm5ldA==",
         Base64.NO_WRAP

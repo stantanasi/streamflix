@@ -26,6 +26,7 @@ object SflixProvider : Provider {
 
     override val name = "SFlix"
     override val logo = "https://img.sflix.to/xxrz/400x400/100/66/35/66356c25ce98cb12993249e21742b129/66356c25ce98cb12993249e21742b129.png"
+    override val language = "en"
     val url = "https://sflix.to/"
 
     private val service = SflixService.build()
