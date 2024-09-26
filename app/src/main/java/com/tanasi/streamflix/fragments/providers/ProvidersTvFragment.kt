@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,8 +17,10 @@ import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.databinding.FragmentProvidersTvBinding
 import com.tanasi.streamflix.models.Provider
+import com.tanasi.streamflix.providers.Provider.Companion.providers
 import com.tanasi.streamflix.ui.SpacingItemDecoration
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class ProvidersTvFragment : Fragment() {
 
@@ -81,6 +85,54 @@ class ProvidersTvFragment : Fragment() {
 
 
     private fun initializeProviders() {
+        binding.sProvidersLanguage.apply {
+            class Language(
+                val code: String,
+                val name: String,
+            )
+
+            val languages = providers
+                .distinctBy { it.language }
+                .map {
+                    val locale = Locale(it.language)
+
+                    Language(
+                        code = it.language,
+                        name = locale.getDisplayLanguage(locale),
+                    )
+                }
+                .sortedBy { it.name.lowercase() }
+
+            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    if (position == 0) {
+                        viewModel.getProviders()
+                    } else {
+                        viewModel.getProviders(languages[position - 1].code)
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                }
+            }
+
+            val spinnerAdapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                languages.map { it.name }.toMutableList()
+                    .also { it.add(0, context.getString(R.string.providers_all_languages)) }
+                    .toTypedArray()
+            ).also {
+                it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            }
+            setAdapter(spinnerAdapter)
+        }
+
         binding.rvProviders.apply {
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY

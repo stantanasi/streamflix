@@ -13,6 +13,7 @@ interface Provider {
 
     val name: String
     val logo: String
+    val language: String
 
     suspend fun getHome(): List<Category>
 

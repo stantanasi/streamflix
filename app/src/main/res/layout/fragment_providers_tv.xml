@@ -6,6 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".fragments.providers.ProvidersTvFragment">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:src="@drawable/ic_providers_language"
+        android:tint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@id/s_providers_language"
+        app:layout_constraintEnd_toStartOf="@id/s_providers_language"
+        app:layout_constraintTop_toTopOf="@id/s_providers_language"
+        tools:ignore="ContentDescription,UseAppTint" />
+
+    <Spinner
+        android:id="@+id/s_providers_language"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/tv_providers_label"
         android:layout_width="0dp"

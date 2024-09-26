@@ -18,6 +18,7 @@
     <string name="app_layout_tv">TV layout</string>
     <string name="app_layout_apply">Apply</string>
 
+    <string name="providers_all_languages">All languages</string>
     <string name="providers_choose_title">Choose a provider</string>
 
     <string name="main_menu_change_provider">Change provider</string>

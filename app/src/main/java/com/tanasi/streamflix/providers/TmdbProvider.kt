@@ -24,6 +24,7 @@ object TmdbProvider : Provider {
     override val name = "TMDb"
     override val logo =
         "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Tmdb.new.logo.svg/1280px-Tmdb.new.logo.svg.png"
+    override val language = "en"
 
     override suspend fun getHome(): List<Category> {
         val categories = mutableListOf<Category>()
