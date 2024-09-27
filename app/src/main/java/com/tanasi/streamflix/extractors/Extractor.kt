@@ -27,6 +27,7 @@ abstract class Extractor {
             MyFileStorageExtractor(),
             MoflixExtractor(),
             VidsrcNetExtractor(),
+            StreamWishExtractor(),
         )
 
         suspend fun extract(link: String): Video {
