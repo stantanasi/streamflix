@@ -47,6 +47,17 @@ open class StreamWishExtractor : Extractor() {
     }
 
 
+    class UqloadsXyz : StreamWishExtractor() {
+        override val name = "Uqloads"
+        override val mainUrl = "https://uqloads.xyz"
+
+        suspend fun extract(link: String, referer: String): Video {
+            this.referer = referer
+            return extract(link)
+        }
+    }
+
+
     private interface Service {
 
         companion object {
