@@ -27,6 +27,9 @@ abstract class Extractor {
             MyFileStorageExtractor(),
             MoflixExtractor(),
             VidsrcNetExtractor(),
+            StreamWishExtractor(),
+            StreamWishExtractor.UqloadsXyz(),
+            TwoEmbedExtractor(),
         )
 
         suspend fun extract(link: String): Video {
