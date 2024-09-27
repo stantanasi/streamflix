@@ -29,6 +29,7 @@ abstract class Extractor {
             VidsrcNetExtractor(),
             StreamWishExtractor(),
             StreamWishExtractor.UqloadsXyz(),
+            TwoEmbedExtractor(),
         )
 
         suspend fun extract(link: String): Video {
