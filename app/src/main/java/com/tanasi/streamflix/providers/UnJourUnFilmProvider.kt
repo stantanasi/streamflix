@@ -528,7 +528,60 @@ object UnJourUnFilmProvider : Provider {
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
-        TODO("Not yet implemented")
+        if (page > 1) return People(id, name = "")
+
+        val document = service.getCast(id)
+
+        val people = People(
+            id = id,
+            name = document.selectFirst("h1.heading-archive")
+                ?.text()
+                ?: "",
+
+            filmography = document.select("div.items article.item").mapNotNull {
+                val showId = it.selectFirst("a")
+                    ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                    ?: ""
+                val showTitle = it.selectFirst("div.data h3")
+                    ?.text()
+                    ?: ""
+                val showReleased = it.selectFirst("div.data span")
+                    ?.text()
+                val showQuality = it.selectFirst("span.quality")
+                    ?.text()
+                val showRating = it.selectFirst("div.rating")
+                    ?.text()?.toDoubleOrNull()
+                val showPoster = it.selectFirst("img")
+                    ?.attr("src")
+
+                val href = it.selectFirst("a")
+                    ?.attr("href")
+                    ?: ""
+                if (href.contains("/movies/")) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        released = showReleased,
+                        quality = showQuality,
+                        rating = showRating,
+                        poster = showPoster,
+                    )
+                } else if (href.contains("/tvshows/")) {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        released = showReleased,
+                        quality = showQuality,
+                        rating = showRating,
+                        poster = showPoster,
+                    )
+                } else {
+                    null
+                }
+            }
+        )
+
+        return people
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
@@ -583,5 +636,8 @@ object UnJourUnFilmProvider : Provider {
             @Path("id") id: String,
             @Path("page") page: Int,
         ): Document
+
+        @GET("cast/{id}")
+        suspend fun getCast(@Path("id") id: String): Document
     }
 }
