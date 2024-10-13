@@ -45,6 +45,7 @@ interface Provider {
             SerienStreamProvider,
             TmdbProvider,
             SuperStreamProvider,
+            UnJourUnFilmProvider,
         )
     }
 }

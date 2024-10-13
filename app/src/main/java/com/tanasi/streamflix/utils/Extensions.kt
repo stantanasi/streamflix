@@ -51,6 +51,7 @@ fun String.toCalendar(): Calendar? {
         SimpleDateFormat("yyyy", Locale.ENGLISH),
         SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH),
         SimpleDateFormat("MMMM d, yyyy ('United' 'States')", Locale.ENGLISH),
+        SimpleDateFormat("MMM. d, yyyy", Locale.ENGLISH),
     )
     patterns.forEach { sdf ->
         try {

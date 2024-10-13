@@ -30,6 +30,8 @@ abstract class Extractor {
             StreamWishExtractor(),
             StreamWishExtractor.UqloadsXyz(),
             TwoEmbedExtractor(),
+            ChillxExtractor(),
+            ChillxExtractor.JeanExtractor(),
         )
 
         suspend fun extract(link: String): Video {
