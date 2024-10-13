@@ -14,8 +14,8 @@ android {
         applicationId "com.tanasi.streamflix"
         minSdk 21
         targetSdk 34
-        versionCode 30
-        versionName "1.6.13"
+        versionCode 31
+        versionName "1.7.0"
 
         def properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
