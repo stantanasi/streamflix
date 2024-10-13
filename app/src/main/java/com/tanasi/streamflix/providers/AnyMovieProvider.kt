@@ -15,7 +15,6 @@ import okhttp3.OkHttpClient
 import org.json.JSONObject
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -33,7 +32,7 @@ object AnyMovieProvider : Provider {
     override val name = "AnyMovie"
     override val logo = "https://anymovie.cc/wp-content/uploads/2023/08/AM-LOGO-1.png"
     override val language = "en"
-    val url = "https://anymovie.cc/"
+    private const val URL = "https://anymovie.cc/"
 
     private var _wpsearch = ""
 
@@ -981,7 +980,7 @@ object AnyMovieProvider : Provider {
                     .build()
 
                 val retrofit = Retrofit.Builder()
-                    .baseUrl(url)
+                    .baseUrl(URL)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)

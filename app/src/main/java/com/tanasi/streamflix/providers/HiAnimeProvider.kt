@@ -26,7 +26,7 @@ object HiAnimeProvider : Provider {
     override val name = "HiAnime"
     override val logo = "https://hianime.to/images/logo.png"
     override val language = "en"
-    val url = "https://hianime.to/"
+    private const val URL = "https://hianime.to/"
 
     private val service = HiAnimeService.build()
 
@@ -666,7 +666,7 @@ object HiAnimeProvider : Provider {
                     .build()
 
                 val retrofit = Retrofit.Builder()
-                    .baseUrl(url)
+                    .baseUrl(URL)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)

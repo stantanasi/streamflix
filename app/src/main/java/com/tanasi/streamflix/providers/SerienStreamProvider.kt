@@ -36,7 +36,7 @@ object SerienStreamProvider : Provider {
     override val logo =
         "https://s.to/public/img/logo-sto-serienstream-sx-to-serien-online-streaming-vod.png"
     override val language = "de"
-    val url = "https://serienstream.to/"
+    private const val URL = "https://serienstream.to/"
 
     private val service = BurningSeriesService.build()
 
@@ -74,7 +74,7 @@ object SerienStreamProvider : Provider {
                         TvShow(
                             id = getTvShowIdFromLink(it.selectFirst("a")?.attr("href") ?: ""),
                             title = it.selectFirst("a")?.text() ?: "",
-                            poster = url + it.selectFirst("img")?.attr("data-src")
+                            poster = URL + it.selectFirst("img")?.attr("data-src")
                         )
                     })
         )
@@ -85,7 +85,7 @@ object SerienStreamProvider : Provider {
                         TvShow(
                             id = getTvShowIdFromLink(it.selectFirst("a")?.attr("href") ?: ""),
                             title = it.selectFirst("a")?.text() ?: "",
-                            poster = url + it.selectFirst("img")?.attr("data-src")
+                            poster = URL + it.selectFirst("img")?.attr("data-src")
                         )
                     })
         )
@@ -96,7 +96,7 @@ object SerienStreamProvider : Provider {
                         TvShow(
                             id = getTvShowIdFromLink(it.selectFirst("a")?.attr("href") ?: ""),
                             title = it.selectFirst("a")?.text() ?: "",
-                            poster = url + it.selectFirst("img")?.attr("data-src")
+                            poster = URL + it.selectFirst("img")?.attr("data-src")
                         )
                     })
         )
@@ -180,8 +180,8 @@ object SerienStreamProvider : Provider {
                 )
             },
             trailer = document.selectFirst("div[itemprop='trailer'] a")?.attr("href") ?: "",
-            poster = url + document.selectFirst("div.seriesCoverBox img")?.attr("data-src"),
-            banner = url + document.selectFirst("#series > section > div.backdrop")
+            poster = URL + document.selectFirst("div.seriesCoverBox img")?.attr("data-src"),
+            banner = URL + document.selectFirst("#series > section > div.backdrop")
                 ?.attr("style")
                 ?.replace("background-image: url(/", "")?.replace(")", ""),
             seasons = document.select("#stream > ul:nth-child(1) > li")
@@ -222,7 +222,7 @@ object SerienStreamProvider : Provider {
                             ?.let { it1 -> getTvShowIdFromLink(it1) }
                             ?: "",
                         title = it.selectFirst("h3")?.text() ?: "",
-                        poster = url + it.selectFirst("img")?.attr("data-src")
+                        poster = URL + it.selectFirst("img")?.attr("data-src")
                     )
                 )
             }
@@ -241,7 +241,7 @@ object SerienStreamProvider : Provider {
                             ?.let { it1 -> getTvShowIdFromLink(it1) }
                             ?: "",
                         title = it.selectFirst("h3")?.text() ?: "",
-                        poster = url + it.selectFirst("img")?.attr("data-src")
+                        poster = URL + it.selectFirst("img")?.attr("data-src")
                     )
                 }
         )
@@ -255,7 +255,7 @@ object SerienStreamProvider : Provider {
 
         val document = service.getTvShowEpisodeServers(showName, seasonNumber, episodeNumber)
         return document.select("div.hosterSiteVideo > ul > li").map {
-            val redirectUrl = url + it.selectFirst("a")?.attr("href")
+            val redirectUrl = URL + it.selectFirst("a")?.attr("href")
             val serverAfterRedirect = service.getRedirectLink(redirectUrl)
             val videoUrl = (serverAfterRedirect.raw() as okhttp3.Response).request.url
             var videoUrlString = videoUrl.toString()
@@ -293,7 +293,7 @@ object SerienStreamProvider : Provider {
 
             fun build(): BurningSeriesService {
                 val client = getOkHttpClient()
-                val retrofit = Retrofit.Builder().baseUrl(url)
+                val retrofit = Retrofit.Builder().baseUrl(URL)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create()).client(client).build()
                 return retrofit.create(BurningSeriesService::class.java)
