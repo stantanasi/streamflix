@@ -1,7 +1,9 @@
 package com.tanasi.streamflix.providers
 
+import com.google.gson.annotations.SerializedName
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -14,7 +16,11 @@ import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import retrofit2.HttpException
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -606,7 +612,16 @@ object UnJourUnFilmProvider : Provider {
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
-        TODO("Not yet implemented")
+        val (post, nume) = server.id.split("/")
+
+        val embed = service.api(
+            action = "doo_player_ajax",
+            post = post,
+            nume = nume,
+            type = "movie"
+        )
+
+        return Extractor.extract(embed.embedUrl)
     }
 
 
@@ -620,6 +635,7 @@ object UnJourUnFilmProvider : Provider {
                 val retrofit = Retrofit.Builder()
                     .baseUrl(URL)
                     .addConverterFactory(JsoupConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
                     .build()
 
@@ -659,5 +675,20 @@ object UnJourUnFilmProvider : Provider {
 
         @GET("cast/{id}")
         suspend fun getCast(@Path("id") id: String): Document
+
+        @POST("${URL}wp-admin/admin-ajax.php")
+        @FormUrlEncoded
+        suspend fun api(
+            @Field("action") action: String,
+            @Field("nume") nume: String,
+            @Field("post") post: String,
+            @Field("type") type: String,
+        ): EmbedResponse
+
+
+        data class EmbedResponse(
+            @SerializedName("embed_url") val embedUrl: String,
+            val type: String?,
+        )
     }
 }
