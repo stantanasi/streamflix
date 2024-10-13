@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
+import com.tanasi.streamflix.models.Genre
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.utils.UserPreferences
@@ -89,6 +90,12 @@ class SearchViewModel(database: AppDatabase) : ViewModel() {
 
         try {
             val results = UserPreferences.currentProvider!!.search(query)
+                .sortedBy {
+                    when (it) {
+                        is Genre -> it.name
+                        else -> ""
+                    }
+                }
 
             this@SearchViewModel.query = query
             page = 1
