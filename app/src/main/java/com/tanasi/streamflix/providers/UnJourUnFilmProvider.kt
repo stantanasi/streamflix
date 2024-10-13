@@ -585,7 +585,24 @@ object UnJourUnFilmProvider : Provider {
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
-        TODO("Not yet implemented")
+        val document = when (videoType) {
+            is Video.Type.Episode -> service.getEpisode(id)
+            is Video.Type.Movie -> service.getMovie(id)
+        }
+
+        val servers = document.select("ul#playeroptionsul > li").mapNotNull {
+            if (it.attr("data-nume") == "trailer")
+                return@mapNotNull null
+
+            Video.Server(
+                id = "${it.attr("data-post")}/${it.attr("data-nume")}",
+                name = it.selectFirst("span.title")
+                    ?.text()
+                    ?: "",
+            )
+        }
+
+        return servers
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
@@ -630,6 +647,9 @@ object UnJourUnFilmProvider : Provider {
 
         @GET("tvshows/{id}")
         suspend fun getTvShow(@Path("id") id: String): Document
+
+        @GET("episodes/{id}")
+        suspend fun getEpisode(@Path("id") id: String): Document
 
         @GET("genre/{id}/page/{page}")
         suspend fun getGenre(
