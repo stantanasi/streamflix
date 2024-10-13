@@ -291,7 +291,88 @@ object UnJourUnFilmProvider : Provider {
     }
 
     override suspend fun getMovie(id: String): Movie {
-        TODO("Not yet implemented")
+        val document = service.getMovie(id)
+
+        val movie = Movie(
+            id = id,
+            title = document.selectFirst("h1")
+                ?.text()
+                ?: "",
+            overview = document.selectFirst("div#info div.wp-content p")
+                ?.text(),
+            released = document.selectFirst("div.extra span.date")
+                ?.text(),
+            runtime = document.selectFirst("div.extra span.runtime")
+                ?.text()?.substringBefore(" Min")?.toIntOrNull(),
+            rating = document.selectFirst("span.dt_rating_vgs")
+                ?.text()?.toDoubleOrNull(),
+            poster = document.selectFirst("div.poster img")
+                ?.attr("src"),
+            banner = document.selectFirst("img.cover")
+                ?.attr("src"),
+
+            genres = document.select("div.sgeneros a").map {
+                Genre(
+                    id = it.attr("href").substringBeforeLast("/").substringAfterLast("/"),
+                    name = it.text(),
+                )
+            },
+            directors = document.select("div#cast div.person[itemprop=director]").map {
+                People(
+                    id = it.selectFirst("a")
+                        ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                        ?: "",
+                    name = it.selectFirst("div.name")
+                        ?.text()
+                        ?: "",
+                    image = it.selectFirst("img")
+                        ?.attr("src"),
+                )
+            },
+            cast = document.select("div#cast div.person[itemprop=actor]").map {
+                People(
+                    id = it.selectFirst("a")
+                        ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                        ?: "",
+                    name = it.selectFirst("div.name")
+                        ?.text()
+                        ?: "",
+                    image = it.selectFirst("img")
+                        ?.attr("src"),
+                )
+            },
+            recommendations = document.select("div.srelacionados article").mapNotNull {
+                val showId = it.selectFirst("a")
+                    ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                    ?: ""
+                val showTitle = it.selectFirst("img")
+                    ?.attr("alt")
+                    ?: ""
+                val showPoster = it.selectFirst("img")
+                    ?.attr("src")
+
+                val href = it.selectFirst("a")
+                    ?.attr("href")
+                    ?: ""
+                if (href.contains("/movies/")) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        poster = showPoster,
+                    )
+                } else if (href.contains("/tvshows/")) {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        poster = showPoster,
+                    )
+                } else {
+                    null
+                }
+            },
+        )
+
+        return movie
     }
 
     override suspend fun getTvShow(id: String): TvShow {
@@ -350,5 +431,8 @@ object UnJourUnFilmProvider : Provider {
 
         @GET("tvshows/page/{page}")
         suspend fun getTvShows(@Path("page") page: Int): Document
+
+        @GET("movies/{id}")
+        suspend fun getMovie(@Path("id") id: String): Document
     }
 }
