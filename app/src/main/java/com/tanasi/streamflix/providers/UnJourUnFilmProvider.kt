@@ -262,7 +262,32 @@ object UnJourUnFilmProvider : Provider {
     }
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
-        TODO("Not yet implemented")
+        val document = try {
+            service.getTvShows(page)
+        } catch (e: HttpException) {
+            if (e.code() == 404) return emptyList()
+            else throw e
+        }
+
+
+        val tvShows = document.select("div#archive-content article.item").map {
+            TvShow(
+                id = it.selectFirst("a")
+                    ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                    ?: "",
+                title = it.selectFirst("div.data h3")
+                    ?.text()
+                    ?: "",
+                released = it.selectFirst("div.data span")
+                    ?.text(),
+                rating = it.selectFirst("div.rating")
+                    ?.text()?.toDoubleOrNull(),
+                poster = it.selectFirst("img")
+                    ?.attr("src"),
+            )
+        }
+
+        return tvShows
     }
 
     override suspend fun getMovie(id: String): Movie {
@@ -322,5 +347,8 @@ object UnJourUnFilmProvider : Provider {
 
         @GET("movies/page/{page}")
         suspend fun getMovies(@Path("page") page: Int): Document
+
+        @GET("tvshows/page/{page}")
+        suspend fun getTvShows(@Path("page") page: Int): Document
     }
 }
