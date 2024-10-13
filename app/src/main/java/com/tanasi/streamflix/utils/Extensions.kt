@@ -46,6 +46,8 @@ import kotlin.math.min
 
 fun String.toCalendar(): Calendar? {
     val patterns = listOf(
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH),
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.ENGLISH),
         SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH),
         SimpleDateFormat("d MMMM yyyy ('USA')", Locale.ENGLISH),
         SimpleDateFormat("yyyy", Locale.ENGLISH),

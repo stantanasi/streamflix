@@ -11,7 +11,7 @@ class Converters {
 
     @TypeConverter
     fun fromCalendar(value: Calendar?): String? {
-        return value?.format("yyyy-MM-dd'T'HH:mm'Z'")
+        return value?.format("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     }
 
     @TypeConverter
