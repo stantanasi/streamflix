@@ -10,7 +10,9 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import okhttp3.OkHttpClient
+import org.jsoup.nodes.Document
 import retrofit2.Retrofit
+import retrofit2.http.GET
 
 object UnJourUnFilmProvider : Provider {
 
@@ -23,7 +25,139 @@ object UnJourUnFilmProvider : Provider {
     private val service = Service.build()
 
     override suspend fun getHome(): List<Category> {
-        TODO("Not yet implemented")
+        val document = service.getHome()
+
+        val categories = mutableListOf<Category>()
+
+        categories.add(
+            Category(
+                name = Category.FEATURED,
+                list = document.select("div#slider-movies-tvshows article.item").mapNotNull {
+                    val id = it.selectFirst("a")
+                        ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                        ?: ""
+                    val title = it.selectFirst("h3.title")
+                        ?.text()
+                        ?: ""
+                    val released = it.selectFirst("div.data span")
+                        ?.text()
+                    val banner = it.selectFirst("img")
+                        ?.attr("src")
+
+                    val href = it.selectFirst("a")
+                        ?.attr("href")
+                        ?: ""
+                    if (href.contains("/movies/")) {
+                        Movie(
+                            id = id,
+                            title = title,
+                            released = released,
+                            banner = banner,
+                        )
+                    } else if (href.contains("/tvshows/")) {
+                        TvShow(
+                            id = id,
+                            title = title,
+                            released = released,
+                            banner = banner,
+                        )
+                    } else {
+                        null
+                    }
+                }
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Le TOP Actuel",
+                list = document.select("div.items")[0].select("article.item").mapNotNull {
+                    val id = it.selectFirst("a")
+                        ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                        ?: ""
+                    val title = it.selectFirst("div.data h3")
+                        ?.text()
+                        ?: ""
+                    val released = it.selectFirst("div.data span")
+                        ?.text()
+                    val rating = it.selectFirst("div.rating")
+                        ?.text()?.toDoubleOrNull()
+                    val poster = it.selectFirst("img")
+                        ?.attr("data-src")
+
+                    val href = it.selectFirst("a")
+                        ?.attr("href")
+                        ?: ""
+                    if (href.contains("/movies/")) {
+                        Movie(
+                            id = id,
+                            title = title,
+                            released = released,
+                            rating = rating,
+                            poster = poster,
+                        )
+                    } else if (href.contains("/tvshows/")) {
+                        TvShow(
+                            id = id,
+                            title = title,
+                            released = released,
+                            rating = rating,
+                            poster = poster,
+                        )
+                    } else {
+                        null
+                    }
+                },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Derniers Films",
+                list = document.select("div.items")[1].select("article.item").mapNotNull {
+                    Movie(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                            ?: "",
+                        title = it.selectFirst("div.data h3")
+                            ?.text()
+                            ?: "",
+                        released = it.selectFirst("div.data span")
+                            ?.text(),
+                        quality = it.selectFirst("span.quality")
+                            ?.text(),
+                        rating = it.selectFirst("div.rating")
+                            ?.text()?.toDoubleOrNull(),
+                        poster = it.selectFirst("img")
+                            ?.attr("src"),
+                    )
+                },
+            )
+        )
+
+        categories.add(
+            Category(
+                name = "Dernières Séries",
+                list = document.select("div.items")[2].select("article.item").mapNotNull {
+                    TvShow(
+                        id = it.selectFirst("a")
+                            ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                            ?: "",
+                        title = it.selectFirst("div.data h3")
+                            ?.text()
+                            ?: "",
+                        released = it.selectFirst("div.data span")
+                            ?.text(),
+                        rating = it.selectFirst("div.rating")
+                            ?.text()?.toDoubleOrNull(),
+                        poster = it.selectFirst("img")
+                            ?.attr("src"),
+                    )
+                },
+            )
+        )
+
+        return categories
     }
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
@@ -83,5 +217,8 @@ object UnJourUnFilmProvider : Provider {
                 return retrofit.create(Service::class.java)
             }
         }
+
+        @GET(".")
+        suspend fun getHome(): Document
     }
 }
