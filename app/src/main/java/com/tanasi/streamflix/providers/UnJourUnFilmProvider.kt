@@ -468,7 +468,63 @@ object UnJourUnFilmProvider : Provider {
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
-        TODO("Not yet implemented")
+        val document = try {
+            service.getGenre(id, page)
+        } catch (e: HttpException) {
+            if (e.code() == 404) return Genre(id, "")
+            else throw e
+        }
+
+        val genre = Genre(
+            id = id,
+            name = document.selectFirst("h1.heading-archive")
+                ?.text()
+                ?: "",
+
+            shows = document.select("div.items article.item").mapNotNull {
+                val showId = it.selectFirst("a")
+                    ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                    ?: ""
+                val showTitle = it.selectFirst("div.data h3")
+                    ?.text()
+                    ?: ""
+                val showReleased = it.selectFirst("div.data span")
+                    ?.text()
+                val showQuality = it.selectFirst("span.quality")
+                    ?.text()
+                val showRating = it.selectFirst("div.rating")
+                    ?.text()?.toDoubleOrNull()
+                val showPoster = it.selectFirst("img")
+                    ?.attr("src")
+
+                val href = it.selectFirst("a")
+                    ?.attr("href")
+                    ?: ""
+                if (href.contains("/movies/")) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        released = showReleased,
+                        quality = showQuality,
+                        rating = showRating,
+                        poster = showPoster,
+                    )
+                } else if (href.contains("/tvshows/")) {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        released = showReleased,
+                        quality = showQuality,
+                        rating = showRating,
+                        poster = showPoster,
+                    )
+                } else {
+                    null
+                }
+            },
+        )
+
+        return genre
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
@@ -521,5 +577,11 @@ object UnJourUnFilmProvider : Provider {
 
         @GET("tvshows/{id}")
         suspend fun getTvShow(@Path("id") id: String): Document
+
+        @GET("genre/{id}/page/{page}")
+        suspend fun getGenre(
+            @Path("id") id: String,
+            @Path("page") page: Int,
+        ): Document
     }
 }
