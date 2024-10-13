@@ -11,8 +11,11 @@ import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.http.GET
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 object UnJourUnFilmProvider : Provider {
 
@@ -161,7 +164,71 @@ object UnJourUnFilmProvider : Provider {
     }
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
-        TODO("Not yet implemented")
+        if (query.isEmpty()) {
+            val document = service.getHome()
+
+            val genres = document.select("li.menu-item-object-genres").map {
+                Genre(
+                    id = it.selectFirst("a")
+                        ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                        ?: "",
+                    name = it.text(),
+                )
+            }.distinctBy { it.id }
+
+            return genres
+        }
+
+        val document = try {
+            service.search(page, query)
+        } catch (e: HttpException) {
+            if (e.code() == 404) return emptyList()
+            else throw e
+        }
+
+        val results = document.select("div.result-item").mapNotNull {
+            val id = it.selectFirst("a")
+                ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                ?: ""
+            val title = it.selectFirst("div.title")
+                ?.text()
+                ?: ""
+            val overview = it.selectFirst("div.contenido")
+                ?.text()?.substringAfter(": ")
+            val released = it.selectFirst("span.year")
+                ?.text()
+            val rating = it.selectFirst("div.rating")
+                ?.text()?.substringAfter("IMDb ")?.toDoubleOrNull()
+            val poster = it.selectFirst("img")
+                ?.attr("src")
+
+            val href = it.selectFirst("a")
+                ?.attr("href")
+                ?: ""
+            if (href.contains("/movies/")) {
+                Movie(
+                    id = id,
+                    title = title,
+                    overview = overview,
+                    released = released,
+                    rating = rating,
+                    poster = poster,
+                )
+            } else if (href.contains("/tvshows/")) {
+                TvShow(
+                    id = id,
+                    title = title,
+                    overview = overview,
+                    released = released,
+                    rating = rating,
+                    poster = poster,
+                )
+            } else {
+                null
+            }
+        }
+
+        return results
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
@@ -220,5 +287,11 @@ object UnJourUnFilmProvider : Provider {
 
         @GET(".")
         suspend fun getHome(): Document
+
+        @GET("page/{page}")
+        suspend fun search(
+            @Path("page") page: Int,
+            @Query("s") s: String,
+        ): Document
     }
 }
