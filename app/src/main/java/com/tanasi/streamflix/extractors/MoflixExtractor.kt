@@ -84,7 +84,9 @@ class MoflixExtractor : Extractor() {
 
             Video(
                 m3u8,
-                referer = "$host/"
+                headers = mapOf(
+                    "Referer" to "$host/",
+                ),
             )
         }
 

@@ -274,7 +274,7 @@ fun String.toSubtitleMimeType(): String {
     }
 }
 
-inline fun <reified T: Enum<T>> T.next(): T {
+inline fun <reified T : Enum<T>> T.next(): T {
     val values = enumValues<T>()
     val nextOrdinal = (ordinal + 1) % values.size
     return values[nextOrdinal]
@@ -309,3 +309,6 @@ private fun ContentResolver.getContentFileName(uri: Uri): String? = runCatching 
             ?.let { cursor.getString(it) }
     }
 }.getOrNull()
+
+operator fun <K, V> Map<out K, V>.plus(map: Map<out K, V>): Map<K, V> =
+    LinkedHashMap(this).apply { putAll(map) }

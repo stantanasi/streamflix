@@ -43,9 +43,9 @@ import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.models.WatchItem
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
-import com.tanasi.streamflix.utils.filterNotNullValues
 import com.tanasi.streamflix.utils.getFileName
 import com.tanasi.streamflix.utils.next
+import com.tanasi.streamflix.utils.plus
 import com.tanasi.streamflix.utils.setMediaServerId
 import com.tanasi.streamflix.utils.setMediaServers
 import com.tanasi.streamflix.utils.toSubtitleMimeType
@@ -350,9 +350,8 @@ class PlayerTvFragment : Fragment() {
 
         httpDataSource.setDefaultRequestProperties(
             mapOf(
-                "Referer" to video.referer,
                 "User-Agent" to userAgent,
-            ).filterNotNullValues()
+            ) + (video.headers ?: emptyMap())
         )
 
         player.setMediaItem(

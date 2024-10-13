@@ -58,7 +58,9 @@ class MyFileStorageExtractor : Extractor() {
         val video = Video(
             source = url,
             subtitles = emptyList(),
-            referer = "https://bflix.gs/"
+            headers = mapOf(
+                "Referer" to "https://bflix.gs/",
+            ),
         )
 
         return video

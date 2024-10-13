@@ -55,7 +55,9 @@ class VidsrcNetExtractor : Extractor() {
         return Video(
             source = decrypt(playerId, encryptedSource),
             subtitles = emptyList(),
-            referer = iframedoc,
+            headers = mapOf(
+                "Referer" to iframedoc
+            ),
         )
     }
 
