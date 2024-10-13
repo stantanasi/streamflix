@@ -7,6 +7,7 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.People
+import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import okhttp3.OkHttpClient
@@ -376,7 +377,68 @@ object UnJourUnFilmProvider : Provider {
     }
 
     override suspend fun getTvShow(id: String): TvShow {
-        TODO("Not yet implemented")
+        val document = service.getTvShow(id)
+
+        val tvShow = TvShow(
+            id = id,
+            title = document.selectFirst("h1")
+                ?.text()
+                ?: "",
+            overview = document.selectFirst("div#info div.wp-content p")
+                ?.text(),
+            rating = document.selectFirst("span.dt_rating_vgs")
+                ?.text()?.toDoubleOrNull(),
+            poster = document.selectFirst("div.poster img")
+                ?.attr("src"),
+
+            seasons = document.select("div#seasons div.se-c").mapIndexed { index, it ->
+                Season(
+                    id = "$id/$index",
+                    number = it.selectFirst("span.se-t")
+                        ?.text()?.toIntOrNull()
+                        ?: 0,
+                    title = it.selectFirst("span.title")
+                        ?.ownText(),
+                )
+            },
+            genres = document.select("div.sgeneros a").map {
+                Genre(
+                    id = it.attr("href").substringBeforeLast("/").substringAfterLast("/"),
+                    name = it.text(),
+                )
+            },
+            recommendations = document.select("div.srelacionados article").mapNotNull {
+                val showId = it.selectFirst("a")
+                    ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                    ?: ""
+                val showTitle = it.selectFirst("img")
+                    ?.attr("alt")
+                    ?: ""
+                val showPoster = it.selectFirst("img")
+                    ?.attr("src")
+
+                val href = it.selectFirst("a")
+                    ?.attr("href")
+                    ?: ""
+                if (href.contains("/movies/")) {
+                    Movie(
+                        id = showId,
+                        title = showTitle,
+                        poster = showPoster,
+                    )
+                } else if (href.contains("/tvshows/")) {
+                    TvShow(
+                        id = showId,
+                        title = showTitle,
+                        poster = showPoster,
+                    )
+                } else {
+                    null
+                }
+            },
+        )
+
+        return tvShow
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
@@ -434,5 +496,8 @@ object UnJourUnFilmProvider : Provider {
 
         @GET("movies/{id}")
         suspend fun getMovie(@Path("id") id: String): Document
+
+        @GET("tvshows/{id}")
+        suspend fun getTvShow(@Path("id") id: String): Document
     }
 }
