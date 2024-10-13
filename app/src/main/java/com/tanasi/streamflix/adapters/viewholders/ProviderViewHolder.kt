@@ -10,6 +10,7 @@ import com.tanasi.streamflix.databinding.ItemProviderTvBinding
 import com.tanasi.streamflix.models.Provider
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.toActivity
+import java.util.Locale
 
 class ProviderViewHolder(
     private val _binding: ViewBinding
@@ -48,6 +49,10 @@ class ProviderViewHolder(
             .into(binding.ivProviderLogo)
 
         binding.tvProviderName.text = provider.name
+
+        binding.tvProviderLanguage.text = Locale(provider.language)
+            .let { it.getDisplayLanguage(it) }
+            .replaceFirstChar { it.titlecase() }
     }
 
     private fun displayTvItem(binding: ItemProviderTvBinding) {
@@ -67,5 +72,9 @@ class ProviderViewHolder(
             .into(binding.ivProviderLogo)
 
         binding.tvProviderName.text = provider.name
+
+        binding.tvProviderLanguage.text = Locale(provider.language)
+            .let { it.getDisplayLanguage(it) }
+            .replaceFirstChar { it.titlecase() }
     }
 }
