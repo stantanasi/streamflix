@@ -442,7 +442,29 @@ object UnJourUnFilmProvider : Provider {
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
-        TODO("Not yet implemented")
+        val (tvShowId, seasonIndex) = seasonId.split("/")
+
+        val document = service.getTvShow(tvShowId)
+
+        val episodes = document.select("div#seasons div.se-c").getOrNull(seasonIndex.toInt())
+            ?.select("ul.episodios li")?.map {
+                Episode(
+                    id = it.selectFirst("a")
+                        ?.attr("href")?.substringBeforeLast("/")?.substringAfterLast("/")
+                        ?: "",
+                    number = it.selectFirst("div.numerando")
+                        ?.text()?.substringAfter("- ")?.toIntOrNull()
+                        ?: 0,
+                    title = it.selectFirst("div.episodiotitle > a")
+                        ?.text(),
+                    released = it.selectFirst("span.date")
+                        ?.text(),
+                    poster = it.selectFirst("img")
+                        ?.attr("src"),
+                )
+            } ?: emptyList()
+
+        return episodes
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
