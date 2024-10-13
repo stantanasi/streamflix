@@ -27,8 +27,25 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
         combine(
             database.movieDao().getWatchingMovies(),
             database.episodeDao().getWatchingEpisodes(),
-        ) { watchingMovies, watchingEpisodes ->
+            database.episodeDao().getAll(),
+        ) { watchingMovies, watchingEpisodes, episodes ->
+            val watchNextEpisodes = episodes
+                .groupBy { it.tvShow?.id }
+                .values.mapNotNull { tvShowEpisodes ->
+                    val watchedEpisode = tvShowEpisodes.findLast { it.isWatched }
+                    val nextEpisode = watchedEpisode?.let {
+                        val index = tvShowEpisodes.indexOf(it)
+                        tvShowEpisodes.getOrNull(index + 1)
+                    }
+
+                    nextEpisode?.watchedDate = watchedEpisode?.watchedDate
+                    nextEpisode
+                }
+
             watchingMovies + watchingEpisodes.onEach { episode ->
+                episode.tvShow = episode.tvShow?.let { database.tvShowDao().getById(it.id) }
+                episode.season = episode.season?.let { database.seasonDao().getById(it.id) }
+            } + watchNextEpisodes.onEach { episode ->
                 episode.tvShow = episode.tvShow?.let { database.tvShowDao().getById(it.id) }
                 episode.season = episode.season?.let { database.seasonDao().getById(it.id) }
             }
@@ -86,7 +103,10 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
                     Category(
                         name = Category.CONTINUE_WATCHING,
                         list = continueWatching
-                            .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
+                            .sortedByDescending {
+                                it.watchHistory?.lastEngagementTimeUtcMillis
+                                    ?: it.watchedDate?.timeInMillis
+                            }
                             .distinctBy {
                                 when (it) {
                                     is Episode -> it.tvShow?.id
