@@ -57,6 +57,11 @@ open class ChillxExtractor : Extractor() {
         return video
     }
 
+    class JeanExtractor : ChillxExtractor() {
+        override val name = "Jean"
+        override val mainUrl = "https://player.jeansaispasplus.homes/"
+    }
+
 
     private interface Service {
 
