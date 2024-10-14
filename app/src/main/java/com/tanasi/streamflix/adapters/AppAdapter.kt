@@ -83,6 +83,8 @@ class AppAdapter(
         EPISODE_CONTINUE_WATCHING_MOBILE_ITEM,
         EPISODE_CONTINUE_WATCHING_TV_ITEM,
 
+        FOOTER,
+
         GENRE_GRID_MOBILE_ITEM,
         GENRE_GRID_TV_ITEM,
 
@@ -135,6 +137,7 @@ class AppAdapter(
     var isLoading = false
     private var header: Header<ViewBinding>? = null
     private var onLoadMoreListener: (() -> Unit)? = null
+    private var footer: Footer<ViewBinding>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (Type.entries[viewType]) {
@@ -195,6 +198,10 @@ class AppAdapter(
                     parent,
                     false,
                 )
+            )
+
+            Type.FOOTER -> FooterViewHolder(
+                footer!!.binding(parent)
             )
 
             Type.GENRE_GRID_MOBILE_ITEM -> GenreViewHolder(
@@ -454,6 +461,7 @@ class AppAdapter(
         when (holder) {
             is CategoryViewHolder -> holder.bind(items[adjustedPosition] as Category)
             is EpisodeViewHolder -> holder.bind(items[adjustedPosition] as Episode)
+            is FooterViewHolder -> footer?.bind?.invoke(holder.binding)
             is GenreViewHolder -> holder.bind(items[adjustedPosition] as Genre)
             is HeaderViewHolder -> header?.bind?.invoke(holder.binding)
             is MovieViewHolder -> holder.bind(items[adjustedPosition] as Movie)
@@ -475,7 +483,8 @@ class AppAdapter(
 
     override fun getItemCount(): Int = items.size +
             (header?.let { 1 } ?: 0) +
-            (onLoadMoreListener?.let { 1 } ?: 0)
+            (onLoadMoreListener?.let { 1 } ?: 0) +
+            (footer?.let { 1 } ?: 0)
 
     override fun getItemViewType(position: Int): Int {
         if (header != null && position == 0) {
@@ -485,6 +494,15 @@ class AppAdapter(
         val adjustedPosition = header?.let { position - 1 } ?: position
         if (adjustedPosition in items.indices) {
             return items[adjustedPosition].itemType.ordinal
+        }
+
+        val loadMorePosition = itemCount - 1 - (if (footer != null) 1 else 0)
+        if (onLoadMoreListener != null && position == loadMorePosition) {
+            return Type.LOADING_ITEM.ordinal
+        }
+
+        if (footer != null && position == itemCount - 1) {
+            return Type.FOOTER.ordinal
         }
 
         return Type.LOADING_ITEM.ordinal
@@ -586,6 +604,17 @@ class AppAdapter(
         }
     }
 
+    fun <T : ViewBinding> setFooter(
+        binding: (parent: ViewGroup) -> T,
+        bind: ((binding: T) -> Unit)? = null,
+    ) {
+        @Suppress("UNCHECKED_CAST")
+        this.footer = Footer(
+            binding = binding,
+            bind = bind as ((ViewBinding) -> Unit)?,
+        )
+    }
+
 
     private class HeaderViewHolder(
         val binding: ViewBinding
@@ -602,5 +631,16 @@ class AppAdapter(
         binding: ViewBinding
     ) : RecyclerView.ViewHolder(
         binding.root
+    )
+
+    private class FooterViewHolder(
+        val binding: ViewBinding
+    ) : RecyclerView.ViewHolder(
+        binding.root
+    )
+
+    private data class Footer<T : ViewBinding>(
+        val binding: (parent: ViewGroup) -> T,
+        val bind: ((binding: T) -> Unit)? = null,
     )
 }
