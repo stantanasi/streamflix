@@ -10,17 +10,20 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentPeopleMobileBinding
+import com.tanasi.streamflix.databinding.HeaderPeopleMobileBinding
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.dp
+import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.coroutines.launch
 
@@ -93,7 +96,18 @@ class PeopleMobileFragment : Fragment() {
 
 
     private fun initializePeople() {
-        binding.rvPeopleFilmography.apply {
+        binding.rvPeople.apply {
+            layoutManager = GridLayoutManager(context, 3).also {
+                it.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        val viewType = appAdapter.getItemViewType(position)
+                        return when (AppAdapter.Type.entries[viewType]) {
+                            AppAdapter.Type.HEADER -> it.spanCount
+                            else -> 1
+                        }
+                    }
+                }
+            }
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
@@ -104,16 +118,72 @@ class PeopleMobileFragment : Fragment() {
     }
 
     private fun displayPeople(people: People, hasMore: Boolean) {
-        binding.tvPeopleName.text = people.name
+        appAdapter.setHeader(
+            binding = { parent ->
+                HeaderPeopleMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            },
+            bind = { binding ->
+                binding.ivPeopleImage.apply {
+                    clipToOutline = true
+                    Glide.with(context)
+                        .load(people.image)
+                        .placeholder(R.drawable.ic_person_placeholder)
+                        .centerCrop()
+                        .into(this)
+                }
 
-        binding.ivPeopleImage.apply {
-            clipToOutline = true
-            Glide.with(context)
-                .load(people.image)
-                .placeholder(R.drawable.ic_person_placeholder)
-                .centerCrop()
-                .into(this)
-        }
+                binding.tvPeopleName.text = people.name
+
+                binding.tvPeopleBirthday.text = people.birthday?.format("MMMM dd, yyyy")
+
+                binding.gPeopleBirthday.visibility = when {
+                    binding.tvPeopleBirthday.text.isNullOrEmpty() -> View.GONE
+                    else -> View.VISIBLE
+                }
+
+                binding.tvPeopleDeathday.text = people.deathday?.format("MMMM dd, yyyy")
+
+                binding.gPeopleDeathday.visibility = when {
+                    binding.tvPeopleDeathday.text.isNullOrEmpty() -> View.GONE
+                    else -> View.VISIBLE
+                }
+
+                binding.tvPeopleBirthplace.text = people.placeOfBirth
+
+                binding.gPeopleBirthplace.visibility = when {
+                    binding.tvPeopleBirthplace.text.isNullOrEmpty() -> View.GONE
+                    else -> View.VISIBLE
+                }
+
+                binding.tvPeopleBiography.apply {
+                    maxLines = 7
+                    text = people.biography
+                }
+
+                binding.tvPeopleBiographyReadMore.apply {
+                    setOnClickListener {
+                        binding.tvPeopleBiography.maxLines = Int.MAX_VALUE
+                        binding.tvPeopleBiographyReadMore.visibility = View.GONE
+                    }
+
+                    binding.tvPeopleBiography.post {
+                        visibility = when {
+                            binding.tvPeopleBiography.lineCount > 7 -> View.VISIBLE
+                            else -> View.GONE
+                        }
+                    }
+                }
+
+                binding.gPeopleBiography.visibility = when {
+                    binding.tvPeopleBiography.text.isNullOrEmpty() -> View.GONE
+                    else -> View.VISIBLE
+                }
+            }
+        )
 
         appAdapter.submitList(people.filmography.onEach {
             when (it) {

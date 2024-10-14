@@ -69,6 +69,12 @@
     <string name="season_number">Season %d</string>
     <string name="episode_number">Episode %d</string>
 
+    <string name="people_birthday">Birthday</string>
+    <string name="people_deathday">Day of death</string>
+    <string name="people_birthplace">Place of birth</string>
+    <string name="people_biography">Biography</string>
+    <string name="people_read_more">Read More ></string>
+
     <string name="genre_header_name">%s Movies and TV Shows</string>
 
     <string name="player_subtitle_tv_show">S%d E%d • %s</string>

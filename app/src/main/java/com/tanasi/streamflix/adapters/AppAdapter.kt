@@ -5,10 +5,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.tanasi.streamflix.adapters.viewholders.CategoryViewHolder
 import com.tanasi.streamflix.adapters.viewholders.EpisodeViewHolder
 import com.tanasi.streamflix.adapters.viewholders.GenreViewHolder
-import com.tanasi.streamflix.adapters.viewholders.LoadingViewHolder
 import com.tanasi.streamflix.adapters.viewholders.MovieViewHolder
 import com.tanasi.streamflix.adapters.viewholders.PeopleViewHolder
 import com.tanasi.streamflix.adapters.viewholders.ProviderViewHolder
@@ -83,8 +83,12 @@ class AppAdapter(
         EPISODE_CONTINUE_WATCHING_MOBILE_ITEM,
         EPISODE_CONTINUE_WATCHING_TV_ITEM,
 
+        FOOTER,
+
         GENRE_GRID_MOBILE_ITEM,
         GENRE_GRID_TV_ITEM,
+
+        HEADER,
 
         LOADING_ITEM,
 
@@ -131,7 +135,9 @@ class AppAdapter(
     private val states = mutableMapOf<Int, Parcelable?>()
 
     var isLoading = false
+    private var header: Header<ViewBinding>? = null
     private var onLoadMoreListener: (() -> Unit)? = null
+    private var footer: Footer<ViewBinding>? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
         when (Type.entries[viewType]) {
@@ -194,6 +200,10 @@ class AppAdapter(
                 )
             )
 
+            Type.FOOTER -> FooterViewHolder(
+                footer!!.binding(parent)
+            )
+
             Type.GENRE_GRID_MOBILE_ITEM -> GenreViewHolder(
                 ItemGenreGridMobileBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -207,6 +217,10 @@ class AppAdapter(
                     parent,
                     false,
                 )
+            )
+
+            Type.HEADER -> HeaderViewHolder(
+                header!!.binding(parent)
             )
 
             Type.LOADING_ITEM -> LoadingViewHolder(
@@ -443,15 +457,18 @@ class AppAdapter(
             isLoading = true
         }
 
+        val adjustedPosition = header?.let { position - 1 } ?: position
         when (holder) {
-            is CategoryViewHolder -> holder.bind(items[position] as Category)
-            is EpisodeViewHolder -> holder.bind(items[position] as Episode)
-            is GenreViewHolder -> holder.bind(items[position] as Genre)
-            is MovieViewHolder -> holder.bind(items[position] as Movie)
-            is PeopleViewHolder -> holder.bind(items[position] as People)
-            is ProviderViewHolder -> holder.bind(items[position] as Provider)
-            is SeasonViewHolder -> holder.bind(items[position] as Season)
-            is TvShowViewHolder -> holder.bind(items[position] as TvShow)
+            is CategoryViewHolder -> holder.bind(items[adjustedPosition] as Category)
+            is EpisodeViewHolder -> holder.bind(items[adjustedPosition] as Episode)
+            is FooterViewHolder -> footer?.bind?.invoke(holder.binding)
+            is GenreViewHolder -> holder.bind(items[adjustedPosition] as Genre)
+            is HeaderViewHolder -> header?.bind?.invoke(holder.binding)
+            is MovieViewHolder -> holder.bind(items[adjustedPosition] as Movie)
+            is PeopleViewHolder -> holder.bind(items[adjustedPosition] as People)
+            is ProviderViewHolder -> holder.bind(items[adjustedPosition] as Provider)
+            is SeasonViewHolder -> holder.bind(items[adjustedPosition] as Season)
+            is TvShowViewHolder -> holder.bind(items[adjustedPosition] as TvShow)
         }
 
         val state = states[holder.layoutPosition]
@@ -464,13 +481,32 @@ class AppAdapter(
         }
     }
 
-    override fun getItemCount(): Int = items.size + when {
-        onLoadMoreListener != null -> 1
-        else -> 0
-    }
+    override fun getItemCount(): Int = items.size +
+            (header?.let { 1 } ?: 0) +
+            (onLoadMoreListener?.let { 1 } ?: 0) +
+            (footer?.let { 1 } ?: 0)
 
-    override fun getItemViewType(position: Int): Int = items.getOrNull(position)?.itemType?.ordinal
-        ?: Type.LOADING_ITEM.ordinal
+    override fun getItemViewType(position: Int): Int {
+        if (header != null && position == 0) {
+            return Type.HEADER.ordinal
+        }
+
+        val adjustedPosition = header?.let { position - 1 } ?: position
+        if (adjustedPosition in items.indices) {
+            return items[adjustedPosition].itemType.ordinal
+        }
+
+        val loadMorePosition = itemCount - 1 - (if (footer != null) 1 else 0)
+        if (onLoadMoreListener != null && position == loadMorePosition) {
+            return Type.LOADING_ITEM.ordinal
+        }
+
+        if (footer != null && position == itemCount - 1) {
+            return Type.FOOTER.ordinal
+        }
+
+        return Type.LOADING_ITEM.ordinal
+    }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
@@ -548,6 +584,17 @@ class AppAdapter(
     }
 
 
+    fun <T : ViewBinding> setHeader(
+        binding: (parent: ViewGroup) -> T,
+        bind: ((binding: T) -> Unit)? = null,
+    ) {
+        @Suppress("UNCHECKED_CAST")
+        this.header = Header(
+            binding = binding,
+            bind = bind as ((ViewBinding) -> Unit)?,
+        )
+    }
+
     fun setOnLoadMoreListener(onLoadMoreListener: (() -> Unit)?) {
         if (this.onLoadMoreListener != null && onLoadMoreListener == null) {
             this.onLoadMoreListener = null
@@ -556,4 +603,44 @@ class AppAdapter(
             this.onLoadMoreListener = onLoadMoreListener
         }
     }
+
+    fun <T : ViewBinding> setFooter(
+        binding: (parent: ViewGroup) -> T,
+        bind: ((binding: T) -> Unit)? = null,
+    ) {
+        @Suppress("UNCHECKED_CAST")
+        this.footer = Footer(
+            binding = binding,
+            bind = bind as ((ViewBinding) -> Unit)?,
+        )
+    }
+
+
+    private class HeaderViewHolder(
+        val binding: ViewBinding
+    ) : RecyclerView.ViewHolder(
+        binding.root
+    )
+
+    private data class Header<T : ViewBinding>(
+        val binding: (parent: ViewGroup) -> T,
+        val bind: ((binding: T) -> Unit)? = null,
+    )
+
+    private class LoadingViewHolder(
+        binding: ViewBinding
+    ) : RecyclerView.ViewHolder(
+        binding.root
+    )
+
+    private class FooterViewHolder(
+        val binding: ViewBinding
+    ) : RecyclerView.ViewHolder(
+        binding.root
+    )
+
+    private data class Footer<T : ViewBinding>(
+        val binding: (parent: ViewGroup) -> T,
+        val bind: ((binding: T) -> Unit)? = null,
+    )
 }
