@@ -10,11 +10,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentGenreMobileBinding
+import com.tanasi.streamflix.databinding.HeaderGenreMobileBinding
 import com.tanasi.streamflix.models.Genre
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
@@ -92,9 +93,18 @@ class GenreMobileFragment : Fragment() {
 
 
     private fun initializeGenre() {
-        binding.tvGenreName.text = getString(R.string.genre_header_name, args.name)
-
         binding.rvGenre.apply {
+            layoutManager = GridLayoutManager(context, 3).also {
+                it.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        val viewType = appAdapter.getItemViewType(position)
+                        return when (AppAdapter.Type.entries[viewType]) {
+                            AppAdapter.Type.HEADER -> it.spanCount
+                            else -> 1
+                        }
+                    }
+                }
+            }
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
@@ -105,6 +115,19 @@ class GenreMobileFragment : Fragment() {
     }
 
     private fun displayGenre(genre: Genre, hasMore: Boolean) {
+        appAdapter.setHeader(
+            binding = { parent ->
+                HeaderGenreMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            },
+            bind = { binding ->
+                binding.tvGenreName.text = args.name
+            }
+        )
+
         appAdapter.submitList(genre.shows.onEach {
             when (it) {
                 is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_MOBILE_ITEM
