@@ -23,6 +23,7 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.dp
+import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.coroutines.launch
 
@@ -136,6 +137,51 @@ class PeopleMobileFragment : Fragment() {
                 }
 
                 binding.tvPeopleName.text = people.name
+
+                binding.tvPeopleBirthday.text = people.birthday?.format("MMMM dd, yyyy")
+
+                binding.gPeopleBirthday.visibility = when {
+                    binding.tvPeopleBirthday.text.isNullOrEmpty() -> View.GONE
+                    else -> View.VISIBLE
+                }
+
+                binding.tvPeopleDeathday.text = people.deathday?.format("MMMM dd, yyyy")
+
+                binding.gPeopleDeathday.visibility = when {
+                    binding.tvPeopleDeathday.text.isNullOrEmpty() -> View.GONE
+                    else -> View.VISIBLE
+                }
+
+                binding.tvPeopleBirthplace.text = people.placeOfBirth
+
+                binding.gPeopleBirthplace.visibility = when {
+                    binding.tvPeopleBirthplace.text.isNullOrEmpty() -> View.GONE
+                    else -> View.VISIBLE
+                }
+
+                binding.tvPeopleBiography.apply {
+                    maxLines = 7
+                    text = people.biography
+                }
+
+                binding.tvPeopleBiographyReadMore.apply {
+                    setOnClickListener {
+                        binding.tvPeopleBiography.maxLines = Int.MAX_VALUE
+                        binding.tvPeopleBiographyReadMore.visibility = View.GONE
+                    }
+
+                    binding.tvPeopleBiography.post {
+                        visibility = when {
+                            binding.tvPeopleBiography.lineCount > 7 -> View.VISIBLE
+                            else -> View.GONE
+                        }
+                    }
+                }
+
+                binding.gPeopleBiography.visibility = when {
+                    binding.tvPeopleBiography.text.isNullOrEmpty() -> View.GONE
+                    else -> View.VISIBLE
+                }
             }
         )
 
