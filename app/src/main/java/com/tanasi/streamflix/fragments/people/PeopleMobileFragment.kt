@@ -10,12 +10,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentPeopleMobileBinding
+import com.tanasi.streamflix.databinding.HeaderPeopleMobileBinding
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.TvShow
@@ -93,7 +95,18 @@ class PeopleMobileFragment : Fragment() {
 
 
     private fun initializePeople() {
-        binding.rvPeopleFilmography.apply {
+        binding.rvPeople.apply {
+            layoutManager = GridLayoutManager(context, 3).also {
+                it.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        val viewType = appAdapter.getItemViewType(position)
+                        return when (AppAdapter.Type.entries[viewType]) {
+                            AppAdapter.Type.HEADER -> it.spanCount
+                            else -> 1
+                        }
+                    }
+                }
+            }
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
             }
@@ -104,16 +117,27 @@ class PeopleMobileFragment : Fragment() {
     }
 
     private fun displayPeople(people: People, hasMore: Boolean) {
-        binding.tvPeopleName.text = people.name
+        appAdapter.setHeader(
+            binding = { parent ->
+                HeaderPeopleMobileBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false,
+                )
+            },
+            bind = { binding ->
+                binding.ivPeopleImage.apply {
+                    clipToOutline = true
+                    Glide.with(context)
+                        .load(people.image)
+                        .placeholder(R.drawable.ic_person_placeholder)
+                        .centerCrop()
+                        .into(this)
+                }
 
-        binding.ivPeopleImage.apply {
-            clipToOutline = true
-            Glide.with(context)
-                .load(people.image)
-                .placeholder(R.drawable.ic_person_placeholder)
-                .centerCrop()
-                .into(this)
-        }
+                binding.tvPeopleName.text = people.name
+            }
+        )
 
         appAdapter.submitList(people.filmography.onEach {
             when (it) {
