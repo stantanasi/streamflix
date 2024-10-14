@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewbinding.ViewBinding
 import com.tanasi.streamflix.adapters.viewholders.CategoryViewHolder
 import com.tanasi.streamflix.adapters.viewholders.EpisodeViewHolder
 import com.tanasi.streamflix.adapters.viewholders.GenreViewHolder
@@ -85,6 +86,8 @@ class AppAdapter(
         GENRE_GRID_MOBILE_ITEM,
         GENRE_GRID_TV_ITEM,
 
+        HEADER,
+
         LOADING_ITEM,
 
         MOVIE_MOBILE_ITEM,
@@ -130,6 +133,7 @@ class AppAdapter(
     private val states = mutableMapOf<Int, Parcelable?>()
 
     var isLoading = false
+    private var header: Header<ViewBinding>? = null
     private var onLoadMoreListener: (() -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
@@ -206,6 +210,10 @@ class AppAdapter(
                     parent,
                     false,
                 )
+            )
+
+            Type.HEADER -> HeaderViewHolder(
+                header!!.binding(parent)
             )
 
             Type.LOADING_ITEM -> LoadingViewHolder(
@@ -442,15 +450,17 @@ class AppAdapter(
             isLoading = true
         }
 
+        val adjustedPosition = header?.let { position - 1 } ?: position
         when (holder) {
-            is CategoryViewHolder -> holder.bind(items[position] as Category)
-            is EpisodeViewHolder -> holder.bind(items[position] as Episode)
-            is GenreViewHolder -> holder.bind(items[position] as Genre)
-            is MovieViewHolder -> holder.bind(items[position] as Movie)
-            is PeopleViewHolder -> holder.bind(items[position] as People)
-            is ProviderViewHolder -> holder.bind(items[position] as Provider)
-            is SeasonViewHolder -> holder.bind(items[position] as Season)
-            is TvShowViewHolder -> holder.bind(items[position] as TvShow)
+            is CategoryViewHolder -> holder.bind(items[adjustedPosition] as Category)
+            is EpisodeViewHolder -> holder.bind(items[adjustedPosition] as Episode)
+            is GenreViewHolder -> holder.bind(items[adjustedPosition] as Genre)
+            is HeaderViewHolder -> header?.bind?.invoke(holder.binding)
+            is MovieViewHolder -> holder.bind(items[adjustedPosition] as Movie)
+            is PeopleViewHolder -> holder.bind(items[adjustedPosition] as People)
+            is ProviderViewHolder -> holder.bind(items[adjustedPosition] as Provider)
+            is SeasonViewHolder -> holder.bind(items[adjustedPosition] as Season)
+            is TvShowViewHolder -> holder.bind(items[adjustedPosition] as TvShow)
         }
 
         val state = states[holder.layoutPosition]
@@ -463,13 +473,22 @@ class AppAdapter(
         }
     }
 
-    override fun getItemCount(): Int = items.size + when {
-        onLoadMoreListener != null -> 1
-        else -> 0
-    }
+    override fun getItemCount(): Int = items.size +
+            (header?.let { 1 } ?: 0) +
+            (onLoadMoreListener?.let { 1 } ?: 0)
 
-    override fun getItemViewType(position: Int): Int = items.getOrNull(position)?.itemType?.ordinal
-        ?: Type.LOADING_ITEM.ordinal
+    override fun getItemViewType(position: Int): Int {
+        if (header != null && position == 0) {
+            return Type.HEADER.ordinal
+        }
+
+        val adjustedPosition = header?.let { position - 1 } ?: position
+        if (adjustedPosition in items.indices) {
+            return items[adjustedPosition].itemType.ordinal
+        }
+
+        return Type.LOADING_ITEM.ordinal
+    }
 
     override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
         super.onViewRecycled(holder)
@@ -547,6 +566,17 @@ class AppAdapter(
     }
 
 
+    fun <T : ViewBinding> setHeader(
+        binding: (parent: ViewGroup) -> T,
+        bind: ((binding: T) -> Unit)? = null,
+    ) {
+        @Suppress("UNCHECKED_CAST")
+        this.header = Header(
+            binding = binding,
+            bind = bind as ((ViewBinding) -> Unit)?,
+        )
+    }
+
     fun setOnLoadMoreListener(onLoadMoreListener: (() -> Unit)?) {
         if (this.onLoadMoreListener != null && onLoadMoreListener == null) {
             this.onLoadMoreListener = null
@@ -556,6 +586,17 @@ class AppAdapter(
         }
     }
 
+
+    private class HeaderViewHolder(
+        val binding: ViewBinding
+    ) : RecyclerView.ViewHolder(
+        binding.root
+    )
+
+    private data class Header<T : ViewBinding>(
+        val binding: (parent: ViewGroup) -> T,
+        val bind: ((binding: T) -> Unit)? = null,
+    )
 
     private class LoadingViewHolder(
         binding: ViewBinding
