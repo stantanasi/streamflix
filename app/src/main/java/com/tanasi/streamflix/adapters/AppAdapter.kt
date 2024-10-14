@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.adapters.viewholders.CategoryViewHolder
 import com.tanasi.streamflix.adapters.viewholders.EpisodeViewHolder
 import com.tanasi.streamflix.adapters.viewholders.GenreViewHolder
-import com.tanasi.streamflix.adapters.viewholders.LoadingViewHolder
 import com.tanasi.streamflix.adapters.viewholders.MovieViewHolder
 import com.tanasi.streamflix.adapters.viewholders.PeopleViewHolder
 import com.tanasi.streamflix.adapters.viewholders.ProviderViewHolder
@@ -556,4 +555,11 @@ class AppAdapter(
             this.onLoadMoreListener = onLoadMoreListener
         }
     }
+
+
+    private class LoadingViewHolder(
+        binding: ViewBinding
+    ) : RecyclerView.ViewHolder(
+        binding.root
+    )
 }
