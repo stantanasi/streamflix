@@ -756,6 +756,10 @@ object TmdbProvider : Provider {
                 id = person.id.toString(),
                 name = person.name,
                 image = person.profilePath?.w500,
+                biography = person.biography,
+                placeOfBirth = person.placeOfBirth,
+                birthday = person.birthday,
+                deathday = person.deathday,
 
                 filmography = person.combinedCredits?.cast
                     ?.mapNotNull { multi ->
