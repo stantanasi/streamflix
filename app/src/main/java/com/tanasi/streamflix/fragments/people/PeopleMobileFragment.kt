@@ -130,7 +130,7 @@ class PeopleMobileFragment : Fragment() {
                 binding.ivPeopleImage.apply {
                     clipToOutline = true
                     Glide.with(context)
-                        .load(people.image)
+                        .load(people.image ?: args.image)
                         .placeholder(R.drawable.ic_person_placeholder)
                         .centerCrop()
                         .into(this)

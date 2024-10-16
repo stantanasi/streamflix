@@ -175,6 +175,10 @@
         <argument
             android:name="name"
             app:argType="string" />
+        <argument
+            android:name="image"
+            app:argType="string"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/player"
