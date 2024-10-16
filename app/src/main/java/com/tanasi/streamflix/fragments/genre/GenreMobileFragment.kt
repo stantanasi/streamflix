@@ -124,7 +124,7 @@ class GenreMobileFragment : Fragment() {
                 )
             },
             bind = { binding ->
-                binding.tvGenreName.text = args.name
+                binding.tvGenreName.text = genre.name.takeIf { it.isNotEmpty() } ?: args.name
             }
         )
 

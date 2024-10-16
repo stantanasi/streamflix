@@ -91,8 +91,6 @@ class GenreTvFragment : Fragment() {
 
 
     private fun initializeGenre() {
-        binding.tvGenreName.text = getString(R.string.genre_header_name, args.name)
-
         binding.vgvGenre.apply {
             adapter = appAdapter.apply {
                 stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
@@ -102,6 +100,11 @@ class GenreTvFragment : Fragment() {
     }
 
     private fun displayGenre(genre: Genre, hasMore: Boolean) {
+        binding.tvGenreName.text = getString(
+            R.string.genre_header_name,
+            genre.name.takeIf { it.isNotEmpty() } ?: args.name
+        )
+
         appAdapter.submitList(genre.shows.onEach {
             when (it) {
                 is Movie -> it.itemType = AppAdapter.Type.MOVIE_GRID_TV_ITEM
