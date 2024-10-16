@@ -153,6 +153,11 @@ open class RabbitstreamExtractor : Extractor() {
         override val mainUrl = "https://dokicloud.one"
     }
 
+    class PremiumEmbedingExtractor : RabbitstreamExtractor() {
+        override val name = "PremiumEmbeding"
+        override val mainUrl = "https://premiumembeding.cloud"
+    }
+
 
     private interface Service {
 

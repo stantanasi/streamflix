@@ -15,6 +15,7 @@ abstract class Extractor {
             RabbitstreamExtractor(),
             RabbitstreamExtractor.MegacloudExtractor(),
             RabbitstreamExtractor.DokicloudExtractor(),
+            RabbitstreamExtractor.PremiumEmbedingExtractor(),
             StreamhubExtractor(),
             VoeExtractor(),
             StreamtapeExtractor(),
