@@ -160,6 +160,9 @@
         <action
             android:id="@+id/action_people_to_tv_show"
             app:destination="@id/tv_show" />
+        <argument
+            android:name="name"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/providers"

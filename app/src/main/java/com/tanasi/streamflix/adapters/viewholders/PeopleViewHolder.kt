@@ -44,10 +44,16 @@ class PeopleViewHolder(
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
                     is MovieMobileFragment -> findNavController().navigate(
-                        MovieMobileFragmentDirections.actionMovieToPeople(people.id)
+                        MovieMobileFragmentDirections.actionMovieToPeople(
+                            people.id,
+                            people.name,
+                        )
                     )
                     is TvShowMobileFragment -> findNavController().navigate(
-                        TvShowMobileFragmentDirections.actionTvShowToPeople(people.id)
+                        TvShowMobileFragmentDirections.actionTvShowToPeople(
+                            people.id,
+                            people.name,
+                        )
                     )
                 }
             }
@@ -70,10 +76,16 @@ class PeopleViewHolder(
             setOnClickListener {
                 when (context.toActivity()?.getCurrentFragment()) {
                     is MovieTvFragment -> findNavController().navigate(
-                        MovieTvFragmentDirections.actionMovieToPeople(people.id)
+                        MovieTvFragmentDirections.actionMovieToPeople(
+                            people.id,
+                            people.name,
+                        )
                     )
                     is TvShowTvFragment -> findNavController().navigate(
-                        TvShowTvFragmentDirections.actionTvShowToPeople(people.id)
+                        TvShowTvFragmentDirections.actionTvShowToPeople(
+                            people.id,
+                            people.name,
+                        )
                     )
                 }
             }

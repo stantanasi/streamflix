@@ -102,7 +102,7 @@ class PeopleTvFragment : Fragment() {
     }
 
     private fun displayPeople(people: People, hasMore: Boolean) {
-        binding.tvPeopleName.text = people.name
+        binding.tvPeopleName.text = people.name.takeIf { it.isNotEmpty() } ?: args.name
 
         binding.ivPeopleImage.apply {
             clipToOutline = true

@@ -136,7 +136,7 @@ class PeopleMobileFragment : Fragment() {
                         .into(this)
                 }
 
-                binding.tvPeopleName.text = people.name
+                binding.tvPeopleName.text = people.name.takeIf { it.isNotEmpty() } ?: args.name
 
                 binding.tvPeopleBirthday.text = people.birthday?.format("MMMM dd, yyyy")
 
