@@ -521,7 +521,7 @@ object AnimeWorldProvider : Provider {
                 return Genre(
                     id = id,
                     name = document.selectFirst("div.widget-title > span.title > h1")
-                        ?.text() ?: "errore"
+                        ?.text() ?: ""
                 )
             }
         }
@@ -529,7 +529,7 @@ object AnimeWorldProvider : Provider {
         val genre = Genre(
             id = id,
             name = document.selectFirst("div.widget-title > span.title > h1")
-                ?.text() ?: "errore",
+                ?.text() ?: "",
 
             shows = document.select("div.film-list .item").map {
                 val showId = it.selectFirst("a")
@@ -570,16 +570,16 @@ object AnimeWorldProvider : Provider {
             ) {
                 return People(
                     id = id,
-                    name = document.selectFirst("#main div.widget-body > form > div:nth-child(6) > button > span")
-                        ?.text() ?: "errore"
+                    name = document.selectFirst("label[for=\"studio-$id\"]")
+                        ?.text() ?: ""
                 )
             }
         }
 
         return People(
             id = id,
-            name = document.selectFirst("#main div.widget-body > form > div:nth-child(6) > button > span")
-                ?.text() ?: "errore",
+            name = document.selectFirst("label[for=\"studio-$id\"]")
+                ?.text() ?: "",
 
             filmography = document.select("div.film-list .item").map {
                 val showId = it.selectFirst("a")
