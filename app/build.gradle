@@ -8,14 +8,14 @@ plugins {
 
 android {
     namespace 'com.tanasi.streamflix'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.tanasi.streamflix"
         minSdk 21
-        targetSdk 34
-        versionCode 31
-        versionName "1.7.0"
+        targetSdk 35
+        versionCode 32
+        versionName "1.7.1"
 
         def properties = new Properties()
         properties.load(project.rootProject.file('local.properties').newDataInputStream())
@@ -54,8 +54,8 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.8.2'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.8.2'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.8.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.8.3'
     implementation project(path: ':navigation')
 
     implementation 'androidx.core:core-ktx:1.13.1'
