@@ -47,6 +47,7 @@ interface Provider {
             SuperStreamProvider,
             UnJourUnFilmProvider,
             AnimeWorldProvider,
+            AniWorldProvider,
         )
     }
 }
