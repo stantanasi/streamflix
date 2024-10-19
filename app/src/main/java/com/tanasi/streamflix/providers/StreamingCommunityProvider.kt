@@ -51,33 +51,36 @@ object StreamingCommunityProvider : Provider {
         val res = service.getHome(version = version)
         if (version != res.version) version = res.version
 
-        val mainTitle = res.props.title
+        val mainTitles = res.props.sliders[2].titles
 
         val categories = mutableListOf<Category>()
 
         categories.add(
+            // 2: top10
             Category(
                 name = Category.FEATURED,
-                list = listOf (
-                    if (mainTitle.type == "movie")
+                list = mainTitles.map {
+                    if (it.type == "movie")
                         Movie(
-                            id = mainTitle.id + "-" + mainTitle.slug,
-                            title = mainTitle.name,
-                            banner = getImageLink(mainTitle.images.find { it.type == "background" }?.filename)
+                            id = it.id + "-" + it.slug,
+                            title = it.name,
+                            banner = getImageLink(it.images.find { it.type == "background" }?.filename),
+                            rating = it.score
                         )
                     else
                         TvShow(
-                            id = mainTitle.id + "-" + mainTitle.slug,
-                            title = mainTitle.name,
-                            banner = getImageLink(mainTitle.images.find { it.type == "background" }?.filename)
+                            id = it.id + "-" + it.slug,
+                            title = it.name,
+                            banner = getImageLink(it.images.find { it.type == "background" }?.filename),
+                            rating = it.score
                         )
-                ),
+                },
             )
         )
 
         categories.addAll(
-            // 2: top10, 0: trending, 1:latest
-            listOf(2, 0, 1).map { index ->
+            // 0: trending, 1:latest
+            listOf(0, 1).map { index ->
                 val slider = res.props.sliders[index]
                 Category(
                     name = slider.label,
