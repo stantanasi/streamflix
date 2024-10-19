@@ -46,6 +46,7 @@ interface Provider {
             TmdbProvider,
             SuperStreamProvider,
             UnJourUnFilmProvider,
+            StreamingCommunityProvider,
             AnimeWorldProvider,
         )
     }
