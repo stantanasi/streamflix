@@ -15,13 +15,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.bumptech.glide.Glide
 import com.tanasi.navigation.widget.setupWithNavController
+import com.tanasi.streamflix.BuildConfig
 import com.tanasi.streamflix.NavMainGraphDirections
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ActivityMainTvBinding
 import com.tanasi.streamflix.databinding.ContentHeaderMenuMainTvBinding
 import com.tanasi.streamflix.fragments.player.PlayerTvFragment
-import com.tanasi.streamflix.ui.AppLayoutTvDialog
 import com.tanasi.streamflix.ui.UpdateAppTvDialog
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.getCurrentFragment
@@ -49,23 +49,18 @@ class MainTvActivity : FragmentActivity() {
         UserPreferences.setup(this)
         AppDatabase.setup(this)
 
-        when (val appLayout = UserPreferences.appLayout) {
-            null,
-            UserPreferences.AppLayout.AUTO -> {
+        when (BuildConfig.APP_LAYOUT) {
+            "mobile" -> {
+                finish()
+                startActivity(Intent(this, MainMobileActivity::class.java))
+            }
+            "tv" -> {}
+            else -> {
                 if (!packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
                     finish()
                     startActivity(Intent(this, MainMobileActivity::class.java))
                 }
-                if (appLayout == null) {
-                    AppLayoutTvDialog(this)
-                        .show()
-                }
             }
-            UserPreferences.AppLayout.MOBILE -> {
-                finish()
-                startActivity(Intent(this, MainMobileActivity::class.java))
-            }
-            UserPreferences.AppLayout.TV -> {}
         }
 
         UserPreferences.currentProvider?.let {

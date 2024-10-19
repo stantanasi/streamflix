@@ -13,10 +13,10 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.tanasi.streamflix.BuildConfig
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ActivityMainMobileBinding
-import com.tanasi.streamflix.ui.AppLayoutMobileDialog
 import com.tanasi.streamflix.ui.UpdateAppMobileDialog
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.launch
@@ -43,22 +43,17 @@ class MainMobileActivity : FragmentActivity() {
         UserPreferences.setup(this)
         AppDatabase.setup(this)
 
-        when (val appLayout = UserPreferences.appLayout) {
-            null,
-            UserPreferences.AppLayout.AUTO -> {
+        when (BuildConfig.APP_LAYOUT) {
+            "mobile" -> {}
+            "tv" -> {
+                finish()
+                startActivity(Intent(this, MainTvActivity::class.java))
+            }
+            else -> {
                 if (packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)) {
                     finish()
                     startActivity(Intent(this, MainTvActivity::class.java))
                 }
-                if (appLayout == null) {
-                    AppLayoutMobileDialog(this)
-                        .show()
-                }
-            }
-            UserPreferences.AppLayout.MOBILE -> {}
-            UserPreferences.AppLayout.TV -> {
-                finish()
-                startActivity(Intent(this, MainTvActivity::class.java))
             }
         }
 
