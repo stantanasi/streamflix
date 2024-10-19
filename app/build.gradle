@@ -10,6 +10,9 @@ android {
     namespace 'com.tanasi.streamflix'
     compileSdk 35
 
+    def properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
     defaultConfig {
         applicationId "com.tanasi.streamflix"
         minSdk 21
@@ -17,12 +20,22 @@ android {
         versionCode 32
         versionName "1.7.1"
 
-        def properties = new Properties()
-        properties.load(project.rootProject.file('local.properties').newDataInputStream())
-
         buildConfigField "String", "APP_LAYOUT", "\"${properties.getProperty("APP_LAYOUT")}\""
         buildConfigField "String", "TMDB_API_KEY", "\"${properties.getProperty("TMDB_API_KEY")}\""
         buildConfigField "String", "RABBITSTREAM_SOURCE_API", "\"${properties.getProperty("RABBITSTREAM_SOURCE_API")}\""
+    }
+
+    sourceSets {
+        main {
+            def appLayout = properties.getProperty("APP_LAYOUT")
+            if (appLayout == "mobile") {
+                manifest.srcFile "${project.rootDir}/app/src/main/mobile/AndroidManifest.xml"
+            } else if (appLayout == "tv") {
+                manifest.srcFile "${project.rootDir}/app/src/main/tv/AndroidManifest.xml"
+            } else {
+                manifest.srcFile "${project.rootDir}/app/src/main/AndroidManifest.xml"
+            }
+        }
     }
 
     compileOptions {
