@@ -3,7 +3,7 @@ package com.tanasi.streamflix.providers
 import com.google.gson.annotations.SerializedName
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
-import com.tanasi.streamflix.extractors.Extractor
+import com.tanasi.streamflix.extractors.VixcloudExtractor
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Genre
@@ -428,7 +428,7 @@ object StreamingCommunityProvider : Provider {
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
-        return Extractor.extract(server.src)
+        return VixcloudExtractor().extract(server.src)
     }
 
 
