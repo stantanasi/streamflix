@@ -70,7 +70,8 @@ class VixcloudExtractor : Extractor() {
 
         return Video(
             source = finalUrl,
-            subtitles = listOf()
+            subtitles = listOf(),
+            type = "application/x-mpegURL"
         )
     }
 
