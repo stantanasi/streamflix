@@ -416,17 +416,22 @@ object StreamingCommunityProvider : Provider {
 
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
-        val mediaId = when (videoType) {
-            is Video.Type.Movie -> id.substringBefore("-")
-            is Video.Type.Episode -> id
+        val document = when (videoType) {
+            is Video.Type.Movie -> service.getIframe(
+                id.substringBefore("-")
+            )
+            is Video.Type.Episode -> service.getIframe(
+                id.substringBefore("?"),
+                id.substringAfter("=")
+            )
         }
 
-        val document = service.getIframe(mediaId)
+        val src = document.selectFirst("iframe")?.attr("src") ?: ""
 
         return listOf(Video.Server(
-            id = mediaId,
+            id = id,
             name = "StreamingCommunity",
-            src = document.selectFirst("iframe")?.attr("src") ?: ""
+            src = src
         ))
     }
 
@@ -506,6 +511,9 @@ object StreamingCommunityProvider : Provider {
 
         @GET("iframe/{id}")
         suspend fun getIframe(@Path("id") id: String): Document
+
+        @GET("iframe/{id}")
+        suspend fun getIframe(@Path("id") id: String, @Query("episode_id") episodeId: String): Document
 
         data class Image(
             val filename: String,
