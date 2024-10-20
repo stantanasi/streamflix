@@ -357,6 +357,7 @@ class PlayerTvFragment : Fragment() {
         player.setMediaItem(
             MediaItem.Builder()
                 .setUri(Uri.parse(video.source))
+                .setMimeType(video.type)
                 .setSubtitleConfigurations(video.subtitles.map { subtitle ->
                     MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitle.file))
                         .setMimeType(subtitle.file.toSubtitleMimeType())
