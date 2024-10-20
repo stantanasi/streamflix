@@ -104,6 +104,7 @@ class PlayerTvFragment : Fragment() {
         player.setMediaItem(
             MediaItem.Builder()
                 .setUri(player.currentMediaItem?.localConfiguration?.uri)
+                .setMimeType(player.currentMediaItem?.localConfiguration?.mimeType)
                 .setSubtitleConfigurations(currentSubtitleConfigurations
                         + MediaItem.SubtitleConfiguration.Builder(uri)
                     .setMimeType(fileName.toSubtitleMimeType())
@@ -212,6 +213,7 @@ class PlayerTvFragment : Fragment() {
                         player.setMediaItem(
                             MediaItem.Builder()
                                 .setUri(player.currentMediaItem?.localConfiguration?.uri)
+                                .setMimeType(player.currentMediaItem?.localConfiguration?.mimeType)
                                 .setSubtitleConfigurations(currentSubtitleConfigurations
                                         + MediaItem.SubtitleConfiguration.Builder(state.uri)
                                     .setMimeType(fileName.toSubtitleMimeType())
