@@ -311,7 +311,7 @@ object StreamingCommunityProvider : Provider {
             },
             seasons = title.seasons?.map {
                 Season(
-                    id = id + "/stagione-" + it.number,
+                    id = "$id/stagione-${it.number}",
                     number = it.number.toIntOrNull() ?: (title.seasons.indexOf(it) + 1),
                     title = it.name
                 )
@@ -513,7 +513,10 @@ object StreamingCommunityProvider : Provider {
         suspend fun getIframe(@Path("id") id: String): Document
 
         @GET("iframe/{id}")
-        suspend fun getIframe(@Path("id") id: String, @Query("episode_id") episodeId: String): Document
+        suspend fun getIframe(@Path("id") id: String,
+                              @Query("episode_id") episodeId: String,
+                              @Query("next_episode") nextEpisode: Char = '1'
+        ): Document
 
         data class Image(
             val filename: String,
