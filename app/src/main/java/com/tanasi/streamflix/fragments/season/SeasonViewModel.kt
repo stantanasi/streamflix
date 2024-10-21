@@ -19,8 +19,7 @@ import kotlinx.coroutines.launch
 
 class SeasonViewModel(
     seasonId: String,
-    private val tvShow: TvShow,
-    private val season: Season,
+    private val tvShowId: String,
     private val database: AppDatabase,
 ) : ViewModel() {
 
@@ -37,7 +36,9 @@ class SeasonViewModel(
                 else -> emit(emptyList<Episode>())
             }
         },
-    ) { state, episodesDb ->
+        database.tvShowDao().getByIdAsFlow(tvShowId),
+        database.seasonDao().getByIdAsFlow(seasonId),
+    ) { state, episodesDb, tvShow, season ->
         when (state) {
             is State.SuccessLoadingEpisodes -> {
                 State.SuccessLoadingEpisodes(
@@ -46,6 +47,9 @@ class SeasonViewModel(
                             ?.takeIf { !episode.isSame(it) }
                             ?.let { episode.copy().merge(it) }
                             ?: episode
+                    }.onEach { episode ->
+                        episode.tvShow = tvShow
+                        episode.season = season
                     }
                 )
             }
@@ -76,6 +80,8 @@ class SeasonViewModel(
                         ?.merge(episodeDb)
                 }
 
+            val tvShow = TvShow(tvShowId)
+            val season = Season(seasonId)
             episodes.forEach { episode ->
                 episode.tvShow = tvShow
                 episode.season = season
