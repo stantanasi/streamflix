@@ -24,7 +24,7 @@ import com.tanasi.streamflix.utils.UserPreferences
         Season::class,
         TvShow::class,
     ],
-    version = 3,
+    version = 4,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -64,6 +64,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .allowMainThreadQueries()
                 .addMigrations(MIGRATION_1_2)
                 .addMigrations(MIGRATION_2_3)
+                .addMigrations(MIGRATION_3_4)
                 .build()
 
 
@@ -106,6 +107,12 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("INSERT INTO tv_shows_temp SELECT * FROM tv_shows")
                 db.execSQL("DROP TABLE tv_shows")
                 db.execSQL("ALTER TABLE tv_shows_temp RENAME TO tv_shows")
+            }
+        }
+
+        private val MIGRATION_3_4: Migration = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE tv_shows ADD COLUMN isWatching INTEGER DEFAULT 1 NOT NULL")
             }
         }
     }
