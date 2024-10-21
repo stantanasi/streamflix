@@ -11,8 +11,39 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EpisodeDao {
 
-    @Query("SELECT * FROM episodes ORDER BY tvShow, season, number")
-    fun getAll(): Flow<List<Episode>>
+    @Query(
+        """
+        SELECT episodes.*, (SELECT MAX(e.watchedDate)
+                    FROM episodes e
+                    WHERE e.tvShow = episodes.tvShow AND e.isWatched = 1) AS watchedDate
+        FROM tv_shows
+        JOIN episodes ON episodes.id = (
+            SELECT e.id 
+            FROM episodes e 
+            JOIN seasons s ON s.id = e.season
+            JOIN (
+                SELECT e2.id, s2.number as seasonNumber, e2.number AS episodeNumber
+                FROM episodes e2
+                JOIN seasons s2 ON s2.id = e2.season
+                WHERE e2.tvShow = episodes.tvShow AND e2.isWatched = 1
+                ORDER BY s2.number DESC, e2.number DESC
+                LIMIT 1
+            ) last_watched
+            WHERE e.tvShow = tv_shows.id AND (
+                (s.number = last_watched.seasonNumber AND e.number > last_watched.episodeNumber) 
+                    OR s.number > last_watched.seasonNumber
+            )
+            ORDER BY s.number, e.number
+            LIMIT 1
+        )
+        WHERE tv_shows.isWatching = 1 AND NOT EXISTS (
+            SELECT 1
+            FROM episodes e
+            WHERE e.tvShow = episodes.tvShow AND e.lastEngagementTimeUtcMillis IS NOT NULL
+        )
+    """
+    )
+    fun getNextEpisodesToWatch(): Flow<List<Episode>>
 
     @Query("SELECT * FROM episodes WHERE id = :id")
     fun getById(id: String): Episode?
@@ -48,7 +79,8 @@ interface EpisodeDao {
         ?.let { update(episode) }
         ?: insert(episode)
 
-    @Query("""
+    @Query(
+        """
         UPDATE episodes
         SET isWatched = 0
         WHERE id IN (
@@ -62,6 +94,7 @@ interface EpisodeDao {
                   WHERE episode.id = :id
             ) episode2 ON (episode.tvShow = episode2.tvShow AND (season.number > episode2.seasonNumber OR (season.number = episode2.seasonNumber AND episode.number > episode2.number)))
         )
-    """)
+    """
+    )
     fun resetProgressionFromEpisode(id: String)
 }
