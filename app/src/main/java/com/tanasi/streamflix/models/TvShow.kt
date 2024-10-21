@@ -37,6 +37,20 @@ class TvShow(
     override var isFavorite: Boolean = false
     var isWatching: Boolean = true
 
+    val episodeToWatch: Episode?
+        get() {
+            val episodes = seasons.flatMap { it.episodes }
+            val episode = episodes
+                .filter { it.watchHistory != null }
+                .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
+                .firstOrNull()
+                ?: episodes.indexOfLast { it.isWatched }
+                    .takeIf { it != -1 && it + 1 < episodes.size }
+                    ?.let { episodes.getOrNull(it + 1) }
+                ?: seasons.firstOrNull { it.number != 0 }?.episodes?.firstOrNull()
+                ?: episodes.firstOrNull()
+            return episode
+        }
 
     fun isSame(tvShow: TvShow): Boolean {
         if (isFavorite != tvShow.isFavorite) return false
