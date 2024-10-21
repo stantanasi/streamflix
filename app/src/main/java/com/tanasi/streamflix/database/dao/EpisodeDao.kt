@@ -11,9 +11,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EpisodeDao {
 
-    @Query("SELECT * FROM episodes ORDER BY tvShow, season, number")
-    fun getAll(): Flow<List<Episode>>
-
     @Query(
         """
         SELECT episodes.*, (SELECT MAX(e.watchedDate)

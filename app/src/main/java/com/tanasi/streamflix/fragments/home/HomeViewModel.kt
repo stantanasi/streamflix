@@ -27,21 +27,8 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
         combine(
             database.movieDao().getWatchingMovies(),
             database.episodeDao().getWatchingEpisodes(),
-            database.episodeDao().getAll(),
-        ) { watchingMovies, watchingEpisodes, episodes ->
-            val watchNextEpisodes = episodes
-                .groupBy { it.tvShow?.id }
-                .values.mapNotNull { tvShowEpisodes ->
-                    val watchedEpisode = tvShowEpisodes.findLast { it.isWatched }
-                    val nextEpisode = watchedEpisode?.let {
-                        val index = tvShowEpisodes.indexOf(it)
-                        tvShowEpisodes.getOrNull(index + 1)
-                    }
-
-                    nextEpisode?.watchedDate = watchedEpisode?.watchedDate
-                    nextEpisode
-                }
-
+            database.episodeDao().getNextEpisodesToWatch(),
+        ) { watchingMovies, watchingEpisodes, watchNextEpisodes ->
             watchingMovies + watchingEpisodes.onEach { episode ->
                 episode.tvShow = episode.tvShow?.let { database.tvShowDao().getById(it.id) }
                 episode.season = episode.season?.let { database.seasonDao().getById(it.id) }
