@@ -33,6 +33,7 @@ abstract class Extractor {
             TwoEmbedExtractor(),
             ChillxExtractor(),
             ChillxExtractor.JeanExtractor(),
+            MoviesapiExtractor(),
         )
 
         suspend fun extract(link: String): Video {
