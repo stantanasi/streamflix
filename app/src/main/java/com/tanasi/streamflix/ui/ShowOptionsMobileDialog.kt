@@ -127,12 +127,19 @@ class ShowOptionsMobileDialog(
                     merge(episode)
                     watchHistory = null
                 })
+                episode.tvShow?.let { tvShow ->
+                    database.tvShowDao().save(tvShow.copy().apply {
+                        merge(tvShow)
+                        isWatching = false
+                    })
+                }
 
                 hide()
             }
 
             visibility = when {
                 episode.watchHistory != null -> View.VISIBLE
+                episode.tvShow?.isWatching ?: false -> View.VISIBLE
                 else -> View.GONE
             }
         }

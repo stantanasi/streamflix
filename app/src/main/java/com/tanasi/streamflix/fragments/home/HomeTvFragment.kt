@@ -12,7 +12,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
-import androidx.tvprovider.media.tv.TvContractCompat
 import com.bumptech.glide.Glide
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
@@ -21,10 +20,7 @@ import com.tanasi.streamflix.databinding.FragmentHomeTvBinding
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
-import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.models.WatchItem
-import com.tanasi.streamflix.utils.WatchNextUtils
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
@@ -52,71 +48,6 @@ class HomeTvFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        WatchNextUtils.programs(requireContext())
-            .forEach { program ->
-                when (program.type) {
-                    TvContractCompat.PreviewPrograms.TYPE_MOVIE -> {
-                        database.movieDao().getById(program.contentId)
-                            ?.let { movieDb ->
-                                movieDb.watchHistory = WatchItem.WatchHistory(
-                                    program.lastEngagementTimeUtcMillis,
-                                    program.lastPlaybackPositionMillis.toLong(),
-                                    program.durationMillis.toLong(),
-                                )
-                                database.movieDao().update(movieDb)
-                            }
-                            ?: database.movieDao().insert(Movie(
-                                id = program.contentId,
-                                title = program.title,
-                                released = program.releaseDate,
-                                poster = program.posterArtUri?.toString(),
-                            ).also { movie ->
-                                movie.watchHistory = WatchItem.WatchHistory(
-                                    program.lastEngagementTimeUtcMillis,
-                                    program.lastPlaybackPositionMillis.toLong(),
-                                    program.durationMillis.toLong(),
-                                )
-                            })
-                    }
-                    TvContractCompat.PreviewPrograms.TYPE_TV_EPISODE -> {
-                        database.episodeDao().getById(program.contentId)
-                            ?.let { episodeDb ->
-                                episodeDb.watchHistory = WatchItem.WatchHistory(
-                                    program.lastEngagementTimeUtcMillis,
-                                    program.lastPlaybackPositionMillis.toLong(),
-                                    program.durationMillis.toLong(),
-                                )
-                                database.episodeDao().update(episodeDb)
-                            }
-                            ?: database.episodeDao().insert(Episode(
-                                id = program.contentId,
-                                number = program.episodeNumber?.toIntOrNull() ?: 0,
-                                title = program.episodeTitle,
-
-                                tvShow = TvShow(
-                                    id = program.seriesId ?: "",
-                                    title = program.title ?: "",
-                                    poster = program.posterArtUri?.toString(),
-                                ),
-                                season = Season(
-                                    id = "",
-                                    number = program.seasonNumber?.toIntOrNull() ?: 0,
-                                    title = program.seasonTitle,
-                                ),
-                            ).also { episode ->
-                                episode.watchHistory = WatchItem.WatchHistory(
-                                    program.lastEngagementTimeUtcMillis,
-                                    program.lastPlaybackPositionMillis.toLong(),
-                                    program.durationMillis.toLong(),
-                                )
-                            })
-                    }
-                    else -> {}
-                }
-
-                WatchNextUtils.deleteProgramById(requireContext(), program.id)
-            }
 
         initializeHome()
 

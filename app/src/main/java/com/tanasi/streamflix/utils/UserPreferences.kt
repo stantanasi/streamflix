@@ -21,18 +21,6 @@ object UserPreferences {
         )
     }
 
-    enum class AppLayout {
-        AUTO,
-        MOBILE,
-        TV
-    }
-
-
-    var appLayout: AppLayout?
-        get() = Key.APP_LAYOUT.getInt()?.let { AppLayout.entries[it] }
-        set(value) {
-            Key.APP_LAYOUT.setInt(value?.ordinal ?: AppLayout.AUTO.ordinal)
-        }
 
     var currentProvider: Provider?
         get() = providers.find { it.name == Key.CURRENT_PROVIDER.getString() }

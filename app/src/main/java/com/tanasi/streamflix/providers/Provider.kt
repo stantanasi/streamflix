@@ -48,6 +48,7 @@ interface Provider {
             UnJourUnFilmProvider,
             StreamingCommunityProvider,
             AnimeWorldProvider,
+            AniWorldProvider,
         )
     }
 }

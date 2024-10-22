@@ -13,6 +13,9 @@ interface SeasonDao {
     @Query("SELECT * FROM seasons WHERE id = :id")
     fun getById(id: String): Season?
 
+    @Query("SELECT * FROM seasons WHERE id = :id")
+    fun getByIdAsFlow(id: String): Flow<Season?>
+
     @Query("SELECT * FROM seasons WHERE tvShow = :tvShowId")
     fun getByTvShowIdAsFlow(tvShowId: String): Flow<List<Season>>
 

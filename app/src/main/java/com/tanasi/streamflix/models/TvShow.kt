@@ -35,15 +35,32 @@ class TvShow(
 
     var released = released?.toCalendar()
     override var isFavorite: Boolean = false
+    var isWatching: Boolean = true
 
+    val episodeToWatch: Episode?
+        get() {
+            val episodes = seasons.flatMap { it.episodes }
+            val episode = episodes
+                .filter { it.watchHistory != null }
+                .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
+                .firstOrNull()
+                ?: episodes.indexOfLast { it.isWatched }
+                    .takeIf { it != -1 && it + 1 < episodes.size }
+                    ?.let { episodes.getOrNull(it + 1) }
+                ?: seasons.firstOrNull { it.number != 0 }?.episodes?.firstOrNull()
+                ?: episodes.firstOrNull()
+            return episode
+        }
 
     fun isSame(tvShow: TvShow): Boolean {
         if (isFavorite != tvShow.isFavorite) return false
+        if (isWatching != tvShow.isWatching) return false
         return true
     }
 
     fun merge(tvShow: TvShow): TvShow {
         this.isFavorite = tvShow.isFavorite
+        this.isWatching = tvShow.isWatching
         return this
     }
 
@@ -108,6 +125,7 @@ class TvShow(
         if (recommendations != other.recommendations) return false
         if (released != other.released) return false
         if (isFavorite != other.isFavorite) return false
+        if (isWatching != other.isWatching) return false
         if (!::itemType.isInitialized || !other::itemType.isInitialized) return false
         return itemType == other.itemType
     }
@@ -129,6 +147,7 @@ class TvShow(
         result = 31 * result + recommendations.hashCode()
         result = 31 * result + (released?.hashCode() ?: 0)
         result = 31 * result + isFavorite.hashCode()
+        result = 31 * result + isWatching.hashCode()
         result = 31 * result + (if (::itemType.isInitialized) itemType.hashCode() else 0)
         return result
     }

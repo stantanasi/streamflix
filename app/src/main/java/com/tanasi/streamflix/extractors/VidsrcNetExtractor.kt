@@ -29,15 +29,16 @@ class VidsrcNetExtractor : Extractor() {
         val service = Service.build(mainUrl)
 
         val iframedoc = service.get(link)
-            .select("iframe#player_iframe").attr("src")
-            .let { if (it.startsWith("//")) "https:$it" else it }
+            .selectFirst("iframe#player_iframe")?.attr("src")
+            ?.let { if (it.startsWith("//")) "https:$it" else it }
+            ?: throw Exception("Can't retrieve rcp")
 
         val doc = service.get(iframedoc, referer = link)
 
         val prorcp = Regex("src: '(/prorcp/.*?)'")
             .find(doc.toString())?.groupValues?.get(1)
             ?.let { iframedoc.substringBefore("/rcp") + it }
-            ?: throw Exception("Can't retrieve source")
+            ?: throw Exception("Can't retrieve prorcp")
 
         val script = service.get(
             prorcp,
@@ -50,7 +51,7 @@ class VidsrcNetExtractor : Extractor() {
 
         val encryptedSource = Regex("""<div id="$playerId" style="display:none;">\s*(.*?)\s*</div>""")
             .find(script)?.groupValues?.get(1)
-            ?: throw Exception("Can't retrieve source")
+            ?: throw Exception("Can't retrieve encrypted source")
 
         return Video(
             source = decrypt(playerId, encryptedSource),

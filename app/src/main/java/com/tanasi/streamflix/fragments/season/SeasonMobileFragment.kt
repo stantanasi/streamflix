@@ -16,8 +16,6 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentSeasonMobileBinding
 import com.tanasi.streamflix.models.Episode
-import com.tanasi.streamflix.models.Season
-import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.ui.SpacingItemDecoration
 import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.viewModelsFactory
@@ -33,18 +31,8 @@ class SeasonMobileFragment : Fragment() {
     private val viewModel by viewModelsFactory {
         SeasonViewModel(
             args.seasonId,
-            TvShow(
-                id = args.tvShowId,
-                title = args.tvShowTitle,
-                poster = args.tvShowPoster,
-                banner = args.tvShowBanner,
-            ),
-            Season(
-                id = args.seasonId,
-                number = args.seasonNumber,
-                title = args.seasonTitle,
-            ),
-            database,
+            args.tvShowId,
+            database
         )
     }
 

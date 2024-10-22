@@ -30,7 +30,7 @@ object UnJourUnFilmProvider : Provider {
     override val logo =
         "https://1jour1film.pics/wp-content/uploads/2022/12/screenshot-looka.com-2021.10.19-12_28_21.png"
     override val language = "fr"
-    private const val URL = "https://1jour1film.pics/"
+    private const val URL = "https://1jour1film.skin/"
 
     private val service = Service.build()
 

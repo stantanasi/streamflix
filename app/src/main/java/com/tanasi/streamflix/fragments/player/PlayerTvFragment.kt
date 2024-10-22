@@ -435,14 +435,25 @@ class PlayerTvFragment : Fragment() {
 
                     when (val videoType = args.videoType as Video.Type) {
                         is Video.Type.Movie -> {
-                            database.movieDao().update(watchItem as Movie)
+                            val movie = watchItem as Movie
+                            database.movieDao().update(movie)
                         }
 
                         is Video.Type.Episode -> {
+                            val episode = watchItem as Episode
                             if (player.hasFinished()) {
                                 database.episodeDao().resetProgressionFromEpisode(videoType.id)
                             }
-                            database.episodeDao().update(watchItem as Episode)
+                            database.episodeDao().update(episode)
+
+                            episode.tvShow?.let { tvShow ->
+                                database.tvShowDao().getById(tvShow.id)
+                            }?.let { tvShow ->
+                                database.tvShowDao().save(tvShow.copy().apply {
+                                    merge(tvShow)
+                                    isWatching = true
+                                })
+                            }
                         }
                     }
                 }
