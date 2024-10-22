@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.extractors
 
+import androidx.media3.common.MimeTypes
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
@@ -71,7 +72,7 @@ class VixcloudExtractor : Extractor() {
         return Video(
             source = finalUrl,
             subtitles = listOf(),
-            type = "application/x-mpegURL"
+            type = MimeTypes.APPLICATION_M3U8
         )
     }
 
