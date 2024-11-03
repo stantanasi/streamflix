@@ -114,13 +114,11 @@ class MainTvActivity : FragmentActivity() {
                 when (state) {
                     MainViewModel.State.CheckingUpdate -> {}
                     is MainViewModel.State.SuccessCheckingUpdate -> {
-                        if (state.asset != null) {
-                            updateAppDialog = UpdateAppTvDialog(this@MainTvActivity, state.newReleases).also {
-                                it.setOnUpdateClickListener { _ ->
-                                    if (!it.isLoading) viewModel.downloadUpdate(this@MainTvActivity, state.asset)
-                                }
-                                it.show()
+                        updateAppDialog = UpdateAppTvDialog(this@MainTvActivity, state.newReleases).also {
+                            it.setOnUpdateClickListener { _ ->
+                                if (!it.isLoading) viewModel.downloadUpdate(this@MainTvActivity, state.asset)
                             }
+                            it.show()
                         }
                     }
 

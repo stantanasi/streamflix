@@ -85,13 +85,11 @@ class MainMobileActivity : FragmentActivity() {
                 when (state) {
                     MainViewModel.State.CheckingUpdate -> {}
                     is MainViewModel.State.SuccessCheckingUpdate -> {
-                        if (state.asset != null) {
-                            updateAppDialog = UpdateAppMobileDialog(this@MainMobileActivity, state.newReleases).also {
-                                it.setOnUpdateClickListener { _ ->
-                                    if (!it.isLoading) viewModel.downloadUpdate(this@MainMobileActivity, state.asset)
-                                }
-                                it.show()
+                        updateAppDialog = UpdateAppMobileDialog(this@MainMobileActivity, state.newReleases).also {
+                            it.setOnUpdateClickListener { _ ->
+                                if (!it.isLoading) viewModel.downloadUpdate(this@MainMobileActivity, state.asset)
                             }
+                            it.show()
                         }
                     }
 
