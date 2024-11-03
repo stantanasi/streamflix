@@ -35,11 +35,14 @@ object StreamingCommunityProvider : Provider {
 
     private val service = StreamingCommunityService.build()
 
-    private var version: String = runBlocking { getVersion() }
-    private suspend fun getVersion(): String {
-        val document = service.getHome()
-        return JSONObject(document.selectFirst("#app")?.attr("data-page") ?: "").getString("version")
-    }
+    private var version: String = ""
+        get() {
+            if (field != "") return field
+
+            val document = runBlocking { service.getHome() }
+            field = JSONObject(document.selectFirst("#app")?.attr("data-page") ?: "").getString("version")
+            return field
+        }
 
     private fun getImageLink(filename: String?): String? {
         if (filename.isNullOrEmpty())
