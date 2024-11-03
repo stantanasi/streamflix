@@ -97,7 +97,8 @@ class ProvidersMobileFragment : Fragment() {
 
                     Language(
                         code = it.language,
-                        name = locale.getDisplayLanguage(locale),
+                        name = locale.getDisplayLanguage(locale)
+                            .replaceFirstChar { it.titlecase() },
                     )
                 }
                 .sortedBy { it.name.lowercase() }
