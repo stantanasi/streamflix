@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Preference
+        android:icon="@drawable/ic_settings_about"
+        android:key="p_settings_about"
+        android:title="@string/settings_about" />
+
+    <Preference
+        android:icon="@drawable/ic_settings_help"
+        android:key="p_settings_help"
+        android:title="@string/settings_help" />
+
+</androidx.preference.PreferenceScreen>

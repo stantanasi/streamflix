@@ -23,4 +23,9 @@
         android:icon="@drawable/ic_menu_tv"
         android:title="@string/main_menu_tv_shows" />
 
+    <item
+        android:id="@id/settings"
+        android:icon="@drawable/ic_menu_settings"
+        android:title="@string/main_menu_settings" />
+
 </menu>

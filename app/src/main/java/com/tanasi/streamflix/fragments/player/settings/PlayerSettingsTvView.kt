@@ -311,31 +311,31 @@ class PlayerSettingsTvView @JvmOverloads constructor(
                     is Settings -> {
                         when (item) {
                             Settings.Quality -> setImageDrawable(
-                                ContextCompat.getDrawable(context, R.drawable.ic_settings_quality)
+                                ContextCompat.getDrawable(context, R.drawable.ic_player_settings_quality)
                             )
                             Settings.Audio -> setImageDrawable(
-                                ContextCompat.getDrawable(context, R.drawable.ic_settings_audio)
+                                ContextCompat.getDrawable(context, R.drawable.ic_player_settings_audio)
                             )
                             Settings.Subtitle -> setImageDrawable(
                                 ContextCompat.getDrawable(
                                     context,
                                     when (Settings.Subtitle.selected) {
-                                        is Settings.Subtitle.TextTrackInformation -> R.drawable.ic_settings_subtitle_on
-                                        else -> R.drawable.ic_settings_subtitle_off
+                                        is Settings.Subtitle.TextTrackInformation -> R.drawable.ic_player_settings_subtitle_on
+                                        else -> R.drawable.ic_player_settings_subtitle_off
                                     }
                                 )
                             )
                             Settings.Speed -> setImageDrawable(
                                 ContextCompat.getDrawable(
                                     context,
-                                    R.drawable.ic_settings_playback_speed
+                                    R.drawable.ic_player_settings_playback_speed
                                 )
                             )
 
                             Settings.Server -> setImageDrawable(
                                 ContextCompat.getDrawable(
                                     context,
-                                    R.drawable.ic_settings_servers
+                                    R.drawable.ic_player_settings_servers
                                 )
                             )
                         }

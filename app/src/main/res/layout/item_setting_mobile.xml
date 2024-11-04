@@ -22,7 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription,UseAppTint"
-        tools:src="@drawable/ic_settings_quality"
+        tools:src="@drawable/ic_player_settings_quality"
         tools:visibility="visible" />
 
     <View
@@ -90,7 +90,7 @@
         android:layout_height="18dp"
         android:layout_marginEnd="10dp"
         android:duplicateParentState="true"
-        android:src="@drawable/ic_setting_arrow_right"
+        android:src="@drawable/ic_player_setting_arrow_right"
         android:tint="#808080"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -104,7 +104,7 @@
         android:layout_height="18dp"
         android:layout_marginEnd="10dp"
         android:duplicateParentState="true"
-        android:src="@drawable/ic_setting_check"
+        android:src="@drawable/ic_player_setting_check"
         android:tint="@color/setting_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

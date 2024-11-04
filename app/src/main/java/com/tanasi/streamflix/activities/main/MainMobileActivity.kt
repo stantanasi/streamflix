@@ -75,7 +75,8 @@ class MainMobileActivity : FragmentActivity() {
                 R.id.search,
                 R.id.home,
                 R.id.movies,
-                R.id.tv_shows -> binding.bnvMain.visibility = View.VISIBLE
+                R.id.tv_shows,
+                R.id.settings -> binding.bnvMain.visibility = View.VISIBLE
                 else -> binding.bnvMain.visibility = View.GONE
             }
         }
@@ -118,7 +119,8 @@ class MainMobileActivity : FragmentActivity() {
                     R.id.home -> finish()
                     R.id.search,
                     R.id.movies,
-                    R.id.tv_shows -> binding.bnvMain.findViewById<View>(R.id.home).performClick()
+                    R.id.tv_shows,
+                    R.id.settings -> binding.bnvMain.findViewById<View>(R.id.home).performClick()
                     else -> navController.navigateUp()
                         .takeIf { !it }?.let { finish() }
                 }

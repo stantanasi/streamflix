@@ -198,4 +198,16 @@
             android:name="videoType"
             app:argType="com.tanasi.streamflix.models.Video$Type" />
     </fragment>
+    <fragment
+        android:id="@+id/settings"
+        android:name="com.tanasi.streamflix.fragments.settings.SettingsMobileFragment"
+        android:label="fragment_settings_mobile" >
+        <action
+            android:id="@+id/action_settings_to_settings_about"
+            app:destination="@id/settings_about" />
+    </fragment>
+    <fragment
+        android:id="@+id/settings_about"
+        android:name="com.tanasi.streamflix.fragments.settings.about.SettingsAboutMobileFragment"
+        android:label="fragment_settings_about_mobile" />
 </navigation>
