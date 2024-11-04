@@ -181,4 +181,6 @@
     <string name="player_settings_speed_2">× 2</string>
     <string name="player_settings_servers_title">Servers</string>
     <string name="player_settings_servers_label">Servers</string>
+
+    <string name="settings_about">About</string>
 </resources>
