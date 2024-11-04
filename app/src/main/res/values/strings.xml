@@ -26,6 +26,7 @@
     <string name="main_menu_home">Home</string>
     <string name="main_menu_movies">Movies</string>
     <string name="main_menu_tv_shows">TV Shows</string>
+    <string name="main_menu_settings">Settings</string>
 
     <string name="search_input_hint">Search movies, TV shows</string>
 
