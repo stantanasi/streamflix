@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme.Widget.Button" parent="AppTheme.Tv">
+    <style name="AppTheme.Widget.Tv.Button" parent="AppTheme.Tv">
         <item name="android:background">@drawable/bg_button_tv</item>
         <item name="android:focusable">true</item>
         <item name="android:focusableInTouchMode">true</item>

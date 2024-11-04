@@ -133,7 +133,7 @@
 
     <TextView
         android:id="@+id/btn_movie_watch_now"
-        style="@style/AppTheme.Widget.Button"
+        style="@style/AppTheme.Widget.Tv.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
@@ -162,7 +162,7 @@
 
     <TextView
         android:id="@+id/btn_movie_trailer"
-        style="@style/AppTheme.Widget.Button"
+        style="@style/AppTheme.Widget.Tv.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="25dp"
@@ -175,7 +175,7 @@
 
     <ImageView
         android:id="@+id/btn_movie_favorite"
-        style="@style/AppTheme.Widget.Button"
+        style="@style/AppTheme.Widget.Tv.Button"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="20dp"

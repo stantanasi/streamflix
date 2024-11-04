@@ -35,7 +35,7 @@
 
     <TextView
         android:id="@+id/btn_is_loading_retry"
-        style="@style/AppTheme.Widget.Button"
+        style="@style/AppTheme.Widget.Tv.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
