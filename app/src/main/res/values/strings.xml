@@ -185,4 +185,5 @@
     <string name="settings_about">About</string>
     <string name="settings_about_version">Version</string>
     <string name="settings_about_version_name">Version %s</string>
+    <string name="settings_about_donate">Donate</string>
 </resources>
