@@ -1,5 +1,7 @@
 package com.tanasi.streamflix.fragments.settings
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.navigation.fragment.findNavController
@@ -19,6 +21,18 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
             setOnPreferenceClickListener {
                 findNavController().navigate(
                     SettingsMobileFragmentDirections.actionSettingsToSettingsAbout()
+                )
+                true
+            }
+        }
+
+        findPreference<Preference>("p_settings_help")?.apply {
+            setOnPreferenceClickListener {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/stantanasi/streamflix")
+                    )
                 )
                 true
             }
