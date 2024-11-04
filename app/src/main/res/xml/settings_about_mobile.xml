@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <Preference
+        app:iconSpaceReserved="false"
+        app:key="p_settings_about_version"
+        app:title="@string/settings_about_version"
+        tools:summary="@string/settings_about_version_name" />
+
+    <Preference
+        app:iconSpaceReserved="false"
+        app:key="p_settings_about_donate"
+        app:title="@string/settings_about_donate" />
+
+</androidx.preference.PreferenceScreen>
