@@ -183,4 +183,6 @@
     <string name="player_settings_servers_label">Servers</string>
 
     <string name="settings_about">About</string>
+    <string name="settings_about_version">Version</string>
+    <string name="settings_about_version_name">Version %s</string>
 </resources>
