@@ -2,6 +2,7 @@ package com.tanasi.streamflix.fragments.settings
 
 import android.os.Bundle
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
+import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import com.tanasi.streamflix.R
 
@@ -15,6 +16,12 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
 
     private fun displaySettings() {
         findPreference<Preference>("p_settings_about")?.apply {
+            setOnPreferenceClickListener {
+                findNavController().navigate(
+                    SettingsMobileFragmentDirections.actionSettingsToSettingsAbout()
+                )
+                true
+            }
         }
     }
 }

@@ -201,5 +201,13 @@
     <fragment
         android:id="@+id/settings"
         android:name="com.tanasi.streamflix.fragments.settings.SettingsTvFragment"
-        android:label="fragment_settings_mobile" />
+        android:label="fragment_settings_mobile" >
+        <action
+            android:id="@+id/action_settings_to_settings_about"
+            app:destination="@id/settings_about" />
+    </fragment>
+    <fragment
+        android:id="@+id/settings_about"
+        android:name="com.tanasi.streamflix.fragments.settings.about.SettingsAboutTvFragment"
+        android:label="fragment_settings_about_mobile" />
 </navigation>
