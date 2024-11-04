@@ -198,4 +198,8 @@
             android:id="@+id/action_genre_to_tv_show"
             app:destination="@id/tv_show" />
     </fragment>
+    <fragment
+        android:id="@+id/settings"
+        android:name="com.tanasi.streamflix.fragments.settings.SettingsTvFragment"
+        android:label="fragment_settings_mobile" />
 </navigation>
