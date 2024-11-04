@@ -95,6 +95,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.8.7'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7'
     implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation 'androidx.leanback:leanback-preference:1.2.0-alpha04'
 
     implementation 'androidx.tvprovider:tvprovider:1.1.0-alpha01'
 
