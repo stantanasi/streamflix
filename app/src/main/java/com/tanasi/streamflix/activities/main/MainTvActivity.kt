@@ -104,7 +104,8 @@ class MainTvActivity : FragmentActivity() {
                 R.id.search,
                 R.id.home,
                 R.id.movies,
-                R.id.tv_shows -> binding.navMain.visibility = View.VISIBLE
+                R.id.tv_shows,
+                R.id.settings -> binding.navMain.visibility = View.VISIBLE
                 else -> binding.navMain.visibility = View.GONE
             }
         }
@@ -150,7 +151,8 @@ class MainTvActivity : FragmentActivity() {
                     }
                     R.id.search,
                     R.id.movies,
-                    R.id.tv_shows -> when {
+                    R.id.tv_shows,
+                    R.id.settings -> when {
                         binding.navMain.hasFocus() -> binding.navMain.findViewById<View>(R.id.home)
                             .let {
                                 it.requestFocus()
