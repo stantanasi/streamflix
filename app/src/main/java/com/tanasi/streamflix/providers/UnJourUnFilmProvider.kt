@@ -621,7 +621,15 @@ object UnJourUnFilmProvider : Provider {
             type = "movie"
         )
 
-        return Extractor.extract(embed.embedUrl)
+        val video = Extractor.extract(embed.embedUrl)
+
+        return video.copy(
+            subtitles = video.subtitles.map { subtitle ->
+                subtitle.copy(
+                    file = subtitle.file.replace(".srt", ".vtt"),
+                )
+            },
+        )
     }
 
 
