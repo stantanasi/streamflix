@@ -1,8 +1,10 @@
 package com.tanasi.streamflix.fragments.player
 
+import android.app.PictureInPictureParams
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -237,8 +239,19 @@ class PlayerMobileFragment : Fragment() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
+        binding.pvPlayer.useController = !isInPictureInPictureMode
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode)
+    }
+
+    fun onUserLeaveHint() {
+        if (::player.isInitialized && player.isPlaying) {
+            enterPIPMode()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
         player.pause()
     }
 
@@ -304,6 +317,18 @@ class PlayerMobileFragment : Fragment() {
         binding.pvPlayer.controller.tvExoTitle.text = args.title
 
         binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
+
+        binding.pvPlayer.controller.btnExoPictureInPicture.setOnClickListener {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                Toast.makeText(
+                    requireContext(),
+                    requireContext().getString(R.string.player_picture_in_picture_not_supported),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                enterPIPMode()
+            }
+        }
 
         binding.pvPlayer.controller.btnExoExternalPlayer.setOnClickListener {
             Toast.makeText(
@@ -476,6 +501,16 @@ class PlayerMobileFragment : Fragment() {
 
         player.prepare()
         player.play()
+    }
+
+    private fun enterPIPMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            binding.pvPlayer.useController = false
+            requireActivity().enterPictureInPictureMode(
+                PictureInPictureParams.Builder()
+                    .build()
+            )
+        }
     }
 
 

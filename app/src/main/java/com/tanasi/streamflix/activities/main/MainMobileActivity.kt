@@ -17,8 +17,10 @@ import com.tanasi.streamflix.BuildConfig
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.ActivityMainMobileBinding
+import com.tanasi.streamflix.fragments.player.PlayerMobileFragment
 import com.tanasi.streamflix.ui.UpdateAppMobileDialog
 import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.getCurrentFragment
 import kotlinx.coroutines.launch
 
 class MainMobileActivity : FragmentActivity() {
@@ -126,5 +128,13 @@ class MainMobileActivity : FragmentActivity() {
                 }
             }
         })
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+
+        when (val currentFragment = getCurrentFragment()) {
+            is PlayerMobileFragment -> currentFragment.onUserLeaveHint()
+        }
     }
 }

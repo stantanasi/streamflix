@@ -172,6 +172,20 @@
             tools:text="00:00:00" />
 
         <ImageView
+            android:id="@+id/btn_exo_picture_in_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:padding="12dp"
+            android:src="@drawable/exo_styled_controls_picture_in_picture"
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_exo_aspect_ratio"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
+
+
+        <ImageView
             android:id="@+id/btn_exo_aspect_ratio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
