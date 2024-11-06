@@ -111,12 +111,10 @@
         android:layout_marginEnd="16dp"
         android:gravity="center"
         android:textSize="12sp"
-        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_update_arrow"
         app:layout_constraintTop_toBottomOf="@id/tv_update_new_version"
-        tools:text="- Bug fixes"
-        tools:visibility="visible" />
+        tools:text="- Bug fixes" />
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier1"
@@ -139,21 +137,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/barrier1"
         tools:visibility="visible" />
-
-    <Button
-        android:id="@+id/btn_update_release_notes"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:text="@string/update_release_notes"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pb_update_is_loading" />
 
     <Button
         android:id="@+id/btn_update_cancel"

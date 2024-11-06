@@ -40,10 +40,6 @@ class UpdateAppTvDialog(
             )
         }.joinToString("\n")
 
-        binding.btnUpdateReleaseNotes.setOnClickListener {
-            binding.tvUpdateReleaseNotes.isVisible = !binding.tvUpdateReleaseNotes.isVisible
-        }
-
         binding.btnUpdateCancel.setOnClickListener {
             hide()
         }
