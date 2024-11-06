@@ -244,6 +244,12 @@ class PlayerMobileFragment : Fragment() {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode)
     }
 
+    fun onUserLeaveHint() {
+        if (::player.isInitialized && player.isPlaying) {
+            enterPIPMode()
+        }
+    }
+
     override fun onStop() {
         super.onStop()
         player.pause()
