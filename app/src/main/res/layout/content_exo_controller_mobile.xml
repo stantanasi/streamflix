@@ -73,7 +73,7 @@
         tools:ignore="ContentDescription,UseAppTint" />
 
     <ImageView
-        android:id="@id/exo_rew"
+        android:id="@+id/exo_rew"
         android:layout_width="60dp"
         android:layout_height="0dp"
         android:layout_marginEnd="70dp"
@@ -87,7 +87,7 @@
         tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
 
     <ImageView
-        android:id="@id/exo_play_pause"
+        android:id="@+id/exo_play_pause"
         android:layout_width="90dp"
         android:layout_height="0dp"
         android:padding="15dp"
@@ -101,7 +101,7 @@
         tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
 
     <ImageView
-        android:id="@id/exo_ffwd"
+        android:id="@+id/exo_ffwd"
         android:layout_width="60dp"
         android:layout_height="0dp"
         android:layout_marginStart="70dp"
@@ -115,7 +115,7 @@
         tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
 
     <androidx.media3.ui.DefaultTimeBar
-        android:id="@id/exo_progress"
+        android:id="@+id/exo_progress"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -126,7 +126,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@id/exo_bottom_bar"
+        android:id="@+id/exo_bottom_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
