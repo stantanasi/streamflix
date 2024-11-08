@@ -23,10 +23,11 @@ import java.util.concurrent.TimeUnit
 
 object HiAnimeProvider : Provider {
 
-    override val name = "HiAnime"
-    override val logo = "https://hianime.to/images/logo.png"
-    override val language = "en"
     private const val URL = "https://hianime.to/"
+
+    override val name = "HiAnime"
+    override val logo = "$URL/images/logo.png"
+    override val language = "en"
 
     private val service = HiAnimeService.build()
 

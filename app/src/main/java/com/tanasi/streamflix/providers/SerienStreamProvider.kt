@@ -36,11 +36,12 @@ import java.util.concurrent.TimeUnit
 
 object SerienStreamProvider : Provider {
 
+    private const val URL = "https://serienstream.to/"
+
     override val name = "SerienStream"
     override val logo =
-        "https://s.to/public/img/logo-sto-serienstream-sx-to-serien-online-streaming-vod.png"
+        "$URL/public/img/logo-sto-serienstream-sx-to-serien-online-streaming-vod.png"
     override val language = "de"
-    private const val URL = "https://serienstream.to/"
 
     private val service = BurningSeriesService.build()
 

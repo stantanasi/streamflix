@@ -30,10 +30,11 @@ import java.util.concurrent.TimeUnit
 
 object AniWorldProvider : Provider {
 
+    private const val URL = "https://aniworld.to/"
+
     override val name = "AniWorld"
     override val logo = ""
     override val language = "de"
-    private const val URL = "https://aniworld.to/"
 
     private val service = Service.build()
 

@@ -26,11 +26,12 @@ import retrofit2.http.Query
 
 object UnJourUnFilmProvider : Provider {
 
+    private const val URL = "https://1jour1film.skin/"
+
     override val name = "1JOUR1FILM"
     override val logo =
-        "https://1jour1film.pics/wp-content/uploads/2022/12/screenshot-looka.com-2021.10.19-12_28_21.png"
+        "$URL/wp-content/uploads/2022/12/screenshot-looka.com-2021.10.19-12_28_21.png"
     override val language = "fr"
-    private const val URL = "https://1jour1film.skin/"
 
     private val service = Service.build()
 

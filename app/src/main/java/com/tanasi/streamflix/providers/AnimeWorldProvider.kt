@@ -23,10 +23,11 @@ import java.util.concurrent.TimeUnit
 
 object AnimeWorldProvider : Provider {
 
+    private const val URL = "https://animeworld.so/"
+
     override val name = "AnimeWorld"
     override val logo = "https://static.animeworld.so/assets/images/favicon/android-icon-192x192.png"
     override val language = "it"
-    private const val URL = "https://animeworld.so/"
 
     private val service = AnimeWorldService.build()
 

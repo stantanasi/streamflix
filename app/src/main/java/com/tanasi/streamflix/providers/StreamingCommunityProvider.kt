@@ -26,12 +26,13 @@ import java.util.concurrent.TimeUnit
 
 object StreamingCommunityProvider : Provider {
 
-    override val name = "StreamingCommunity"
-    override val logo = "https://streamingcommunity.computer/apple-touch-icon.png"
-    override val language = "it"
     private const val DOMAIN = "streamingcommunity.computer"
     private const val URL = "https://$DOMAIN/"
     private const val MAX_SEARCH_RESULTS = 60
+
+    override val name = "StreamingCommunity"
+    override val logo = "$URL/apple-touch-icon.png"
+    override val language = "it"
 
     private val service = StreamingCommunityService.build()
 
