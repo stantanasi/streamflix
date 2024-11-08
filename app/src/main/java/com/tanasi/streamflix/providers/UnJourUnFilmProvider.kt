@@ -26,7 +26,7 @@ import retrofit2.http.Query
 
 object UnJourUnFilmProvider : Provider {
 
-    private const val URL = "https://1jour1film.skin/"
+    private const val URL = "https://1jour1film.monster/"
 
     override val name = "1JOUR1FILM"
     override val logo =
