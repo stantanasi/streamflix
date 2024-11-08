@@ -29,7 +29,6 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerControlView
-import androidx.media3.ui.PlayerView
 import androidx.media3.ui.SubtitleView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -61,14 +60,8 @@ class PlayerTvFragment : Fragment() {
     private var _binding: FragmentPlayerTvBinding? = null
     private val binding get() = _binding!!
 
-    private val PlayerView.controller
+    private val PlayerControlView.binding
         get() = ContentExoControllerTvBinding.bind(this.findViewById(R.id.cl_exo_controller))
-    private val PlayerView.isControllerVisible
-        get() = this.javaClass.getDeclaredField("controller").let {
-            it.isAccessible = true
-            val controller = it.get(this) as PlayerControlView
-            controller.isVisible
-        }
 
     private val args by navArgs<PlayerTvFragmentArgs>()
     private val database by lazy { AppDatabase.getInstance(requireContext()) }
@@ -258,7 +251,7 @@ class PlayerTvFragment : Fragment() {
             binding.settings.onBackPressed()
         }
 
-        binding.pvPlayer.isControllerVisible -> {
+        binding.pvPlayer.controller.isVisible -> {
             binding.pvPlayer.hideController()
             true
         }
@@ -295,11 +288,11 @@ class PlayerTvFragment : Fragment() {
             setStyle(UserPreferences.captionStyle)
         }
 
-        binding.pvPlayer.controller.tvExoTitle.text = args.title
+        binding.pvPlayer.controller.binding.tvExoTitle.text = args.title
 
-        binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
+        binding.pvPlayer.controller.binding.tvExoSubtitle.text = args.subtitle
 
-        binding.pvPlayer.controller.btnExoExternalPlayer.setOnClickListener {
+        binding.pvPlayer.controller.binding.btnExoExternalPlayer.setOnClickListener {
             Toast.makeText(
                 requireContext(),
                 requireContext().getString(R.string.player_external_player_error_video),
@@ -307,9 +300,9 @@ class PlayerTvFragment : Fragment() {
             ).show()
         }
 
-        binding.pvPlayer.controller.exoProgress.setKeyTimeIncrement(10_000)
+        binding.pvPlayer.controller.binding.exoProgress.setKeyTimeIncrement(10_000)
 
-        binding.pvPlayer.controller.btnExoAspectRatio.setOnClickListener {
+        binding.pvPlayer.controller.binding.btnExoAspectRatio.setOnClickListener {
             UserPreferences.playerResize = UserPreferences.playerResize.next()
             binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
 
@@ -321,7 +314,7 @@ class PlayerTvFragment : Fragment() {
             binding.pvPlayer.resizeMode = UserPreferences.playerResize.resizeMode
         }
 
-        binding.pvPlayer.controller.exoSettings.setOnClickListener {
+        binding.pvPlayer.controller.binding.exoSettings.setOnClickListener {
             binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
             binding.settings.show()
         }
@@ -375,7 +368,7 @@ class PlayerTvFragment : Fragment() {
                 .build()
         )
 
-        binding.pvPlayer.controller.btnExoExternalPlayer.setOnClickListener {
+        binding.pvPlayer.controller.binding.btnExoExternalPlayer.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(Uri.parse(video.source), "video/*")
 
@@ -398,7 +391,7 @@ class PlayerTvFragment : Fragment() {
                 super.onPlaybackStateChanged(playbackState)
 
                 if (playbackState == Player.STATE_READY) {
-                    binding.pvPlayer.controller.exoPlayPause.nextFocusDownId = -1
+                    binding.pvPlayer.controller.binding.exoPlayPause.nextFocusDownId = -1
                 }
             }
 
