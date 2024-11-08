@@ -33,7 +33,7 @@ import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
-import androidx.media3.ui.PlayerView
+import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.SubtitleView
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -65,7 +65,7 @@ class PlayerMobileFragment : Fragment() {
     private var _binding: FragmentPlayerMobileBinding? = null
     private val binding get() = _binding!!
 
-    private val PlayerView.controller
+    private val PlayerControlView.binding
         get() = ContentExoControllerMobileBinding.bind(this.findViewById(R.id.cl_exo_controller))
 
     private val args by navArgs<PlayerMobileFragmentArgs>()
@@ -310,15 +310,15 @@ class PlayerMobileFragment : Fragment() {
             setStyle(UserPreferences.captionStyle)
         }
 
-        binding.pvPlayer.controller.btnExoBack.setOnClickListener {
+        binding.pvPlayer.controller.binding.btnExoBack.setOnClickListener {
             findNavController().navigateUp()
         }
 
-        binding.pvPlayer.controller.tvExoTitle.text = args.title
+        binding.pvPlayer.controller.binding.tvExoTitle.text = args.title
 
-        binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
+        binding.pvPlayer.controller.binding.tvExoSubtitle.text = args.subtitle
 
-        binding.pvPlayer.controller.btnExoExternalPlayer.setOnClickListener {
+        binding.pvPlayer.controller.binding.btnExoExternalPlayer.setOnClickListener {
             Toast.makeText(
                 requireContext(),
                 requireContext().getString(R.string.player_external_player_error_video),
@@ -326,17 +326,17 @@ class PlayerMobileFragment : Fragment() {
             ).show()
         }
 
-        binding.pvPlayer.controller.btnExoLock.setOnClickListener {
-            binding.pvPlayer.controller.gControlsLock.visibility = View.GONE
-            binding.pvPlayer.controller.btnExoUnlock.visibility = View.VISIBLE
+        binding.pvPlayer.controller.binding.btnExoLock.setOnClickListener {
+            binding.pvPlayer.controller.binding.gControlsLock.visibility = View.GONE
+            binding.pvPlayer.controller.binding.btnExoUnlock.visibility = View.VISIBLE
         }
 
-        binding.pvPlayer.controller.btnExoUnlock.setOnClickListener {
-            binding.pvPlayer.controller.gControlsLock.visibility = View.VISIBLE
-            binding.pvPlayer.controller.btnExoUnlock.visibility = View.GONE
+        binding.pvPlayer.controller.binding.btnExoUnlock.setOnClickListener {
+            binding.pvPlayer.controller.binding.gControlsLock.visibility = View.VISIBLE
+            binding.pvPlayer.controller.binding.btnExoUnlock.visibility = View.GONE
         }
 
-        binding.pvPlayer.controller.btnExoPictureInPicture.setOnClickListener {
+        binding.pvPlayer.controller.binding.btnExoPictureInPicture.setOnClickListener {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 Toast.makeText(
                     requireContext(),
@@ -348,7 +348,7 @@ class PlayerMobileFragment : Fragment() {
             }
         }
 
-        binding.pvPlayer.controller.btnExoAspectRatio.setOnClickListener {
+        binding.pvPlayer.controller.binding.btnExoAspectRatio.setOnClickListener {
             UserPreferences.playerResize = UserPreferences.playerResize.next()
             binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
 
@@ -360,7 +360,7 @@ class PlayerMobileFragment : Fragment() {
             binding.pvPlayer.resizeMode = UserPreferences.playerResize.resizeMode
         }
 
-        binding.pvPlayer.controller.exoSettings.setOnClickListener {
+        binding.pvPlayer.controller.binding.exoSettings.setOnClickListener {
             binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
             binding.settings.show()
         }
@@ -414,7 +414,7 @@ class PlayerMobileFragment : Fragment() {
                 .build()
         )
 
-        binding.pvPlayer.controller.btnExoExternalPlayer.setOnClickListener {
+        binding.pvPlayer.controller.binding.btnExoExternalPlayer.setOnClickListener {
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(Uri.parse(video.source), "video/*")
 

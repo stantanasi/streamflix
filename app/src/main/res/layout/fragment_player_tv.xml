@@ -7,7 +7,7 @@
     android:background="#000000"
     tools:context=".fragments.player.PlayerTvFragment">
 
-    <androidx.media3.ui.PlayerView
+    <com.tanasi.streamflix.ui.PlayerTvView
         android:id="@+id/pv_player"
         android:layout_width="0dp"
         android:layout_height="0dp"
