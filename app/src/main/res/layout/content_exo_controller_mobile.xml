@@ -172,6 +172,19 @@
             tools:text="00:00:00" />
 
         <ImageView
+            android:id="@+id/btn_exo_lock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:padding="12dp"
+            android:src="@drawable/exo_styled_controls_lock"
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btn_exo_picture_in_picture"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
+
+        <ImageView
             android:id="@+id/btn_exo_picture_in_picture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -183,7 +196,6 @@
             app:layout_constraintEnd_toStartOf="@id/btn_exo_aspect_ratio"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
-
 
         <ImageView
             android:id="@+id/btn_exo_aspect_ratio"
@@ -211,5 +223,27 @@
             tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/btn_exo_unlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:padding="12dp"
+        android:src="@drawable/exo_styled_controls_unlock"
+        android:tint="#FFFFFF"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="ContentDescription,PrivateResource,UseAppTint"
+        tools:visibility="visible" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/g_controls_lock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:constraint_referenced_ids="btn_exo_back,tv_exo_title,tv_exo_subtitle,btn_exo_external_player,exo_rew,exo_play_pause,exo_ffwd,exo_progress,exo_bottom_bar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

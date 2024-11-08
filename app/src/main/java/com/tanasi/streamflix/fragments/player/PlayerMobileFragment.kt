@@ -318,6 +318,24 @@ class PlayerMobileFragment : Fragment() {
 
         binding.pvPlayer.controller.tvExoSubtitle.text = args.subtitle
 
+        binding.pvPlayer.controller.btnExoExternalPlayer.setOnClickListener {
+            Toast.makeText(
+                requireContext(),
+                requireContext().getString(R.string.player_external_player_error_video),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        binding.pvPlayer.controller.btnExoLock.setOnClickListener {
+            binding.pvPlayer.controller.gControlsLock.visibility = View.GONE
+            binding.pvPlayer.controller.btnExoUnlock.visibility = View.VISIBLE
+        }
+
+        binding.pvPlayer.controller.btnExoUnlock.setOnClickListener {
+            binding.pvPlayer.controller.gControlsLock.visibility = View.VISIBLE
+            binding.pvPlayer.controller.btnExoUnlock.visibility = View.GONE
+        }
+
         binding.pvPlayer.controller.btnExoPictureInPicture.setOnClickListener {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
                 Toast.makeText(
@@ -328,14 +346,6 @@ class PlayerMobileFragment : Fragment() {
             } else {
                 enterPIPMode()
             }
-        }
-
-        binding.pvPlayer.controller.btnExoExternalPlayer.setOnClickListener {
-            Toast.makeText(
-                requireContext(),
-                requireContext().getString(R.string.player_external_player_error_video),
-                Toast.LENGTH_SHORT
-            ).show()
         }
 
         binding.pvPlayer.controller.btnExoAspectRatio.setOnClickListener {
