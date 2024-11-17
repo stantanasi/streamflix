@@ -48,6 +48,7 @@ interface Provider {
             StreamingCommunityProvider,
             AnimeWorldProvider,
             AniWorldProvider,
+            RidomoviesProvider,
         )
     }
 }
