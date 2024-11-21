@@ -38,6 +38,7 @@ abstract class Extractor {
             ChillxExtractor.JeanExtractor(),
             MoviesapiExtractor(),
             CloseloadExtractor(),
+            LuluVdoExtractor(),
         )
 
         suspend fun extract(link: String): Video {
