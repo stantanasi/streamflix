@@ -49,6 +49,7 @@ interface Provider {
             AnimeWorldProvider,
             AniWorldProvider,
             RidomoviesProvider,
+            OtakufrProvider,
         )
     }
 }

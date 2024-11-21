@@ -50,6 +50,7 @@ fun String.toCalendar(): Calendar? {
         SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.ENGLISH),
         SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH),
         SimpleDateFormat("d MMMM yyyy ('USA')", Locale.ENGLISH),
+        SimpleDateFormat("d MMMM yyyy", Locale.FRENCH),
         SimpleDateFormat("yyyy", Locale.ENGLISH),
         SimpleDateFormat("MMM d, yyyy", Locale.ENGLISH),
         SimpleDateFormat("MMMM d, yyyy ('United' 'States')", Locale.ENGLISH),
