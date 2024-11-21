@@ -30,11 +30,17 @@ abstract class Extractor {
             VidsrcNetExtractor(),
             StreamWishExtractor(),
             StreamWishExtractor.UqloadsXyz(),
+            StreamWishExtractor.SwishExtractor(),
+            StreamWishExtractor.HlswishExtractor(),
+            StreamWishExtractor.PlayerwishExtractor(),
             TwoEmbedExtractor(),
             ChillxExtractor(),
             ChillxExtractor.JeanExtractor(),
             MoviesapiExtractor(),
             CloseloadExtractor(),
+            LuluVdoExtractor(),
+            DoodLaExtractor(),
+            DoodLaExtractor.DoodLiExtractor(),
         )
 
         suspend fun extract(link: String): Video {

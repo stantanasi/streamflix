@@ -21,16 +21,18 @@ open class StreamWishExtractor : Extractor() {
 
         val document = service.get(getEmbedUrl(link), referer = referer)
 
-        val script = document.select("script")
-            .let { scripts -> scripts.getOrNull(scripts.size - 2) }
-            ?.html()
+
+        val script = Regex("<script .*>(eval.*?)</script>", RegexOption.DOT_MATCHES_ALL).find(document.toString())
+            ?.groupValues?.get(1)
             ?.let { JsUnpacker(it).unpack() }
             ?: throw Exception("Can't retrieve script")
 
+        val source = Regex("file:\\s*\"(.*?m3u8.*?)\"").find(script)
+            ?.groupValues?.getOrNull(1)
+            ?: throw Exception("Can't retrieve m3u8")
+
         val video = Video(
-            source = Regex("file:\\s*\"(.*?m3u8.*?)\"").find(script)
-                ?.groupValues?.getOrNull(1)
-                ?: throw Exception("Can't retrieve m3u8"),
+            source = source,
             subtitles = emptyList(),
         )
 
@@ -55,6 +57,21 @@ open class StreamWishExtractor : Extractor() {
             this.referer = referer
             return extract(link)
         }
+    }
+
+    class SwishExtractor : StreamWishExtractor() {
+        override val name = "Swish"
+        override val mainUrl = "https://swishsrv.com/"
+    }
+
+    class HlswishExtractor : StreamWishExtractor() {
+        override val name = "Hlswish"
+        override val mainUrl = "https://hlswish.com/"
+    }
+
+    class PlayerwishExtractor : StreamWishExtractor() {
+        override val name = "Playerwish"
+        override val mainUrl = "https://playerwish.com/"
     }
 
 
