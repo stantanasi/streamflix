@@ -39,6 +39,8 @@ abstract class Extractor {
             MoviesapiExtractor(),
             CloseloadExtractor(),
             LuluVdoExtractor(),
+            DoodLaExtractor(),
+            DoodLaExtractor.DoodLiExtractor(),
         )
 
         suspend fun extract(link: String): Video {
