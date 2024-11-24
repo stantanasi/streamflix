@@ -8,3 +8,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+*.salive
+*.log
