@@ -804,11 +804,11 @@ object TmdbProvider : Provider {
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         val servers = listOf(
+            TwoEmbedExtractor().server(videoType),
             MoviesapiExtractor().server(videoType),
             VidsrcNetExtractor().server(videoType),
             MyFileStorageExtractor().nowTvServer(videoType),
             MoflixExtractor().server(videoType),
-            TwoEmbedExtractor().server(videoType),
             VidsrcToExtractor().server(videoType),
         )
 
