@@ -167,8 +167,8 @@ object OtakufrProvider : Provider {
             seasons = listOf(
                 Season(
                     id = id,
-                    title = "Episodes"
-                )
+                    title = "Épisodes",
+                ),
             ),
             genres = document.select("div.synop ul li")
                 .find { it.selectFirst("strong")?.text()?.contains("Genre") == true }
