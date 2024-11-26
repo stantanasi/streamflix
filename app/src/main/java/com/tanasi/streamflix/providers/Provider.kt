@@ -50,6 +50,7 @@ interface Provider {
             AniWorldProvider,
             RidomoviesProvider,
             OtakufrProvider,
+            WiflixProvider,
         )
     }
 }
