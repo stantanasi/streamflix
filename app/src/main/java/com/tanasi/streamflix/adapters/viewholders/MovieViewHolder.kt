@@ -574,13 +574,22 @@ class MovieViewHolder(
             }
         }
 
-        binding.btnMovieTrailer.setOnClickListener {
-            context.startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(movie.trailer)
+        binding.btnMovieTrailer.apply {
+            val trailer = movie.trailer
+
+            setOnClickListener {
+                context.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(trailer)
+                    )
                 )
-            )
+            }
+
+            visibility = when {
+                trailer != null -> View.VISIBLE
+                else -> View.GONE
+            }
         }
 
         binding.btnMovieFavorite.apply {
@@ -695,13 +704,22 @@ class MovieViewHolder(
             }
         }
 
-        binding.btnMovieTrailer.setOnClickListener {
-            context.startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(movie.trailer)
+        binding.btnMovieTrailer.apply {
+            val trailer = movie.trailer
+
+            setOnClickListener {
+                context.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(trailer)
+                    )
                 )
-            )
+            }
+
+            visibility = when {
+                trailer != null -> View.VISIBLE
+                else -> View.GONE
+            }
         }
 
         binding.btnMovieFavorite.apply {

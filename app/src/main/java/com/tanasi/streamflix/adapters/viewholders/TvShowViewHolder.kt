@@ -613,13 +613,22 @@ class TvShowViewHolder(
             }
         }
 
-        binding.btnTvShowTrailer.setOnClickListener {
-            context.startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(tvShow.trailer)
+        binding.btnTvShowTrailer.apply {
+            val trailer = tvShow.trailer
+
+            setOnClickListener {
+                context.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(trailer)
+                    )
                 )
-            )
+            }
+
+            visibility = when {
+                trailer != null -> View.VISIBLE
+                else -> View.GONE
+            }
         }
 
         binding.btnTvShowFavorite.apply {
@@ -789,13 +798,22 @@ class TvShowViewHolder(
             }
         }
 
-        binding.btnTvShowTrailer.setOnClickListener {
-            context.startActivity(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(tvShow.trailer)
+        binding.btnTvShowTrailer.apply {
+            val trailer = tvShow.trailer
+
+            setOnClickListener {
+                context.startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse(trailer)
+                    )
                 )
-            )
+            }
+
+            visibility = when {
+                trailer != null -> View.VISIBLE
+                else -> View.GONE
+            }
         }
 
         binding.btnTvShowFavorite.apply {
