@@ -290,19 +290,26 @@ object MStream : Provider {
             val seasonNumber = if (idSplit.size > 1) idSplit[1] else ""
             val episodeNumber = if (idSplit.size > 1) idSplit[2] else ""
             document = service.getEpisodeStreams(titleId, seasonNumber, episodeNumber)
+            val json = JSONObject(document.string())
+            return json.getJSONObject("episode").getJSONArray("videos").map {
+                Server(
+                    id = it?.getString("id") ?: "",
+                    name = URL(it?.getString("src")).host + " ( " + it?.getString("name") + ")",
+                    src = it?.getString("src") ?: ""
+                )
+            }
         } else {
             val idSplit = idCombined.split("#")
             val watchId = idSplit[1]
             document = service.getStreams(watchId)
-        }
-
-        val json = JSONObject(document.string())
-        return json.getJSONObject("episode").getJSONArray("videos").map {
-            Server(
-                id = it?.getString("id") ?: "",
-                name = URL(it?.getString("src")).host + " ( " + it?.getString("name") + ")",
-                src = it?.getString("src") ?: ""
-            )
+            val json = JSONObject(document.string())
+            return json.getJSONArray("alternative_videos").map {
+                Server(
+                    id = it?.getString("id") ?: "",
+                    name = URL(it?.getString("src")).host + " ( " + it?.getString("name") + ")",
+                    src = it?.getString("src") ?: ""
+                )
+            }
         }
     }
 
