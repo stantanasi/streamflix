@@ -256,24 +256,29 @@ object MStream : Provider {
         return Genre(id,
             name = json.getJSONObject("channel").getJSONObject("restriction")
                 .getString("display_name"),
-            shows = if (page > 1) genres.map {
+            shows = if (page == 1) genres.map {
                 if (it?.optBoolean("is_series") == true) getTvShowObj(it)
                 else getMovieObj(it, true)
             } else emptyList())
-
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
-        return People(
-            id = TODO(),
-            name = TODO(),
-            image = TODO(),
-            biography = TODO(),
-            placeOfBirth = TODO(),
-            birthday = TODO(),
-            deathday = TODO(),
-            filmography = TODO()
-        )
+        val document = service.getPerson(id)
+        val json = JSONObject(document.string())
+        val person = json.getJSONObject("person")
+        val knownFor = json.getJSONArray("knownFor")
+        return People(id = person.optString("id"),
+            name = person.optString("name"),
+            image = person.optString("poster"),
+            placeOfBirth = person.optString("birth_place"),
+            birthday = person.optString("birth_date"),
+            deathday = person.optString("death_date"),
+
+            filmography = if (page == 1) knownFor.map {
+                if (it?.optBoolean("is_series") == true) getTvShowObj(it)
+                else getMovieObj(it, true)
+            }
+            else emptyList())
     }
 
     override suspend fun getServers(idCombined: String, videoType: Video.Type): List<Server> {
@@ -364,6 +369,9 @@ object MStream : Provider {
 
         @GET("/api/v1/search/{searchText}?loader=searchPage")
         suspend fun getSearch(@Path("searchText") id: String): ResponseBody
+
+        @GET("/api/v1/people/{personId}?loader=personPage")
+        suspend fun getPerson(@Path("personId") id: String): ResponseBody
 
         @GET("/api/v1/channel/genre?channelType=channel&loader=channelPage")
         suspend fun getGenre(@Query("restriction") channelName: String): ResponseBody
