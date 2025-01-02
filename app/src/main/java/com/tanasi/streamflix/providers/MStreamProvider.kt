@@ -31,7 +31,7 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 import kotlin.String
 
-object MStream : Provider {
+object MStreamProvider : Provider {
     private val URL = Base64.decode(
         "aHR0cHM6Ly9tb2ZsaXg=", Base64.NO_WRAP
     ).toString(Charsets.UTF_8) + Base64.decode(
