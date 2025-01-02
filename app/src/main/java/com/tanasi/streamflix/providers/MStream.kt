@@ -1,7 +1,6 @@
 package com.tanasi.streamflix.providers
 
 import android.util.Base64
-import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.models.Category
@@ -17,14 +16,16 @@ import okhttp3.Cache
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.OkHttpClient.Builder
+import okhttp3.ResponseBody
 import okhttp3.dnsoverhttps.DnsOverHttps
+import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONArray
 import org.json.JSONObject
-import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 import java.io.File
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -42,7 +43,7 @@ object MStream : Provider {
         "LXN0cmVhbQ==", Base64.NO_WRAP
     ).toString(Charsets.UTF_8)
 
-    override val logo = URL + "/favicon/icon-192x192.png"
+    override val logo = "$URL/storage/branding_media/b0d168ea-8d1b-4b40-9292-65e9a600d3c6.png"
     override val language = "de"
 
     private val service = MStreamService.build()
@@ -55,154 +56,211 @@ object MStream : Provider {
         return result
     }
 
-    override suspend fun getHome(): List<Category> {
-        val homepageChannel = "350"
-        val document = service.getChannel(homepageChannel)
-        val documentWithoutEscapeChars = document.select("body").text()
-        val json = JSONObject(documentWithoutEscapeChars)
-        val channelContent =
-            json.getJSONObject("channel").getJSONObject("content").getJSONArray("data")
-
-        return channelContent.map { itemCategory ->
-            Category(name = itemCategory?.get("name").toString(),
-                list = (itemCategory?.getJSONObject("content")
-                    ?.getJSONArray("data"))?.map { itemShowMovie ->
-                        if (itemShowMovie?.getBoolean("is_series") == true) TvShow(
-                            id = itemShowMovie.getString("id") ?: "",
-                            title = itemShowMovie.getString("name") ?: "",
-                            poster = itemShowMovie.getString("poster").replace("original", "w300"),
-                        )
-                        else Movie(
-                            id = itemShowMovie?.getString("id") ?: "",
-                            title = itemShowMovie?.getString("name") ?: "",
-                            poster = itemShowMovie?.getString("poster")?.replace("original", "w300")
-                                ?: "",
-                        )
-                    } ?: emptyList())
-        }
-
-    }
-
-    override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
-        return emptyList()
-    }
-
-    override suspend fun getMovies(page: Int): List<Movie> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getTvShows(page: Int): List<TvShow> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getMovie(id: String): Movie {
-        val document = service.getTitle(id)
-        val documentWithoutEscapeChars = document.select("body").text()
-        val json = JSONObject(documentWithoutEscapeChars)
-        val jsonTitle = json.getJSONObject("title")
+    fun getMovieObj(json: JSONObject?, reducePosterSize: Boolean): Movie {
+        val jsonTitle = json?.optJSONObject("title") ?: json
         return Movie(
-            id = id + "#" + jsonTitle.getJSONObject("primary_video").getString("id"),
-            title = jsonTitle.getString("name"),
-            poster = jsonTitle.getString("poster"),
-            banner = jsonTitle.getString("backdrop"),
-            overview = jsonTitle.getString("description"),
-            released = jsonTitle.getString("year"),
-            rating = jsonTitle.getDouble("rating"),
-            runtime = jsonTitle.getInt("runtime"),
-            genres = jsonTitle.optJSONArray("genres")?.map { genreItem ->
+            id = jsonTitle?.optString("id") + "#" + jsonTitle?.optJSONObject("primary_video")
+                ?.optString("id"),
+            title = jsonTitle?.optString("name") ?: "unknown title",
+            poster = (((if (jsonTitle?.optString("poster")
+                    ?.contains("http") == false
+            ) ("$URL/") else "") + jsonTitle?.optString("poster"))).replace(
+                "original", if (reducePosterSize == true) "original" else "w300"
+            ),
+            banner = (if (jsonTitle?.optString("backdrop")
+                    ?.contains("http") == false
+            ) ("$URL/") else "") + jsonTitle?.optString("backdrop"),
+            overview = jsonTitle?.optString("description"),
+            released = jsonTitle?.optString("year"),
+            rating = jsonTitle?.optDouble("rating"),
+            runtime = jsonTitle?.optInt("runtime"),
+            genres = jsonTitle?.optJSONArray("genres")?.map {
                 Genre(
-                    id = genreItem?.getString("id") ?: "",
-                    name = genreItem?.getString("display_name") ?: "",
+                    id = it?.getString("id") ?: "",
+                    name = it?.getString("display_name") ?: "",
                     shows = emptyList()
                 )
             } ?: emptyList(),
-            cast = json.optJSONObject("credits")?.optJSONArray("actors")?.map { peopleItem ->
+            cast = json?.optJSONObject("credits")?.optJSONArray("actors")?.map {
                 People(
-                    id = peopleItem?.getString("id") ?: "",
-                    name = peopleItem?.getString("name") ?: "",
-                    image = peopleItem?.getString("poster") ?: "",
+                    id = it?.getString("id") ?: "",
+                    name = it?.getString("name") ?: "",
+                    image = it?.getString("poster") ?: "",
                 )
             } ?: emptyList(),
-            directors = json.optJSONObject("credits")?.optJSONArray("directing")
-                ?.map { peopleItem ->
-                    People(
-                        id = peopleItem?.getString("id") ?: "",
-                        name = peopleItem?.getString("name") ?: "",
-                        image = peopleItem?.getString("poster") ?: "",
-                    )
-                } ?: emptyList(),
+            directors = json?.optJSONObject("credits")?.optJSONArray("directing")?.map {
+                People(
+                    id = it?.getString("id") ?: "",
+                    name = it?.getString("name") ?: "",
+                    image = it?.getString("poster") ?: "",
+                )
+            } ?: emptyList(),
         )
+    }
+
+    fun getTvShowObj(json: JSONObject?): TvShow {
+        val jsonTitle = json?.optJSONObject("title") ?: json
+        return TvShow(
+            id = jsonTitle?.optString("id") ?: "0",
+            title = jsonTitle?.optString("name") ?: "unknown title",
+            poster = ((if (jsonTitle?.optString("poster")
+                    ?.contains("http") == false
+            ) ("$URL/") else "") + jsonTitle?.optString("poster")),
+            banner = (if (jsonTitle?.optString("backdrop")
+                    ?.contains("http") == false
+            ) ("$URL/") else "") + jsonTitle?.optString("backdrop"),
+            overview = jsonTitle?.optString("description"),
+            released = jsonTitle?.optString("year"),
+            rating = jsonTitle?.optDouble("rating"),
+            genres = jsonTitle?.optJSONArray("genres")?.map {
+                Genre(
+                    id = it?.getString("id") ?: "",
+                    name = it?.getString("display_name") ?: "",
+                    shows = emptyList()
+                )
+            } ?: emptyList(),
+            cast = json?.optJSONObject("credits")?.optJSONArray("actors")?.map {
+                People(
+                    id = it?.getString("id") ?: "",
+                    name = it?.getString("name") ?: "",
+                    image = it?.getString("poster") ?: "",
+                )
+            } ?: emptyList(),
+            directors = json?.optJSONObject("credits")?.optJSONArray("directing")?.map {
+                People(
+                    id = it?.getString("id") ?: "",
+                    name = it?.getString("name") ?: "",
+                    image = it?.getString("poster") ?: "",
+                )
+            } ?: emptyList(),
+            seasons = json?.optJSONObject("seasons")?.optJSONArray("data")?.map {
+                Season(
+                    id = it?.getString("title_id") + "_" + it?.getInt("number"),
+                    number = it?.getInt("number") ?: 0,
+                    poster = it?.getString("poster") ?: "",
+                )
+            } ?: emptyList(),
+        )
+    }
+
+    override suspend fun getHome(): List<Category> {
+        val homepageChannel = "350"
+        val document = service.getChannel(homepageChannel)
+        val json = JSONObject(document.string())
+        val channelContent =
+            json.getJSONObject("channel").getJSONObject("content").getJSONArray("data")
+        return channelContent.map {
+            Category(name = (if (it?.getString("id") == "354") Category.FEATURED
+            else it?.getString("name")).toString(),
+                list = (it?.optJSONObject("content")?.optJSONArray("data"))?.map {
+                    if (it?.optBoolean("is_series") == true) getTvShowObj(it)
+                    else getMovieObj(it, true)
+                } ?: emptyList())
+        }
+    }
+
+    override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
+        var genres = listOf(
+            "Drama",
+            "Action",
+            "Animation",
+            "Abenteuer",
+            "Familie",
+            "Fantasy",
+            "Komödie",
+            "Thriller",
+            "Krimi",
+            "Mystery",
+            "Horror",
+            "Liebesfilm",
+            "Historie",
+            "Kriegsfilm",
+            "Western",
+            "Musik",
+            "Dokumentarfilm",
+            "Action & Adventure",
+            "Sci-Fi & Fantasy",
+            "Soap",
+            "Kids",
+            "Anime",
+            "Science Fiction"
+        )
+        if (query.isEmpty() && page == 1) {
+            return genres.map {
+                Genre(id = it.replace(" & ", "-").replace(" / ", "-").replace(" ", "-"), name = it)
+            }
+        }
+        if (page > 1) return emptyList()
+
+        val document = service.getSearch(query)
+        val json = JSONObject(document.string())
+        return (json.getJSONArray("results").map {
+            if (it?.optBoolean("is_series") == true) getTvShowObj(it)
+            else if (it?.getString("model_type") == "movie" || it?.getString("model_type") == "title") getMovieObj(
+                it, true
+            )
+            else null
+        }).mapNotNull { it }
+    }
+
+    override suspend fun getMovies(page: Int): List<Movie> {
+        val homepageChannel = "345"
+        val document = service.getChannelWithPage(homepageChannel, page.toString())
+        val json = JSONObject(document.string())
+        val channelContent = json.getJSONObject("pagination").getJSONArray("data")
+        return channelContent.map { getMovieObj(it, false) }
+    }
+
+    override suspend fun getTvShows(page: Int): List<TvShow> {
+        val homepageChannel = "346"
+        val document = service.getChannelWithPage(homepageChannel, page.toString())
+        val json = JSONObject(document.string())
+        val channelContent = json.getJSONObject("pagination").getJSONArray("data")
+        return channelContent.map { getTvShowObj(it) }
+    }
+
+    override suspend fun getMovie(id: String): Movie {
+        val idCleaned = id.split("#")[0]
+        val document = service.getTitle(idCleaned)
+        val json = JSONObject(document.string())
+        return getMovieObj(json, false)
     }
 
     override suspend fun getTvShow(id: String): TvShow {
         val document = service.getTitle(id)
-        val documentWithoutEscapeChars = document.select("body").text()
-        val json = JSONObject(documentWithoutEscapeChars)
-        val jsonTitle = json.getJSONObject("title")
-        return TvShow(
-            id = id,
-            title = jsonTitle.getString("name"),
-            poster = jsonTitle.getString("poster"),
-            banner = jsonTitle.getString("backdrop"),
-            overview = jsonTitle.getString("description"),
-            released = jsonTitle.getString("year"),
-            rating = jsonTitle.getDouble("rating"),
-            genres = jsonTitle.optJSONArray("genres")?.map { genreItem ->
-                Genre(
-                    id = genreItem?.getString("id") ?: "",
-                    name = genreItem?.getString("display_name") ?: "",
-                    shows = emptyList()
-                )
-            } ?: emptyList(),
-            cast = json.optJSONObject("credits")?.optJSONArray("actors")?.map { peopleItem ->
-                People(
-                    id = peopleItem?.getString("id") ?: "",
-                    name = peopleItem?.getString("name") ?: "",
-                    image = peopleItem?.getString("poster") ?: "",
-                )
-            } ?: emptyList(),
-            directors = json.optJSONObject("credits")?.optJSONArray("directing")
-                ?.map { peopleItem ->
-                    People(
-                        id = peopleItem?.getString("id") ?: "",
-                        name = peopleItem?.getString("name") ?: "",
-                        image = peopleItem?.getString("poster") ?: "",
-                    )
-                } ?: emptyList(),
-            seasons = json.optJSONObject("seasons")?.optJSONArray("data")?.map { seasonItem ->
-                Season(
-                    id = seasonItem?.getString("title_id") + "_" + seasonItem?.getInt("number"),
-                    number = seasonItem?.getInt("number") ?: 0,
-                    poster = seasonItem?.getString("poster") ?: "",
-                )
-            } ?: emptyList(),
-        )
+        val json = JSONObject(document.string())
+        return getTvShowObj(json)
     }
 
     override suspend fun getEpisodesBySeason(idCombined: String): List<Episode> {
         val seasonId = idCombined.split("_")[0]
         val seasonNumber = idCombined.split("_")[1]
-
         val document = service.getEpisodes(seasonId, seasonNumber)
-        val documentWithoutEscapeChars = document.select("body").text()
-        val json = JSONObject(documentWithoutEscapeChars)
-
-        return json.getJSONObject("pagination").getJSONArray("data").map { episodeItem ->
+        val json = JSONObject(document.string())
+        return json.getJSONObject("pagination").getJSONArray("data").map {
             Episode(
-                id = (episodeItem?.getString("title_id") + "_" + episodeItem?.getInt("season_number") + "_" + episodeItem?.getInt(
+                id = (it?.getString("title_id") + "_" + it?.getInt("season_number") + "_" + it?.getInt(
                     "episode_number"
                 )),
-                title = episodeItem?.getString("name") ?: "",
-                number = episodeItem?.getInt("episode_number") ?: 0,
-                poster = episodeItem?.getString("poster") ?: "",
+                title = it?.getString("name") ?: "",
+                number = it?.getInt("episode_number") ?: 0,
+                poster = it?.getString("poster") ?: "",
             )
         }
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
-        return Genre(
-            id, name = "", shows = emptyList()
-        )
+        val document = service.getGenre(id)
+        val json = JSONObject(document.string())
+        val genres = json.getJSONObject("channel").getJSONObject("content").getJSONArray("data")
+        return Genre(id,
+            name = json.getJSONObject("channel").getJSONObject("restriction")
+                .getString("display_name"),
+            shows = if (page > 1) genres.map {
+                if (it?.optBoolean("is_series") == true) getTvShowObj(it)
+                else getMovieObj(it, true)
+            } else emptyList())
+
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
@@ -219,8 +277,8 @@ object MStream : Provider {
     }
 
     override suspend fun getServers(idCombined: String, videoType: Video.Type): List<Server> {
-        val isShow = idCombined.contains("_");
-        var document: Document;
+        val isShow = idCombined.contains("_")
+        var document: ResponseBody
         if (isShow) {
             val idSplit = idCombined.split("_")
             val titleId = idSplit[0]
@@ -233,19 +291,17 @@ object MStream : Provider {
             document = service.getStreams(watchId)
         }
 
-        val documentWithoutEscapeChars = document.select("body").text()
-        val json = JSONObject(documentWithoutEscapeChars)
-
-        return json.getJSONObject("episode").getJSONArray("videos").map { videoItem ->
+        val json = JSONObject(document.string())
+        return json.getJSONObject("episode").getJSONArray("videos").map {
             Server(
-                id = videoItem?.getString("id") ?: "",
-                name = URL(videoItem?.getString("src")).host + " ( " + videoItem?.getString("name") + ")",
-                src = videoItem?.getString("src") ?: ""
+                id = it?.getString("id") ?: "",
+                name = URL(it?.getString("src")).host + " ( " + it?.getString("name") + ")",
+                src = it?.getString("src") ?: ""
             )
         }
     }
 
-    override suspend fun getVideo(server: Video.Server): Video {
+    override suspend fun getVideo(server: Server): Video {
         val link = server.src
         return Extractor.extract(link)
     }
@@ -263,7 +319,9 @@ object MStream : Provider {
                     val requestWithHeaders = original.newBuilder().header("Referer", URL).build()
                     chain.proceed(requestWithHeaders)
                 }
-                val client = clientBuilder.build()
+                val client = clientBuilder.addNetworkInterceptor(
+                    HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+                ).build()
 
                 val dns =
                     DnsOverHttps.Builder().client(client).url(DNS_QUERY_URL.toHttpUrl()).build()
@@ -274,31 +332,43 @@ object MStream : Provider {
             fun build(): MStreamService {
                 val client = getOkHttpClient()
                 val retrofit = Retrofit.Builder().client(client).baseUrl(URL)
-                    .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create()).build()
                 return retrofit.create(MStreamService::class.java)
             }
         }
 
         @GET("/api/v1/channel/{channelId}")
-        suspend fun getChannel(@Path("channelId") id: String): Document
+        suspend fun getChannel(
+            @Path("channelId") channelId: String
+        ): ResponseBody
+
+        @GET("/api/v1/channel/{channelId}?returnContentOnly=true")
+        suspend fun getChannelWithPage(
+            @Path("channelId") channelId: String, @Query("page") page: String
+        ): ResponseBody
 
         @GET("/api/v1/titles/{titleId}")
-        suspend fun getTitle(@Path("titleId") id: String): Document
+        suspend fun getTitle(@Path("titleId") titleId: String): ResponseBody
 
         @GET("/api/v1/titles/{titleId}/seasons/{seasonNumber}/episodes?perPage=999&orderBy=episode_number&orderDir=asc")
         suspend fun getEpisodes(
             @Path("titleId") titleId: String, @Path("seasonNumber") seasonNumber: String
-        ): Document
+        ): ResponseBody
 
         @GET("/api/v1/titles/{titleId}/seasons/{seasonNumber}/episodes/{episodeNumber}?loader=episodePage")
         suspend fun getEpisodeStreams(
             @Path("titleId") titleId: String,
             @Path("seasonNumber") seasonNumber: String,
             @Path("episodeNumber") episodeNumber: String
-        ): Document
+        ): ResponseBody
+
+        @GET("/api/v1/search/{searchText}?loader=searchPage")
+        suspend fun getSearch(@Path("searchText") id: String): ResponseBody
+
+        @GET("/api/v1/channel/genre?channelType=channel&loader=channelPage")
+        suspend fun getGenre(@Query("restriction") channelName: String): ResponseBody
 
         @GET("/api/v1/watch/{watchId}")
-        suspend fun getStreams(@Path("watchId") id: String): Document
+        suspend fun getStreams(@Path("watchId") id: String): ResponseBody
     }
 }
