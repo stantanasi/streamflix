@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.providers
 
+import android.util.Base64
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
@@ -36,36 +37,42 @@ import java.util.concurrent.TimeUnit
 
 object SerienStreamProvider : Provider {
 
-    private const val URL = "https://serienstream.to/"
+    private val URL = Base64.decode(
+        "aHR0cHM6Ly9zZXJpZW4=", Base64.NO_WRAP
+    ).toString(Charsets.UTF_8) + Base64.decode(
+        "c3RyZWFtLnRvLw==", Base64.NO_WRAP
+    ).toString(Charsets.UTF_8)
+    override val name = Base64.decode(
+        "U2VyaWVuU3RyZWFt", Base64.NO_WRAP
+    ).toString(Charsets.UTF_8)
 
-    override val name = "SerienStream"
     override val logo =
         "$URL/public/img/logo-sto-serienstream-sx-to-serien-online-streaming-vod.png"
     override val language = "de"
 
-    private val service = BurningSeriesService.build()
+    private val service = SerienStreamService.build()
 
     private fun getTvShowIdFromLink(link: String): String {
         val linkWithoutStaticPrefix = link.replace("/serie/stream/", "")
-        val linkWithSplitedData = linkWithoutStaticPrefix.split("/")
-        val justTvShowId = linkWithSplitedData[0]
+        val linkWithSplitData = linkWithoutStaticPrefix.split("/")
+        val justTvShowId = linkWithSplitData[0]
         return justTvShowId
     }
 
     private fun getSeasonIdFromLink(link: String): String {
         val linkWithoutStaticPrefix = link.replace("/serie/stream/", "")
-        val linkWithSplitedData = linkWithoutStaticPrefix.split("/")
-        val justTvShowId = linkWithSplitedData[0]
-        val justTvShowSeason = linkWithSplitedData[1]
+        val linkWithSplitData = linkWithoutStaticPrefix.split("/")
+        val justTvShowId = linkWithSplitData[0]
+        val justTvShowSeason = linkWithSplitData[1]
         return "$justTvShowId/$justTvShowSeason"
     }
 
     private fun getEpisodeIdFromLink(link: String): String {
         val linkWithoutStaticPrefix = link.replace("/serie/stream/", "")
-        val linkWithSplitedData = linkWithoutStaticPrefix.split("/")
-        val justTvShowId = linkWithSplitedData[0]
-        val justTvShowSeason = linkWithSplitedData[1]
-        val justTvShowEpisode = linkWithSplitedData[2]
+        val linkWithSplitData = linkWithoutStaticPrefix.split("/")
+        val justTvShowId = linkWithSplitData[0]
+        val justTvShowSeason = linkWithSplitData[1]
+        val justTvShowEpisode = linkWithSplitData[2]
         return "$justTvShowId/$justTvShowSeason/$justTvShowEpisode"
     }
 
@@ -133,13 +140,11 @@ object SerienStreamProvider : Provider {
     override suspend fun getTvShows(page: Int): List<TvShow> {
         if (page > 1) return emptyList()
         val document = service.getSeriesListAlphabet()
-        return document.select(".genre > ul > li")
-            .map {
+        return document.select(".genre > ul > li").map {
                 TvShow(
                     id = getTvShowIdFromLink(
                         it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
-                    ),
-                    title = it.selectFirst("a[data-alternative-titles]")?.text() ?: ""
+                    ), title = it.selectFirst("a[data-alternative-titles]")?.text() ?: ""
                 )
             }
     }
@@ -150,28 +155,23 @@ object SerienStreamProvider : Provider {
 
     override suspend fun getTvShow(id: String): TvShow {
         val document = service.getTvShow(id)
-        val imdbTitleUrl =
-            document.selectFirst("div.series-title a.imdb-link")?.attr("href") ?: ""
+        val imdbTitleUrl = document.selectFirst("div.series-title a.imdb-link")?.attr("href") ?: ""
         val imdbDocument = service.getCustomUrl(imdbTitleUrl)
-        return TvShow(
-            id = id,
+        return TvShow(id = id,
             title = document.selectFirst("h1 > span")?.text() ?: "",
             overview = document.selectFirst("p.seri_des")?.attr("data-full-description"),
-            released = document.selectFirst("div.series-title > small > span:nth-child(1)")
-                ?.text()
+            released = document.selectFirst("div.series-title > small > span:nth-child(1)")?.text()
                 ?: "",
             rating = imdbDocument.selectFirst("div[data-testid='hero-rating-bar__aggregate-rating__score'] span")
                 ?.text()?.toDoubleOrNull() ?: 0.0,
 
-            directors = document.select(".cast li[itemprop='director']")
-                .map {
+            directors = document.select(".cast li[itemprop='director']").map {
                     People(
                         id = it.selectFirst("a")?.attr("href")?.replace("/serien/", "") ?: "",
                         name = it.selectFirst("span")?.text() ?: ""
                     )
                 },
-            cast = document.select(".cast li[itemprop='actor']")
-                .map {
+            cast = document.select(".cast li[itemprop='actor']").map {
                     People(
                         id = it.selectFirst("a")?.attr("href")?.replace("/serien/", "") ?: "",
                         name = it.selectFirst("span")?.text() ?: ""
@@ -185,8 +185,7 @@ object SerienStreamProvider : Provider {
             },
             trailer = document.selectFirst("div[itemprop='trailer'] a")?.attr("href") ?: "",
             poster = URL + document.selectFirst("div.seriesCoverBox img")?.attr("data-src"),
-            banner = URL + document.selectFirst("#series > section > div.backdrop")
-                ?.attr("style")
+            banner = URL + document.selectFirst("#series > section > div.backdrop")?.attr("style")
                 ?.replace("background-image: url(/", "")?.replace(")", ""),
             seasons = document.select("#stream > ul:nth-child(1) > li")
                 .filter { it -> it.select("a").size > 0 }.map {
@@ -200,9 +199,9 @@ object SerienStreamProvider : Provider {
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
-        val seasonIdSplitted = seasonId.split("/")
-        val showName = seasonIdSplitted[0]
-        val seasonNumber = seasonIdSplitted[1]
+        val linkWithSplitData = seasonId.split("/")
+        val showName = linkWithSplitData[0]
+        val seasonNumber = linkWithSplitData[1]
 
         val document = service.getTvShowEpisodes(showName, seasonNumber)
         return document.select("tbody tr").map {
@@ -219,17 +218,11 @@ object SerienStreamProvider : Provider {
         if (page > 1) return Genre(id, "")
         val shows = mutableListOf<TvShow>()
         val document = service.getGenre(id, page)
-        document.select(".seriesListContainer > div")
-            .map {
-                shows.add(
-                    TvShow(
-                        id = it.selectFirst("a")?.attr("href")
-                            ?.let { it1 -> getTvShowIdFromLink(it1) }
-                            ?: "",
-                        title = it.selectFirst("h3")?.text() ?: "",
-                        poster = URL + it.selectFirst("img")?.attr("data-src")
-                    )
-                )
+        document.select(".seriesListContainer > div").map {
+                shows.add(TvShow(id = it.selectFirst("a")?.attr("href")
+                    ?.let { it1 -> getTvShowIdFromLink(it1) } ?: "",
+                    title = it.selectFirst("h3")?.text() ?: "",
+                    poster = URL + it.selectFirst("img")?.attr("data-src")))
             }
         return Genre(id = id, name = id, shows = shows)
     }
@@ -237,27 +230,21 @@ object SerienStreamProvider : Provider {
     override suspend fun getPeople(id: String, page: Int): People {
         if (page > 1) return People(id, "")
         val document = service.getPeople(id)
-        return People(
-            id = id,
+        return People(id = id,
             name = document.selectFirst("h1 strong")?.text() ?: "",
-            filmography = document.select(".seriesListContainer > div")
-                .map {
-                    TvShow(
-                        id = it.selectFirst("a")?.attr("href")
-                            ?.let { it1 -> getTvShowIdFromLink(it1) }
-                            ?: "",
+            filmography = document.select(".seriesListContainer > div").map {
+                    TvShow(id = it.selectFirst("a")?.attr("href")
+                        ?.let { it1 -> getTvShowIdFromLink(it1) } ?: "",
                         title = it.selectFirst("h3")?.text() ?: "",
-                        poster = URL + it.selectFirst("img")?.attr("data-src")
-                    )
-                }
-        )
+                        poster = URL + it.selectFirst("img")?.attr("data-src"))
+                })
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
-        val seasonIdSplitted = id.split("/")
-        val showName = seasonIdSplitted[0]
-        val seasonNumber = seasonIdSplitted[1]
-        val episodeNumber = seasonIdSplitted[2]
+        val linkWithSplitData = id.split("/")
+        val showName = linkWithSplitData[0]
+        val seasonNumber = linkWithSplitData[1]
+        val episodeNumber = linkWithSplitData[2]
 
         val document = service.getTvShowEpisodeServers(showName, seasonNumber, episodeNumber)
         return document.select("div.hosterSiteVideo > ul > li").map {
@@ -265,12 +252,11 @@ object SerienStreamProvider : Provider {
             val serverAfterRedirect = service.getRedirectLink(redirectUrl)
             val videoUrl = (serverAfterRedirect.raw() as okhttp3.Response).request.url
             var videoUrlString = videoUrl.toString()
-            if (it.selectFirst("h4")?.text() == "VOE")
-                videoUrlString = "https://voe.sx" + videoUrl.encodedPath
+            if (it.selectFirst("h4")?.text() == "VOE") videoUrlString =
+                "https://voe.sx" + videoUrl.encodedPath
 
             Video.Server(
-                id = videoUrlString,
-                name = it.selectFirst("h4")?.text() ?: ""
+                id = videoUrlString, name = it.selectFirst("h4")?.text() ?: ""
             )
         }
     }
@@ -280,29 +266,29 @@ object SerienStreamProvider : Provider {
         return Extractor.extract(link)
     }
 
-    interface BurningSeriesService {
+    interface SerienStreamService {
 
         companion object {
             private const val DNS_QUERY_URL = "https://1.1.1.1/dns-query"
 
             private fun getOkHttpClient(): OkHttpClient {
                 val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
-                val bootstrapClient =
-                    Builder().cache(appCache).readTimeout(30, TimeUnit.SECONDS)
-                        .connectTimeout(30, TimeUnit.SECONDS).build()
+                val clientBuilder = Builder().cache(appCache).readTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                val client = clientBuilder.build()
+
                 val dns =
-                    DnsOverHttps.Builder().client(bootstrapClient).url(DNS_QUERY_URL.toHttpUrl())
-                        .build()
-                val client = Builder().dns(dns).build()
-                return client
+                    DnsOverHttps.Builder().client(client).url(DNS_QUERY_URL.toHttpUrl()).build()
+                val clientToReturn = clientBuilder.dns(dns).build()
+                return clientToReturn
             }
 
-            fun build(): BurningSeriesService {
+            fun build(): SerienStreamService {
                 val client = getOkHttpClient()
                 val retrofit = Retrofit.Builder().baseUrl(URL)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create()).client(client).build()
-                return retrofit.create(BurningSeriesService::class.java)
+                return retrofit.create(SerienStreamService::class.java)
             }
         }
 
@@ -321,8 +307,7 @@ object SerienStreamProvider : Provider {
 
         @GET("genre/{genreName}/{page}")
         suspend fun getGenre(
-            @Path("genreName") genreName: String,
-            @Path("page") page: Int
+            @Path("genreName") genreName: String, @Path("page") page: Int
         ): Document
 
         @GET("serien/{peopleId}")
@@ -350,7 +335,6 @@ object SerienStreamProvider : Provider {
         @GET
         @Headers("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
         suspend fun getRedirectLink(@Url url: String): Response<ResponseBody>
-
 
         data class SearchItem(
             val title: String,

@@ -51,6 +51,7 @@ interface Provider {
             RidomoviesProvider,
             OtakufrProvider,
             WiflixProvider,
+            MStreamProvider,
         )
     }
 }
