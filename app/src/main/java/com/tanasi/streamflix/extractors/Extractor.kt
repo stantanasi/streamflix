@@ -9,7 +9,6 @@ abstract class Extractor {
 
     abstract suspend fun extract(link: String): Video
 
-
     companion object {
         private val extractors = listOf(
             RabbitstreamExtractor(),
@@ -27,6 +26,8 @@ abstract class Extractor {
             VidplayExtractor.VidplayOnline(),
             MyFileStorageExtractor(),
             MoflixExtractor(),
+            MStreamDayExtractor(),
+            MStreamClickExtractor(),
             VidsrcNetExtractor(),
             StreamWishExtractor(),
             StreamWishExtractor.UqloadsXyz(),
