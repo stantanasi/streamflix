@@ -9,6 +9,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.Url
 
 class VixcloudExtractor : Extractor() {
@@ -72,7 +73,11 @@ class VixcloudExtractor : Extractor() {
         return Video(
             source = finalUrl,
             subtitles = listOf(),
-            type = MimeTypes.APPLICATION_M3U8
+            type = MimeTypes.APPLICATION_M3U8,
+            headers = mapOf(
+                "Referer" to mainUrl,
+                "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            )
         )
     }
 
@@ -90,6 +95,7 @@ class VixcloudExtractor : Extractor() {
         }
 
         @GET
+        @Headers("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
         suspend fun getSource(@Url url: String): Document
 
         data class WindowVideo(
