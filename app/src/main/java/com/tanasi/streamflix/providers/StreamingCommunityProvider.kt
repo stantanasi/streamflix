@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 
 object StreamingCommunityProvider : Provider {
 
-    private const val DOMAIN = "streamingcommunity.prof"
+    private const val DOMAIN = "streamingcommunity.paris"
     private const val URL = "https://$DOMAIN/"
     private const val MAX_SEARCH_RESULTS = 60
 
