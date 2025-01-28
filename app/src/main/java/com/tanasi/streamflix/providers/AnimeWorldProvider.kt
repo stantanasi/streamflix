@@ -16,6 +16,7 @@ import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Query
 import java.net.URLDecoder
@@ -24,6 +25,9 @@ import java.util.concurrent.TimeUnit
 object AnimeWorldProvider : Provider {
 
     private const val URL = "https://animeworld.so/"
+    private const val USER_AGENT = "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    private const val HOME_COOKIE = "Cookie: SecurityAW-gl=b1e4fba11173e7a62ba823a1a3071595"
+    private const val DEFAULT_COOKIE = "Cookie: SecurityAW-Ec=711859e9cb3c9361e5588ad8fbcc30a7"
 
     override val name = "AnimeWorld"
     override val logo = "https://static.animeworld.so/assets/images/favicon/android-icon-192x192.png"
@@ -646,7 +650,7 @@ object AnimeWorldProvider : Provider {
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
-        val link = service.getLink(server.id)
+        val link = service.getLink(server.id, 0)
 
         if (server.name == "Streamtape")
             return Extractor.extract(link.grabber.substringBeforeLast("/"))
@@ -679,34 +683,43 @@ object AnimeWorldProvider : Provider {
         }
 
 
+        @Headers(USER_AGENT, HOME_COOKIE)
         @GET(".")
         suspend fun getHome(): Document
 
+        @Headers(USER_AGENT, DEFAULT_COOKIE)
         @GET("search")
         suspend fun search(
             @Query("keyword", encoded = true) keyword: String,
             @Query("page") page: Int
         ): Document
 
+        @Headers(USER_AGENT, DEFAULT_COOKIE)
         @GET("filter?type=4&sort=0")
         suspend fun getMovies(@Query("page") page: Int): Document
 
+        @Headers(USER_AGENT, DEFAULT_COOKIE)
         @GET("filter?type=0&sort=0")
         suspend fun getTvSeries(@Query("page") page: Int): Document
 
+        @Headers(USER_AGENT, DEFAULT_COOKIE)
         @GET("play/{id}")
         suspend fun getDetails(@Path("id") id: String): Document
 
+        @Headers(USER_AGENT, DEFAULT_COOKIE)
         @GET("genre/{id}")
         suspend fun getGenre(@Path("id") id: String, @Query("page") page: Int): Document
 
 
+        @Headers(USER_AGENT, DEFAULT_COOKIE)
         @GET("filter")
         suspend fun getPeople(@Query("studio") id: String, @Query("page") page: Int): Document
 
 
+        @Headers(USER_AGENT, DEFAULT_COOKIE)
         @GET("api/episode/info")
-        suspend fun getLink(@Query("id") id: String): Link
+        suspend fun getLink(@Query("id") id: String, @Query("alt") alt: Number): Link
+
 
         data class Link(
             val grabber: String = ""
