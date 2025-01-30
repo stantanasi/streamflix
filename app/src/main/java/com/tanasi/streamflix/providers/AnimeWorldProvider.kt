@@ -36,19 +36,15 @@ object AnimeWorldProvider : Provider {
 
     private val service = AnimeWorldService.build()
 
-    private var homeCookie: String = ""
-        get() {
-            if (field != "") return field
-            val document = runBlocking { service.getHome() }
-            return getCookieValue(document)
-        }
+    private val homeCookie by lazy {
+        val document = runBlocking { service.getHome() }
+        getCookieValue(document)
+    }
 
-    private var defaultCookie: String = ""
-        get() {
-            if (field != "") return field
-            val document = runBlocking { service.getDetails("naruto-shippuden.v3U8a") }
-            return getCookieValue(document)
-        }
+    private val defaultCookie by lazy {
+        val document = runBlocking { service.getDetails("naruto-shippuden.v3U8a") }
+        getCookieValue(document)
+    }
 
 
     override suspend fun getHome(): List<Category> {
@@ -304,7 +300,7 @@ object AnimeWorldProvider : Provider {
 
 
     override suspend fun getMovie(id: String): Movie {
-        val document = service.getDetails(id)
+        val document = service.getDetails(id, securityCookie = defaultCookie)
 
         val movie = Movie(
             id = id,
@@ -487,7 +483,7 @@ object AnimeWorldProvider : Provider {
         val split = seasonId.split("/")
         val showId = split[0]
         val range = if (split.size > 1) split[1] else ""
-        val document = service.getDetails(showId)
+        val document = service.getDetails(showId, securityCookie = defaultCookie)
         var episodes: List<Episode>
 
         // AW Server
@@ -633,7 +629,7 @@ object AnimeWorldProvider : Provider {
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         val split = id.split("/")
         val showId = split[0]
-        val document = service.getDetails(showId)
+        val document = service.getDetails(showId, securityCookie = defaultCookie)
 
         // episode main id
         val episodeId = when (videoType) {
