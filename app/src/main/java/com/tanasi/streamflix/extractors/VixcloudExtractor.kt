@@ -53,7 +53,7 @@ class VixcloudExtractor : Extractor() {
             .filter { it.size == 2 }
             .associate { it[0] to it[1] }
 
-        if (currentParams.containsKey("b"))
+        if (!currentParams.containsKey("nextEpisode"))
             masterParams["b"] = "1"
 
         if (currentParams.containsKey("canPlayFHD"))
