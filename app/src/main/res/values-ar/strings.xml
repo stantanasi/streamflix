@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">ستريم فليكس</string>
+
+	<string name="loading_error_title">حدث خطأ</string>
+	<string name="loading_error_retry">إعادة المحاولة</string>
+
+	<string name="update_title">تحديث جديد متاح</string>
+	<string name="update_message">يتوفر إصدار جديد من التطبيق!</string>
+	<string name="update_current_version_label">الإصدار الحالي</string>
+	<string name="update_new_version_label">الإصدار الجديد</string>
+	<string name="update_release_notes">ملاحظات التحديث</string>
+	<string name="update_later">ربما لاحقًا</string>
+	<string name="update">تحديث</string>
+
+	<string name="app_layout">تخطيط التطبيق</string>
+	<string name="app_layout_auto">تلقائي</string>
+	<string name="app_layout_mobile">تخطيط الهاتف</string>
+	<string name="app_layout_tv">تخطيط التلفاز</string>
+	<string name="app_layout_apply">تطبيق</string>
+
+	<string name="providers_all_languages">كل اللغات</string>
+	<string name="providers_choose_title">اختر مزود الخدمة</string>
+
+	<string name="main_menu_change_provider">تغيير المزود</string>
+	<string name="main_menu_search">بحث</string>
+	<string name="main_menu_home">الرئيسية</string>
+	<string name="main_menu_movies">أفلام</string>
+	<string name="main_menu_tv_shows">مسلسلات</string>
+	<string name="main_menu_settings">الإعدادات</string>
+
+	<string name="search_input_hint">ابحث عن الأفلام أو المسلسلات</string>
+
+	<string name="home_swiper_watch_now">شاهد الآن</string>
+	<string name="home_continue_watching">متابعة المشاهدة</string>
+	<string name="home_favorite_movies">الأفلام المفضلة</string>
+	<string name="home_favorite_tv_shows">المسلسلات المفضلة</string>
+
+	<string name="option_episode_open_tv_show">اذهب إلى المسلسل</string>
+	<string name="option_show_favorite">أضف إلى المفضلة</string>
+	<string name="option_show_unfavorite">إزالة من المفضلة</string>
+	<string name="option_show_watched">وُسِم كمشاهد</string>
+	<string name="option_show_unwatched">إلغاء الوسم كمشاهد</string>
+	<string name="option_clear_program">إزالة من متابعة المشاهدة</string>
+	<string name="option_cancel">إلغاء</string>
+
+	<string name="episode_item_info">الموسم %d الحلقة %d • %s</string>
+	<string name="episode_item_info_episode_only">الحلقة %d • %s</string>
+
+	<string name="tv_show_item_episode_number">الحلقة %d</string>
+	<string name="tv_show_item_season_number_episode_number">الموسم %d الحلقة %d</string>
+	<string name="tv_show_item_type">مسلسل</string>
+
+	<string name="tv_show_runtime_hours_minutes">%d ساعة %d دقيقة</string>
+	<string name="tv_show_runtime_minutes">%d دقيقة</string>
+	<string name="tv_show_watch_season_episode">مشاهدة الموسم %d الحلقة %d</string>
+	<string name="tv_show_watch_episode">مشاهدة الحلقة %d</string>
+	<string name="tv_show_trailer">الإعلان الترويجي</string>
+	<string name="tv_show_seasons">المواسم</string>
+	<string name="tv_show_cast">طاقم العمل</string>
+	<string name="tv_show_you_may_also_like">قد يعجبك أيضًا</string>
+
+	<string name="movie_item_type">فيلم</string>
+	<string name="movie_runtime_hours_minutes">%d ساعة %d دقيقة</string>
+	<string name="movie_runtime_minutes">%d دقيقة</string>
+	<string name="movie_watch_now">شاهد الآن</string>
+	<string name="movie_trailer">الإعلان الترويجي</string>
+	<string name="movie_cast">طاقم العمل</string>
+	<string name="movie_you_may_also_like">قد يعجبك أيضًا</string>
+
+	<string name="season_number">الموسم %d</string>
+	<string name="episode_number">الحلقة %d</string>
+
+	<string name="people_birthday">تاريخ الميلاد</string>
+	<string name="people_deathday">تاريخ الوفاة</string>
+	<string name="people_birthplace">مكان الميلاد</string>
+	<string name="people_biography">السيرة الذاتية</string>
+	<string name="people_read_more">قراءة المزيد ></string>
+
+	<string name="genre_header_name">أفلام ومسلسلات %s</string>
+
+	<string name="player_subtitle_tv_show">الموسم %d الحلقة %d • %s</string>
+	<string name="player_subtitle_tv_show_episode_only">الحلقة %d • %s</string>
+	<string name="player_picture_in_picture_not_supported">الوضع الصوري داخل الصورة غير مدعوم على جهازك</string>
+	<string name="player_external_player_title">تشغيل باستخدام</string>
+	<string name="player_external_player_error_video">الفيديو لم يتم تحميله بعد</string>
+	<string name="player_aspect_ratio_fit">ملاءمة الشاشة</string>
+	<string name="player_aspect_ratio_fill">تمديد</string>
+	<string name="player_aspect_ratio_zoom">تكبير</string>
+	<string name="player_settings_title">الإعدادات</string>
+	<string name="player_settings_quality_title">جودة الفيديو الحالي</string>
+	<string name="player_settings_quality_label">الجودة</string>
+	<string name="player_settings_quality_sub_label_auto">تلقائي (%dp)</string>
+	<string name="player_settings_quality_auto">تلقائي</string>
+	<string name="player_settings_quality_auto_selected">تلقائي • %dp</string>
+	<string name="player_settings_quality">%dp</string>
+	<string name="player_settings_audio_title">الصوت</string>
+	<string name="player_settings_audio_label">الصوت</string>
+	<string name="player_settings_subtitles_title">الترجمة/التعليقات المغلقة</string>
+	<string name="player_settings_subtitles_label">الترجمة</string>
+	<string name="player_settings_subtitles_off">إيقاف</string>
+
+	<string name="settings_about">حول</string>
+	<string name="settings_about_version">الإصدار</string>
+	<string name="settings_about_version_name">الإصدار %s</string>
+	<string name="settings_about_donate">تبرع</string>
+	<string name="settings_help">مساعدة</string>
+</resources>
+
