@@ -2,7 +2,7 @@
     <string name="app_name">Streamflix</string>
 
     <string name="loading_error_title">Si è verificato un errore</string>
-    <string name="loading_error_retry">Riprove</string>
+    <string name="loading_error_retry">Riprova</string>
 
     <string name="update_title">Nuovo Aggiornamento Disponibile</string>
     <string name="update_message">una nuova versione dell'app è disponibile!</string>
