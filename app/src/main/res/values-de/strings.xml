@@ -32,8 +32,8 @@
 
     <string name="home_swiper_watch_now">Ansehen</string>
     <string name="home_continue_watching">Weiterschauen</string>
-    <string name="home_favorite_movies">Favoriten (Filme)</string>
-    <string name="home_favorite_tv_shows">Favoriten (Serien)</string>
+    <string name="home_favorite_movies">Favoriten - Filme</string>
+    <string name="home_favorite_tv_shows">Favoriten - Serien</string>
 
     <string name="option_episode_open_tv_show">Zur Serie gehen</string>
     <string name="option_show_favorite">Zu Favoriten hinzufügen</string>
