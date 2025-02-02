@@ -187,5 +187,5 @@
     <string name="settings_about_version">Version</string>
     <string name="settings_about_version_name">Version %s</string>
     <string name="settings_about_donate">Spenden</string>
-    <string name="settings_help">Helfen</string>
+    <string name="settings_help">Hilfe</string>
 </resources>
