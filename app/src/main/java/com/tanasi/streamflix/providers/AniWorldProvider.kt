@@ -83,7 +83,7 @@ object AniWorldProvider : Provider {
 
         categories.add(
             Category(
-                name = "Currently Popular TV Shows",
+                name = "Derzeit beliebte Animes",
                 list = document.select("div.container > div:nth-child(16) > div.previews div.coverListItem")
                     .map {
                         TvShow(
@@ -131,7 +131,7 @@ object AniWorldProvider : Provider {
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
-        throw Exception("Not yet implemented")
+        throw Exception("Keine Filme verfügbar")
     }
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
@@ -154,7 +154,7 @@ object AniWorldProvider : Provider {
     }
 
     override suspend fun getMovie(id: String): Movie {
-        throw Exception("Not yet implemented")
+        throw Exception("Keine Filme verfügbar")
     }
 
     override suspend fun getTvShow(id: String): TvShow {

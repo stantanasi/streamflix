@@ -1,0 +1,191 @@
+<resources>
+    <string name="app_name">Streamflix</string>
+
+    <string name="loading_error_title">Ein Fehler ist aufgetreten</string>
+    <string name="loading_error_retry">Erneut versuchen</string>
+
+    <string name="update_title">Aktualisierung verfügbar</string>
+    <string name="update_message">Eine neue Version der App ist verfügbar!</string>
+    <string name="update_current_version_label">Aktuelle Version</string>
+    <string name="update_new_version_label">Neue Version</string>
+    <string name="update_release_notes">Versionshinweise</string>
+    <string name="update_later">Vielleicht später</string>
+    <string name="update">Aktualisieren</string>
+
+    <string name="app_layout">App-Layout</string>
+    <string name="app_layout_auto">Automatisch</string>
+    <string name="app_layout_mobile">Mobiles Layout</string>
+    <string name="app_layout_tv">TV Layout</string>
+    <string name="app_layout_apply">Anwenden</string>
+
+    <string name="providers_all_languages">Alle Sprachen</string>
+    <string name="providers_choose_title">Anbieter auswählen</string>
+
+    <string name="main_menu_change_provider">Anbieter wechseln</string>
+    <string name="main_menu_search">Suche</string>
+    <string name="main_menu_home">Startseite</string>
+    <string name="main_menu_movies">Filme</string>
+    <string name="main_menu_tv_shows">Serien</string>
+    <string name="main_menu_settings">Einstellungen</string>
+
+    <string name="search_input_hint">Filme / Serien suchen</string>
+
+    <string name="home_swiper_watch_now">Ansehen</string>
+    <string name="home_continue_watching">Weiterschauen</string>
+    <string name="home_favorite_movies">Favoriten - Filme</string>
+    <string name="home_favorite_tv_shows">Favoriten - Serien</string>
+
+    <string name="option_episode_open_tv_show">Zur Serie gehen</string>
+    <string name="option_show_favorite">Zu Favoriten hinzufügen</string>
+    <string name="option_show_unfavorite">Aus Favoriten entfernen</string>
+    <string name="option_show_watched">Als Gesehen markieren</string>
+    <string name="option_show_unwatched">Als Ungesehen markieren</string>
+    <string name="option_clear_program">Aus Weiterschauen entfernen</string>
+    <string name="option_cancel">Abbrechen</string>
+
+    <string name="episode_item_info">S%d E%d • %s</string>
+    <string name="episode_item_info_episode_only">E%d • %s</string>
+
+    <string name="tv_show_item_episode_number">E%d</string>
+    <string name="tv_show_item_season_number_episode_number">S%d E%d</string>
+    <string name="tv_show_item_type">TV</string>
+
+    <string name="tv_show_runtime_hours_minutes">%d Std %d Min</string>
+    <string name="tv_show_runtime_minutes">%d Min</string>
+    <string name="tv_show_watch_season_episode">S%d E%d ansehen</string>
+    <string name="tv_show_watch_episode">E%d ansehen</string>
+    <string name="tv_show_trailer">Trailer</string>
+    <string name="tv_show_seasons">Staffeln</string>
+    <string name="tv_show_cast">Besetzung</string>
+    <string name="tv_show_you_may_also_like">Könnte dir auch gefallen:</string>
+
+    <string name="movie_item_type">Film</string>
+    <string name="movie_runtime_hours_minutes">%d h %d min</string>
+    <string name="movie_runtime_minutes">%d min</string>
+    <string name="movie_watch_now">Ansehen</string>
+    <string name="movie_trailer">Trailer</string>
+    <string name="movie_cast">Besetzung</string>
+    <string name="movie_you_may_also_like">Könnte dir auch gefallen:</string>
+
+    <string name="season_number">Staffel %d</string>
+    <string name="episode_number">Episode %d</string>
+
+    <string name="people_birthday">Geburtstag</string>
+    <string name="people_deathday">Todestag</string>
+    <string name="people_birthplace">Geburtsort</string>
+    <string name="people_biography">Biografie</string>
+    <string name="people_read_more">Mehr lesen ></string>
+
+    <string name="genre_header_name">%s Filme und Serien</string>
+
+    <string name="player_subtitle_tv_show">S%d E%d • %s</string>
+    <string name="player_subtitle_tv_show_episode_only">E%d • %s</string>
+    <string name="player_picture_in_picture_not_supported">PiP wird auf diesem Gerät nicht unterstützt</string>
+    <string name="player_external_player_title">Abspielen mit</string>
+    <string name="player_external_player_error_video">Video noch nicht geladen</string>
+    <string name="player_aspect_ratio_fit">An Bildschirm anpassen</string>
+    <string name="player_aspect_ratio_fill">Ausdehnen</string>
+    <string name="player_aspect_ratio_zoom">Zoomen</string>
+    <string name="player_settings_title">Einstellungen</string>
+    <string name="player_settings_quality_title">Qualität des aktuellen Videos</string>
+    <string name="player_settings_quality_label">Qualität</string>
+    <string name="player_settings_quality_sub_label_auto">Auto (%dp)</string>
+    <string name="player_settings_quality_auto">Automatisch</string>
+    <string name="player_settings_quality_auto_selected">Auto • %dp</string>
+    <string name="player_settings_quality">%dp</string>
+    <string name="player_settings_audio_title">Audio</string>
+    <string name="player_settings_audio_label">Audio</string>
+    <string name="player_settings_subtitles_title">Untertitel / Bildbeschreibung</string>
+    <string name="player_settings_subtitles_label">Untertitel</string>
+    <string name="player_settings_subtitles_off">Aus</string>
+    <string name="player_settings_caption_style_title">Untertitelstil</string>
+    <string name="player_settings_caption_style_label">Untertitelstil</string>
+    <string name="player_settings_caption_style_sub_label">Text, Farbe & Hintergrundstil anpassen</string>
+    <string name="player_settings_caption_style_reset_style_label">Stil Zurücksetzen</string>
+    <string name="player_settings_caption_style_font_color_title">Schriftfarbe</string>
+    <string name="player_settings_caption_style_font_color_label">Schriftfarbe</string>
+    <string name="player_settings_caption_style_font_color_white">Weiß</string>
+    <string name="player_settings_caption_style_font_color_yellow">Gelb</string>
+    <string name="player_settings_caption_style_font_color_green">Grün</string>
+    <string name="player_settings_caption_style_font_color_cyan">Cyan</string>
+    <string name="player_settings_caption_style_font_color_blue">Blau</string>
+    <string name="player_settings_caption_style_font_color_magenta">Magenta</string>
+    <string name="player_settings_caption_style_font_color_red">Rot</string>
+    <string name="player_settings_caption_style_font_color_black">Schwarz</string>
+    <string name="player_settings_caption_style_text_size_title">Textgröße</string>
+    <string name="player_settings_caption_style_text_size_label">Textgröße</string>
+    <string name="player_settings_caption_style_text_size_0_5">50%</string>
+    <string name="player_settings_caption_style_text_size_0_75">75%</string>
+    <string name="player_settings_caption_style_text_size_1">100%</string>
+    <string name="player_settings_caption_style_text_size_1_25">125%</string>
+    <string name="player_settings_caption_style_text_size_1_5">150%</string>
+    <string name="player_settings_caption_style_text_size_2">200%</string>
+    <string name="player_settings_caption_style_text_size_3">300%</string>
+    <string name="player_settings_caption_style_font_opacity_title">Durchsichtigkeit (Schrift)</string>
+    <string name="player_settings_caption_style_font_opacity_label">Durchsichtigkeit (Schrift)</string>
+    <string name="player_settings_caption_style_font_opacity_0_5">50%</string>
+    <string name="player_settings_caption_style_font_opacity_0_75">75%</string>
+    <string name="player_settings_caption_style_font_opacity_1">100%</string>
+    <string name="player_settings_caption_style_edge_style_title">Untertitelstil</string>
+    <string name="player_settings_caption_style_edge_style_label">Untertitelstil</string>
+    <string name="player_settings_caption_style_edge_style_none">Keiner</string>
+    <string name="player_settings_caption_style_edge_style_raised">Erhöht</string>
+    <string name="player_settings_caption_style_edge_style_depressed">Plattgedrückt</string>
+    <string name="player_settings_caption_style_edge_style_outline">Einheitlich</string>
+    <string name="player_settings_caption_style_edge_style_drop_shadow">Schlagschatten</string>
+    <string name="player_settings_caption_style_background_color_title">Hintergrundfarbe</string>
+    <string name="player_settings_caption_style_background_color_label">Hintergrundfarbe</string>
+    <string name="player_settings_caption_style_background_color_black">Schwarz</string>
+    <string name="player_settings_caption_style_background_color_yellow">Gelb</string>
+    <string name="player_settings_caption_style_background_color_green">Grün</string>
+    <string name="player_settings_caption_style_background_color_cyan">Cyan</string>
+    <string name="player_settings_caption_style_background_color_blue">Blau</string>
+    <string name="player_settings_caption_style_background_color_magenta">Magenta</string>
+    <string name="player_settings_caption_style_background_color_red">Rot</string>
+    <string name="player_settings_caption_style_background_color_white">Weiß</string>
+    <string name="player_settings_caption_style_background_opacity_title">Durchsichtigkeit (Hintergrund)</string>
+    <string name="player_settings_caption_style_background_opacity_label">Durchsichtigkeit (Hintergrund)</string>
+    <string name="player_settings_caption_style_background_opacity_0">0%</string>
+    <string name="player_settings_caption_style_background_opacity_0_25">25%</string>
+    <string name="player_settings_caption_style_background_opacity_0_5">50%</string>
+    <string name="player_settings_caption_style_background_opacity_0_75">75%</string>
+    <string name="player_settings_caption_style_background_opacity_1">100%</string>
+    <string name="player_settings_caption_style_window_color_title">Fensterfarbe</string>
+    <string name="player_settings_caption_style_window_color_label">Fensterfarbe</string>
+    <string name="player_settings_caption_style_window_color_black">Schwarz</string>
+    <string name="player_settings_caption_style_window_color_yellow">Gelb</string>
+    <string name="player_settings_caption_style_window_color_green">Grün</string>
+    <string name="player_settings_caption_style_window_color_cyan">Cyan</string>
+    <string name="player_settings_caption_style_window_color_blue">Blau</string>
+    <string name="player_settings_caption_style_window_color_magenta">Magenta</string>
+    <string name="player_settings_caption_style_window_color_red">Rot</string>
+    <string name="player_settings_caption_style_window_color_white">Weiß</string>
+    <string name="player_settings_caption_style_window_opacity_title">Durchsichtigkeit (Fenster)</string>
+    <string name="player_settings_caption_style_window_opacity_label">Durchsichtigkeit (Fenster)</string>
+    <string name="player_settings_caption_style_window_opacity_0">0%</string>
+    <string name="player_settings_caption_style_window_opacity_0_25">25%</string>
+    <string name="player_settings_caption_style_window_opacity_0_5">50%</string>
+    <string name="player_settings_caption_style_window_opacity_0_75">75%</string>
+    <string name="player_settings_caption_style_window_opacity_1">100%</string>
+    <string name="player_settings_open_subtitles_title">OpenSubtitles</string>
+    <string name="player_settings_open_subtitles_label">OpenSubtitles</string>
+    <string name="player_settings_local_subtitles_label">Lade aus Dateien</string>
+    <string name="player_settings_speed_title">Videogeschwindigkeit</string>
+    <string name="player_settings_speed_label">Geschwindigkeit</string>
+    <string name="player_settings_speed_0_25">× 0.25</string>
+    <string name="player_settings_speed_0_5">× 0.5</string>
+    <string name="player_settings_speed_0_75">× 0.75</string>
+    <string name="player_settings_speed_1">Normal</string>
+    <string name="player_settings_speed_1_25">× 1.25</string>
+    <string name="player_settings_speed_1_5">× 1.5</string>
+    <string name="player_settings_speed_1_75">× 1.75</string>
+    <string name="player_settings_speed_2">× 2</string>
+    <string name="player_settings_servers_title">Server</string>
+    <string name="player_settings_servers_label">Server</string>
+
+    <string name="settings_about">Über</string>
+    <string name="settings_about_version">Version</string>
+    <string name="settings_about_version_name">Version %s</string>
+    <string name="settings_about_donate">Spenden</string>
+    <string name="settings_help">Hilfe</string>
+</resources>
