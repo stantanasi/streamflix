@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.providers
 
+import MyCookieJar
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
@@ -11,13 +12,11 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -36,19 +35,9 @@ object AnimeWorldProvider : Provider {
 
     private val service = AnimeWorldService.build()
 
-    private val homeCookie by lazy {
-        val document = runBlocking { service.getHome() }
-        getCookieValue(document)
-    }
-
-    private val defaultCookie by lazy {
-        val document = runBlocking { service.getDetails("naruto-shippuden.v3U8a") }
-        getCookieValue(document)
-    }
-
 
     override suspend fun getHome(): List<Category> {
-        val document = service.getHome(securityCookie = homeCookie)
+        val document = service.getHome()
 
         val categories = mutableListOf<Category>()
 
@@ -212,7 +201,7 @@ object AnimeWorldProvider : Provider {
             return genres
         }
 
-        val document = service.search(query.replace(" ", "+"), page, securityCookie = defaultCookie)
+        val document = service.search(query.replace(" ", "+"), page)
         if (page > 1) {
             if (document.select("#paging-form").size == 0
                 || page > (document.selectFirst("#paging-form span.total")?.text()?.toInt() ?: 0)
@@ -251,7 +240,7 @@ object AnimeWorldProvider : Provider {
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
-        val document = service.getMovies(page, securityCookie = defaultCookie)
+        val document = service.getMovies(page)
         if (page > 1) {
             if (document.select("#paging-form").size == 0
                 || page > (document.selectFirst("#paging-form span.total")?.text()?.toInt() ?: 0)
@@ -275,7 +264,7 @@ object AnimeWorldProvider : Provider {
     }
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
-        val document = service.getTvSeries(page, securityCookie = defaultCookie)
+        val document = service.getTvSeries(page)
         if (page > 1) {
             if (document.select("#paging-form").size == 0
                 || page > (document.selectFirst("#paging-form span.total")?.text()?.toInt() ?: 0)
@@ -300,7 +289,7 @@ object AnimeWorldProvider : Provider {
 
 
     override suspend fun getMovie(id: String): Movie {
-        val document = service.getDetails(id, securityCookie = defaultCookie)
+        val document = service.getDetails(id)
 
         val movie = Movie(
             id = id,
@@ -382,7 +371,7 @@ object AnimeWorldProvider : Provider {
     }
 
     override suspend fun getTvShow(id: String): TvShow {
-        val document = service.getDetails(id, securityCookie = defaultCookie)
+        val document = service.getDetails(id)
 
         val tvShow = TvShow(
             id = id,
@@ -483,7 +472,7 @@ object AnimeWorldProvider : Provider {
         val split = seasonId.split("/")
         val showId = split[0]
         val range = if (split.size > 1) split[1] else ""
-        val document = service.getDetails(showId, securityCookie = defaultCookie)
+        val document = service.getDetails(showId)
         var episodes: List<Episode>
 
         // AW Server
@@ -529,7 +518,7 @@ object AnimeWorldProvider : Provider {
 
 
     override suspend fun getGenre(id: String, page: Int): Genre {
-        val document = service.getGenre(id, page, securityCookie = defaultCookie)
+        val document = service.getGenre(id, page)
         if (page > 1) {
             if (document.select("#paging-form").size == 0
                 || page > (document.selectFirst("#paging-form span.total")?.text()?.toInt() ?: 0)
@@ -579,7 +568,7 @@ object AnimeWorldProvider : Provider {
 
 
     override suspend fun getPeople(id: String, page: Int): People {
-        val document = service.getPeople(id, page, securityCookie = defaultCookie)
+        val document = service.getPeople(id, page)
         if (page > 1) {
             if (document.select("#paging-form").size == 0
                 || page > (document.selectFirst("#paging-form span.total")?.text()?.toInt() ?: 0)
@@ -629,7 +618,7 @@ object AnimeWorldProvider : Provider {
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         val split = id.split("/")
         val showId = split[0]
-        val document = service.getDetails(showId, securityCookie = defaultCookie)
+        val document = service.getDetails(showId)
 
         // episode main id
         val episodeId = when (videoType) {
@@ -661,7 +650,7 @@ object AnimeWorldProvider : Provider {
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
-        val link = service.getLink(server.id, 0, securityCookie = defaultCookie)
+        val link = service.getLink(server.id, 0)
 
         if (server.name == "Streamtape")
             return Extractor.extract(link.grabber.substringBeforeLast("/"))
@@ -692,6 +681,7 @@ object AnimeWorldProvider : Provider {
         companion object {
             fun build(): AnimeWorldService {
                 val client = OkHttpClient.Builder()
+                    .cookieJar(MyCookieJar())
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .build()
@@ -713,29 +703,22 @@ object AnimeWorldProvider : Provider {
         suspend fun getHome(): Document
 
         @Headers(USER_AGENT)
-        @GET(".")
-        suspend fun getHome(@Header("Cookie") securityCookie: String): Document
-
-        @Headers(USER_AGENT)
         @GET("search")
         suspend fun search(
             @Query("keyword", encoded = true) keyword: String,
             @Query("page") page: Int,
-            @Header("Cookie") securityCookie: String
         ): Document
 
         @Headers(USER_AGENT)
         @GET("filter?type=4&sort=0")
         suspend fun getMovies(
             @Query("page") page: Int,
-            @Header("Cookie") securityCookie: String
         ): Document
 
         @Headers(USER_AGENT)
         @GET("filter?type=0&sort=0")
         suspend fun getTvSeries(
             @Query("page") page: Int,
-            @Header("Cookie") securityCookie: String
         ): Document
 
         @Headers(USER_AGENT)
@@ -743,18 +726,10 @@ object AnimeWorldProvider : Provider {
         suspend fun getDetails(@Path("id") id: String): Document
 
         @Headers(USER_AGENT)
-        @GET("play/{id}")
-        suspend fun getDetails(
-            @Path("id") id: String,
-            @Header("Cookie") securityCookie: String
-        ): Document
-
-        @Headers(USER_AGENT)
         @GET("genre/{id}")
         suspend fun getGenre(
             @Path("id") id: String,
             @Query("page") page: Int,
-            @Header("Cookie") securityCookie: String
         ): Document
 
 
@@ -763,7 +738,6 @@ object AnimeWorldProvider : Provider {
         suspend fun getPeople(
             @Query("studio") id: String,
             @Query("page") page: Int,
-            @Header("Cookie") securityCookie: String
         ): Document
 
 
@@ -772,7 +746,6 @@ object AnimeWorldProvider : Provider {
         suspend fun getLink(
             @Query("id") id: String,
             @Query("alt") alt: Number,
-            @Header("Cookie") securityCookie: String
         ): Link
 
 
