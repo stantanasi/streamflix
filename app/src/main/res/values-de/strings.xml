@@ -100,7 +100,7 @@
     <string name="player_settings_subtitles_off">Aus</string>
     <string name="player_settings_caption_style_title">Untertitelstil</string>
     <string name="player_settings_caption_style_label">Untertitelstil</string>
-    <string name="player_settings_caption_style_sub_label">Text, Farbe & Hintergrundstil anpassen</string>
+    <string name="player_settings_caption_style_sub_label">Text, Farbe &amp; Hintergrundstil anpassen</string>
     <string name="player_settings_caption_style_reset_style_label">Stil Zurücksetzen</string>
     <string name="player_settings_caption_style_font_color_title">Schriftfarbe</string>
     <string name="player_settings_caption_style_font_color_label">Schriftfarbe</string>
