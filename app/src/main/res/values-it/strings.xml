@@ -5,7 +5,7 @@
     <string name="loading_error_retry">Riprova</string>
 
     <string name="update_title">Nuovo Aggiornamento Disponibile</string>
-    <string name="update_message">una nuova versione dell'app è disponibile!</string>
+    <string name="update_message">una nuova versione dell\'app è disponibile!</string>
     <string name="update_current_version_label">Versione attuale</string>
     <string name="update_new_version_label">Nuova versione</string>
     <string name="update_release_notes">Note di rilascio</string>
