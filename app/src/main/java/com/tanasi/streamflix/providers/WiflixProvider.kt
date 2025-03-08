@@ -11,6 +11,9 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
 import retrofit2.HttpException
@@ -21,19 +24,21 @@ import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
-import java.util.concurrent.TimeUnit
 
 object WiflixProvider : Provider {
 
-    private const val URL = "https://wiflix-hd.vip/"
+    private var URL = "https://wiflix-hd.vip/"
 
     override val name = "Wiflix"
-    override val logo = "$URL/templates/wiflixnew/images/logo.png"
+    override val logo get() = "$URL/templates/wiflixnew/images/logo.png"
     override val language = "fr"
 
-    private val service = Service.build()
+    private lateinit var service: Service
+    private var serviceInitialized = false
+    private val initializationMutex = Mutex()
 
     override suspend fun getHome(): List<Category> {
+        initializeService()
         val document = service.getHome()
 
         val categories = mutableListOf<Category>()
@@ -96,6 +101,8 @@ object WiflixProvider : Provider {
     }
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
+        initializeService()
+
         if (query.isEmpty()) {
             val document = service.getHome()
 
@@ -155,6 +162,7 @@ object WiflixProvider : Provider {
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
+        initializeService()
         val document = service.getMovies(page)
 
         val movies = document.select("div.mov").map {
@@ -174,6 +182,7 @@ object WiflixProvider : Provider {
     }
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
+        initializeService()
         val document = service.getTvShows(page)
 
         val tvShows = document.select("div.mov").map {
@@ -194,6 +203,7 @@ object WiflixProvider : Provider {
     }
 
     override suspend fun getMovie(id: String): Movie {
+        initializeService()
         val document = service.getMovie(id)
 
         val movie = Movie(
@@ -282,6 +292,7 @@ object WiflixProvider : Provider {
     }
 
     override suspend fun getTvShow(id: String): TvShow {
+        initializeService()
         val document = service.getTvShow(id)
 
         val tvShow = TvShow(
@@ -367,6 +378,7 @@ object WiflixProvider : Provider {
     }
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
+        initializeService()
         val (tvShowId, className) = seasonId.split("/")
 
         val document = service.getTvShow(tvShowId)
@@ -383,6 +395,7 @@ object WiflixProvider : Provider {
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
+        initializeService()
         val document = service.getGenre(id, page)
 
         val genre = Genre(
@@ -407,6 +420,7 @@ object WiflixProvider : Provider {
     }
 
     override suspend fun getPeople(id: String, page: Int): People {
+        initializeService()
         val document = try {
             service.getPeople(id, page)
         } catch (e: HttpException) {
@@ -458,6 +472,7 @@ object WiflixProvider : Provider {
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
+        initializeService()
         val servers = when (videoType) {
             is Video.Type.Episode -> {
                 val (tvShowId, rel) = id.split("/")
@@ -505,18 +520,59 @@ object WiflixProvider : Provider {
         return video
     }
 
+    /**
+     * Initializes the service with the current domain URL.
+     * This function is necessary because the provider's domain frequently changes.
+     * We fetch the latest URL from a dedicated website that tracks these changes.
+     */
+    private suspend fun initializeService() {
+        initializationMutex.withLock {
+            val addressService = Service.buildAddressFetcher()
+
+            try {
+                val document = addressService.getHome()
+
+                val newUrl = document.select("div.alert-success")
+                    .firstOrNull {
+                        it.text().contains("Nom de domaine principal") ||
+                            it.text().contains("Nouveau site")
+                    }
+                    ?.selectFirst("a")?.attr("href")?.trim()
+
+                if (!newUrl.isNullOrEmpty()) {
+                    URL = if (newUrl.endsWith("/")) newUrl else "$newUrl/"
+                }
+            } catch (e: Exception) {
+                // In case of failure, we'll use the default URL
+                // No need to throw as we already have a fallback URL
+            }
+
+            service = Service.build(URL)
+            serviceInitialized = true
+        }
+    }
 
     private interface Service {
 
         companion object {
-            fun build(): Service {
-                val client = OkHttpClient.Builder()
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .connectTimeout(30, TimeUnit.SECONDS)
+            private val client = OkHttpClient.Builder()
+                .readTimeout(30, TimeUnit.SECONDS)
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .build()
+
+            fun buildAddressFetcher(): Service {
+                val addressRetrofit = Retrofit.Builder()
+                    .baseUrl("https://ww1.wiflix-adresses.fun/")
+                    .addConverterFactory(JsoupConverterFactory.create())
+                    .client(client)
                     .build()
 
+                return addressRetrofit.create(Service::class.java)
+            }
+
+            fun build(baseUrl: String): Service {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl(URL)
+                    .baseUrl(baseUrl)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
