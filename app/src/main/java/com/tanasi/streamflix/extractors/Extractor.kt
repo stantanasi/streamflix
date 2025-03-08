@@ -42,6 +42,7 @@ abstract class Extractor {
             LuluVdoExtractor(),
             DoodLaExtractor(),
             DoodLaExtractor.DoodLiExtractor(),
+            VidPlyExtractor(),
         )
 
         suspend fun extract(link: String): Video {
