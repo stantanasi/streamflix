@@ -17,8 +17,8 @@ android {
         applicationId "com.tanasi.streamflix"
         minSdk 21
         targetSdk 35
-        versionCode 44
-        versionName "1.7.13"
+        versionCode 45
+        versionName "1.7.14"
 
         buildConfigField "String", "APP_LAYOUT", "\"${properties.getProperty("APP_LAYOUT")}\""
         buildConfigField "String", "TMDB_API_KEY", "\"${properties.getProperty("TMDB_API_KEY")}\""
