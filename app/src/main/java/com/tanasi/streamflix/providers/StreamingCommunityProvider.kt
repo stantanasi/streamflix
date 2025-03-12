@@ -13,7 +13,9 @@ import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import kotlinx.coroutines.runBlocking
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import org.json.JSONObject
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
@@ -444,13 +446,26 @@ object StreamingCommunityProvider : Provider {
     }
 
 
+    class UserAgentInterceptor(private val userAgent: String) : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val originalRequest = chain.request()
+            val requestWithUserAgent = originalRequest.newBuilder()
+                .header("User-Agent", userAgent)
+                .build()
+            return chain.proceed(requestWithUserAgent)
+        }
+    }
+
     private interface StreamingCommunityService {
 
         companion object {
+            private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+
             fun build(): StreamingCommunityService {
                 val client = OkHttpClient.Builder()
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
+                    .addInterceptor(UserAgentInterceptor(USER_AGENT))
                     .build()
 
                 val retrofit = Retrofit.Builder()
