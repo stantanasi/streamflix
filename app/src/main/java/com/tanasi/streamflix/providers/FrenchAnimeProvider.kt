@@ -487,7 +487,7 @@ object FrenchAnimeProvider : Provider {
 
     private fun String.toUrl(): String = if (startsWith("/")) URL.dropLast(1).plus(this) else this
 
-    private fun String?.isFrench(): Boolean = this?.equals("FRENCH", ignoreCase = true) ?: false
+    private fun String?.isFrench(): Boolean = this?.contains("FRENCH", ignoreCase = true) ?: false
 
     private fun String.toTitle(isFrench: Boolean): String = if (isFrench) {
         "(FR) $this".replace(" FRENCH", "")
