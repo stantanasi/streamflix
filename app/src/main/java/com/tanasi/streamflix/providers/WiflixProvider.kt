@@ -538,6 +538,7 @@ object WiflixProvider : Provider {
                             it.text().contains("Nouveau site")
                     }
                     ?.selectFirst("a")?.attr("href")?.trim()
+                    ?.replace("http://", "https://")
 
                 if (!newUrl.isNullOrEmpty()) {
                     URL = if (newUrl.endsWith("/")) newUrl else "$newUrl/"
