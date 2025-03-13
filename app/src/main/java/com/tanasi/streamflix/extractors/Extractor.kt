@@ -43,6 +43,7 @@ abstract class Extractor {
             DoodLaExtractor(),
             DoodLaExtractor.DoodLiExtractor(),
             VidPlyExtractor(),
+            MagaSavorExtractor(),
             VidMoLyExtractor(),
             VidMoLyExtractor.ToDomain(),
         )
