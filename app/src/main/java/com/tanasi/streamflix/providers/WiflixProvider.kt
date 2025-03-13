@@ -37,6 +37,10 @@ object WiflixProvider : Provider {
     private var serviceInitialized = false
     private val initializationMutex = Mutex()
 
+    // Flag to track if more search results are available. Set to false when API returns fewer items than requested.
+    // This prevents querying non-existent pages that could return random/incorrect results.
+    private var hasMore = true
+
     override suspend fun getHome(): List<Category> {
         initializeService()
         val document = service.getHome()
@@ -120,11 +124,23 @@ object WiflixProvider : Provider {
             return genres
         }
 
+        if (page > 1 && !hasMore) return emptyList()
+
         val document = service.search(
-            query,
+            story = query,
             searchStart = page,
             resultFrom = 1 + 20 * (page - 1)
         )
+
+        document.selectFirst("div.berrors")?.text()?.let { resultText ->
+            val totalResults = resultText.substringAfter("trouvé ")
+                .substringBefore(" réponses").toIntOrNull() ?: 0
+            val currentRange = resultText.substringAfter("Résultats de la requête ")
+                .substringBefore(")").split(" - ")
+            val receivedItems = currentRange.getOrNull(1)?.toIntOrNull() ?: 0
+
+            hasMore = receivedItems < totalResults
+        }
 
         val results = document.select("div.mov").mapNotNull {
             val showId = it.selectFirst("a.mov-t")
@@ -538,6 +554,7 @@ object WiflixProvider : Provider {
                             it.text().contains("Nouveau site")
                     }
                     ?.selectFirst("a")?.attr("href")?.trim()
+                    ?.replace("http://", "https://")
 
                 if (!newUrl.isNullOrEmpty()) {
                     URL = if (newUrl.endsWith("/")) newUrl else "$newUrl/"
