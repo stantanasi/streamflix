@@ -44,6 +44,8 @@ abstract class Extractor {
             DoodLaExtractor.DoodLiExtractor(),
             VidPlyExtractor(),
             MagaSavorExtractor(),
+            VidMoLyExtractor(),
+            VidMoLyExtractor.ToDomain(),
         )
 
         suspend fun extract(link: String): Video {
