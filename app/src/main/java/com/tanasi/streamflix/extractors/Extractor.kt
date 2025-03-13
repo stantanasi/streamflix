@@ -46,6 +46,7 @@ abstract class Extractor {
             MagaSavorExtractor(),
             VidMoLyExtractor(),
             VidMoLyExtractor.ToDomain(),
+            VideoSibNetExtractor(),
         )
 
         suspend fun extract(link: String): Video {
