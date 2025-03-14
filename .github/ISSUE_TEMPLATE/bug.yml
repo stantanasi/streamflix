@@ -1,8 +1,6 @@
 name: "🐛 Bug Report"
 description: Create a new ticket for a bug.
 labels: ["bug"]
-assignees:
-  - stantanasi
 body:
   - type: textarea
     attributes:
