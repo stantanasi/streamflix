@@ -53,6 +53,7 @@ interface Provider {
             WiflixProvider,
             MStreamProvider,
             FrenchAnimeProvider,
+            UHDMoviesProvider
         )
     }
 }
