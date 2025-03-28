@@ -19,6 +19,7 @@ import com.tanasi.streamflix.databinding.FragmentProvidersTvBinding
 import com.tanasi.streamflix.models.Provider
 import com.tanasi.streamflix.providers.Provider.Companion.providers
 import com.tanasi.streamflix.ui.SpacingItemDecoration
+import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -99,7 +100,7 @@ class ProvidersTvFragment : Fragment() {
                     Language(
                         code = it.language,
                         name = locale.getDisplayLanguage(locale)
-                            .replaceFirstChar { it.titlecase() },
+                            .replaceFirstChar { char -> char.titlecase() },
                     )
                 }
                 .sortedBy { it.name.lowercase() }
@@ -113,8 +114,10 @@ class ProvidersTvFragment : Fragment() {
                 ) {
                     if (position == 0) {
                         viewModel.getProviders()
+                        UserPreferences.currentLanguage = null
                     } else {
                         viewModel.getProviders(languages[position - 1].code)
+                        UserPreferences.currentLanguage = languages[position - 1].code
                     }
                 }
 
@@ -132,6 +135,12 @@ class ProvidersTvFragment : Fragment() {
                 it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             }
             setAdapter(spinnerAdapter)
+
+            setSelection(
+                UserPreferences.currentLanguage?.let {
+                    languages.indexOfFirst { language -> language.code == it } + 1
+                } ?: 0
+            )
         }
 
         binding.rvProviders.apply {
