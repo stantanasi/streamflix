@@ -26,6 +26,10 @@ object UserPreferences {
         get() = providers.find { it.name == Key.CURRENT_PROVIDER.getString() }
         set(value) = Key.CURRENT_PROVIDER.setString(value?.name)
 
+    var currentLanguage: String?
+        get() = Key.CURRENT_LANGUAGE.getString()
+        set(value) = Key.CURRENT_LANGUAGE.setString(value)
+
     var captionTextSize: Float
         get() = Key.CAPTION_TEXT_SIZE.getFloat()
             ?: PlayerSettingsView.Settings.Subtitle.Style.TextSize.DEFAULT.value
@@ -86,6 +90,7 @@ object UserPreferences {
 
     private enum class Key {
         APP_LAYOUT,
+        CURRENT_LANGUAGE,
         CURRENT_PROVIDER,
         PLAYER_RESIZE,
         CAPTION_TEXT_SIZE,
