@@ -55,7 +55,7 @@ object UHDMoviesProvider : Provider {
      * Base URL for the UHD Movies website.
      * This URL is used as the foundation for all API requests.
      */
-    private val baseUrl = "https://uhdmovies.me"
+    private val baseUrl = "https://uhdmovies.wales"
 
     /**
      * HTTP headers required for making requests to the website.
