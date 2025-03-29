@@ -1,21 +1,18 @@
 package com.tanasi.streamflix.providers
 
 import com.tanasi.streamflix.adapters.AppAdapter
-import com.tanasi.streamflix.models.Category
-import com.tanasi.streamflix.models.Episode
-import com.tanasi.streamflix.models.Genre
-import com.tanasi.streamflix.models.Movie
-import com.tanasi.streamflix.models.People
-import com.tanasi.streamflix.models.TvShow
-import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.models.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
+import android.util.Log
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 /**
  * UHDMoviesProvider implements the Provider interface for the UHD Movies website.
@@ -34,6 +31,11 @@ import java.util.concurrent.TimeUnit
  * - Quality options depend on server selection
  */
 object UHDMoviesProvider : Provider {
+    companion object {
+        private const val TAG = "UHDMoviesProvider"
+        private const val MAX_RETRIES = 3
+        private const val RETRY_DELAY_MS = 1000L
+    }
 
     override val name = "UHD Movies"
     override val logo = ""
@@ -74,12 +76,44 @@ object UHDMoviesProvider : Provider {
      * @return List of Category objects representing main sections
      */
     override suspend fun getHome(): List<Category> {
-        return listOf(
-            Category("Latest", emptyList()),
-            Category("Web Series", emptyList()),
-            Category("Movies", emptyList()),
-            Category("4K HDR", emptyList())
-        )
+        return try {
+            Log.d(TAG, "Fetching home categories")
+            val categories = listOf(
+                Category(
+                    name = "Latest",
+                    list = getPosts("$baseUrl/latest-movies/"),
+                    selectedIndex = 0,
+                    itemSpacing = 0,
+                    itemType = AppAdapter.Type.CATEGORY
+                ),
+                Category(
+                    name = "Web Series",
+                    list = getPosts("$baseUrl/web-series/"),
+                    selectedIndex = 0,
+                    itemSpacing = 0,
+                    itemType = AppAdapter.Type.CATEGORY
+                ),
+                Category(
+                    name = "Movies",
+                    list = getPosts("$baseUrl/movies/"),
+                    selectedIndex = 0,
+                    itemSpacing = 0,
+                    itemType = AppAdapter.Type.CATEGORY
+                ),
+                Category(
+                    name = "4K HDR",
+                    list = getPosts("$baseUrl/4k-hdr/"),
+                    selectedIndex = 0,
+                    itemSpacing = 0,
+                    itemType = AppAdapter.Type.CATEGORY
+                )
+            )
+            Log.d(TAG, "Successfully fetched ${categories.size} categories")
+            categories
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch home categories", e)
+            emptyList()
+        }
     }
 
     /**
@@ -90,40 +124,25 @@ object UHDMoviesProvider : Provider {
      * @return List of search results as AppAdapter.Item objects
      */
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
-        val url = if (page == 1) {
-            "$baseUrl/search/$query/"
-        } else {
-            "$baseUrl/search/$query/page/$page/"
-        }
-        return getPosts(url).map { post ->
-            if (post.link.contains("/movie/")) {
-                Movie(
-                    id = post.link.substringAfterLast("/"),
-                    title = post.title,
-                    poster = post.image,
-                    overview = "",
-                    released = null,
-                    runtime = null,
-                    trailer = null,
-                    quality = null,
-                    rating = null,
-                    banner = null
-                )
-            } else {
-                TvShow(
-                    id = post.link.substringAfterLast("/"),
-                    title = post.title,
-                    poster = post.image,
-                    overview = "",
-                    released = null,
-                    runtime = null,
-                    trailer = null,
-                    quality = null,
-                    rating = null,
-                    banner = null,
-                    seasons = emptyList()
-                )
+        return try {
+            Log.d(TAG, "Searching for: $query, page: $page")
+            if (query.isBlank()) {
+                Log.w(TAG, "Empty search query provided")
+                return emptyList()
             }
+
+            val encodedQuery = URLEncoder.encode(query.trim(), "UTF-8")
+            val url = if (page == 1) {
+                "$baseUrl/search/$encodedQuery/"
+            } else {
+                "$baseUrl/search/$encodedQuery/page/$page/"
+            }
+            val results = getPosts(url)
+            Log.d(TAG, "Found ${results.size} results for query: $query")
+            results
+        } catch (e: Exception) {
+            Log.e(TAG, "Search failed for query: $query", e)
+            emptyList()
         }
     }
 
@@ -134,24 +153,24 @@ object UHDMoviesProvider : Provider {
      * @return List of Movie objects
      */
     override suspend fun getMovies(page: Int): List<Movie> {
-        val url = if (page == 1) {
-            "$baseUrl/movies/"
-        } else {
-            "$baseUrl/movies/page/$page/"
-        }
-        return getPosts(url).map { post ->
-            Movie(
-                id = post.link.substringAfterLast("/"),
-                title = post.title,
-                poster = post.image,
-                overview = "",
-                released = null,
-                runtime = null,
-                trailer = null,
-                quality = null,
-                rating = null,
-                banner = null
-            )
+        return try {
+            Log.d(TAG, "Fetching movies page: $page")
+            if (page < 1) {
+                Log.w(TAG, "Invalid page number: $page")
+                return emptyList()
+            }
+
+            val url = if (page == 1) {
+                "$baseUrl/movies/"
+            } else {
+                "$baseUrl/movies/page/$page/"
+            }
+            val movies = getPosts(url).filterIsInstance<Movie>()
+            Log.d(TAG, "Found ${movies.size} movies on page $page")
+            movies
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch movies page: $page", e)
+            emptyList()
         }
     }
 
@@ -162,25 +181,24 @@ object UHDMoviesProvider : Provider {
      * @return List of TvShow objects
      */
     override suspend fun getTvShows(page: Int): List<TvShow> {
-        val url = if (page == 1) {
-            "$baseUrl/web-series/"
-        } else {
-            "$baseUrl/web-series/page/$page/"
-        }
-        return getPosts(url).map { post ->
-            TvShow(
-                id = post.link.substringAfterLast("/"),
-                title = post.title,
-                poster = post.image,
-                overview = "",
-                released = null,
-                runtime = null,
-                trailer = null,
-                quality = null,
-                rating = null,
-                banner = null,
-                seasons = emptyList()
-            )
+        return try {
+            Log.d(TAG, "Fetching TV shows page: $page")
+            if (page < 1) {
+                Log.w(TAG, "Invalid page number: $page")
+                return emptyList()
+            }
+
+            val url = if (page == 1) {
+                "$baseUrl/web-series/"
+            } else {
+                "$baseUrl/web-series/page/$page/"
+            }
+            val shows = getPosts(url).filterIsInstance<TvShow>()
+            Log.d(TAG, "Found ${shows.size} TV shows on page $page")
+            shows
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch TV shows page: $page", e)
+            emptyList()
         }
     }
 
@@ -343,15 +361,45 @@ object UHDMoviesProvider : Provider {
      * @return Document object
      */
     private suspend fun getDocument(url: String): Document {
-        val request = Request.Builder()
-            .url(url)
-            .headers(okhttp3.Headers.Builder().apply {
-                headers.forEach { (key, value) -> add(key, value) }
-            }.build())
-            .build()
+        var retryCount = 0
+        var lastException: Exception? = null
 
-        val response = client.newCall(request).execute()
-        return Jsoup.parse(response.body?.string() ?: "")
+        while (retryCount < MAX_RETRIES) {
+            try {
+                Log.d(TAG, "Fetching URL: $url (attempt ${retryCount + 1})")
+                val request = Request.Builder()
+                    .url(url)
+                    .headers(okhttp3.Headers.Builder().apply {
+                        headers.forEach { (key, value) -> add(key, value) }
+                    }.build())
+                    .build()
+                    
+                val response = client.newCall(request).execute()
+                if (!response.isSuccessful) {
+                    val errorMsg = "Failed to fetch URL: $url, Status: ${response.code}"
+                    Log.e(TAG, errorMsg)
+                    throw IOException(errorMsg)
+                }
+                
+                val html = response.body?.string() ?: throw IOException("Empty response body")
+                response.close()
+                
+                return Jsoup.parse(html)
+            } catch (e: Exception) {
+                lastException = e
+                retryCount++
+                when (e) {
+                    is SocketTimeoutException -> Log.w(TAG, "Timeout on attempt $retryCount", e)
+                    is UnknownHostException -> Log.e(TAG, "Network error on attempt $retryCount", e)
+                    else -> Log.e(TAG, "Error on attempt $retryCount", e)
+                }
+                if (retryCount < MAX_RETRIES) {
+                    Thread.sleep(RETRY_DELAY_MS)
+                }
+            }
+        }
+        
+        throw lastException ?: IOException("Failed to fetch URL after $MAX_RETRIES attempts")
     }
 
     /**
@@ -360,23 +408,67 @@ object UHDMoviesProvider : Provider {
      * @param url The URL to fetch posts from
      * @return List of Post objects
      */
-    private suspend fun getPosts(url: String): List<Post> {
+    private suspend fun getPosts(url: String): List<AppAdapter.Item> {
         val doc = getDocument(url)
-        return doc.select("article.post").map { element ->
-            Post(
-                title = element.select("h2.entry-title a").text(),
-                link = element.select("h2.entry-title a").attr("href"),
-                image = element.select("img.attachment-post-thumbnail").attr("src")
-            )
+        val items = mutableListOf<AppAdapter.Item>()
+        
+        doc.select("div.movie-list div.movie-item").forEach { item ->
+            try {
+                val link = item.select("a").attr("href")
+                val title = item.select("h3.title").text()
+                val poster = item.select("img").attr("src")
+                val year = item.select("span.year").text().toIntOrNull() ?: 0
+                val rating = item.select("span.rating").text().toFloatOrNull() ?: 0f
+                
+                if (link.isNotEmpty() && title.isNotEmpty()) {
+                    val absoluteLink = if (link.startsWith("http")) link else "$baseUrl$link"
+                    val absolutePoster = if (poster.startsWith("http")) poster else "$baseUrl$poster"
+                    val id = absoluteLink.substringAfterLast("/").substringBefore("/")
+                    
+                    if (link.contains("/web-series/")) {
+                        items.add(
+                            TvShow(
+                                id = id,
+                                title = title,
+                                poster = absolutePoster,
+                                year = year,
+                                rating = rating,
+                                seasons = emptyList()
+                            )
+                        )
+                    } else {
+                        items.add(
+                            Movie(
+                                id = id,
+                                title = title,
+                                poster = absolutePoster,
+                                year = year,
+                                rating = rating,
+                                duration = 0,
+                                description = "",
+                                genres = emptyList(),
+                                cast = emptyList(),
+                                director = "",
+                                writer = "",
+                                country = "",
+                                language = "",
+                                budget = "",
+                                revenue = "",
+                                status = "",
+                                tagline = "",
+                                backdrop = "",
+                                trailer = ""
+                            )
+                        )
+                    }
+                } else {
+                    Log.w(TAG, "Invalid item data: link=$link, title=$title")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to parse item", e)
+            }
         }
+        
+        return items
     }
-
-    /**
-     * Data class representing a post from the website.
-     */
-    private data class Post(
-        val title: String,
-        val link: String,
-        val image: String
-    )
 } 
