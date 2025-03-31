@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.providers
 
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
+import com.tanasi.streamflix.BuildConfig
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.models.Category
@@ -20,6 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Url
 import java.util.concurrent.TimeUnit
 
 object SflixProvider : Provider {
@@ -696,7 +698,23 @@ object SflixProvider : Provider {
     override suspend fun getVideo(server: Video.Server): Video {
         val link = service.getLink(server.id)
 
-        return Extractor.extract(link.link)
+        val sources = service.getEmbed(
+            "${BuildConfig.RABBITSTREAM_SOURCE_API}${link.link}&referrer=${URL}"
+        )
+
+        val video = Video(
+            source = sources.sources.map { it.file }.firstOrNull() ?: "",
+            subtitles = sources.tracks
+                .filter { it.kind == "captions" }
+                .map {
+                    Video.Subtitle(
+                        label = it.label,
+                        file = it.file,
+                    )
+                }
+        )
+
+        return video
     }
 
 
@@ -784,8 +802,13 @@ object SflixProvider : Provider {
         suspend fun getPeople(@Path("id") id: String, @Query("page") page: Int): Document
 
 
-        @GET("ajax/get_link/{id}")
+        @GET("ajax/episode/sources/{id}")
         suspend fun getLink(@Path("id") id: String): Link
+
+        @GET
+        suspend fun getEmbed(
+            @Url url: String,
+        ): Embed
 
 
         data class Link(
@@ -795,5 +818,24 @@ object SflixProvider : Provider {
             val tracks: List<String> = listOf(),
             val title: String = "",
         )
+
+        data class Embed(
+            val sources: List<Source>,
+            val tracks: List<Track>,
+            val t: Int,
+            val server: Int,
+        ) {
+            data class Source(
+                val file: String,
+                val type: String,
+            )
+
+            data class Track(
+                val file: String,
+                val label: String,
+                val kind: String,
+                val default: Boolean?,
+            )
+        }
     }
 }
