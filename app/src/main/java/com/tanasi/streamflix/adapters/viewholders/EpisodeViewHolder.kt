@@ -6,6 +6,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingMobileBinding
 import com.tanasi.streamflix.databinding.ItemEpisodeContinueWatchingTvBinding
@@ -103,6 +104,7 @@ class EpisodeViewHolder(
             Glide.with(context)
                 .load(episode.poster)
                 .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
         }
 
@@ -205,6 +207,7 @@ class EpisodeViewHolder(
                 .load(episode.poster)
                 .fallback(R.drawable.glide_fallback_cover)
                 .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
         }
 
@@ -303,6 +306,7 @@ class EpisodeViewHolder(
             Glide.with(context)
                 .load(episode.tvShow?.poster ?: episode.tvShow?.banner ?: episode.poster)
                 .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
         }
 
@@ -417,6 +421,7 @@ class EpisodeViewHolder(
                 .load(episode.tvShow?.poster ?: episode.tvShow?.banner ?: episode.poster)
                 .fallback(R.drawable.glide_fallback_cover)
                 .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
         }
 

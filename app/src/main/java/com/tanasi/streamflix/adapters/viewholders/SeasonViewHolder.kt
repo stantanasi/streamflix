@@ -5,6 +5,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemSeasonMobileBinding
 import com.tanasi.streamflix.databinding.ItemSeasonTvBinding
@@ -54,6 +55,7 @@ class SeasonViewHolder(
                 .load(season.poster)
                 .fallback(R.drawable.glide_fallback_cover)
                 .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
         }
 
@@ -94,6 +96,7 @@ class SeasonViewHolder(
                 .load(season.poster)
                 .fallback(R.drawable.glide_fallback_cover)
                 .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
         }
 
