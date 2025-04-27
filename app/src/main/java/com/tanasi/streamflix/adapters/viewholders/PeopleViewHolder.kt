@@ -5,6 +5,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.databinding.ItemPeopleMobileBinding
 import com.tanasi.streamflix.databinding.ItemPeopleTvBinding
@@ -67,6 +68,7 @@ class PeopleViewHolder(
                 .load(people.image)
                 .placeholder(R.drawable.ic_person_placeholder)
                 .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
         }
 
@@ -109,6 +111,7 @@ class PeopleViewHolder(
                 .load(people.image)
                 .placeholder(R.drawable.ic_person_placeholder)
                 .centerCrop()
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
         }
 

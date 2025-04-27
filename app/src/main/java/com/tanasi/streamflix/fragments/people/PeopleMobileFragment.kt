@@ -13,6 +13,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
@@ -133,6 +134,7 @@ class PeopleMobileFragment : Fragment() {
                         .load(people.image ?: args.image)
                         .placeholder(R.drawable.ic_person_placeholder)
                         .centerCrop()
+                        .transition(DrawableTransitionOptions.withCrossFade())
                         .into(this)
                 }
 
