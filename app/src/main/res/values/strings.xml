@@ -190,4 +190,5 @@
     <string name="settings_help">Help</string>
     <string name="settings_category_streamingcommunity">StreamingCommunity settings</string>
     <string name="settings_category_streamingcommunity_domain">StreamingCommunity domain name (Requires app reboot)</string>
+    <string name="settings_close_app">Close app</string>
 </resources>

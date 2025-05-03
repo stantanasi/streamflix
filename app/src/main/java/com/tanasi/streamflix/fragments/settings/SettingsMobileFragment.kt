@@ -8,6 +8,7 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.utils.UserPreferences
+import kotlin.system.exitProcess
 
 class SettingsMobileFragment : PreferenceFragmentCompat() {
 
@@ -35,6 +36,13 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
                         Uri.parse("https://github.com/stantanasi/streamflix")
                     )
                 )
+                true
+            }
+        }
+
+        findPreference<Preference>("p_settings_close_app")?.apply {
+            setOnPreferenceClickListener {
+                exitProcess(0)
                 true
             }
         }

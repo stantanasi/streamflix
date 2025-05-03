@@ -12,6 +12,11 @@
         android:key="p_settings_help"
         android:title="@string/settings_help" />
 
+    <Preference
+        android:icon="@drawable/ic_settings_close"
+        android:key="p_settings_close_app"
+        android:title="@string/settings_close_app" />
+
     <PreferenceCategory android:title="@string/settings_category_streamingcommunity">
         <EditTextPreference
             android:key="p_settings_streamingcommunity_domain"

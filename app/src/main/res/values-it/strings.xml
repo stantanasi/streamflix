@@ -190,4 +190,5 @@
     <string name="settings_help">Aiuto</string>
     <string name="settings_category_streamingcommunity">Impostazioni StreamingCommunity</string>
     <string name="settings_category_streamingcommunity_domain">Nome di dominio StreamingCommunity (Richiede riavvio app)</string>
+    <string name="settings_close_app">Chiudi applicazione</string>
 </resources>

@@ -8,6 +8,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.utils.UserPreferences
+import kotlin.system.exitProcess
 
 class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
 
@@ -35,6 +36,13 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
                         Uri.parse("https://github.com/stantanasi/streamflix")
                     )
                 )
+                true
+            }
+        }
+
+        findPreference<Preference>("p_settings_close_app")?.apply {
+            setOnPreferenceClickListener {
+                exitProcess(0)
                 true
             }
         }
