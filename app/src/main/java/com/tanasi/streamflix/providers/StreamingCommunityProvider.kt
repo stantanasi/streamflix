@@ -12,6 +12,7 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -28,13 +29,23 @@ import java.util.concurrent.TimeUnit
 
 object StreamingCommunityProvider : Provider {
 
-    private const val DOMAIN = "streamingcommunity.garden"
-    private const val URL = "https://$DOMAIN/"
-    private const val MAX_SEARCH_RESULTS = 60
+    private var DOMAIN: String = ""
+        get() {
+            return if (UserPreferences.streamingcommunityDomain.isNullOrEmpty())
+                "streamingcommunity.spa"
+            else
+                UserPreferences.streamingcommunityDomain as String
+        }
+        set(value) {
+            UserPreferences.streamingcommunityDomain = value;
+            field = value
+        }
+    private val URL = "https://$DOMAIN/"
 
     override val name = "StreamingCommunity"
     override val logo = "$URL/apple-touch-icon.png"
     override val language = "it"
+    private const val MAX_SEARCH_RESULTS = 60
 
     private val service = StreamingCommunityService.build()
 

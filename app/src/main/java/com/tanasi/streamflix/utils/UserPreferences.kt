@@ -87,6 +87,10 @@ object UserPreferences {
             Key.SUBTITLE_NAME.setString(value)
         }
 
+    var streamingcommunityDomain: String?
+        get() = Key.STREAMINGCOMMUNITY_DOMAIN.getString()
+        set(value) = Key.STREAMINGCOMMUNITY_DOMAIN.setString(value)
+
 
     private enum class Key {
         APP_LAYOUT,
@@ -100,7 +104,8 @@ object UserPreferences {
         CAPTION_STYLE_EDGE_TYPE,
         CAPTION_STYLE_EDGE_COLOR,
         QUALITY_HEIGHT,
-        SUBTITLE_NAME;
+        SUBTITLE_NAME,
+        STREAMINGCOMMUNITY_DOMAIN;
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)
