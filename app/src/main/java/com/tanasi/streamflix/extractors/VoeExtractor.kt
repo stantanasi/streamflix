@@ -22,7 +22,7 @@ class VoeExtractor : Extractor() {
         val source = service.getSource(link.replace(mainUrl, ""))
         val scriptTag = source.selectFirst("script[type=application/json]")
         val jsonContent = scriptTag?.data()?.trim()
-        var m3u8 = "";
+        var m3u8 = ""
         val encodedString = encodedRegex.find(jsonContent ?: "")?.groupValues?.getOrNull(1)
         if (encodedString != null) {
             val decryptedJson = decryptF7(jsonContent.toString())
