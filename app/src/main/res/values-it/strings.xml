@@ -188,4 +188,6 @@
     <string name="settings_about_version_name">Versione %s</string>
     <string name="settings_about_donate">Donazioni</string>
     <string name="settings_help">Aiuto</string>
+    <string name="settings_category_streamingcommunity">Impostazioni StreamingCommunity</string>
+    <string name="settings_category_streamingcommunity_domain">Nome di dominio StreamingCommunity (Richiede riavvio app)</string>
 </resources>

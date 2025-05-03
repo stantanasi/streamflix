@@ -7,6 +7,7 @@ import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import com.tanasi.streamflix.R
+import com.tanasi.streamflix.utils.UserPreferences
 
 class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
 
@@ -34,6 +35,15 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
                         Uri.parse("https://github.com/stantanasi/streamflix")
                     )
                 )
+                true
+            }
+        }
+
+        findPreference<Preference>("p_settings_streamingcommunity_domain")?.apply {
+            setDefaultValue(UserPreferences.streamingcommunityDomain)
+
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.streamingcommunityDomain = newValue as String
                 true
             }
         }

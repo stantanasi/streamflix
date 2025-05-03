@@ -7,6 +7,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.tanasi.streamflix.R
+import com.tanasi.streamflix.utils.UserPreferences
 
 class SettingsMobileFragment : PreferenceFragmentCompat() {
 
@@ -34,6 +35,15 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
                         Uri.parse("https://github.com/stantanasi/streamflix")
                     )
                 )
+                true
+            }
+        }
+
+        findPreference<Preference>("p_settings_streamingcommunity_domain")?.apply {
+            setDefaultValue(UserPreferences.streamingcommunityDomain)
+
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.streamingcommunityDomain = newValue as String
                 true
             }
         }
