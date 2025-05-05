@@ -353,24 +353,13 @@ object StreamingCommunityProvider : Provider {
 
 
     override suspend fun getGenre(id: String, page: Int): Genre {
-        val res = service.getGenre(id, version = version)
-        if (res.version != null && res.version != version) version = res.version
-
-
-        if (page > 1) {
-            return Genre(
-                id = id,
-                name = ""
-            )
-        }
-
-        val titles = res.titles ?: res.props.titles
+        val res = service.getGenre(id, (page - 1) * MAX_SEARCH_RESULTS, version = version)
 
         val genre = Genre(
             id = id,
-            name = res.props.genres?.find { it.id == id }?.name ?: "",
+            name = "",
 
-            shows = titles.map {
+            shows = res.titles.map {
                 val poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
 
                 if (it.type == "movie")
@@ -532,9 +521,10 @@ object StreamingCommunityProvider : Provider {
             @Header("x-inertia-version") version: String
         ): SeasonRes
 
-        @GET("archivio")
+        @GET("api/archive")
         suspend fun getGenre(
             @Query("genre[]") id: String,
+            @Query("offset") offset: Int = 0,
             @Header("x-inertia") xInertia: String = "true",
             @Header("x-inertia-version") version: String
         ): ArchiveRes
@@ -620,14 +610,8 @@ object StreamingCommunityProvider : Provider {
             val props: SeasonProps
         )
 
-        data class ArchiveProps(
-            val titles: List<Show>,
-            val genres: List<Genre>?
-        )
         data class ArchiveRes(
-            val titles: List<Show>?,
-            val version: String?,
-            val props: ArchiveProps
+            val titles: List<Show>
         )
     }
 }
