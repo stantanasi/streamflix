@@ -2,6 +2,14 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <PreferenceCategory android:title="@string/settings_category_streamingcommunity">
+        <EditTextPreference
+            android:key="p_settings_streamingcommunity_domain"
+            android:title="@string/settings_category_streamingcommunity_domain"
+            android:inputType="text"
+            app:useSimpleSummaryProvider="true"/>
+    </PreferenceCategory>
+
     <Preference
         android:icon="@drawable/ic_settings_about"
         android:key="p_settings_about"
@@ -11,13 +19,5 @@
         android:icon="@drawable/ic_settings_help"
         android:key="p_settings_help"
         android:title="@string/settings_help" />
-
-    <PreferenceCategory android:title="@string/settings_category_streamingcommunity">
-        <EditTextPreference
-            android:key="p_settings_streamingcommunity_domain"
-            android:title="@string/settings_category_streamingcommunity_domain"
-            android:inputType="text"
-            app:useSimpleSummaryProvider="true"/>
-    </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>
