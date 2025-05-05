@@ -6,8 +6,7 @@
         <EditTextPreference
             android:key="p_settings_streamingcommunity_domain"
             android:title="@string/settings_category_streamingcommunity_domain"
-            android:inputType="text"
-            app:useSimpleSummaryProvider="true"/>
+            android:inputType="text"/>
     </PreferenceCategory>
 
     <Preference

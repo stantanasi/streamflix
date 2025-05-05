@@ -47,16 +47,24 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
         }
 
         findPreference<EditTextPreference>("p_settings_streamingcommunity_domain")?.apply {
-            setDefaultValue(UserPreferences.streamingcommunityDomain)
+            summary = UserPreferences.streamingcommunityDomain
 
             setOnBindEditTextListener { editText ->
                 editText.inputType = InputType.TYPE_CLASS_TEXT
                 editText.imeOptions = EditorInfo.IME_ACTION_DONE
+
                 editText.hint = "streamingcommunity.spa"
+
+                val pref = UserPreferences.streamingcommunityDomain
+                if (pref.isNullOrEmpty())
+                    editText.setText("streamingcommunity.spa")
+                else
+                    editText.setText(pref)
             }
 
             setOnPreferenceChangeListener { _, newValue ->
                 UserPreferences.streamingcommunityDomain = newValue as String
+                summary = newValue
 
                 Toast.makeText(
                     requireContext(),
