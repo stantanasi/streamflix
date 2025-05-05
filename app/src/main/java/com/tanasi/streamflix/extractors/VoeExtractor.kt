@@ -20,15 +20,24 @@ class VoeExtractor : Extractor() {
     override suspend fun extract(link: String): Video {
         val service = VoeExtractorService.build(mainUrl, link)
         val source = service.getSource(link.replace(mainUrl, ""))
-        val encodedString = encodedRegex.find(source.html())?.groupValues?.get(1)
-        val decryptedJson = decryptF7(encodedString.toString())
-        val m3u8 = decryptedJson.get("source")?.asString
-        //val mp4 = decryptedJson.get("direct_access_url")?.asString
+        val scriptTag = source.selectFirst("script[type=application/json]")
+        val jsonContent = scriptTag?.data()?.trim()
+        var m3u8 = ""
+        val encodedString = encodedRegex.find(jsonContent ?: "")?.groupValues?.getOrNull(1)
+        if (encodedString != null) {
+            val decryptedJson = decryptF7(jsonContent.toString())
+            m3u8 = decryptedJson.get("source")?.asString.toString()
+        } else {
+            val decryptedJson = decryptF7(jsonContent.toString())
+            m3u8 = decryptedJson.get("source")?.asString.toString()
+        }
+
 
         return Video(
-            source = m3u8.toString(),
+            source = m3u8,
             subtitles = listOf()
         )
+
     }
 
     private fun decryptF7(p8: String): JsonObject {
