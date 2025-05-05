@@ -1,5 +1,6 @@
 package com.tanasi.streamflix.providers
 
+import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
@@ -28,28 +29,37 @@ import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 object StreamingCommunityProvider : Provider {
-
-    private var DOMAIN: String = ""
+    private var _domain: String? = null
+    private var domain: String
         get() {
-            return if (UserPreferences.streamingcommunityDomain.isNullOrEmpty())
+            if (!_domain.isNullOrEmpty())
+                return _domain!!
+
+            Log.e("DOMAIN", "cache miss reading userprefs")
+            val storedDomain = UserPreferences.streamingcommunityDomain
+
+            _domain = if (storedDomain.isNullOrEmpty())
                 "streamingcommunity.spa"
             else
-                UserPreferences.streamingcommunityDomain as String
+                storedDomain
+
+            return _domain!!
         }
         set(value) {
-            UserPreferences.streamingcommunityDomain = value;
-            field = value
+            if (value != domain) {
+                Log.e("DOMAIN", "updating userprefs with $value")
+                _domain = value
+                UserPreferences.streamingcommunityDomain = value
+                service = StreamingCommunityService.build("https://$value/")
+            }
         }
-    private val URL: String
-        get() = "https://$DOMAIN/"
 
     override val name = "StreamingCommunity"
-    override val logo = "$URL/apple-touch-icon.png"
+    override val logo = "https://$domain/apple-touch-icon.png"
     override val language = "it"
     private const val MAX_SEARCH_RESULTS = 60
 
-    private val service: StreamingCommunityService
-        get() = StreamingCommunityService.build()
+    private var service = StreamingCommunityService.build("https://$domain/")
 
     private var version: String = ""
         get() {
@@ -63,7 +73,7 @@ object StreamingCommunityProvider : Provider {
     private fun getImageLink(filename: String?): String? {
         if (filename.isNullOrEmpty())
             return null
-        return "https://cdn.$DOMAIN/images/$filename"
+        return "https://cdn.$domain/images/$filename"
     }
 
     override suspend fun getHome(): List<Category> {
@@ -458,20 +468,36 @@ object StreamingCommunityProvider : Provider {
         }
     }
 
+    class RedirectInterceptor(): Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val response = chain.proceed(chain.request())
+            val location = response.header("Location")
+            if (!location.isNullOrEmpty()) {
+                domain = location
+                    .substringBeforeLast("/")
+                    .substringAfterLast("/")
+            }
+            Log.e("Interceptor", "Request url: ${response.request.url}")
+            return response
+        }
+    }
+
     private interface StreamingCommunityService {
 
         companion object {
             private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 
-            fun build(): StreamingCommunityService {
+            fun build(baseUrl: String): StreamingCommunityService {
+                Log.e("SCService", "building retrofit")
                 val client = OkHttpClient.Builder()
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .addInterceptor(UserAgentInterceptor(USER_AGENT))
+                    .addNetworkInterceptor(RedirectInterceptor())
                     .build()
 
                 val retrofit = Retrofit.Builder()
-                    .baseUrl(URL)
+                    .baseUrl(baseUrl)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
