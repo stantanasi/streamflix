@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.providers
 
-import android.util.Log
 import com.google.gson.annotations.SerializedName
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
@@ -37,7 +36,6 @@ object StreamingCommunityProvider : Provider {
             if (!_domain.isNullOrEmpty())
                 return _domain!!
 
-            Log.e("DOMAIN", "cache miss reading userprefs")
             val storedDomain = UserPreferences.streamingcommunityDomain
 
             _domain = if (storedDomain.isNullOrEmpty())
@@ -49,7 +47,6 @@ object StreamingCommunityProvider : Provider {
         }
         set(value) {
             if (value != domain) {
-                Log.e("DOMAIN", "updating userprefs with $value")
                 _domain = value
                 UserPreferences.streamingcommunityDomain = value
                 service = StreamingCommunityService.build("https://$value/")
@@ -460,7 +457,7 @@ object StreamingCommunityProvider : Provider {
     }
 
 
-    class UserAgentInterceptor(private val userAgent: String) : Interceptor {
+    private class UserAgentInterceptor(private val userAgent: String) : Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
             val originalRequest = chain.request()
             val requestWithUserAgent = originalRequest.newBuilder()
@@ -470,7 +467,7 @@ object StreamingCommunityProvider : Provider {
         }
     }
 
-    class RedirectInterceptor(): Interceptor {
+    private class RedirectInterceptor : Interceptor {
         override fun intercept(chain: Interceptor.Chain): Response {
             val response = chain.proceed(chain.request())
             val location = response.header("Location")
@@ -479,7 +476,6 @@ object StreamingCommunityProvider : Provider {
                     .substringBeforeLast("/")
                     .substringAfterLast("/")
             }
-            Log.e("Interceptor", "Request url: ${response.request.url}")
             return response
         }
     }
@@ -490,7 +486,6 @@ object StreamingCommunityProvider : Provider {
             private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 
             fun build(baseUrl: String): StreamingCommunityService {
-                Log.e("SCService", "building retrofit")
                 val client = OkHttpClient.Builder()
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
