@@ -14,7 +14,6 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.utils.UserPreferences
-import com.tanasi.streamflix.utils.toActivity
 import kotlin.system.exitProcess
 
 class SettingsMobileFragment : PreferenceFragmentCompat() {
@@ -54,11 +53,11 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
                 editText.inputType = InputType.TYPE_CLASS_TEXT
                 editText.imeOptions = EditorInfo.IME_ACTION_DONE
 
-                editText.hint = "streamingcommunity.spa"
+                editText.hint = "streamingcommunity.example"
 
                 val pref = UserPreferences.streamingcommunityDomain
                 if (pref.isNullOrEmpty())
-                    editText.setText("streamingcommunity.spa")
+                    editText.setText("streamingcommunity.example")
                 else
                     editText.setText(pref)
             }

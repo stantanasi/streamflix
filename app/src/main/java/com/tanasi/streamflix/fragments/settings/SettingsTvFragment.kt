@@ -53,11 +53,11 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
                 editText.inputType = InputType.TYPE_CLASS_TEXT
                 editText.imeOptions = EditorInfo.IME_ACTION_DONE
 
-                editText.hint = "streamingcommunity.spa"
+                editText.hint = "streamingcommunity.example"
 
                 val pref = UserPreferences.streamingcommunityDomain
                 if (pref.isNullOrEmpty())
-                    editText.setText("streamingcommunity.spa")
+                    editText.setText("streamingcommunity.example")
                 else
                     editText.setText(pref)
             }

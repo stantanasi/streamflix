@@ -29,6 +29,8 @@ import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 object StreamingCommunityProvider : Provider {
+    private const val DEFAULT_DOMAIN: String = "streamingcommunity.exposed"
+
     private var _domain: String? = null
     private var domain: String
         get() {
@@ -39,7 +41,7 @@ object StreamingCommunityProvider : Provider {
             val storedDomain = UserPreferences.streamingcommunityDomain
 
             _domain = if (storedDomain.isNullOrEmpty())
-                "streamingcommunity.spa"
+                DEFAULT_DOMAIN
             else
                 storedDomain
 
