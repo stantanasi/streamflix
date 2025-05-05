@@ -4,10 +4,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.navigation.fragment.findNavController
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.utils.UserPreferences
+import com.tanasi.streamflix.utils.toActivity
 import kotlin.system.exitProcess
 
 class SettingsMobileFragment : PreferenceFragmentCompat() {
@@ -40,18 +42,19 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
             }
         }
 
-        findPreference<Preference>("p_settings_close_app")?.apply {
-            setOnPreferenceClickListener {
-                exitProcess(0)
-                true
-            }
-        }
-
-        findPreference<Preference>("p_settings_streamingcommunity_domain")?.apply {
+        findPreference<EditTextPreference>("p_settings_streamingcommunity_domain")?.apply {
             setDefaultValue(UserPreferences.streamingcommunityDomain)
+
+            setOnBindEditTextListener { editText ->
+                editText.hint = "streamingcommunity.spa"
+            }
 
             setOnPreferenceChangeListener { _, newValue ->
                 UserPreferences.streamingcommunityDomain = newValue as String
+                requireActivity().apply {
+                    finish()
+                    startActivity(Intent(this, this::class.java))
+                }
                 true
             }
         }

@@ -40,14 +40,16 @@ object StreamingCommunityProvider : Provider {
             UserPreferences.streamingcommunityDomain = value;
             field = value
         }
-    private val URL = "https://$DOMAIN/"
+    private val URL: String
+        get() = "https://$DOMAIN/"
 
     override val name = "StreamingCommunity"
     override val logo = "$URL/apple-touch-icon.png"
     override val language = "it"
     private const val MAX_SEARCH_RESULTS = 60
 
-    private val service = StreamingCommunityService.build()
+    private val service: StreamingCommunityService
+        get() = StreamingCommunityService.build()
 
     private var version: String = ""
         get() {

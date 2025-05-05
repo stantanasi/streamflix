@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.navigation.fragment.findNavController
+import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.utils.UserPreferences
@@ -40,18 +41,19 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
             }
         }
 
-        findPreference<Preference>("p_settings_close_app")?.apply {
-            setOnPreferenceClickListener {
-                exitProcess(0)
-                true
-            }
-        }
-
-        findPreference<Preference>("p_settings_streamingcommunity_domain")?.apply {
+        findPreference<EditTextPreference>("p_settings_streamingcommunity_domain")?.apply {
             setDefaultValue(UserPreferences.streamingcommunityDomain)
+
+            setOnBindEditTextListener { editText ->
+                editText.hint = "streamingcommunity.spa"
+            }
 
             setOnPreferenceChangeListener { _, newValue ->
                 UserPreferences.streamingcommunityDomain = newValue as String
+                requireActivity().apply {
+                    finish()
+                    startActivity(Intent(this, this::class.java))
+                }
                 true
             }
         }
