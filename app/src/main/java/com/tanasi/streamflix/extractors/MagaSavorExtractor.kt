@@ -1,8 +1,11 @@
 package com.tanasi.streamflix.extractors
 
 import android.util.Base64
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.DecryptHelper
 import java.util.regex.Pattern
 import okhttp3.OkHttpClient
 import org.jsoup.nodes.Document
@@ -17,29 +20,22 @@ class MagaSavorExtractor : Extractor() {
 
     override suspend fun extract(link: String): Video {
         val service = Service.build(mainUrl)
-
-        val document = service.get(link, mainUrl)
-
-        val hlsUrl = extractHlsUrl(document)
-
-        return Video(source = hlsUrl)
-    }
-
-    private fun extractHlsUrl(document: Document): String {
-        val scriptTags = document.select("script")
-        for (script in scriptTags) {
-            val scriptContent = script.html()
-            if ("var sources" in scriptContent) {
-                val pattern = Pattern.compile("'hls':\\s*'([^']+)'")
-                val matcher = pattern.matcher(scriptContent)
-                if (matcher.find()) {
-                    val encodedUrl = matcher.group(1)
-                    val decodedBytes = Base64.decode(encodedUrl, Base64.DEFAULT)
-                    return String(decodedBytes, Charsets.UTF_8)
-                }
-            }
+        val source = service.get(link, mainUrl)
+        val scriptTag = source.selectFirst("script[type=application/json]")
+        val encodedStringInScriptTag = scriptTag?.data()?.trim().orEmpty()
+        val encodedString = DecryptHelper.findEncodedRegex(source.html())
+        val decryptedContent = if (encodedString != null) {
+            DecryptHelper.decrypt(encodedString)
+        } else {
+            DecryptHelper.decrypt(encodedStringInScriptTag)
         }
-        throw Exception("Could not find HLS source in the webpage")
+        val m3u8 = decryptedContent.get("source")?.asString.orEmpty()
+
+        return Video(
+            source = m3u8,
+            subtitles = listOf()
+        )
+
     }
 
     private interface Service {
