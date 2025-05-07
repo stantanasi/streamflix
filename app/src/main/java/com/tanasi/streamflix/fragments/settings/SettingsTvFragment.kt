@@ -3,6 +3,11 @@ package com.tanasi.streamflix.fragments.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.InputType
+import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.navigation.fragment.findNavController
 import androidx.preference.EditTextPreference
@@ -42,18 +47,34 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
         }
 
         findPreference<EditTextPreference>("p_settings_streamingcommunity_domain")?.apply {
-            setDefaultValue(UserPreferences.streamingcommunityDomain)
+            summary = UserPreferences.streamingcommunityDomain
 
             setOnBindEditTextListener { editText ->
-                editText.hint = "streamingcommunity.spa"
+                editText.inputType = InputType.TYPE_CLASS_TEXT
+                editText.imeOptions = EditorInfo.IME_ACTION_DONE
+
+                editText.hint = "streamingcommunity.example"
+
+                val pref = UserPreferences.streamingcommunityDomain
+                if (pref.isNullOrEmpty())
+                    editText.setText("streamingcommunity.example")
+                else
+                    editText.setText(pref)
             }
 
             setOnPreferenceChangeListener { _, newValue ->
                 UserPreferences.streamingcommunityDomain = newValue as String
-                requireActivity().apply {
-                    finish()
-                    startActivity(Intent(this, this::class.java))
-                }
+                summary = newValue
+
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.settings_streamingcommunity_close_app),
+                    Toast.LENGTH_LONG
+                ).show()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    exitProcess(0)
+                }, 3000)
+
                 true
             }
         }
