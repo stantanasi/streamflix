@@ -3,18 +3,15 @@ package com.tanasi.streamflix.fragments.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.InputType
 import android.view.inputmethod.EditorInfo
-import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.tanasi.streamflix.R
+import com.tanasi.streamflix.providers.StreamingCommunityProvider
 import com.tanasi.streamflix.utils.UserPreferences
-import kotlin.system.exitProcess
 
 class SettingsMobileFragment : PreferenceFragmentCompat() {
 
@@ -66,14 +63,18 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
                 UserPreferences.streamingcommunityDomain = newValue as String
                 summary = newValue
 
-                Toast.makeText(
-                    requireContext(),
-                    getString(R.string.settings_streamingcommunity_close_app),
-                    Toast.LENGTH_LONG
-                ).show()
-                Handler(Looper.getMainLooper()).postDelayed({
-                    exitProcess(0)
-                }, 3000)
+                when (UserPreferences.currentProvider) {
+                    is StreamingCommunityProvider -> {
+//                        re build service
+                        (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService(newValue)
+
+//                        restart activity
+                        requireActivity().apply {
+                            finish()
+                            startActivity(Intent(this, this::class.java))
+                        }
+                    }
+                }
 
                 true
             }

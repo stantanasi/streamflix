@@ -191,5 +191,4 @@
     <string name="settings_category_streamingcommunity">Impostazioni StreamingCommunity</string>
     <string name="settings_category_streamingcommunity_domain">Nome di dominio StreamingCommunity</string>
     <string name="settings_close_app">Chiudi applicazione</string>
-    <string name="settings_streamingcommunity_close_app">L\'app si chiuderà tra 3.. 2.. 1..</string>
 </resources>

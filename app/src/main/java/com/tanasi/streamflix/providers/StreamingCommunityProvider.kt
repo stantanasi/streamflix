@@ -49,7 +49,7 @@ object StreamingCommunityProvider : Provider {
             if (value != domain) {
                 _domain = value
                 UserPreferences.streamingcommunityDomain = value
-                service = StreamingCommunityService.build("https://$value/")
+                rebuildService(value)
             }
         }
 
@@ -59,6 +59,10 @@ object StreamingCommunityProvider : Provider {
     private const val MAX_SEARCH_RESULTS = 60
 
     private var service = StreamingCommunityService.build("https://$domain/")
+
+    fun rebuildService(newDomain: String = domain) {
+        service = StreamingCommunityService.build("https://$newDomain/")
+    }
 
     private var version: String = ""
         get() {
