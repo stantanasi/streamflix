@@ -28,7 +28,7 @@ import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 object StreamingCommunityProvider : Provider {
-    private const val DEFAULT_DOMAIN: String = "streamingcommunity.exposed"
+    private const val DEFAULT_DOMAIN: String = "streamingcommunity.ovh"
 
     private var _domain: String? = null
     private var domain: String
