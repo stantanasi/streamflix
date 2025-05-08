@@ -477,8 +477,8 @@ object StreamingCommunityProvider : Provider {
             val location = response.header("Location")
             if (!location.isNullOrEmpty()) {
                 domain = location
-                    .substringBeforeLast("/")
-                    .substringAfterLast("/")
+                    .substringAfter("https://")
+                    .substringBefore("/")
             }
             return response
         }
