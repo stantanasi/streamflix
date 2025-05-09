@@ -151,50 +151,6 @@ class ShowOptionsMobileDialog(
             visibility = View.VISIBLE
         }
 
-
-//        if (!episode.isWatched) {
-//            binding.btnOptionEpisodeMarkAllPreviousWatched.apply {
-//                setOnClickListener {
-//                    val episodeDao = database.episodeDao()
-//                    val episodeNumber = episode.number
-//
-//                    val tvShowId = episode.tvShow?.id ?: return@setOnClickListener
-//                    val episodesToMark = mutableListOf<Episode>()
-//                    val episodesNotWatched = mutableListOf<Episode>()
-//                    val allEpisodes = episodeDao.getEpisodesByTvShowId(tvShowId)
-//
-//                    for (ep in allEpisodes) {
-//                        if (!ep.isWatched && ep.number <= episodeNumber) {
-//                            episodesToMark.add(ep)
-//                        } else {
-//                            episodesNotWatched.add(ep)
-//                        }
-//                    }
-//
-//                    val now = Calendar.getInstance()
-//
-//                    for (ep in episodesToMark) {
-//                        episodeDao.save(ep.copy().apply {
-//                            merge(ep)
-//                            isWatched = true
-//                            watchedDate = now
-//                            watchHistory = null
-//                        })
-//                    }
-//
-//                    hide()
-//                }
-//                text = when {
-//                    episode.isWatched -> context.getString(R.string.option_show_mark_all_previous_unwatched)
-//                    else -> context.getString(R.string.option_show_mark_all_previous_watched)
-//                }
-//                visibility = View.VISIBLE
-//            }
-//        } else {
-//            binding.btnOptionEpisodeMarkAllPreviousWatched.visibility = View.GONE
-//        }
-
-
         binding.btnOptionProgramClear.apply {
             setOnClickListener {
                 database.episodeDao().save(episode.copy().apply {
