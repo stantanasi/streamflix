@@ -39,6 +39,7 @@
     <string name="option_show_favorite">Zu Favoriten hinzufügen</string>
     <string name="option_show_unfavorite">Aus Favoriten entfernen</string>
     <string name="option_show_watched">Als Gesehen markieren</string>
+    <string name="option_show_mark_all_previous_watched">Bis hier als Gesehen markieren</string>
     <string name="option_show_unwatched">Als Ungesehen markieren</string>
     <string name="option_clear_program">Aus Weiterschauen entfernen</string>
     <string name="option_cancel">Abbrechen</string>

@@ -10,7 +10,9 @@ import retrofit2.http.Url
 class VidozaExtractor : Extractor() {
 
     override val name = "Vidoza"
+
     override val mainUrl = "https://vidoza.net"
+    override val aliasUrls = listOf<String>("https://videzz.net")
 
     override suspend fun extract(link: String): Video {
         val service = VoeExtractorService.build(mainUrl)

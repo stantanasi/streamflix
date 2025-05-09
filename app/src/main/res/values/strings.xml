@@ -39,6 +39,8 @@
     <string name="option_show_favorite">Add to favorites</string>
     <string name="option_show_unfavorite">Remove from favorites</string>
     <string name="option_show_watched">Mark as watched</string>
+    <string name="option_show_mark_all_previous_watched">Mark as watched until here</string>
+    <string name="option_show_mark_all_previous_unwatched">Mark as unwatched until here</string>
     <string name="option_show_unwatched">Mark as unwatched</string>
     <string name="option_clear_program">Remove from Continue Watching</string>
     <string name="option_cancel">Cancel</string>

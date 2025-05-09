@@ -72,6 +72,9 @@ interface EpisodeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(episodes: List<Episode>)
 
+    @Query("SELECT * FROM episodes WHERE tvShow = :tvShowId")
+    fun getEpisodesByTvShowId(tvShowId: String): List<Episode>
+
     @Update
     fun update(episode: Episode)
 

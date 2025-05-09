@@ -40,6 +40,7 @@
 	<string name="option_show_favorite">أضف إلى المفضلة</string>
 	<string name="option_show_unfavorite">إزالة من المفضلة</string>
 	<string name="option_show_watched">وُسِم كمشاهد</string>
+	<string name="option_show_mark_all_previous_watched">ضع علامة كمشاهدة حتى هنا</string>
 	<string name="option_show_unwatched">إلغاء الوسم كمشاهد</string>
 	<string name="option_clear_program">إزالة من متابعة المشاهدة</string>
 	<string name="option_cancel">إلغاء</string>
