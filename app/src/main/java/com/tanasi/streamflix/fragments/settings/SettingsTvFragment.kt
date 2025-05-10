@@ -9,6 +9,7 @@ import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.navigation.fragment.findNavController
 import androidx.preference.EditTextPreference
 import androidx.preference.Preference
+import androidx.preference.SwitchPreference
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.providers.StreamingCommunityProvider
 import com.tanasi.streamflix.utils.UserPreferences
@@ -69,6 +70,27 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
                         (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService(newValue)
 
 //                        restart activity
+                        requireActivity().apply {
+                            finish()
+                            startActivity(Intent(this, this::class.java))
+                        }
+                    }
+                }
+
+                true
+            }
+        }
+
+        findPreference<SwitchPreference>("p_settings_streamingcommunity_dnsOverHttps")?.apply {
+            isChecked = UserPreferences.streamingcommunityDnsOverHttps
+
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.streamingcommunityDnsOverHttps = newValue as Boolean
+
+                when (UserPreferences.currentProvider) {
+                    is StreamingCommunityProvider -> {
+                        (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService()
+
                         requireActivity().apply {
                             finish()
                             startActivity(Intent(this, this::class.java))

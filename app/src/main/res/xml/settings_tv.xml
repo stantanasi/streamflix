@@ -7,6 +7,9 @@
             android:key="p_settings_streamingcommunity_domain"
             android:title="@string/settings_category_streamingcommunity_domain"
             android:inputType="text"/>
+        <SwitchPreference
+            android:key="p_settings_streamingcommunity_dnsOverHttps"
+            android:title="@string/settings_category_streamingcommunity_dnsOverHttps" />
     </PreferenceCategory>
 
     <Preference
