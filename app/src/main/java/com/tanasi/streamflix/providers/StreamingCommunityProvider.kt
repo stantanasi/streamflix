@@ -14,9 +14,11 @@ import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.runBlocking
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
+import okhttp3.dnsoverhttps.DnsOverHttps
 import org.json.JSONObject
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
@@ -490,12 +492,22 @@ object StreamingCommunityProvider : Provider {
             private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 
             fun build(baseUrl: String): StreamingCommunityService {
-                val client = OkHttpClient.Builder()
+                val clientBuilder = OkHttpClient.Builder()
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .addInterceptor(UserAgentInterceptor(USER_AGENT))
                     .addNetworkInterceptor(RedirectInterceptor())
-                    .build()
+
+                if (UserPreferences.streamingcommunityDnsOverHttps) {
+                    val bootstrapClient = OkHttpClient.Builder().build()
+                    val dohDns = DnsOverHttps.Builder().client(bootstrapClient)
+                        .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
+                        .build()
+
+                    clientBuilder.dns(dohDns)
+                }
+
+                val client = clientBuilder.build()
 
                 val retrofit = Retrofit.Builder()
                     .baseUrl(baseUrl)
