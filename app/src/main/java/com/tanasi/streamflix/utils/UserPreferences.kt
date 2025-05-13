@@ -91,6 +91,10 @@ object UserPreferences {
         get() = Key.STREAMINGCOMMUNITY_DOMAIN.getString()
         set(value) = Key.STREAMINGCOMMUNITY_DOMAIN.setString(value)
 
+    var streamingcommunityDnsOverHttps: Boolean
+        get() = Key.STREAMINGCOMMUNITY_DNS_OVER_HTTPS.getBoolean()?: true
+        set(value) = Key.STREAMINGCOMMUNITY_DNS_OVER_HTTPS.setBoolean(value)
+
 
     private enum class Key {
         APP_LAYOUT,
@@ -105,7 +109,8 @@ object UserPreferences {
         CAPTION_STYLE_EDGE_COLOR,
         QUALITY_HEIGHT,
         SUBTITLE_NAME,
-        STREAMINGCOMMUNITY_DOMAIN;
+        STREAMINGCOMMUNITY_DOMAIN,
+        STREAMINGCOMMUNITY_DNS_OVER_HTTPS;
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)
