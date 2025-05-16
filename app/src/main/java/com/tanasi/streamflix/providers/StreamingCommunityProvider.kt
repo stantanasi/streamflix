@@ -269,22 +269,27 @@ object StreamingCommunityProvider : Provider {
                 else
                     null
             },
-            recommendations = res.props.sliders[0].titles.map {
-                if (it.type == "movie") {
-                    Movie(
-                        id = it.id + "-" + it.slug,
-                        title = it.name,
-                        rating = it.score,
-                        poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
-                    )
-                } else {
-                    TvShow(
-                        id = it.id + "-" + it.slug,
-                        title = it.name,
-                        rating = it.score,
-                        poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
-                    )
-                }
+            recommendations = let {
+                if (res.props.sliders.isNotEmpty())
+                    res.props.sliders[0].titles.map {
+                        if (it.type == "movie") {
+                            Movie(
+                                id = it.id + "-" + it.slug,
+                                title = it.name,
+                                rating = it.score,
+                                poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
+                            )
+                        } else {
+                            TvShow(
+                                id = it.id + "-" + it.slug,
+                                title = it.name,
+                                rating = it.score,
+                                poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
+                            )
+                        }
+                    }
+                else
+                    listOf()
             }
         )
     }
@@ -321,22 +326,27 @@ object StreamingCommunityProvider : Provider {
                 else
                     null
             },
-            recommendations = res.props.sliders[0].titles.map {
-                if (it.type == "movie") {
-                    Movie(
-                        id = it.id + "-" + it.slug,
-                        title = it.name,
-                        rating = it.score,
-                        poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
-                    )
-                } else {
-                    TvShow(
-                        id = it.id + "-" + it.slug,
-                        title = it.name,
-                        rating = it.score,
-                        poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
-                    )
-                }
+            recommendations = let {
+                if (res.props.sliders.isNotEmpty())
+                    res.props.sliders[0].titles.map {
+                        if (it.type == "movie") {
+                            Movie(
+                                id = it.id + "-" + it.slug,
+                                title = it.name,
+                                rating = it.score,
+                                poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
+                            )
+                        } else {
+                            TvShow(
+                                id = it.id + "-" + it.slug,
+                                title = it.name,
+                                rating = it.score,
+                                poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
+                            )
+                        }
+                    }
+                else
+                    listOf()
             },
             seasons = title.seasons?.map {
                 Season(
