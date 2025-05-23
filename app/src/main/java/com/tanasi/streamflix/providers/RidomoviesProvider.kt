@@ -415,7 +415,7 @@ object RidomoviesProvider : Provider {
             private const val DNS_QUERY_URL = "https://1.1.1.1/dns-query"
 
             fun build(): Service {
-                val dohClient = OkHttpClient() // Used for DNS over HTTPS
+                val dohClient = OkHttpClient()
 
                 val client = OkHttpClient.Builder()
                     .readTimeout(30, TimeUnit.SECONDS)
@@ -438,7 +438,7 @@ object RidomoviesProvider : Provider {
                     .build()
 
                 val retrofit = Retrofit.Builder()
-                    .baseUrl(URL) // Ensure `URL` is correctly defined
+                    .baseUrl(URL)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
