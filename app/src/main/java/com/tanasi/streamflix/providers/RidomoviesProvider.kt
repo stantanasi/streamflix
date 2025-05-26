@@ -11,7 +11,9 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
+import okhttp3.dnsoverhttps.DnsOverHttps
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
@@ -410,10 +412,29 @@ object RidomoviesProvider : Provider {
     private interface Service {
 
         companion object {
+            private const val DNS_QUERY_URL = "https://1.1.1.1/dns-query"
+
             fun build(): Service {
+                val dohClient = OkHttpClient()
+
                 val client = OkHttpClient.Builder()
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
+                    .dns(
+                        DnsOverHttps.Builder()
+                            .client(dohClient)
+                            .url(DNS_QUERY_URL.toHttpUrl())
+                            .build()
+                    )
+                    .addInterceptor { chain ->
+                        val request = chain.request().newBuilder()
+                            .addHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                            .addHeader("Accept-Language", "en-US,en;q=0.5")
+                            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
+                            .addHeader("Platform", "android")
+                            .build()
+                        chain.proceed(request)
+                    }
                     .build()
 
                 val retrofit = Retrofit.Builder()
@@ -426,6 +447,7 @@ object RidomoviesProvider : Provider {
                 return retrofit.create(Service::class.java)
             }
         }
+
 
 
         @GET("home")
