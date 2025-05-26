@@ -43,7 +43,7 @@ object FilmPalastProvider : Provider {
         val featured = document.select("div.headerslider ul#sliderDla li").map { li ->
             val title = li.select("span.title.rb").text()
             val href = li.select("a.moviSliderPlay").attr("href")
-            val id = href.substringAfterLast("/") // Get the part after the last "/"
+            val id = href.substringAfterLast("/")
             val posterSrc = li.select("a img").attr("src")
             val fullPosterUrl = if (posterSrc.startsWith("/")) {
                 "https://filmpalast.to$posterSrc"
@@ -170,12 +170,11 @@ object FilmPalastProvider : Provider {
             val url = linkElement?.attr("href")?.trim()
 
             if (!url.isNullOrEmpty()) {
-
                 servers.add(
                     Video.Server(
                         id = name.split(" ")[0],
-                        name = name.split(" ")[0],
-                        src = url,
+                        name = if (!name.lowercase().contains("bigwarp")) name.split(" ")[0] else name.split(" ")[0] + " (VLC Only)",
+                        src = url
                     )
                 )
             }
@@ -215,14 +214,14 @@ object FilmPalastProvider : Provider {
                 posterSrc
             }
 
-            val info = article.select("*").toInfo() // Apply your helper here
+            val info = article.select("*").toInfo()
 
             Movie(
                 id = href.substringAfterLast("/"),
                 title = title,
                 released = info.released,
                 quality = info.quality,
-                rating = info.rating ?: 0.0, // Fall back to 0.0 if not found
+                rating = info.rating ?: 0.0,
                 poster = fullPosterUrl
             )
         }
@@ -248,7 +247,7 @@ object FilmPalastProvider : Provider {
 
             object {
                 val rating =
-                    rating.takeIf { starCount > 0 } // Use calculated rating only if stars exist
+                    rating.takeIf { starCount > 0 }
 
                 val quality = textList.find { it in listOf("HD", "SD", "CAM", "TS", "HDRip") }
 

@@ -49,7 +49,7 @@ abstract class Extractor {
             VidMoLyExtractor.ToDomain(),
             VideoSibNetExtractor(),
             SaveFilesExtractor(),
-//            BigWarpExtractor(),
+            BigWarpExtractor(),
         )
 
         suspend fun extract(link: String): Video {
