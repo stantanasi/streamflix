@@ -28,16 +28,19 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.Url
 import java.io.File
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import androidx.core.net.toUri
+import com.tanasi.streamflix.models.Show
 
 object CuevanaDosProvider : Provider {
 
     private const val URL = "https://www.cuevana2espanol.net/"
-    override val name = "Cuevana2Espanol"
-    override val logo = ""
+    override val name = "Cuevana2 Español"
+    override val logo = "https://www.cuevana2espanol.net/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.33e4f182.png&w=640&q=7"
     override val language = "es"
 
     private val service = CuevanaDosService.build();
@@ -118,13 +121,78 @@ object CuevanaDosProvider : Provider {
         return categories
     }
 
-    override suspend fun search(
-        query: String,
-        page: Int
-    ): List<AppAdapter.Item> {
+    override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
+        if (query.isEmpty()) {
+            if (query.isEmpty()) {
+                val genres = listOf(
+                    Genre("accion", "Acción"),
+                    Genre("animacion", "Animación"),
+                    Genre("crimen", "Crimen"),
+                    Genre("familia", "Fámilia"),
+                    Genre("misterio", "Misterio"),
+                    Genre("suspenso", "Suspenso"),
+                    Genre("aventura", "Aventura"),
+                    Genre("ciencia-ficcion", "Ciencia Ficción"),
+                    Genre("drama", "Drama"),
+                    Genre("fantasia", "Fantasía"),
+                    Genre("romance", "Romance"),
+                    Genre("terror", "Terror")
+                )
 
-        throw Exception("Not implemented yet")
+                return genres
+            }
+
+        }
+        val document = service.search(query)
+
+        val items = mutableListOf<AppAdapter.Item>()
+
+        val elements = document.select("div.col article")
+
+        for (element in elements) {
+            val linkElement = element.selectFirst("a")
+            val href = linkElement?.attr("href") ?: continue
+            val title = element.selectFirst("h3")?.text()?.trim() ?: continue
+            val year = element.selectFirst("span")?.text()?.trim() ?: ""
+            val rawImgUrl = element.selectFirst("img")?.attr("src") ?: ""
+            val imgUrl = rawImgUrl.toUri().getQueryParameter("url") ?: rawImgUrl
+
+            val id = href.removePrefix("/movies/").removePrefix("/series/")
+
+            when {
+                href.startsWith("/movies/") -> {
+                    items.add(
+                        Movie(
+                            id = id,
+                            title = title,
+                            overview = "",
+                            released = year,
+                            runtime = 0,
+                            poster = imgUrl,
+                            banner = "",
+                        )
+                    )
+                }
+
+                href.startsWith("/series/") -> {
+                    items.add(
+                        TvShow(
+                            id = id,
+                            title = title,
+                            overview = "",
+                            released = year,
+                            runtime = 0,
+                            poster = imgUrl,
+                            banner = "",
+                        )
+                    )
+                }
+            }
+        }
+
+        return items
     }
+
 
     override suspend fun getMovies(page: Int): List<Movie> {
         val document = service.getMovies(page)
@@ -312,20 +380,59 @@ object CuevanaDosProvider : Provider {
         return emptyList()
     }
 
+    override suspend fun getGenre(id: String, page: Int): Genre {
+        val document = service.getGenre(id, page)
+        val elements = document.select("div.col article:not(.MovieSidebarItem_item__U15hi):not(.SerieSidebarItem_item__Y_r4w)")
 
+        val shows = mutableListOf<Show>()
 
-    override suspend fun getGenre(
-        id: String,
-        page: Int
-    ): Genre {
-        throw Exception("Not implemented yet")
+        for (element in elements) {
+            val linkElement = element.selectFirst("a") ?: continue
+            val href = linkElement.attr("href")
+            val title = element.selectFirst("h3")?.text()?.trim() ?: continue
+            val year = element.selectFirst("span")?.text()?.trim() ?: ""
+            val rawImgUrl = linkElement.selectFirst("img")?.attr("src") ?: ""
+            val poster = rawImgUrl.toUri().getQueryParameter("url") ?: rawImgUrl
+
+            val id = href.removePrefix("/movies/").removePrefix("/series/")
+
+            val show: Show? = when {
+                href.startsWith("/movies/") -> Movie(
+                    id = id,
+                    title = title,
+                    overview = "",
+                    released = year,
+                    runtime = 0,
+                    poster = poster,
+                    banner = ""
+                )
+                href.startsWith("/series/") -> TvShow(
+                    id = id,
+                    title = title,
+                    overview = "",
+                    released = year,
+                    runtime = 0,
+                    poster = poster,
+                    banner = ""
+                )
+                else -> null
+            }
+
+            show?.let { shows.add(it) }
+        }
+
+        val genre = Genre(id = id, name = id.replaceFirstChar { it.uppercase() }, shows = shows)
+
+        return genre
+
     }
+
 
     override suspend fun getPeople(
         id: String,
         page: Int
     ): People {
-        throw Exception("Not implemented yet")
+        throw Exception("Function not available for Cuevana2")
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
@@ -447,8 +554,8 @@ object CuevanaDosProvider : Provider {
 
         @GET(".")
         suspend fun getHome(): Document
-        @GET("/search?q={query}")
-        suspend fun search(@Path("query") query: String): Document
+        @GET("/search")
+        suspend fun search(@Query("q") query: String): Document
         @GET("movies/{name}")
         suspend fun getMovie(@Path("name") id: String): Document
         @GET
@@ -464,6 +571,9 @@ object CuevanaDosProvider : Provider {
         suspend fun getTvShow(@Path("name") id: String): Document
         @GET("series/{name}/seasons/{seasonNumber}/episodes/{episodeNumber}")
         suspend fun getEpisode(@Path("name") name: String, @Path("seasonNumber") seasonNumber: String, @Path("episodeNumber") episodeNumber: String): Document
+        @GET("/genres/{genre}/page/{page}")
+        suspend fun getGenre(@Path("genre") genre: String,@Path("page") page: Int ): Document
+
     }
 
 }
