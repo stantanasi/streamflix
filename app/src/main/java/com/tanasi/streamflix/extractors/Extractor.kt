@@ -35,6 +35,7 @@ abstract class Extractor {
             StreamWishExtractor.SwishExtractor(),
             StreamWishExtractor.HlswishExtractor(),
             StreamWishExtractor.PlayerwishExtractor(),
+            StreamWishExtractor.SwiftPlayersExtractor(),
             TwoEmbedExtractor(),
             ChillxExtractor(),
             ChillxExtractor.JeanExtractor(),

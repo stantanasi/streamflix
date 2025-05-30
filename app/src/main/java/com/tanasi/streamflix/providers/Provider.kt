@@ -54,6 +54,7 @@ interface Provider {
             MStreamProvider,
             FrenchAnimeProvider,
             FilmPalastProvider,
+            CuevanaDosProvider,
         )
     }
 }

@@ -58,6 +58,10 @@ open class StreamWishExtractor : Extractor() {
         return if (url.contains("/f/")) {
             val videoId = url.substringAfter("/f/")
             "$mainUrl/$videoId"
+        } else if (url.contains("/e/")){
+            val videoId = url.substringAfter("/e/")
+            "$mainUrl/$videoId"
+
         } else {
             url
         }
@@ -72,6 +76,10 @@ open class StreamWishExtractor : Extractor() {
             this.referer = referer
             return extract(link)
         }
+    }
+    class SwiftPlayersExtractor : StreamWishExtractor(){
+        override val name = "SwiftPlayer"
+        override val mainUrl = "https://swiftplayers.com/"
     }
 
     class SwishExtractor : StreamWishExtractor() {
