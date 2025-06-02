@@ -6,6 +6,7 @@ abstract class Extractor {
 
     abstract val name: String
     abstract val mainUrl: String
+    open val aliasUrls: List<String> = emptyList()
 
     abstract suspend fun extract(link: String): Video
 
@@ -42,6 +43,13 @@ abstract class Extractor {
             LuluVdoExtractor(),
             DoodLaExtractor(),
             DoodLaExtractor.DoodLiExtractor(),
+            VidPlyExtractor(),
+            MagaSavorExtractor(),
+            VidMoLyExtractor(),
+            VidMoLyExtractor.ToDomain(),
+            VideoSibNetExtractor(),
+            SaveFilesExtractor(),
+            BigWarpExtractor(),
         )
 
         suspend fun extract(link: String): Video {
@@ -51,6 +59,13 @@ abstract class Extractor {
             for (extractor in extractors) {
                 if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, ""))) {
                     return extractor.extract(link)
+                }
+                else {
+                    for (aliasUrl in extractor.aliasUrls) {
+                        if (compareUrl.startsWith(aliasUrl.lowercase().replace(urlRegex, ""))) {
+                            return extractor.extract(link)
+                        }
+                    }
                 }
             }
             for (extractor in extractors) {
@@ -63,7 +78,18 @@ abstract class Extractor {
                 ) {
                     return extractor.extract(link)
                 }
+                else {
+                    for (aliasUrl in extractor.aliasUrls) {
+                        if (compareUrl.startsWith(aliasUrl.replace(
+                                Regex("^(https?://)?(www\\.)?(.*?)(\\.[a-z]+)"),
+                                "$3"
+                            ))) {
+                            return extractor.extract(link)
+                        }
+                    }
+                }
             }
+
 
             throw Exception("No extractors found")
         }

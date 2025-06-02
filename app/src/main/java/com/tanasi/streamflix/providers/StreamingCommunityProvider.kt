@@ -12,8 +12,13 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.runBlocking
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
+import okhttp3.dnsoverhttps.DnsOverHttps
 import org.json.JSONObject
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
@@ -25,16 +30,42 @@ import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 object StreamingCommunityProvider : Provider {
+    private const val DEFAULT_DOMAIN: String = "streamingunity.to"
 
-    private const val DOMAIN = "streamingcommunity.paris"
-    private const val URL = "https://$DOMAIN/"
-    private const val MAX_SEARCH_RESULTS = 60
+    private var _domain: String? = null
+    private var domain: String
+        get() {
+            if (!_domain.isNullOrEmpty())
+                return _domain!!
+
+            val storedDomain = UserPreferences.streamingcommunityDomain
+
+            _domain = if (storedDomain.isNullOrEmpty())
+                DEFAULT_DOMAIN
+            else
+                storedDomain
+
+            return _domain!!
+        }
+        set(value) {
+            if (value != domain) {
+                _domain = value
+                UserPreferences.streamingcommunityDomain = value
+                rebuildService(value)
+            }
+        }
+    private const val lang = "it"
 
     override val name = "StreamingCommunity"
-    override val logo = "$URL/apple-touch-icon.png"
+    override val logo = "https://$domain/apple-touch-icon.png"
     override val language = "it"
+    private const val MAX_SEARCH_RESULTS = 60
 
-    private val service = StreamingCommunityService.build()
+    private var service = StreamingCommunityService.build("https://$domain/")
+
+    fun rebuildService(newDomain: String = domain) {
+        service = StreamingCommunityService.build("https://$newDomain/")
+    }
 
     private var version: String = ""
         get() {
@@ -48,7 +79,7 @@ object StreamingCommunityProvider : Provider {
     private fun getImageLink(filename: String?): String? {
         if (filename.isNullOrEmpty())
             return null
-        return "https://cdn.$DOMAIN/images/$filename"
+        return "https://cdn.$domain/images/$filename"
     }
 
     override suspend fun getHome(): List<Category> {
@@ -159,25 +190,22 @@ object StreamingCommunityProvider : Provider {
         if (page > 1)
             return listOf()
 
-        val res = service.getMovies(version = version)
-        if (version != res.version) version = res.version
+        val res = service.getArchive(type = "movie", version = version)
 
         val movies = mutableListOf<Movie>()
 
-        res.props.sliders.map {
-            it.titles.map { title ->
-                val poster = getImageLink(title.images.find { it.type == "poster" }?.filename)
+        res.titles.map { title ->
+            val poster = getImageLink(title.images.find { it.type == "poster" }?.filename)
 
-                movies.add(
-                    Movie(
-                        id = title.id + "-" + title.slug,
-                        title = title.name,
-                        released = title.lastAirDate,
-                        rating = title.score,
-                        poster = poster
-                    )
+            movies.add(
+                Movie(
+                    id = title.id + "-" + title.slug,
+                    title = title.name,
+                    released = title.lastAirDate,
+                    rating = title.score,
+                    poster = poster
                 )
-            }
+            )
         }
 
         return movies.distinctBy { it.id }
@@ -187,25 +215,22 @@ object StreamingCommunityProvider : Provider {
         if (page > 1)
             return listOf()
 
-        val res = service.getTvSeries(version = version)
-        if (version != res.version) version = res.version
+        val res = service.getArchive(type = "tv", version = version)
 
         val tvShows = mutableListOf<TvShow>()
 
-        res.props.sliders.map {
-            it.titles.map { title ->
-                val poster = getImageLink(title.images.find { it.type == "poster" }?.filename)
+        res.titles.map { title ->
+            val poster = getImageLink(title.images.find { it.type == "poster" }?.filename)
 
-                tvShows.add(
-                    TvShow(
-                        id = title.id + "-" + title.slug,
-                        title = title.name,
-                        released = title.lastAirDate,
-                        rating = title.score,
-                        poster = poster
-                    )
+            tvShows.add(
+                TvShow(
+                    id = title.id + "-" + title.slug,
+                    title = title.name,
+                    released = title.lastAirDate,
+                    rating = title.score,
+                    poster = poster
                 )
-            }
+            )
         }
 
         return tvShows.distinctBy { it.id }
@@ -244,22 +269,27 @@ object StreamingCommunityProvider : Provider {
                 else
                     null
             },
-            recommendations = res.props.sliders[0].titles.map {
-                if (it.type == "movie") {
-                    Movie(
-                        id = it.id + "-" + it.slug,
-                        title = it.name,
-                        rating = it.score,
-                        poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
-                    )
-                } else {
-                    TvShow(
-                        id = it.id + "-" + it.slug,
-                        title = it.name,
-                        rating = it.score,
-                        poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
-                    )
-                }
+            recommendations = let {
+                if (res.props.sliders.isNotEmpty())
+                    res.props.sliders[0].titles.map {
+                        if (it.type == "movie") {
+                            Movie(
+                                id = it.id + "-" + it.slug,
+                                title = it.name,
+                                rating = it.score,
+                                poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
+                            )
+                        } else {
+                            TvShow(
+                                id = it.id + "-" + it.slug,
+                                title = it.name,
+                                rating = it.score,
+                                poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
+                            )
+                        }
+                    }
+                else
+                    listOf()
             }
         )
     }
@@ -296,26 +326,31 @@ object StreamingCommunityProvider : Provider {
                 else
                     null
             },
-            recommendations = res.props.sliders[0].titles.map {
-                if (it.type == "movie") {
-                    Movie(
-                        id = it.id + "-" + it.slug,
-                        title = it.name,
-                        rating = it.score,
-                        poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
-                    )
-                } else {
-                    TvShow(
-                        id = it.id + "-" + it.slug,
-                        title = it.name,
-                        rating = it.score,
-                        poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
-                    )
-                }
+            recommendations = let {
+                if (res.props.sliders.isNotEmpty())
+                    res.props.sliders[0].titles.map {
+                        if (it.type == "movie") {
+                            Movie(
+                                id = it.id + "-" + it.slug,
+                                title = it.name,
+                                rating = it.score,
+                                poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
+                            )
+                        } else {
+                            TvShow(
+                                id = it.id + "-" + it.slug,
+                                title = it.name,
+                                rating = it.score,
+                                poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
+                            )
+                        }
+                    }
+                else
+                    listOf()
             },
             seasons = title.seasons?.map {
                 Season(
-                    id = "$id/stagione-${it.number}",
+                    id = "$id/season-${it.number}",
                     number = it.number.toIntOrNull() ?: (title.seasons.indexOf(it) + 1),
                     title = it.name
                 )
@@ -340,24 +375,13 @@ object StreamingCommunityProvider : Provider {
 
 
     override suspend fun getGenre(id: String, page: Int): Genre {
-        val res = service.getGenre(id, version = version)
-        if (res.version != null && res.version != version) version = res.version
-
-
-        if (page > 1) {
-            return Genre(
-                id = id,
-                name = ""
-            )
-        }
-
-        val titles = res.titles ?: res.props.titles
+        val res = service.getArchive(genreId = id, offset = (page - 1) * MAX_SEARCH_RESULTS, version = version)
 
         val genre = Genre(
             id = id,
-            name = res.props.genres?.find { it.id == id }?.name ?: "",
+            name = "",
 
-            shows = titles.map {
+            shows = res.titles.map {
                 val poster = getImageLink(it.images.find { it.type == "poster" }?.filename)
 
                 if (it.type == "movie")
@@ -444,17 +468,54 @@ object StreamingCommunityProvider : Provider {
     }
 
 
+    private class UserAgentInterceptor(private val userAgent: String) : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val originalRequest = chain.request()
+            val requestWithUserAgent = originalRequest.newBuilder()
+                .header("User-Agent", userAgent)
+                .build()
+            return chain.proceed(requestWithUserAgent)
+        }
+    }
+
+    private class RedirectInterceptor : Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+            val response = chain.proceed(chain.request())
+            val location = response.header("Location")
+            if (!location.isNullOrEmpty()) {
+                domain = location
+                    .substringAfter("https://")
+                    .substringBefore("/")
+            }
+            return response
+        }
+    }
+
     private interface StreamingCommunityService {
 
         companion object {
-            fun build(): StreamingCommunityService {
-                val client = OkHttpClient.Builder()
+            private const val USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+
+            fun build(baseUrl: String): StreamingCommunityService {
+                val clientBuilder = OkHttpClient.Builder()
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
-                    .build()
+                    .addInterceptor(UserAgentInterceptor(USER_AGENT))
+                    .addNetworkInterceptor(RedirectInterceptor())
+
+                if (UserPreferences.streamingcommunityDnsOverHttps) {
+                    val bootstrapClient = OkHttpClient.Builder().build()
+                    val dohDns = DnsOverHttps.Builder().client(bootstrapClient)
+                        .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
+                        .build()
+
+                    clientBuilder.dns(dohDns)
+                }
+
+                val client = clientBuilder.build()
 
                 val retrofit = Retrofit.Builder()
-                    .baseUrl(URL)
+                    .baseUrl(baseUrl)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
@@ -465,10 +526,10 @@ object StreamingCommunityProvider : Provider {
         }
 
 
-        @GET("/")
+        @GET("/$lang")
         suspend fun getHome(): Document
 
-        @GET("/")
+        @GET("/$lang")
         suspend fun getHome(
             @Header("x-inertia") xInertia: String = "true",
             @Header("x-inertia-version") version: String
@@ -477,46 +538,38 @@ object StreamingCommunityProvider : Provider {
         @GET("api/search")
         suspend fun search(
             @Query("q", encoded = true) keyword: String,
-            @Query("offset") offset: Int = 0
+            @Query("offset") offset: Int = 0,
+            @Query("lang") language: String = lang
         ): SearchRes
 
-        @GET("film")
-        suspend fun getMovies(
+        @GET("api/archive")
+        suspend fun getArchive(
+            @Query("genre[]") genreId: String? = null,
+            @Query("type") type: String? = null,
+            @Query("offset") offset: Int = 0,
             @Header("x-inertia") xInertia: String = "true",
-            @Header("x-inertia-version") version: String
-        ): HomeRes
+            @Header("x-inertia-version") version: String,
+            @Query("lang") language: String = lang
+        ): ArchiveRes
 
-        @GET("serie-tv")
-        suspend fun getTvSeries(
-            @Header("x-inertia") xInertia: String = "true",
-            @Header("x-inertia-version") version: String
-        ): HomeRes
-
-        @GET("titles/{id}")
+        @GET("$lang/titles/{id}")
         suspend fun getDetails(
             @Path("id") id: String,
             @Header("x-inertia") xInertia: String = "true",
             @Header("x-inertia-version") version: String
         ): HomeRes
 
-        @GET("titles/{id}")
+        @GET("$lang/titles/{id}/")
         suspend fun getSeasonDetails(
             @Path("id") id: String,
             @Header("x-inertia") xInertia: String = "true",
             @Header("x-inertia-version") version: String
         ): SeasonRes
 
-        @GET("archivio")
-        suspend fun getGenre(
-            @Query("genre[]") id: String,
-            @Header("x-inertia") xInertia: String = "true",
-            @Header("x-inertia-version") version: String
-        ): ArchiveRes
-
-        @GET("iframe/{id}")
+        @GET("$lang/iframe/{id}")
         suspend fun getIframe(@Path("id") id: String): Document
 
-        @GET("iframe/{id}")
+        @GET("$lang/iframe/{id}")
         suspend fun getIframe(@Path("id") id: String,
                               @Query("episode_id") episodeId: String,
                               @Query("next_episode") nextEpisode: Char = '1'
@@ -594,14 +647,8 @@ object StreamingCommunityProvider : Provider {
             val props: SeasonProps
         )
 
-        data class ArchiveProps(
-            val titles: List<Show>,
-            val genres: List<Genre>?
-        )
         data class ArchiveRes(
-            val titles: List<Show>?,
-            val version: String?,
-            val props: ArchiveProps
+            val titles: List<Show>
         )
     }
 }

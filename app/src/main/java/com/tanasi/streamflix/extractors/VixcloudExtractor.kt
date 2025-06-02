@@ -36,6 +36,11 @@ class VixcloudExtractor : Extractor() {
             .substringBefore("}")
             .substringBeforeLast(",") + "}"
 
+        val hasBParam = scriptText
+            .substringAfter("url:")
+            .substringBefore(",")
+            .contains("b=1")
+
         val gson = Gson()
         val windowVideo = gson.fromJson(videoJson, VixcloudExtractorService.WindowVideo::class.java)
         val masterPlaylist = gson.fromJson(masterPlaylistJson, VixcloudExtractorService.WindowParams::class.java)
@@ -53,7 +58,7 @@ class VixcloudExtractor : Extractor() {
             .filter { it.size == 2 }
             .associate { it[0] to it[1] }
 
-        if (!currentParams.containsKey("nextEpisode"))
+        if (hasBParam)
             masterParams["b"] = "1"
 
         if (currentParams.containsKey("canPlayFHD"))

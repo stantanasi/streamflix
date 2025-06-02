@@ -26,6 +26,10 @@ object UserPreferences {
         get() = providers.find { it.name == Key.CURRENT_PROVIDER.getString() }
         set(value) = Key.CURRENT_PROVIDER.setString(value?.name)
 
+    var currentLanguage: String?
+        get() = Key.CURRENT_LANGUAGE.getString()
+        set(value) = Key.CURRENT_LANGUAGE.setString(value)
+
     var captionTextSize: Float
         get() = Key.CAPTION_TEXT_SIZE.getFloat()
             ?: PlayerSettingsView.Settings.Subtitle.Style.TextSize.DEFAULT.value
@@ -83,9 +87,18 @@ object UserPreferences {
             Key.SUBTITLE_NAME.setString(value)
         }
 
+    var streamingcommunityDomain: String?
+        get() = Key.STREAMINGCOMMUNITY_DOMAIN.getString()
+        set(value) = Key.STREAMINGCOMMUNITY_DOMAIN.setString(value)
+
+    var streamingcommunityDnsOverHttps: Boolean
+        get() = Key.STREAMINGCOMMUNITY_DNS_OVER_HTTPS.getBoolean()?: true
+        set(value) = Key.STREAMINGCOMMUNITY_DNS_OVER_HTTPS.setBoolean(value)
+
 
     private enum class Key {
         APP_LAYOUT,
+        CURRENT_LANGUAGE,
         CURRENT_PROVIDER,
         PLAYER_RESIZE,
         CAPTION_TEXT_SIZE,
@@ -95,7 +108,9 @@ object UserPreferences {
         CAPTION_STYLE_EDGE_TYPE,
         CAPTION_STYLE_EDGE_COLOR,
         QUALITY_HEIGHT,
-        SUBTITLE_NAME;
+        SUBTITLE_NAME,
+        STREAMINGCOMMUNITY_DOMAIN,
+        STREAMINGCOMMUNITY_DNS_OVER_HTTPS;
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)

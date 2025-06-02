@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tanasi.streamflix.models.Provider
 import com.tanasi.streamflix.providers.Provider.Companion.providers
+import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,7 @@ class ProvidersViewModel : ViewModel() {
     }
 
     init {
-        getProviders()
+        getProviders(UserPreferences.currentLanguage)
     }
 
 

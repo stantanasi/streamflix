@@ -101,6 +101,16 @@
                 android:padding="12dp"
                 android:text="@string/option_show_watched"
                 android:textColor="@color/option_text" />
+            <TextView
+                android:id="@+id/btn_option_episode_mark_all_previous_watched"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_item_option"
+                android:gravity="center_vertical"
+                android:padding="12dp"
+                android:text="@string/option_show_mark_all_previous_watched"
+                android:textColor="@color/option_text" />
 
             <TextView
                 android:id="@+id/btn_option_program_clear"

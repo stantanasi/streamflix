@@ -52,6 +52,8 @@ interface Provider {
             OtakufrProvider,
             WiflixProvider,
             MStreamProvider,
+            FrenchAnimeProvider,
+            FilmPalastProvider,
         )
     }
 }

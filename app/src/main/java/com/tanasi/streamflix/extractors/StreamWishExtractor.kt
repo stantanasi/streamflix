@@ -27,13 +27,28 @@ open class StreamWishExtractor : Extractor() {
             ?.let { JsUnpacker(it).unpack() }
             ?: throw Exception("Can't retrieve script")
 
-        val source = Regex("file:\\s*\"(.*?m3u8.*?)\"").find(script)
-            ?.groupValues?.getOrNull(1)
+        val source = Regex("\"hls\\d+\":\\s*\"(.*?m3u8.*?)\"").findAll(script)
+            .map { it.groupValues.getOrNull(1) }
+            .firstOrNull()
             ?: throw Exception("Can't retrieve m3u8")
+
+        val subtitles = Regex("file:\\s*\"(.*?)\"(?:,label:\\s*\"(.*?)\")?,kind:\\s*\"(.*?)\"").findAll(
+            Regex("tracks:\\s*\\[(.*?)]").find(script)
+                ?.groupValues?.get(1)
+                ?: ""
+        )
+            .filter { it.groupValues[3] == "captions" }
+            .map {
+                Video.Subtitle(
+                    label = it.groupValues[2],
+                    file = it.groupValues[1],
+                )
+            }
+            .toList()
 
         val video = Video(
             source = source,
-            subtitles = emptyList(),
+            subtitles = subtitles,
         )
 
         return video

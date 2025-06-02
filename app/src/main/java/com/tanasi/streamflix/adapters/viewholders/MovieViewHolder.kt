@@ -10,6 +10,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
@@ -151,6 +152,7 @@ class MovieViewHolder(
         Glide.with(context)
             .load(movie.poster)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivMoviePoster)
 
         binding.tvMovieQuality.apply {
@@ -243,6 +245,7 @@ class MovieViewHolder(
             .load(movie.poster)
             .fallback(R.drawable.glide_fallback_cover)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivMoviePoster)
 
         binding.pbMovieProgress.apply {
@@ -308,6 +311,7 @@ class MovieViewHolder(
         Glide.with(context)
             .load(movie.poster)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivMoviePoster)
 
         binding.tvMovieQuality.apply {
@@ -382,6 +386,7 @@ class MovieViewHolder(
             .load(movie.poster)
             .fallback(R.drawable.glide_fallback_cover)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivMoviePoster)
 
         binding.pbMovieProgress.apply {
@@ -415,6 +420,7 @@ class MovieViewHolder(
         Glide.with(context)
             .load(movie.banner)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivSwiperBackground)
 
         binding.tvSwiperTitle.text = movie.title
@@ -487,6 +493,7 @@ class MovieViewHolder(
         binding.ivMoviePoster.run {
             Glide.with(context)
                 .load(movie.poster)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
             visibility = when {
                 movie.poster.isNullOrEmpty() -> View.GONE
@@ -617,6 +624,7 @@ class MovieViewHolder(
         binding.ivMoviePoster.run {
             Glide.with(context)
                 .load(movie.poster)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
             visibility = when {
                 movie.poster.isNullOrEmpty() -> View.GONE

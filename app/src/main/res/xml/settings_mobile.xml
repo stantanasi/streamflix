@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="@string/settings_category_streamingcommunity">
+        <EditTextPreference
+            android:key="p_settings_streamingcommunity_domain"
+            android:title="@string/settings_category_streamingcommunity_domain"
+            android:inputType="text"/>
+        <SwitchPreference
+            android:key="p_settings_streamingcommunity_dnsOverHttps"
+            android:title="@string/settings_category_streamingcommunity_dnsOverHttps" />
+    </PreferenceCategory>
 
     <Preference
         android:icon="@drawable/ic_settings_about"

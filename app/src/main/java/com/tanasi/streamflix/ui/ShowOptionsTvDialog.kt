@@ -129,6 +129,37 @@ class ShowOptionsTvDialog(
             }
             visibility = View.VISIBLE
         }
+        binding.btnOptionEpisodeMarkAllPreviousWatched.apply {
+            setOnClickListener {
+                val episodeDao = database.episodeDao()
+                val episodeNumber = episode.number
+                val tvShowId = episode.tvShow?.id ?: return@setOnClickListener
+                val allEpisodes = episodeDao.getEpisodesByTvShowId(tvShowId)
+
+                val targetState = !episode.isWatched // If current is watched, we unwatch; else, we mark watched
+                val now = Calendar.getInstance()
+
+                for (ep in allEpisodes) {
+                    if (ep.number <= episodeNumber && ep.isWatched != targetState) {
+                        episodeDao.save(ep.copy().apply {
+                            merge(ep)
+                            isWatched = targetState
+                            watchedDate = if (targetState) now else null
+                            watchHistory = if (targetState) null else watchHistory
+                        })
+                    }
+                }
+
+                hide()
+            }
+
+            text = when {
+                episode.isWatched -> context.getString(R.string.option_show_mark_all_previous_unwatched)
+                else -> context.getString(R.string.option_show_mark_all_previous_watched)
+            }
+            visibility = View.VISIBLE
+        }
+4
 
         binding.btnOptionProgramClear.apply {
             setOnClickListener {

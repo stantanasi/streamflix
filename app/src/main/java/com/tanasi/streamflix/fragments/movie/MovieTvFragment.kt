@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentMovieTvBinding
@@ -95,6 +96,7 @@ class MovieTvFragment : Fragment() {
     private fun displayMovie(movie: Movie) {
         Glide.with(requireContext())
             .load(movie.banner)
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivMovieBanner)
 
         appAdapter.submitList(listOfNotNull(

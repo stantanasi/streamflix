@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentTvShowMobileBinding
@@ -98,6 +99,7 @@ class TvShowMobileFragment : Fragment() {
     private fun displayTvShow(tvShow: TvShow) {
         Glide.with(requireContext())
             .load(tvShow.banner)
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivTvShowBanner)
 
         appAdapter.submitList(listOfNotNull(

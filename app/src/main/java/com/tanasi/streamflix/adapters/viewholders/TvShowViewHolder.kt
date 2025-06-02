@@ -10,6 +10,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
@@ -140,6 +141,7 @@ class TvShowViewHolder(
         Glide.with(context)
             .load(tvShow.poster)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivTvShowPoster)
 
         binding.tvTvShowQuality.apply {
@@ -216,6 +218,7 @@ class TvShowViewHolder(
             .load(tvShow.poster)
             .fallback(R.drawable.glide_fallback_cover)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivTvShowPoster)
 
         binding.tvTvShowQuality.apply {
@@ -282,6 +285,7 @@ class TvShowViewHolder(
         Glide.with(context)
             .load(tvShow.poster)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivTvShowPoster)
 
         binding.tvTvShowQuality.apply {
@@ -357,6 +361,7 @@ class TvShowViewHolder(
             .load(tvShow.poster)
             .fallback(R.drawable.glide_fallback_cover)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivTvShowPoster)
 
         binding.tvTvShowQuality.apply {
@@ -392,6 +397,7 @@ class TvShowViewHolder(
         Glide.with(context)
             .load(tvShow.banner)
             .centerCrop()
+            .transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.ivSwiperBackground)
 
         binding.tvSwiperTitle.text = tvShow.title
@@ -471,6 +477,7 @@ class TvShowViewHolder(
         binding.ivTvShowPoster.run {
             Glide.with(context)
                 .load(tvShow.poster)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
             visibility = when {
                 tvShow.poster.isNullOrEmpty() -> View.GONE
@@ -656,6 +663,7 @@ class TvShowViewHolder(
         binding.ivTvShowPoster.run {
             Glide.with(context)
                 .load(tvShow.poster)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(this)
             visibility = when {
                 tvShow.poster.isNullOrEmpty() -> View.GONE
