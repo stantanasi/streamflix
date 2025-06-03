@@ -40,7 +40,7 @@
     <string name="option_show_unfavorite">Aus Favoriten entfernen</string>
     <string name="option_show_watched">Als Gesehen markieren</string>
     <string name="option_show_mark_all_previous_watched">Bis hier als Gesehen markieren</string>
-    <string name="option_show_mark_all_previous_unwatched">Bis hierher als ungesehen markieren</string>
+    <string name="option_show_mark_all_previous_unwatched">Bis hier als Ungesehen markieren</string>																						
     <string name="option_show_unwatched">Als Ungesehen markieren</string>
     <string name="option_clear_program">Aus Weiterschauen entfernen</string>
     <string name="option_cancel">Abbrechen</string>
@@ -123,8 +123,8 @@
     <string name="player_settings_caption_style_text_size_1_5">150%</string>
     <string name="player_settings_caption_style_text_size_2">200%</string>
     <string name="player_settings_caption_style_text_size_3">300%</string>
-    <string name="player_settings_caption_style_font_opacity_title">Durchsichtigkeit (Schrift)</string>
-    <string name="player_settings_caption_style_font_opacity_label">Durchsichtigkeit (Schrift)</string>
+    <string name="player_settings_caption_style_font_opacity_title">Deckkraft (Schrift)</string>
+    <string name="player_settings_caption_style_font_opacity_label">Deckkraft (Schrift)</string>
     <string name="player_settings_caption_style_font_opacity_0_5">50%</string>
     <string name="player_settings_caption_style_font_opacity_0_75">75%</string>
     <string name="player_settings_caption_style_font_opacity_1">100%</string>
@@ -145,8 +145,8 @@
     <string name="player_settings_caption_style_background_color_magenta">Magenta</string>
     <string name="player_settings_caption_style_background_color_red">Rot</string>
     <string name="player_settings_caption_style_background_color_white">Weiß</string>
-    <string name="player_settings_caption_style_background_opacity_title">Durchsichtigkeit (Hintergrund)</string>
-    <string name="player_settings_caption_style_background_opacity_label">Durchsichtigkeit (Hintergrund)</string>
+    <string name="player_settings_caption_style_background_opacity_title">Deckkraft (Hintergrund)</string>
+    <string name="player_settings_caption_style_background_opacity_label">Deckkraft (Hintergrund)</string>
     <string name="player_settings_caption_style_background_opacity_0">0%</string>
     <string name="player_settings_caption_style_background_opacity_0_25">25%</string>
     <string name="player_settings_caption_style_background_opacity_0_5">50%</string>
@@ -162,8 +162,8 @@
     <string name="player_settings_caption_style_window_color_magenta">Magenta</string>
     <string name="player_settings_caption_style_window_color_red">Rot</string>
     <string name="player_settings_caption_style_window_color_white">Weiß</string>
-    <string name="player_settings_caption_style_window_opacity_title">Durchsichtigkeit (Fenster)</string>
-    <string name="player_settings_caption_style_window_opacity_label">Durchsichtigkeit (Fenster)</string>
+    <string name="player_settings_caption_style_window_opacity_title">Deckkraft (Fenster)</string>
+    <string name="player_settings_caption_style_window_opacity_label">Deckkraft (Fenster)</string>
     <string name="player_settings_caption_style_window_opacity_0">0%</string>
     <string name="player_settings_caption_style_window_opacity_0_25">25%</string>
     <string name="player_settings_caption_style_window_opacity_0_5">50%</string>
@@ -190,4 +190,8 @@
     <string name="settings_about_version_name">Version %s</string>
     <string name="settings_about_donate">Spenden</string>
     <string name="settings_help">Hilfe</string>
+    <string name="settings_category_streamingcommunity">StreamingCommunity - Einstellungen</string>
+    <string name="settings_category_streamingcommunity_domain">StreamingCommunity - Domain-Name</string>
+    <string name="settings_close_app">App schließen</string>
+    <string name="settings_category_streamingcommunity_dnsOverHttps">Sichere DNS-Auflösung verwenden</string>																																				  																																	
 </resources>

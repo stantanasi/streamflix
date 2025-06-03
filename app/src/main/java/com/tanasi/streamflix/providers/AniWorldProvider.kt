@@ -33,7 +33,7 @@ object AniWorldProvider : Provider {
     private const val URL = "https://aniworld.to/"
 
     override val name = "AniWorld"
-    override val logo = ""
+    override val logo = "$URL/public/img/facebook.jpg"
     override val language = "de"
 
     private val service = Service.build()
