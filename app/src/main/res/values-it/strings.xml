@@ -40,6 +40,7 @@
     <string name="option_show_unfavorite">Rimuovi dai preferiti</string>
     <string name="option_show_watched">Segna come visto</string>
     <string name="option_show_mark_all_previous_watched">Segna come visto fino qui</string>
+    <string name="option_show_mark_all_previous_unwatched">Segna come non visto fino a qui</string>
     <string name="option_show_unwatched">Segna come non visto</string>
     <string name="option_clear_program">Rimuovi da Continua a Guardare</string>
     <string name="option_cancel">Annulla</string>
