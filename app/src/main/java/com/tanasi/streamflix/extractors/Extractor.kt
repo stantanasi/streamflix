@@ -51,6 +51,7 @@ abstract class Extractor {
             VideoSibNetExtractor(),
             SaveFilesExtractor(),
             BigWarpExtractor(),
+            DoodLaExtractor.DoodExtractor(),
         )
 
         suspend fun extract(link: String): Video {

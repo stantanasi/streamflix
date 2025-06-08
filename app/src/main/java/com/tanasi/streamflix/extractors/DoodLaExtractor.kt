@@ -57,6 +57,10 @@ open class DoodLaExtractor : Extractor() {
         override var mainUrl = "https://dood.li"
     }
 
+    class DoodExtractor : DoodLaExtractor() {
+        override val mainUrl = "https://vide0.net"
+    }
+
 
     private interface Service {
 
