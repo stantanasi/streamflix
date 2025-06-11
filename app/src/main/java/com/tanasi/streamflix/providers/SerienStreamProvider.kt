@@ -12,6 +12,10 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import okhttp3.Cache
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
@@ -38,18 +42,16 @@ import java.util.concurrent.TimeUnit
 object SerienStreamProvider : Provider {
 
     private val URL = Base64.decode(
-        "aHR0cHM6Ly9zZXJpZW4=", Base64.NO_WRAP
+        "aHR0cHM6Ly9z", Base64.NO_WRAP
     ).toString(Charsets.UTF_8) + Base64.decode(
-        "c3RyZWFtLnRvLw==", Base64.NO_WRAP
+        "LnRvLw==", Base64.NO_WRAP
     ).toString(Charsets.UTF_8)
     override val name = Base64.decode(
         "U2VyaWVuU3RyZWFt", Base64.NO_WRAP
     ).toString(Charsets.UTF_8)
-
     override val logo =
         "$URL/public/img/logo-sto-serienstream-sx-to-serien-online-streaming-vod.png"
     override val language = "de"
-
     private val service = SerienStreamService.build()
 
     private fun getTvShowIdFromLink(link: String): String {
@@ -122,32 +124,89 @@ object SerienStreamProvider : Provider {
                 Genre(id = it.text().lowercase(Locale.getDefault()), name = it.text())
             }
         }
+        if (!isSeriesCacheLoaded) return emptyList()
+        val lowerQuery = query.trim().lowercase()
+        val filtered = seriesCache.filter { it.title.lowercase().contains(lowerQuery) }
 
-        if (page > 1) return emptyList()
-        return service.search(query).map {
-            TvShow(
-                id = getTvShowIdFromLink(it.link),
-                title = Jsoup.parse(it.title).text(),
-                overview = Jsoup.parse(it.description).text(),
-            )
-        }
+        val fromIndex = (page - 1) * chunkSize
+        if (fromIndex >= filtered.size) return emptyList()
+        val toIndex = minOf(fromIndex + chunkSize, filtered.size)
+        return filtered.subList(fromIndex, toIndex)
+
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
         throw Exception("Keine Filme verfügbar")
     }
 
+    private var preloadJob: Job? = null
+
+    private val cacheLock = Any()
+
     override suspend fun getTvShows(page: Int): List<TvShow> {
-        if (page > 1) return emptyList()
-        val document = service.getSeriesListAlphabet()
-        return document.select(".genre > ul > li").map {
-                TvShow(
-                    id = getTvShowIdFromLink(
-                        it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
-                    ), title = it.selectFirst("a[data-alternative-titles]")?.text() ?: ""
-                )
+        val fromIndex = (page - 1) * chunkSize
+        val toIndex = page * chunkSize
+
+        if (!isSeriesCacheLoaded) {
+            val document = service.getSeriesListAlphabet()
+            val elements = document.select(".genre > ul > li")
+
+            synchronized(cacheLock) {
+                seriesCache.clear()
             }
+
+            val immediateLoad = elements.take(toIndex)
+            synchronized(cacheLock) {
+                immediateLoad.forEach {
+                    val link = it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
+                    seriesCache.add(
+                        TvShow(
+                            id = getTvShowIdFromLink(link),
+                            title = it.selectFirst("a[data-alternative-titles]")?.text() ?: "",
+                            overview = ""
+                        )
+                    )
+                }
+            }
+
+            preloadJob = CoroutineScope(Dispatchers.IO).launch {
+                val remaining = elements.drop(toIndex)
+                synchronized(cacheLock) {
+                    remaining.forEach {
+                        val link = it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
+                        if (link.contains("/serie/stream")) {
+                            seriesCache.add(
+                                TvShow(
+                                    id = getTvShowIdFromLink(link),
+                                    title = it.selectFirst("a[data-alternative-titles]")?.text() ?: "",
+                                    overview = ""
+                                )
+                            )
+                        }
+                    }
+                    isSeriesCacheLoaded = true
+                }
+            }
+        }
+
+        synchronized(cacheLock) {
+            if (fromIndex >= seriesCache.size) return emptyList()
+            val actualToIndex = minOf(toIndex, seriesCache.size)
+            return seriesCache.subList(fromIndex, actualToIndex).toList()
+        }
     }
+
+
+
+    private fun searchCachedSeries(query: String): List<TvShow> {
+        if (!isSeriesCacheLoaded) return emptyList()
+        val lowerQuery = query.trim().lowercase()
+
+        return seriesCache.filter {
+            it.title.lowercase().contains(lowerQuery)
+        }
+    }
+
 
     override suspend fun getMovie(id: String): Movie {
         throw Exception("Keine Filme verfügbar")
@@ -166,17 +225,17 @@ object SerienStreamProvider : Provider {
                 ?.text()?.toDoubleOrNull() ?: 0.0,
 
             directors = document.select(".cast li[itemprop='director']").map {
-                    People(
-                        id = it.selectFirst("a")?.attr("href")?.replace("/serien/", "") ?: "",
-                        name = it.selectFirst("span")?.text() ?: ""
-                    )
-                },
+                People(
+                    id = it.selectFirst("a")?.attr("href")?.replace("/serien/", "") ?: "",
+                    name = it.selectFirst("span")?.text() ?: ""
+                )
+            },
             cast = document.select(".cast li[itemprop='actor']").map {
-                    People(
-                        id = it.selectFirst("a")?.attr("href")?.replace("/serien/", "") ?: "",
-                        name = it.selectFirst("span")?.text() ?: ""
-                    )
-                },
+                People(
+                    id = it.selectFirst("a")?.attr("href")?.replace("/serien/", "") ?: "",
+                    name = it.selectFirst("span")?.text() ?: ""
+                )
+            },
             genres = document.select(".genres li").map {
                 Genre(
                     id = it.selectFirst("a")?.text()?.lowercase(Locale.getDefault()) ?: "",
@@ -219,11 +278,11 @@ object SerienStreamProvider : Provider {
         val shows = mutableListOf<TvShow>()
         val document = service.getGenre(id, page)
         document.select(".seriesListContainer > div").map {
-                shows.add(TvShow(id = it.selectFirst("a")?.attr("href")
-                    ?.let { it1 -> getTvShowIdFromLink(it1) } ?: "",
-                    title = it.selectFirst("h3")?.text() ?: "",
-                    poster = URL + it.selectFirst("img")?.attr("data-src")))
-            }
+            shows.add(TvShow(id = it.selectFirst("a")?.attr("href")
+                ?.let { it1 -> getTvShowIdFromLink(it1) } ?: "",
+                title = it.selectFirst("h3")?.text() ?: "",
+                poster = URL + it.selectFirst("img")?.attr("data-src")))
+        }
         return Genre(id = id, name = id, shows = shows)
     }
 
@@ -233,11 +292,11 @@ object SerienStreamProvider : Provider {
         return People(id = id,
             name = document.selectFirst("h1 strong")?.text() ?: "",
             filmography = document.select(".seriesListContainer > div").map {
-                    TvShow(id = it.selectFirst("a")?.attr("href")
-                        ?.let { it1 -> getTvShowIdFromLink(it1) } ?: "",
-                        title = it.selectFirst("h3")?.text() ?: "",
-                        poster = URL + it.selectFirst("img")?.attr("data-src"))
-                })
+                TvShow(id = it.selectFirst("a")?.attr("href")
+                    ?.let { it1 -> getTvShowIdFromLink(it1) } ?: "",
+                    title = it.selectFirst("h3")?.text() ?: "",
+                    poster = URL + it.selectFirst("img")?.attr("data-src"))
+            })
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
@@ -265,6 +324,42 @@ object SerienStreamProvider : Provider {
         val link = server.id
         return Extractor.extract(link)
     }
+
+    private val seriesCache = mutableListOf<TvShow>()
+    private const val chunkSize = 25
+    private var isSeriesCacheLoaded = false
+
+    suspend fun preloadSeriesAlphabet() {
+        if (isSeriesCacheLoaded) return
+
+        val document = service.getSeriesListAlphabet()
+        val elements = document.select(".genre > ul > li")
+
+        seriesCache.clear()
+        for (element in elements) {
+            val link = element.attr("href")
+            seriesCache.add(
+                TvShow(
+                    id = getTvShowIdFromLink(link),
+                    title = Jsoup.parse(element.text()).text(),
+                    overview = ""
+                )
+            )
+        }
+        isSeriesCacheLoaded = true
+    }
+
+    fun getSeriesChunk(pageIndex: Int): List<TvShow> {
+        val fromIndex = pageIndex * chunkSize
+        if (fromIndex >= seriesCache.size) return emptyList()
+        val toIndex = minOf(fromIndex + chunkSize, seriesCache.size)
+        return seriesCache.subList(fromIndex, toIndex)
+    }
+
+    fun getTotalPages(): Int {
+        return (seriesCache.size + chunkSize - 1) / chunkSize
+    }
+
 
     interface SerienStreamService {
 
