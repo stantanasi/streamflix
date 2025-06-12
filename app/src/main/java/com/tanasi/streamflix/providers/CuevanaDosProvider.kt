@@ -146,9 +146,7 @@ object CuevanaDosProvider : Provider {
         val document = service.search(query)
 
         val items = mutableListOf<AppAdapter.Item>()
-
-        val elements = document.select("div.col article")
-
+        val elements = document.select("div.col article:not(.MovieSidebarItem_item__U15hi):not(.SerieSidebarItem_item__Y_r4w)")
         for (element in elements) {
             val linkElement = element.selectFirst("a")
             val href = linkElement?.attr("href") ?: continue
