@@ -1,8 +1,18 @@
 package com.tanasi.streamflix.providers
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Base64
+import android.util.Log
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.SerienStreamDatabase
+import com.tanasi.streamflix.database.dao.TvShowDao
 import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
@@ -12,9 +22,11 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.UpdateTvShowsWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okhttp3.Cache
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -35,8 +47,13 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Url
 import java.io.File
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 
 object SerienStreamProvider : Provider {
@@ -46,6 +63,7 @@ object SerienStreamProvider : Provider {
     ).toString(Charsets.UTF_8) + Base64.decode(
         "LnRvLw==", Base64.NO_WRAP
     ).toString(Charsets.UTF_8)
+    @SuppressLint("StaticFieldLeak")
     override val name = Base64.decode(
         "U2VyaWVuU3RyZWFt", Base64.NO_WRAP
     ).toString(Charsets.UTF_8)
@@ -53,6 +71,46 @@ object SerienStreamProvider : Provider {
         "$URL/public/img/logo-sto-serienstream-sx-to-serien-online-streaming-vod.png"
     override val language = "de"
     private val service = SerienStreamService.build()
+
+
+    private var tvShowDao: TvShowDao? = null
+    private var isWorkerScheduled = false
+    private lateinit var appContext: Context
+
+    @SuppressLint("StaticFieldLeak")
+    fun initialize(context: Context) {
+        if (tvShowDao == null) {
+            tvShowDao = SerienStreamDatabase.getInstance(context).tvShowDao()
+
+            this.appContext = context.applicationContext
+
+        }
+        if (!isWorkerScheduled) {
+            scheduleUpdateWorker(context)
+            isWorkerScheduled = true
+        }
+    }
+
+    private fun scheduleUpdateWorker(context: Context) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<UpdateTvShowsWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "UpdateTvShowsWorker",
+            ExistingWorkPolicy.KEEP,
+            workRequest
+        )
+    }
+
+    private fun getDao(): TvShowDao {
+        return tvShowDao ?: throw IllegalStateException("SerienStreamProvider not initialized")
+    }
+
 
     private fun getTvShowIdFromLink(link: String): String {
         val linkWithoutStaticPrefix = link.replace("/serie/stream/", "")
@@ -148,53 +206,25 @@ object SerienStreamProvider : Provider {
         val toIndex = page * chunkSize
 
         if (!isSeriesCacheLoaded) {
-            val document = service.getSeriesListAlphabet()
-            val elements = document.select(".genre > ul > li")
-
-            synchronized(cacheLock) {
-                seriesCache.clear()
-            }
-
-            val immediateLoad = elements.take(toIndex)
-            synchronized(cacheLock) {
-                immediateLoad.forEach {
-                    val link = it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
-                    seriesCache.add(
-                        TvShow(
-                            id = getTvShowIdFromLink(link),
-                            title = it.selectFirst("a[data-alternative-titles]")?.text() ?: "",
-                            overview = ""
-                        )
-                    )
-                }
-            }
-
-            preloadJob = CoroutineScope(Dispatchers.IO).launch {
-                val remaining = elements.drop(toIndex)
+            val cachedShows = getDao().getAll().first()
+            if (cachedShows.isNotEmpty()) {
                 synchronized(cacheLock) {
-                    remaining.forEach {
-                        val link = it.selectFirst("a[data-alternative-titles]")?.attr("href") ?: ""
-                        if (link.contains("/serie/stream")) {
-                            seriesCache.add(
-                                TvShow(
-                                    id = getTvShowIdFromLink(link),
-                                    title = it.selectFirst("a[data-alternative-titles]")?.text() ?: "",
-                                    overview = ""
-                                )
-                            )
-                        }
-                    }
+                    seriesCache.clear()
+                    seriesCache.addAll(cachedShows)
                     isSeriesCacheLoaded = true
                 }
+            } else {
+                preloadSeriesAlphabet()
             }
         }
-
+        CoroutineScope(Dispatchers.IO).launch { preloadSeriesAlphabet() }
         synchronized(cacheLock) {
             if (fromIndex >= seriesCache.size) return emptyList()
             val actualToIndex = minOf(toIndex, seriesCache.size)
             return seriesCache.subList(fromIndex, actualToIndex).toList()
         }
     }
+
 
 
 
@@ -300,24 +330,42 @@ object SerienStreamProvider : Provider {
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
+        val servers = mutableListOf<Video.Server>()
         val linkWithSplitData = id.split("/")
         val showName = linkWithSplitData[0]
         val seasonNumber = linkWithSplitData[1]
         val episodeNumber = linkWithSplitData[2]
-
         val document = service.getTvShowEpisodeServers(showName, seasonNumber, episodeNumber)
-        return document.select("div.hosterSiteVideo > ul > li").map {
-            val redirectUrl = URL + it.selectFirst("a")?.attr("href")
-            val serverAfterRedirect = service.getRedirectLink(redirectUrl)
-            val videoUrl = (serverAfterRedirect.raw() as okhttp3.Response).request.url
-            var videoUrlString = videoUrl.toString()
-            if (it.selectFirst("h4")?.text() == "VOE") videoUrlString =
-                "https://voe.sx" + videoUrl.encodedPath
 
-            Video.Server(
-                id = videoUrlString, name = it.selectFirst("h4")?.text() ?: ""
-            )
+        for (element in document.select("div.hosterSiteVideo > ul > li")) {
+            val serverName = element.selectFirst("h4")?.text() ?: "Unknown server"
+            val href = element.selectFirst("a")?.attr("href") ?: "No href"
+            try {
+                val redirectUrl = URL + href
+
+                val serverAfterRedirect = try {
+                    service.getRedirectLink(redirectUrl)
+                } catch (exception: Exception) {
+                    val unsafeOkHttpClient = SerienStreamService.buildUnsafe()
+                    unsafeOkHttpClient.getRedirectLink(redirectUrl)
+                }
+                val videoUrl = (serverAfterRedirect.raw() as okhttp3.Response).request.url
+                var videoUrlString = videoUrl.toString()
+                if (serverName == "VOE") {
+                    videoUrlString = "https://voe.sx" + videoUrl.encodedPath
+                }
+                servers.add(
+                    Video.Server(
+                        id = videoUrlString,
+                        name = serverName
+                    )
+                )
+            }catch (e: Exception) {
+                Log.e("SerienStreamProvider","Failed to process server '$serverName' with URL '$href'")
+            }
         }
+        return servers
+
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
@@ -329,24 +377,42 @@ object SerienStreamProvider : Provider {
     private const val chunkSize = 25
     private var isSeriesCacheLoaded = false
 
-    suspend fun preloadSeriesAlphabet() {
-        if (isSeriesCacheLoaded) return
-
+    private suspend fun preloadSeriesAlphabet() {
         val document = service.getSeriesListAlphabet()
         val elements = document.select(".genre > ul > li")
 
-        seriesCache.clear()
-        for (element in elements) {
-            val link = element.attr("href")
-            seriesCache.add(
-                TvShow(
-                    id = getTvShowIdFromLink(link),
-                    title = Jsoup.parse(element.text()).text(),
-                    overview = ""
-                )
+        val loadedShows = elements.map {
+            val title = Jsoup.parse(it.text()).text()
+            TvShow(
+                id = getTvShowIdFromLink(it.selectFirst("a")?.attr("href") ?: ""),
+                title = title,
+                overview = "",
             )
         }
+
+        val dao = getDao()
+        val existingIds = dao.getAllIds()
+        val newShows = loadedShows.filter { it.id !in existingIds }
+
+        if (newShows.isNotEmpty()) {
+            dao.insertAll(newShows)
+
+            synchronized(cacheLock) {
+                seriesCache.addAll(newShows)
+            }
+        }
+
         isSeriesCacheLoaded = true
+
+        scheduleUpdateWorker(appContext)
+    }
+
+
+    fun invalidateCache() {
+        synchronized(cacheLock) {
+            seriesCache.clear()
+            isSeriesCacheLoaded = false
+        }
     }
 
     fun getSeriesChunk(pageIndex: Int): List<TvShow> {
@@ -368,24 +434,82 @@ object SerienStreamProvider : Provider {
 
             private fun getOkHttpClient(): OkHttpClient {
                 val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
-                val clientBuilder = Builder().cache(appCache).readTimeout(30, TimeUnit.SECONDS)
+                val clientBuilder = OkHttpClient.Builder()
+                    .cache(appCache)
+                    .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
                 val client = clientBuilder.build()
 
-                val dns =
-                    DnsOverHttps.Builder().client(client).url(DNS_QUERY_URL.toHttpUrl()).build()
-                val clientToReturn = clientBuilder.dns(dns).build()
-                return clientToReturn
+                val dns = DnsOverHttps.Builder()
+                    .client(client)
+                    .url(DNS_QUERY_URL.toHttpUrl())
+                    .build()
+                return clientBuilder
+                    .dns(dns)
+                    .build()
+            }
+
+            private fun getUnsafeOkHttpClient(): OkHttpClient {
+                try {
+                    val trustAllCerts = arrayOf<TrustManager>(
+                        object : X509TrustManager {
+                            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
+                            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
+                            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+                        }
+                    )
+                    val sslContext = SSLContext.getInstance("SSL")
+                    sslContext.init(null, trustAllCerts, SecureRandom())
+                    val sslSocketFactory = sslContext.socketFactory
+
+                    val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
+                    val clientBuilder = OkHttpClient.Builder()
+                        .cache(appCache)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
+                        .hostnameVerifier { _, _ -> true }
+
+                    val client = clientBuilder.build()
+
+                    val dns = DnsOverHttps.Builder()
+                        .client(client)
+                        .url(DNS_QUERY_URL.toHttpUrl())
+                        .build()
+
+                    return clientBuilder
+                        .dns(dns)
+                        .followRedirects(true)
+                        .followSslRedirects(true)
+                        .build()
+                } catch (e: Exception) {
+                    throw RuntimeException(e)
+                }
             }
 
             fun build(): SerienStreamService {
                 val client = getOkHttpClient()
-                val retrofit = Retrofit.Builder().baseUrl(URL)
+                val retrofit = Retrofit.Builder()
+                    .baseUrl(URL)
                     .addConverterFactory(JsoupConverterFactory.create())
-                    .addConverterFactory(GsonConverterFactory.create()).client(client).build()
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(client)
+                    .build()
+                return retrofit.create(SerienStreamService::class.java)
+            }
+
+            fun buildUnsafe(): SerienStreamService {
+                val client = getUnsafeOkHttpClient()
+                val retrofit = Retrofit.Builder()
+                    .baseUrl(URL)
+                    .addConverterFactory(JsoupConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(client)
+                    .build()
                 return retrofit.create(SerienStreamService::class.java)
             }
         }
+
 
         @GET(".")
         suspend fun getHome(): Document
@@ -428,7 +552,12 @@ object SerienStreamProvider : Provider {
         suspend fun getCustomUrl(@Url url: String): Document
 
         @GET
-        @Headers("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+        @Headers(
+            "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language: en-US,en;q=0.5",
+            "Connection: keep-alive"
+        )
         suspend fun getRedirectLink(@Url url: String): Response<ResponseBody>
 
         data class SearchItem(

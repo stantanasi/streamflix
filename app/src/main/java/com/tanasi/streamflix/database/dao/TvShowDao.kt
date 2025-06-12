@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.database.dao
 
 import androidx.room.Dao
+import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -28,6 +29,18 @@ interface TvShowDao {
 
     @Update
     fun update(tvShow: TvShow)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAll(tvShows: List<TvShow>)
+
+    @Query("SELECT * FROM tv_shows")
+    fun getAll(): Flow<List<TvShow>>
+
+    @Query("SELECT * FROM tv_shows WHERE poster IS NULL or poster = ''")
+    suspend fun getAllWithNullPoster(): List<TvShow>
+
+    @Query("SELECT id FROM tv_shows")
+    suspend fun getAllIds(): List<String>
 
     fun save(tvShow: TvShow) = getById(tvShow.id)
         ?.let { update(tvShow) }
