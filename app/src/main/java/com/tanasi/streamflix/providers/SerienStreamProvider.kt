@@ -182,16 +182,14 @@ object SerienStreamProvider : Provider {
                 Genre(id = it.text().lowercase(Locale.getDefault()), name = it.text())
             }
         }
-        if (!isSeriesCacheLoaded) return emptyList()
-        val lowerQuery = query.trim().lowercase()
-        val filtered = seriesCache.filter { it.title.lowercase().contains(lowerQuery) }
-
-        val fromIndex = (page - 1) * chunkSize
-        if (fromIndex >= filtered.size) return emptyList()
-        val toIndex = minOf(fromIndex + chunkSize, filtered.size)
-        return filtered.subList(fromIndex, toIndex)
-
+        val lowerQuery = query.trim().lowercase(Locale.getDefault())
+        val limit = chunkSize
+        val offset = (page - 1) * chunkSize
+        val results = getDao().searchTvShows(lowerQuery, limit, offset)
+        return results
     }
+
+
 
     override suspend fun getMovies(page: Int): List<Movie> {
         throw Exception("Keine Filme verfügbar")
@@ -389,23 +387,23 @@ object SerienStreamProvider : Provider {
                 overview = "",
             )
         }
-
         val dao = getDao()
         val existingIds = dao.getAllIds()
         val newShows = loadedShows.filter { it.id !in existingIds }
 
         if (newShows.isNotEmpty()) {
             dao.insertAll(newShows)
-
-            synchronized(cacheLock) {
-                seriesCache.addAll(newShows)
-            }
         }
-
-        isSeriesCacheLoaded = true
+        val allShows = dao.getAll().first()
+        synchronized(cacheLock) {
+            seriesCache.clear()
+            seriesCache.addAll(allShows)
+            isSeriesCacheLoaded = true
+        }
 
         scheduleUpdateWorker(appContext)
     }
+
 
 
     fun invalidateCache() {

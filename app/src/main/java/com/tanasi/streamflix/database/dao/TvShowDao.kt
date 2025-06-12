@@ -42,6 +42,9 @@ interface TvShowDao {
     @Query("SELECT id FROM tv_shows")
     suspend fun getAllIds(): List<String>
 
+    @Query("SELECT * FROM tv_shows WHERE LOWER(title) LIKE '%' || :query || '%' LIMIT :limit OFFSET :offset")
+    suspend fun searchTvShows(query: String, limit: Int, offset: Int): List<TvShow>
+
     fun save(tvShow: TvShow) = getById(tvShow.id)
         ?.let { update(tvShow) }
         ?: insert(tvShow)
