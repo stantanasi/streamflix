@@ -25,6 +25,7 @@ class AniWorldUpdateTvShowWorker(
     companion object {
         private const val PREFS_NAME = "AniWorldUpdateTvShowsPrefs"
         private const val KEY_PROCESSED_FILE = "processed_aniworld_tvshows_json"
+        private const val AFTER_BOOTUP_ANIWORLD ="after_bootup_aniworld"
     }
 
     private val dao = AniWorldDatabase.getInstance(context).tvShowDao()
@@ -35,63 +36,64 @@ class AniWorldUpdateTvShowWorker(
         try {
             val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val hasProcessedFile = prefs.getBoolean(KEY_PROCESSED_FILE, false)
-            val file = File(applicationContext.filesDir, "aniworld_tvshows.json")
+            val isAfterBootUp = prefs.getBoolean(AFTER_BOOTUP_ANIWORLD, false)
+            val assetManager = applicationContext.assets
+            val inputStream = assetManager.open("aniworld_tvshows.json")
+
+            val jsonString = inputStream.bufferedReader().use { it.readText() }
             val semaphore = Semaphore(30)
-
-            if (file.exists() && !hasProcessedFile) {
-                try {
-                    val json = file.readText()
-                    val listType = object : TypeToken<List<TvShow>>() {}.type
-                    val tvShowsFromJson: List<TvShow> = gson.fromJson(json, listType) ?: emptyList()
-
-                    val updateJobs = tvShowsFromJson.map { show ->
-                        async {
-                            semaphore.withPermit {
-                                val existing = dao.getById(show.id)
-                                if (existing != null && existing.poster == null) {
-                                    val updated = existing.copy(
-                                        poster = show.poster,
-                                        overview = show.overview
-                                    )
-                                    dao.update(updated)
-                                    Log.d("AniWorldWorker", "Updated from JSON: ${show.title}")
+            if (isAfterBootUp) {
+                if (!hasProcessedFile) {
+                    try {
+                        val listType = object : TypeToken<List<TvShow>>() {}.type
+                        val tvShowsFromJson: List<TvShow> =
+                            gson.fromJson(jsonString, listType) ?: emptyList()
+                        val updateJobs = tvShowsFromJson.map { show ->
+                            async {
+                                semaphore.withPermit {
+                                    val existing = dao.getById(show.id)
+                                    if (existing != null && existing.poster == null) {
+                                        val updated = existing.copy(
+                                            poster = show.poster,
+                                            overview = show.overview
+                                        )
+                                        dao.update(updated)
+                                        Log.d("AniWorldWorker", "Updated from JSON: ${existing.title}")
+                                    }
                                 }
                             }
                         }
+                        updateJobs.awaitAll()
+                        prefs.edit() { putBoolean(KEY_PROCESSED_FILE, true) }
+                        AniWorldProvider.invalidateCache()
+                    } catch (e: Exception) {
+                        Log.e("AniWorldWorker", "Failed to process JSON", e)
                     }
-
-                    updateJobs.awaitAll()
-
-                    prefs.edit() { putBoolean(KEY_PROCESSED_FILE, true) }
-
-                } catch (e: Exception) {
-                    Log.e("AniWorldWorker", "Failed to process JSON", e)
                 }
-                file.delete()
-            }
 
-            val showsToUpdate = dao.getAllWithNullPoster()
-            val jobs = showsToUpdate.map { show ->
-                async {
-                    semaphore.withPermit {
-                        try {
-                            val detailed = provider.getTvShow(show.id)
-                            val updated = show.copy(
-                                poster = detailed.poster,
-                                overview = detailed.overview
-                            )
-                            dao.update(updated)
-                            Log.d("AniWorldWorker", "Updated from provider: ${show.title}")
-                        } catch (e: HttpException) {
-                            Log.w("AniWorldWorker", "404 for ${show.id}")
-                        } catch (e: Exception) {
-                            Log.e("AniWorldWorker", "Error updating ${show.id}", e)
+                val showsToUpdate = dao.getAllWithNullPoster()
+                val jobs = showsToUpdate.map { show ->
+                    async {
+                        semaphore.withPermit {
+                            try {
+                                val detailed = provider.getTvShow(show.id)
+                                val updated = show.copy(
+                                    poster = detailed.poster,
+                                    overview = detailed.overview
+                                )
+                                dao.update(updated)
+                                Log.d("AniWorldWorker", "Updated from provider: ${show.title}")
+                            } catch (e: HttpException) {
+                                Log.w("AniWorldWorker", "404 for ${show.id}")
+                            } catch (e: Exception) {
+                                Log.e("AniWorldWorker", "Error updating ${show.id}", e)
+                            }
                         }
                     }
                 }
+                jobs.awaitAll()
             }
-
-            jobs.awaitAll()
+            prefs.edit() { putBoolean(AFTER_BOOTUP_ANIWORLD, true) }
             AniWorldProvider.invalidateCache()
             Log.d("AniWorldWorker", "All updates completed")
             Result.success()
@@ -100,6 +102,7 @@ class AniWorldUpdateTvShowWorker(
             Log.e("AniWorldWorker", "Worker failed", e)
             Result.retry()
         }
+
     }
 
 }
