@@ -5,7 +5,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 
 object DecryptHelper {
-    private val encodedRegex = Regex("""MKGMa="(.*?)";""", RegexOption.DOT_MATCHES_ALL)
+    private val encodedRegex = Regex("""<script\s+type="application/json">(.*?)</script>""", RegexOption.DOT_MATCHES_ALL)
 
     fun findEncodedRegex(source: String): String? {
         return encodedRegex.find(source)?.groupValues?.getOrNull(1)

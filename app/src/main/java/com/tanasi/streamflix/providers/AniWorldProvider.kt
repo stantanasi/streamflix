@@ -1,7 +1,15 @@
 package com.tanasi.streamflix.providers
 
+import android.content.Context
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.adapters.AppAdapter
+import com.tanasi.streamflix.database.AniWorldDatabase
+import com.tanasi.streamflix.database.dao.TvShowDao
 import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.models.Category
 import com.tanasi.streamflix.models.Episode
@@ -11,6 +19,12 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.AniWorldUpdateTvShowWorker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import org.jsoup.Jsoup
@@ -37,6 +51,48 @@ object AniWorldProvider : Provider {
     override val language = "de"
 
     private val service = Service.build()
+
+    private var tvShowDao: TvShowDao? = null
+    private var isWorkerScheduled = false
+    private lateinit var appContext: Context
+
+    private var preloadJob: Job? = null
+
+    private val cacheLock = Any()
+
+    fun initialize(context: Context) {
+        if (AniWorldProvider.tvShowDao == null) {
+            AniWorldProvider.tvShowDao = AniWorldDatabase.getInstance(context).tvShowDao()
+
+            this.appContext = context.applicationContext
+
+        }
+        if (!AniWorldProvider.isWorkerScheduled) {
+            scheduleUpdateWorker(context)
+            AniWorldProvider.isWorkerScheduled = true
+        }
+    }
+
+
+    private fun scheduleUpdateWorker(context: Context) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val workRequest = OneTimeWorkRequestBuilder<AniWorldUpdateTvShowWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "AniWorldUpdateTvShowWorker",
+            ExistingWorkPolicy.KEEP,
+            workRequest
+        )
+    }
+
+    private fun getDao(): TvShowDao {
+        return tvShowDao ?: throw IllegalStateException("AniWorldProvider not initialized")
+    }
 
     override suspend fun getHome(): List<Category> {
         val document = service.getHome()
@@ -117,16 +173,10 @@ object AniWorldProvider : Provider {
             return genres
         }
 
-        if (page > 1) return emptyList()
-
-        val results = service.search(query).map {
-            TvShow(
-                id = it.link.substringAfter("/anime/stream/"),
-                title = Jsoup.parse(it.title).text(),
-                overview = Jsoup.parse(it.description).text(),
-            )
-        }
-
+        val lowerQuery = query.trim().lowercase(Locale.getDefault())
+        val limit = chunkSize
+        val offset = (page - 1) * chunkSize
+        val results = getDao().searchTvShows(lowerQuery, limit, offset)
         return results
     }
 
@@ -135,22 +185,32 @@ object AniWorldProvider : Provider {
     }
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
-        if (page > 1) return emptyList()
+        val fromIndex = (page - 1) * chunkSize
+        val toIndex = page * chunkSize
 
-        val document = service.getAnimesAlphabet()
-
-        val tvShows = document.select(".genre > ul > li").map {
-            TvShow(
-                id = it.selectFirst("a[data-alternative-title]")
-                    ?.attr("href")?.substringAfter("/anime/stream/")
-                    ?: "",
-                title = it.selectFirst("a[data-alternative-title]")
-                    ?.text()
-                    ?: "",
-            )
+        if (!isSeriesCacheLoaded) {
+            var cachedShows = emptyList<TvShow>()
+            try {
+                cachedShows = getDao().getAll().first()
+            } catch (exception: Exception){
+                // ignore for now
+            }
+            if (cachedShows.isNotEmpty()) {
+                synchronized(cacheLock) {
+                    seriesCache.clear()
+                    seriesCache.addAll(cachedShows)
+                    isSeriesCacheLoaded = true
+                }
+            } else {
+                preloadSeriesAlphabet()
+            }
         }
-
-        return tvShows
+        CoroutineScope(Dispatchers.IO).launch { preloadSeriesAlphabet() }
+        synchronized(cacheLock) {
+            if (fromIndex >= seriesCache.size) return emptyList()
+            val actualToIndex = minOf(toIndex, seriesCache.size)
+            return seriesCache.subList(fromIndex, actualToIndex).toList()
+        }
     }
 
     override suspend fun getMovie(id: String): Movie {
@@ -347,6 +407,61 @@ object AniWorldProvider : Provider {
         }
 
         return Extractor.extract(link)
+    }
+
+
+    private val seriesCache = mutableListOf<TvShow>()
+    private const val chunkSize = 25
+    private var isSeriesCacheLoaded = false
+
+    private suspend fun preloadSeriesAlphabet() {
+        val document = service.getAnimesAlphabet()
+        val elements = document.select(".genre > ul > li")
+
+        val loadedShows = elements.map {
+            val title = Jsoup.parse(it.text()).text()
+            TvShow(
+                id = it.selectFirst("a[data-alternative-title]")
+                    ?.attr("href")?.substringAfter("/anime/stream/")
+                    ?: "",
+                title = it.selectFirst("a[data-alternative-title]")
+                    ?.text()
+                    ?: "",
+                overview = "",
+            )
+        }
+        val dao = getDao()
+        val existingIds = dao.getAllIds()
+        val newShows = loadedShows.filter { it.id !in existingIds }
+
+        if (newShows.isNotEmpty()) {
+            dao.insertAll(newShows)
+        }
+        val allShows = dao.getAll().first()
+        synchronized(cacheLock) {
+            seriesCache.clear()
+            seriesCache.addAll(allShows)
+            isSeriesCacheLoaded = true
+        }
+
+        scheduleUpdateWorker(appContext)
+    }
+
+    fun invalidateCache() {
+        synchronized(cacheLock) {
+            seriesCache.clear()
+            isSeriesCacheLoaded = false
+        }
+    }
+    fun getSeriesChunk(pageIndex: Int): List<TvShow> {
+        val fromIndex = pageIndex * chunkSize
+        if (fromIndex >= seriesCache.size) return emptyList()
+        val toIndex = minOf(fromIndex + chunkSize, seriesCache.size)
+        return seriesCache.subList(fromIndex, toIndex)
+    }
+
+    fun getTotalPages(): Int {
+        return (seriesCache.size + chunkSize - 1) / chunkSize
     }
 
 
