@@ -18,12 +18,12 @@ import retrofit2.HttpException
 import java.io.File
 import androidx.core.content.edit
 
-class UpdateTvShowsWorker(
+class SerienStreamUpdateTvShowWorker(
     context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
     companion object {
-        private const val PREFS_NAME = "UpdateTvShowsPrefs"
+        private const val PREFS_NAME = "SerienStreamUpdateTvShowsPrefs"
         private const val KEY_PROCESSED_FILE = "processed_serienstream_tvshows_json"
     }
 
@@ -36,7 +36,7 @@ class UpdateTvShowsWorker(
             val prefs = applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             val hasProcessedFile = prefs.getBoolean(KEY_PROCESSED_FILE, false)
             val file = File(applicationContext.filesDir, "serienstream_tvshows.json")
-            val semaphore = Semaphore(20)
+            val semaphore = Semaphore(30)
 
             if (file.exists() && !hasProcessedFile) {
                 try {
@@ -54,7 +54,7 @@ class UpdateTvShowsWorker(
                                         overview = show.overview
                                     )
                                     dao.update(updated)
-                                    Log.d("UpdateTvShowsWorker", "Updated from JSON: ${show.title}")
+                                    Log.d("SerienStreamWorker", "Updated from JSON: ${show.title}")
                                 }
                             }
                         }
@@ -65,7 +65,7 @@ class UpdateTvShowsWorker(
                     prefs.edit() { putBoolean(KEY_PROCESSED_FILE, true) }
 
                 } catch (e: Exception) {
-                    Log.e("UpdateTvShowsWorker", "Failed to process JSON", e)
+                    Log.e("SerienStreamWorker", "Failed to process JSON", e)
                 }
                 file.delete()
             }
@@ -81,11 +81,11 @@ class UpdateTvShowsWorker(
                                 overview = detailed.overview
                             )
                             dao.update(updated)
-                            Log.d("UpdateTvShowsWorker", "Updated from provider: ${show.title}")
+                            Log.d("SerienStreamWorker", "Updated from provider: ${show.title}")
                         } catch (e: HttpException) {
-                            Log.w("UpdateTvShowsWorker", "404 for ${show.id}")
+                            Log.w("SerienStreamWorker", "404 for ${show.id}")
                         } catch (e: Exception) {
-                            Log.e("UpdateTvShowsWorker", "Error updating ${show.id}", e)
+                            Log.e("SerienStreamWorker", "Error updating ${show.id}", e)
                         }
                     }
                 }
@@ -93,11 +93,11 @@ class UpdateTvShowsWorker(
 
             jobs.awaitAll()
             SerienStreamProvider.invalidateCache()
-            Log.d("UpdateTvShowsWorker", "All updates completed")
+            Log.d("SerienStreamWorker", "All updates completed")
             Result.success()
 
         } catch (e: Exception) {
-            Log.e("UpdateTvShowsWorker", "Worker failed", e)
+            Log.e("SerienStreamWorker", "Worker failed", e)
             Result.retry()
         }
     }

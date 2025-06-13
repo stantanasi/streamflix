@@ -1,4 +1,4 @@
-package com.tanasi.streamflix.database
+ package com.tanasi.streamflix.database
 
 import android.content.Context
 import androidx.room.Database
@@ -10,21 +10,21 @@ import com.tanasi.streamflix.models.TvShow
 
 @Database(entities = [TvShow::class], version = 4)
 @TypeConverters(Converters::class)
-abstract class SerienStreamDatabase: RoomDatabase() {
+abstract class AniWorldDatabase: RoomDatabase() {
     abstract fun tvShowDao(): TvShowDao
 
     companion object {
-        @Volatile private var instance: SerienStreamDatabase? = null
+        @Volatile private var instance: AniWorldDatabase? = null
 
-        fun getInstance(context: Context): SerienStreamDatabase {
+        fun getInstance(context: Context): AniWorldDatabase {
             return instance ?: synchronized(this) {
                 instance ?: Room.databaseBuilder(
                     context.applicationContext,
-                    SerienStreamDatabase::class.java,
-                    "serien_stream.db"
+                    AniWorldDatabase::class.java,
+                    "ani_world.db"
                 )
-                .build()
-                .also { instance = it }
+                    .build()
+                    .also { instance = it }
             }
         }
     }

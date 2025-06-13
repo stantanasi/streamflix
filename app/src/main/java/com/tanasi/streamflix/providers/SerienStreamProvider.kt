@@ -22,7 +22,7 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.utils.UpdateTvShowsWorker
+import com.tanasi.streamflix.utils.SerienStreamUpdateTvShowWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import okhttp3.Cache
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
-import okhttp3.OkHttpClient.Builder
 import okhttp3.ResponseBody
 import okhttp3.dnsoverhttps.DnsOverHttps
 import org.jsoup.Jsoup
@@ -77,7 +76,6 @@ object SerienStreamProvider : Provider {
     private var isWorkerScheduled = false
     private lateinit var appContext: Context
 
-    @SuppressLint("StaticFieldLeak")
     fun initialize(context: Context) {
         if (tvShowDao == null) {
             tvShowDao = SerienStreamDatabase.getInstance(context).tvShowDao()
@@ -96,12 +94,12 @@ object SerienStreamProvider : Provider {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val workRequest = OneTimeWorkRequestBuilder<UpdateTvShowsWorker>()
+        val workRequest = OneTimeWorkRequestBuilder<SerienStreamUpdateTvShowWorker>()
             .setConstraints(constraints)
             .build()
 
         WorkManager.getInstance(context).enqueueUniqueWork(
-            "UpdateTvShowsWorker",
+            "SerienStreamUpdateTvShowWorker",
             ExistingWorkPolicy.KEEP,
             workRequest
         )
@@ -222,19 +220,6 @@ object SerienStreamProvider : Provider {
             return seriesCache.subList(fromIndex, actualToIndex).toList()
         }
     }
-
-
-
-
-    private fun searchCachedSeries(query: String): List<TvShow> {
-        if (!isSeriesCacheLoaded) return emptyList()
-        val lowerQuery = query.trim().lowercase()
-
-        return seriesCache.filter {
-            it.title.lowercase().contains(lowerQuery)
-        }
-    }
-
 
     override suspend fun getMovie(id: String): Movie {
         throw Exception("Keine Filme verfügbar")
