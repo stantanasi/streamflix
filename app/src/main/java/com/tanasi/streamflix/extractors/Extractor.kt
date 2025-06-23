@@ -1,5 +1,7 @@
 package com.tanasi.streamflix.extractors
 
+import android.content.Context
+import com.tanasi.streamflix.StreamFlixApp
 import com.tanasi.streamflix.models.Video
 
 abstract class Extractor {
@@ -10,6 +12,9 @@ abstract class Extractor {
 
     abstract suspend fun extract(link: String): Video
 
+    open suspend fun extract(link: String, headers: Map<String, String> = emptyMap()): Video {
+        return extract(link)
+    }
     companion object {
         private val extractors = listOf(
             RabbitstreamExtractor(),
@@ -54,7 +59,7 @@ abstract class Extractor {
             DoodLaExtractor.DoodExtractor(),
         )
 
-        suspend fun extract(link: String): Video {
+        suspend fun extract(link: String, headers: Map<String, String> = emptyMap()): Video {
             val urlRegex = Regex("^(https?://)?(www\\.)?")
             val compareUrl = link.lowercase().replace(urlRegex, "")
 
@@ -93,7 +98,13 @@ abstract class Extractor {
             }
 
 
-            throw Exception("No extractors found")
+            val context = StreamFlixApp.appContext
+            val webViewExtractor = GenericExtractor(context)
+            return try {
+                webViewExtractor.extract(link, headers)
+            } catch (e: Exception) {
+                throw Exception("No extractors found and Generic extractor failed", e)
+            }
         }
     }
 }

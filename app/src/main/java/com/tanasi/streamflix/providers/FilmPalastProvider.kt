@@ -99,6 +99,7 @@ object FilmPalastProvider : Provider {
 
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
+        if (query.isEmpty()) return emptyList()
         if (page > 1) return emptyList()
         val document = service.search(query)
         val movies = document.select("div#content article").map { article ->
@@ -163,17 +164,27 @@ object FilmPalastProvider : Provider {
         val servers = mutableListOf<Video.Server>()
 
         val serverBlocks = document.select("ul.currentStreamLinks")
-
+        val keywords = listOf("bigwarp", "vidhide", "vinovo")
         for (block in serverBlocks) {
             val name = block.selectFirst("li.hostBg p.hostName")?.text()?.trim() ?: "Unbekannt"
-            val linkElement = block.selectFirst("a[href]")
-            val url = linkElement?.attr("href")?.trim()
+            var linkElement = block.selectFirst("a[href]")
+            var url = linkElement?.attr("href")?.trim()
+            if (linkElement == null){
+                linkElement = block.selectFirst("a[data-player-url]")
+                url = linkElement?.attr("data-player-url")?.trim();
+            }
+
 
             if (!url.isNullOrEmpty()) {
+                val displayName = if (keywords.none { name.lowercase().contains(it) }) {
+                    name
+                } else {
+                    "$name (VLC Only)"
+                }
                 servers.add(
                     Video.Server(
                         id = name.split(" ")[0],
-                        name = if (!name.lowercase().contains("bigwarp")) name.split(" ")[0] else name.split(" ")[0] + " (VLC Only)",
+                        name = displayName,
                         src = url
                     )
                 )
@@ -187,6 +198,7 @@ object FilmPalastProvider : Provider {
         val response = service.getRedirectLink(server.src)
             .let { response -> response.raw() as okhttp3.Response }
 
+        val headers = response.headers.toMap()
         val videoUrl = response.request.url
         val link = when (server.name) {
             "VOE" -> {
@@ -197,8 +209,10 @@ object FilmPalastProvider : Provider {
 
             else -> videoUrl.toString()
         }
-
-        return Extractor.extract(link)
+        if (!server.name.contains("(VLC Only)")) {
+            return Extractor.extract(link, headers)
+        }
+        throw Exception("VLC Only view mode")
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
