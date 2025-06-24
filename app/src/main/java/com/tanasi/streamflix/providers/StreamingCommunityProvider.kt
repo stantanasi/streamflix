@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 
 object StreamingCommunityProvider : Provider {
     private const val DEFAULT_DOMAIN: String = "streamingunity.to"
-
+    override val baseUrl = DEFAULT_DOMAIN
     private var _domain: String? = null
     private var domain: String
         get() {

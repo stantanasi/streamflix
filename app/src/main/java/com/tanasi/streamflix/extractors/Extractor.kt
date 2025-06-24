@@ -8,9 +8,11 @@ abstract class Extractor {
     abstract val mainUrl: String
     open val aliasUrls: List<String> = emptyList()
 
+    // THIS is the main method all subclasses must implement
     abstract suspend fun extract(link: String): Video
 
-    open suspend fun extract(link: String, headers: Map<String, String> = emptyMap()): Video {
+    // THIS is a convenience helper
+    open suspend fun extract(link: String, server: Video.Server? = null): Video {
         return extract(link)
     }
 
@@ -57,14 +59,19 @@ abstract class Extractor {
             BigWarpExtractor(),
             DoodLaExtractor.DoodExtractor(),
             LoadXExtractor(),
+            VidHideExtractor(),
+            VeevExtractor(),
         )
 
-        suspend fun extract(link: String, headers: Map<String, String> = emptyMap()): Video {
+        suspend fun extract(link: String, server: Video.Server? = null): Video {
             val urlRegex = Regex("^(https?://)?(www\\.)?")
             val compareUrl = link.lowercase().replace(urlRegex, "")
 
             for (extractor in extractors) {
-                if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, ""))) {
+                if ((server?.name?.lowercase() ?: "").contains(extractor.name.lowercase())){
+                    return extractor.extract(link)
+                }
+                else if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, ""))) {
                     return extractor.extract(link)
                 } else {
                     for (aliasUrl in extractor.aliasUrls) {

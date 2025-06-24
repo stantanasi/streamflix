@@ -44,7 +44,9 @@ import java.util.concurrent.TimeUnit
 
 object AniWorldProvider : Provider {
 
+
     private const val URL = "https://aniworld.to/"
+    override val baseUrl = URL
 
     override val name = "AniWorld"
     override val logo = "$URL/public/img/facebook.jpg"

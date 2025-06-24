@@ -37,6 +37,7 @@ object SuperStreamProvider : Provider {
         "L2FwaS9hcGlfY2xpZW50L2luZGV4Lw==",
         Base64.NO_WRAP
     ).toString(Charsets.UTF_8)
+    override val baseUrl = url
 
     private val service = SuperStreamApiService.build()
 

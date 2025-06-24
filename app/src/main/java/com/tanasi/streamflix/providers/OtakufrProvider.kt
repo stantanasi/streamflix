@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit
 object OtakufrProvider : Provider {
 
     private const val URL = "https://otakufr.cc/"
-
+    override val baseUrl = URL
     override val name = "Otakufr"
     override val logo = "https://i.ibb.co/GndKBbF/otakufr-logo.webp"
     override val language = "fr"

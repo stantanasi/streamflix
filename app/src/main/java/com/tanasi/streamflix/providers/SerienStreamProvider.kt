@@ -62,6 +62,7 @@ object SerienStreamProvider : Provider {
     ).toString(Charsets.UTF_8) + Base64.decode(
         "LnRvLw==", Base64.NO_WRAP
     ).toString(Charsets.UTF_8)
+    override val baseUrl = URL
     @SuppressLint("StaticFieldLeak")
     override val name = Base64.decode(
         "U2VyaWVuU3RyZWFt", Base64.NO_WRAP

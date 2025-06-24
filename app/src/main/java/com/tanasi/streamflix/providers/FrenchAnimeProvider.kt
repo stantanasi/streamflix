@@ -30,7 +30,7 @@ import retrofit2.http.Path
 object FrenchAnimeProvider : Provider {
 
     private const val URL = "https://french-anime.com/"
-
+    override val baseUrl = URL
     override val name = "FrenchAnime"
     override val logo = "$URL/templates/franime/images/favicon3.png"
     override val language = "fr"

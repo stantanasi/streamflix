@@ -11,6 +11,7 @@ import com.tanasi.streamflix.models.Video
 
 interface Provider {
 
+    val baseUrl: String
     val name: String
     val logo: String
     val language: String
@@ -55,6 +56,7 @@ interface Provider {
             FrenchAnimeProvider,
             FilmPalastProvider,
             CuevanaDosProvider,
+            PelisFlixDosProvider,
         )
     }
 }
