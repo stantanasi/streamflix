@@ -1,7 +1,5 @@
 package com.tanasi.streamflix.extractors
 
-import android.content.Context
-import com.tanasi.streamflix.StreamFlixApp
 import com.tanasi.streamflix.models.Video
 
 abstract class Extractor {
@@ -15,6 +13,7 @@ abstract class Extractor {
     open suspend fun extract(link: String, headers: Map<String, String> = emptyMap()): Video {
         return extract(link)
     }
+
     companion object {
         private val extractors = listOf(
             RabbitstreamExtractor(),
@@ -57,6 +56,7 @@ abstract class Extractor {
             SaveFilesExtractor(),
             BigWarpExtractor(),
             DoodLaExtractor.DoodExtractor(),
+            LoadXExtractor(),
         )
 
         suspend fun extract(link: String, headers: Map<String, String> = emptyMap()): Video {
@@ -66,8 +66,7 @@ abstract class Extractor {
             for (extractor in extractors) {
                 if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, ""))) {
                     return extractor.extract(link)
-                }
-                else {
+                } else {
                     for (aliasUrl in extractor.aliasUrls) {
                         if (compareUrl.startsWith(aliasUrl.lowercase().replace(urlRegex, ""))) {
                             return extractor.extract(link)
@@ -84,27 +83,21 @@ abstract class Extractor {
                     )
                 ) {
                     return extractor.extract(link)
-                }
-                else {
+                } else {
                     for (aliasUrl in extractor.aliasUrls) {
-                        if (compareUrl.startsWith(aliasUrl.replace(
-                                Regex("^(https?://)?(www\\.)?(.*?)(\\.[a-z]+)"),
-                                "$3"
-                            ))) {
+                        if (compareUrl.startsWith(
+                                aliasUrl.replace(
+                                    Regex("^(https?://)?(www\\.)?(.*?)(\\.[a-z]+)"),
+                                    "$3"
+                                )
+                            )
+                        ) {
                             return extractor.extract(link)
                         }
                     }
                 }
             }
-
-
-            val context = StreamFlixApp.appContext
-            val webViewExtractor = GenericExtractor(context)
-            return try {
-                webViewExtractor.extract(link, headers)
-            } catch (e: Exception) {
-                throw Exception("No extractors found and Generic extractor failed", e)
-            }
+            throw Exception("No extractors found")
         }
     }
 }

@@ -8,12 +8,7 @@ import com.tanasi.streamflix.providers.SerienStreamProvider
 class StreamFlixApp: Application() {
     override fun onCreate() {
         super.onCreate()
-        appContext = applicationContext
         SerienStreamProvider.initialize(this)
         AniWorldProvider.initialize(this)
-    }
-    companion object {
-        lateinit var appContext: Context
-            private set
     }
 }

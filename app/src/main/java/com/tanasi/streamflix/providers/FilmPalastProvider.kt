@@ -209,10 +209,7 @@ object FilmPalastProvider : Provider {
 
             else -> videoUrl.toString()
         }
-        if (!server.name.contains("(VLC Only)")) {
-            return Extractor.extract(link, headers)
-        }
-        throw Exception("VLC Only view mode")
+        return Extractor.extract(link, headers)
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
