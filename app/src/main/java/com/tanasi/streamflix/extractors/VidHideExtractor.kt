@@ -16,13 +16,12 @@ class VidHideExtractor: Extractor() {
     override val name = "VidHide"
     override val mainUrl = "https://dhtpre.com"
     override val aliasUrls= listOf("https://peytonepre.com")
-    private var mainLink = ""
     companion object {
         const val DEFAULT_USER_AGENT =
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0"
     }
     override suspend fun extract(link: String): Video {
-        mainLink = URL(link).protocol + "://" + URL(link).host
+        val mainLink = URL(link).protocol + "://" + URL(link).host
         val service = Service.build(mainLink)
 
         val source = service.getSource(link,  UserPreferences.currentProvider!!.baseUrl, UserPreferences.currentProvider!!.baseUrl, DEFAULT_USER_AGENT)

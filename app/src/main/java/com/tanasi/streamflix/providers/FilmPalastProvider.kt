@@ -107,11 +107,15 @@ object FilmPalastProvider : Provider {
             }
             return genres
         }
-
         var document = service.searchNoPage(query)
-        val paging = document.selectFirst("div#paging a.pageing.button-small.rb")
-        if (paging != null){
-            document = service.search(query, page)
+
+        if (page > 1){
+            val paging = document.selectFirst("div#paging a.pageing.button-small.rb")
+            if (paging != null){
+                document = service.search(query, page)
+            } else {
+                return emptyList()
+            }
         }
 
         val movies = document.select("div#content article").map { article ->

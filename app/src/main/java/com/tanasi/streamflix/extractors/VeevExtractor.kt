@@ -1,17 +1,21 @@
 package com.tanasi.streamflix.extractors
 
 
+import androidx.media3.common.MimeTypes
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.ResponseBody
+import org.json.JSONObject
 
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Url
+import java.net.URL
+import java.net.URLEncoder
 import kotlin.text.Charsets.UTF_8
 
 open class VeevExtractor : Extractor() {
@@ -39,11 +43,9 @@ open class VeevExtractor : Extractor() {
             "Origin" to UserPreferences.currentProvider!!.baseUrl
         )
 
-        val response = service.getWithHeaders(webUrl, headers["Referer"]!!, headers["User-Agent"]!!, headers["Origin"]!!)
-        val html = response.string()
-
+        val response = service.getWithHeaders(webUrl, headers["Referer"]!!, headers["User-Agent"]!!, webUrl)
         val itemsRegex = Regex("""[\.\s'](?:fc|_vvto\[[^\]]*)(?:['\]]*)?\s*[:=]\s*['"]([^'"]+)""")
-        val items = itemsRegex.findAll(html).map { it.groupValues[1] }.toList()
+        val items = itemsRegex.findAll(response.string()).map { it.groupValues[1] }.toList()
 
         if (items.isNotEmpty()) {
             for (f in items.asReversed()) {
@@ -53,19 +55,23 @@ open class VeevExtractor : Extractor() {
                         "op" to "player_api",
                         "cmd" to "gi",
                         "file_code" to mediaId,
+                        "r" to URLEncoder.encode(UserPreferences.currentProvider!!.baseUrl),
                         "ch" to ch,
                         "ie" to "1"
                     )
-                    val durl = "$webUrl/dl?" + params.map { "${it.key}=${it.value}" }.joinToString("&")
-                    val jresp = service.getWithHeaders(durl, UserPreferences.currentProvider!!.baseUrl, headers["User-Agent"]!!, mainUrl).string()
+                    val mainLink = URL(link).protocol + "://" + URL(link).host
+                    val downloadUrl = "$mainLink/dl?" + params.map { "${it.key}=${it.value}" }.joinToString("&")
+                    val jsonResponse = service.getWithHeaders(downloadUrl, UserPreferences.currentProvider!!.baseUrl, headers["User-Agent"]!!, mainUrl).string()
 
-                    val fileJson = org.json.JSONObject(jresp).optJSONObject("file")
+                    val fileJson = JSONObject(jsonResponse).optJSONObject("file")
                         ?: throw Exception("Video removed")
 
                     if (fileJson.optString("file_status") == "OK") {
                         val dv = fileJson.getJSONArray("dv").getJSONObject(0).getString("s")
-                        val strUrl = decodeUrl(veevDecode(dv), buildArray(ch)[0])
-                        return Video(source = strUrl)
+                        val sourceUrl = decodeUrl(veevDecode(dv), buildArray(ch)[0])
+                        val fileMimeType = fileJson.optString("file_mime_type", "")
+                        val exoMimeType = fileMimeType.toExoPlayerMimeType()
+                        return Video(source = sourceUrl, type = exoMimeType, headers = headers)
                     } else {
                         throw Exception("Video removed")
                     }
@@ -76,6 +82,16 @@ open class VeevExtractor : Extractor() {
             throw Exception("Video removed")
         }
     }
+    fun String.toExoPlayerMimeType(): String {
+        return when (this.lowercase()) {
+            "video/x-matroska", "video/webm" -> MimeTypes.VIDEO_MATROSKA
+            "video/mp4" -> MimeTypes.VIDEO_MP4
+            "application/x-mpegurl", "application/vnd.apple.mpegurl" -> MimeTypes.APPLICATION_M3U8
+            "video/avi" -> MimeTypes.VIDEO_AVI
+            else -> ""
+        }
+    }
+
 
     private fun veevDecode(etext: String): String {
         val result = StringBuilder()
@@ -138,9 +154,6 @@ open class VeevExtractor : Extractor() {
         ): ResponseBody
 
         companion object {
-            private const val DEFAULT_USER_AGENT =
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0"
-
             fun build(baseUrl: String): Service {
                 val retrofit = Retrofit.Builder()
                     .baseUrl(baseUrl)
