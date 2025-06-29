@@ -22,6 +22,8 @@ import com.tanasi.streamflix.utils.TMDb3.w500
 import com.tanasi.streamflix.utils.safeSubList
 
 object TmdbProvider : Provider {
+    override val baseUrl: String
+        get() = TODO("Not yet implemented")
 
     override val name = "TMDb"
     override val logo =

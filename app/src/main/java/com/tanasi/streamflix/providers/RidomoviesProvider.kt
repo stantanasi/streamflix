@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 object RidomoviesProvider : Provider {
 
     const val URL = "https://ridomovies.tv/"
-
+    override val baseUrl = URL
     override val name = "Ridomovies"
     override val logo = "$URL/images/home-logo.png"
     override val language = "en"

@@ -13,6 +13,19 @@ open class StreamWishExtractor : Extractor() {
 
     override val name = "Streamwish"
     override val mainUrl = "https://streamwish.to"
+    override val aliasUrls = listOf("https://streamwish.com","https://streamwish.to","https://ajmidyad.sbs","https://khadhnayad.sbs","https://yadmalik.sbs",
+        "https://hayaatieadhab.sbs","https://kharabnahs.sbs","https://atabkhha.sbs","https://atabknha.sbs","https://atabknhk.sbs",
+        "https://atabknhs.sbs","https://abkrzkr.sbs","https://abkrzkz.sbs","https://wishembed.pro","https://mwish.pro","https://strmwis.xyz",
+        "https://awish.pro","https://dwish.pro","https://vidmoviesb.xyz","https://embedwish.com","https://cilootv.store","https://uqloads.xyz",
+        "https://tuktukcinema.store","https://doodporn.xyz","https://ankrzkz.sbs","https://volvovideo.top","https://streamwish.site",
+        "https://wishfast.top","https://ankrznm.sbs","https://sfastwish.com","https://eghjrutf.sbs","https://eghzrutw.sbs",
+        "https://playembed.online","https://egsyxurh.sbs","https://egtpgrvh.sbs","https://flaswish.com","https://obeywish.com",
+        "https://cdnwish.com","https://javsw.me","https://cinemathek.online","https://trgsfjll.sbs","https://fsdcmo.sbs",
+        "https://anime4low.sbs","https://mohahhda.site","https://ma2d.store","https://dancima.shop","https://swhoi.com",
+        "https://gsfqzmqu.sbs","https://jodwish.com","https://swdyu.com","https://strwish.com","https://asnwish.com",
+        "https://wishonly.site","https://playerwish.com","https://katomen.store","https://hlswish.com","https://streamwish.fun",
+        "https://swishsrv.com","https://iplayerhls.com","https://hlsflast.com","https://4yftwvrdz7.sbs","https://ghbrisk.com",
+        "https://eb8gfmjn71.sbs","https://cybervynx.com","https://edbrdl7pab.sbs","https://stbhg.click","https://dhcplay.com","https://gradehgplus.com", "https://ultpreplayer.com")
 
     protected var referer = ""
 

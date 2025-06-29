@@ -59,6 +59,7 @@ import okhttp3.internal.userAgent
 import java.util.Calendar
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import androidx.core.net.toUri
 
 class PlayerMobileFragment : Fragment() {
 
@@ -397,7 +398,7 @@ class PlayerMobileFragment : Fragment() {
 
         player.setMediaItem(
             MediaItem.Builder()
-                .setUri(Uri.parse(video.source))
+                .setUri(video.source.toUri())
                 .setMimeType(video.type)
                 .setSubtitleConfigurations(video.subtitles.map { subtitle ->
                     MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitle.file))

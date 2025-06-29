@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit
 object FilmPalastProvider : Provider {
 
     private val BASE_URL = "https://filmpalast.to/"
-
+    override val baseUrl = BASE_URL
     override val name = "Filmpalast"
     override val logo = "$BASE_URL/themes/downloadarchive/images/logo.png"
     override val language = "de"
@@ -99,8 +99,25 @@ object FilmPalastProvider : Provider {
 
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
-        if (page > 1) return emptyList()
-        val document = service.search(query)
+        if (query.isEmpty()) {
+            val document = service.getHome()
+            val genres = document.select("aside#sidebar section#genre ul li a").map { element ->
+                val text = element.text()
+                Genre(text, text)
+            }
+            return genres
+        }
+        var document = service.searchNoPage(query)
+
+        if (page > 1){
+            val paging = document.selectFirst("div#paging a.pageing.button-small.rb")
+            if (paging != null){
+                document = service.search(query, page)
+            } else {
+                return emptyList()
+            }
+        }
+
         val movies = document.select("div#content article").map { article ->
             val href = article.selectFirst("h2 a")?.attr("href") ?: ""
             val title = article.selectFirst("h2 a")?.text() ?: ""
@@ -122,9 +139,12 @@ object FilmPalastProvider : Provider {
                 rating = info.rating ?: 0.0,
                 poster = fullPosterUrl
             )
-        }
+        }.distinctBy { it.id }
+
         return movies
+
     }
+
 
 
     override suspend fun getMovie(id: String): Movie {
@@ -163,17 +183,27 @@ object FilmPalastProvider : Provider {
         val servers = mutableListOf<Video.Server>()
 
         val serverBlocks = document.select("ul.currentStreamLinks")
-
+        val keywords = listOf("bigwarp", "vinovo")
         for (block in serverBlocks) {
             val name = block.selectFirst("li.hostBg p.hostName")?.text()?.trim() ?: "Unbekannt"
-            val linkElement = block.selectFirst("a[href]")
-            val url = linkElement?.attr("href")?.trim()
+            var linkElement = block.selectFirst("a[href]")
+            var url = linkElement?.attr("href")?.trim()
+            if (linkElement == null){
+                linkElement = block.selectFirst("a[data-player-url]")
+                url = linkElement?.attr("data-player-url")?.trim();
+            }
+
 
             if (!url.isNullOrEmpty()) {
+                val displayName = if (keywords.none { name.lowercase().contains(it) }) {
+                    name
+                } else {
+                    "$name (VLC Only)"
+                }
                 servers.add(
                     Video.Server(
                         id = name.split(" ")[0],
-                        name = if (!name.lowercase().contains("bigwarp")) name.split(" ")[0] else name.split(" ")[0] + " (VLC Only)",
+                        name = displayName,
                         src = url
                     )
                 )
@@ -187,6 +217,7 @@ object FilmPalastProvider : Provider {
         val response = service.getRedirectLink(server.src)
             .let { response -> response.raw() as okhttp3.Response }
 
+
         val videoUrl = response.request.url
         val link = when (server.name) {
             "VOE" -> {
@@ -197,8 +228,7 @@ object FilmPalastProvider : Provider {
 
             else -> videoUrl.toString()
         }
-
-        return Extractor.extract(link)
+        return Extractor.extract(link, server)
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
@@ -231,12 +261,47 @@ object FilmPalastProvider : Provider {
     override suspend fun getTvShows(page: Int): List<TvShow> {
         throw Exception("Serien nicht implementiert")
     }
+
     override suspend fun getTvShow(id: String): TvShow {
         throw Exception("Serien nicht implementiert")
     }
 
+    override suspend fun getGenre(id: String, page: Int): Genre {
+        val document = service.getGenre(id, page)
+
+        val shows = document.select("div#content article").map { article ->
+            val aTag = article.selectFirst("h2 a")
+            val href = aTag?.attr("href").orEmpty()
+            val title = aTag?.text().orEmpty()
+
+            val posterSrc = article.selectFirst("a img")?.attr("src").orEmpty()
+            val fullPosterUrl = if (posterSrc.startsWith("/")) {
+                "https://filmpalast.to$posterSrc"
+            } else {
+                posterSrc
+            }
+
+            val info = article.select("*").toInfo()
+
+            Movie(
+                id = href.substringAfterLast("/"),
+                title = title,
+                released = info.released,
+                quality = info.quality,
+                rating = info.rating ?: 0.0,
+                poster = fullPosterUrl
+            )
+        }
+
+        return Genre(
+            id = id,
+            name = id.replaceFirstChar { it.uppercase() },
+            shows = shows
+        )
+    }
+
+
     override suspend fun getEpisodesBySeason(seasonId: String) = emptyList<Episode>()
-    override suspend fun getGenre(id: String, page: Int) = Genre(id, "")
     override suspend fun getPeople(id: String, page: Int) = People(id, "")
 
 
@@ -305,12 +370,17 @@ object FilmPalastProvider : Provider {
         @GET("serien/view/page/{page}")
         suspend fun getTvShows(@Path("page") page: Int): Document
 
+        @GET("search/title/{query}/{page}")
+        suspend fun search(@Path("query") query: String,@Path("page") page: Int): Document
         @GET("search/title/{query}")
-        suspend fun search(@Path("query") query: String): Document
+        suspend fun searchNoPage(@Path("query") query: String): Document
 
         @GET
         @Headers("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
         suspend fun getRedirectLink(@Url url: String): Response<ResponseBody>
+
+        @GET("search/genre/{genre}/{page}")
+        suspend fun getGenre(@Path("genre") genre: String, @Path("page") page: Int): Document
 
     }
 

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -58,10 +59,12 @@ class SeasonTvFragment : Fragment() {
                         pbIsLoading.visibility = View.VISIBLE
                         gIsLoadingRetry.visibility = View.GONE
                     }
+
                     is SeasonViewModel.State.SuccessLoadingEpisodes -> {
                         displaySeason(state.episodes)
                         binding.isLoading.root.visibility = View.GONE
                     }
+
                     is SeasonViewModel.State.FailedLoadingEpisodes -> {
                         Toast.makeText(
                             requireContext(),
@@ -100,9 +103,9 @@ class SeasonTvFragment : Fragment() {
     }
 
     private fun displaySeason(episodes: List<Episode>) {
-        appAdapter.submitList(episodes.onEach { episode ->
+        val preparedEpisodes = episodes.onEach { episode ->
             episode.itemType = AppAdapter.Type.EPISODE_TV_ITEM
-        })
+        }
 
         val episodeIndex = episodes
             .filter { it.watchHistory != null }
@@ -111,10 +114,23 @@ class SeasonTvFragment : Fragment() {
             ?.let { episodes.indexOf(it) }
             ?: episodes.indexOfLast { it.isWatched }
                 .takeIf { it != -1 && it + 1 < episodes.size }
-                ?.let { it + 1 }
+                ?.plus(1)
 
-        if (episodeIndex != null) {
-            binding.hgvEpisodes.scrollToPosition(episodeIndex)
-        }
+        appAdapter.submitList(preparedEpisodes)
+
+        episodeIndex?.let { binding.hgvEpisodes.scrollAndFocus(it) }
+
     }
+    private fun RecyclerView.scrollAndFocus(position: Int) {
+        scrollToPosition(position)
+        viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                viewTreeObserver.removeOnGlobalLayoutListener(this)
+                findViewHolderForAdapterPosition(position)?.itemView?.requestFocus()
+            }
+        })
+    }
+
+
+
 }

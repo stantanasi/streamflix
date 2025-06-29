@@ -28,7 +28,7 @@ import retrofit2.http.Path
 object WiflixProvider : Provider {
 
     private var URL = "https://wiflix-hd.vip/"
-
+    override val baseUrl = URL
     override val name = "Wiflix"
     override val logo get() = "$URL/templates/wiflixnew/images/logo.png"
     override val language = "fr"

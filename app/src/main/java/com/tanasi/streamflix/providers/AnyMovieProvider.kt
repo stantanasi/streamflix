@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 object AnyMovieProvider : Provider {
 
     private const val URL = "https://anymovie.cc/"
-
+    override val baseUrl = URL
     override val name = "AnyMovie"
     override val logo = "$URL/wp-content/uploads/2023/08/AM-LOGO-1.png"
     override val language = "en"

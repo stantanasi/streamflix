@@ -27,6 +27,7 @@ import java.util.regex.Pattern
 object AnimeWorldProvider : Provider {
 
     private const val URL = "https://animeworld.so/"
+    override val baseUrl = URL
     private const val USER_AGENT = "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 
     override val name = "AnimeWorld"

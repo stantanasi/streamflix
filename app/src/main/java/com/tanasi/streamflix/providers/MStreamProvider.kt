@@ -37,6 +37,7 @@ object MStreamProvider : Provider {
     ).toString(Charsets.UTF_8) + Base64.decode(
         "LXN0cmVhbS54eXo=", Base64.NO_WRAP
     ).toString(Charsets.UTF_8)
+    override val baseUrl = URL
     override val name = Base64.decode(
         "TW9mbGl4", Base64.NO_WRAP
     ).toString(Charsets.UTF_8) + Base64.decode(

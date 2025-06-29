@@ -8,7 +8,13 @@ abstract class Extractor {
     abstract val mainUrl: String
     open val aliasUrls: List<String> = emptyList()
 
+    // THIS is the main method all subclasses must implement
     abstract suspend fun extract(link: String): Video
+
+    // THIS is a convenience helper
+    open suspend fun extract(link: String, server: Video.Server? = null): Video {
+        return extract(link)
+    }
 
     companion object {
         private val extractors = listOf(
@@ -52,17 +58,22 @@ abstract class Extractor {
             SaveFilesExtractor(),
             BigWarpExtractor(),
             DoodLaExtractor.DoodExtractor(),
+            LoadXExtractor(),
+            VidHideExtractor(),
+            VeevExtractor(),
         )
 
-        suspend fun extract(link: String): Video {
+        suspend fun extract(link: String, server: Video.Server? = null): Video {
             val urlRegex = Regex("^(https?://)?(www\\.)?")
             val compareUrl = link.lowercase().replace(urlRegex, "")
 
             for (extractor in extractors) {
-                if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, ""))) {
+                if ((server?.name?.lowercase() ?: "").contains(extractor.name.lowercase())){
                     return extractor.extract(link)
                 }
-                else {
+                else if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, ""))) {
+                    return extractor.extract(link)
+                } else {
                     for (aliasUrl in extractor.aliasUrls) {
                         if (compareUrl.startsWith(aliasUrl.lowercase().replace(urlRegex, ""))) {
                             return extractor.extract(link)
@@ -79,20 +90,20 @@ abstract class Extractor {
                     )
                 ) {
                     return extractor.extract(link)
-                }
-                else {
+                } else {
                     for (aliasUrl in extractor.aliasUrls) {
-                        if (compareUrl.startsWith(aliasUrl.replace(
-                                Regex("^(https?://)?(www\\.)?(.*?)(\\.[a-z]+)"),
-                                "$3"
-                            ))) {
+                        if (compareUrl.startsWith(
+                                aliasUrl.replace(
+                                    Regex("^(https?://)?(www\\.)?(.*?)(\\.[a-z]+)"),
+                                    "$3"
+                                )
+                            )
+                        ) {
                             return extractor.extract(link)
                         }
                     }
                 }
             }
-
-
             throw Exception("No extractors found")
         }
     }

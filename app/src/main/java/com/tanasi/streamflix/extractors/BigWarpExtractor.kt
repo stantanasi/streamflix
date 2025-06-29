@@ -14,7 +14,7 @@ class BigWarpExtractor: Extractor() {
 
 
     override suspend fun extract(link: String): Video {
-        val service = SaveFilesExtractorService.build(mainUrl)
+        val service = BigWarpExtractorService.build(mainUrl)
         val source = service.getSource(link.replace(mainUrl, ""))
         val scriptTags = source.select("script[type=text/javascript]")
 
@@ -45,15 +45,15 @@ class BigWarpExtractor: Extractor() {
     }
 
 
-    private interface SaveFilesExtractorService {
+    private interface BigWarpExtractorService {
 
         companion object {
-            fun build(baseUrl: String): SaveFilesExtractorService {
+            fun build(baseUrl: String): BigWarpExtractorService {
                 val retrofitRedirected = Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .build()
-                return retrofitRedirected.create(SaveFilesExtractorService::class.java)
+                return retrofitRedirected.create(BigWarpExtractorService::class.java)
             }
         }
 

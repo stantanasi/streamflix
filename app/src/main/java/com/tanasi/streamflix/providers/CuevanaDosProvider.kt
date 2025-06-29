@@ -39,8 +39,10 @@ import com.tanasi.streamflix.models.Show
 object CuevanaDosProvider : Provider {
 
     private const val URL = "https://www.cuevana2espanol.net/"
+    override val baseUrl = URL
     override val name = "Cuevana2 Español"
-    override val logo = "https://www.cuevana2espanol.net/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.33e4f182.png&w=640&q=7"
+    override val logo =
+        "https://www.cuevana2espanol.net/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.33e4f182.png&w=640&q=7"
     override val language = "es"
 
     private val service = CuevanaDosService.build();
@@ -123,30 +125,30 @@ object CuevanaDosProvider : Provider {
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
         if (query.isEmpty()) {
-            if (query.isEmpty()) {
-                val genres = listOf(
-                    Genre("accion", "Acción"),
-                    Genre("animacion", "Animación"),
-                    Genre("crimen", "Crimen"),
-                    Genre("familia", "Fámilia"),
-                    Genre("misterio", "Misterio"),
-                    Genre("suspenso", "Suspenso"),
-                    Genre("aventura", "Aventura"),
-                    Genre("ciencia-ficcion", "Ciencia Ficción"),
-                    Genre("drama", "Drama"),
-                    Genre("fantasia", "Fantasía"),
-                    Genre("romance", "Romance"),
-                    Genre("terror", "Terror")
-                )
-
-                return genres
-            }
-
+            val genres = listOf(
+                Genre("accion", "Acción"),
+                Genre("animacion", "Animación"),
+                Genre("crimen", "Crimen"),
+                Genre("familia", "Fámilia"),
+                Genre("misterio", "Misterio"),
+                Genre("suspenso", "Suspenso"),
+                Genre("aventura", "Aventura"),
+                Genre("ciencia-ficcion", "Ciencia Ficción"),
+                Genre("drama", "Drama"),
+                Genre("fantasia", "Fantasía"),
+                Genre("romance", "Romance"),
+                Genre("terror", "Terror")
+            )
+            return genres
+        }
+        if (page > 1) {
+            return emptyList()
         }
         val document = service.search(query)
 
         val items = mutableListOf<AppAdapter.Item>()
-        val elements = document.select("div.col article:not(.MovieSidebarItem_item__U15hi):not(.SerieSidebarItem_item__Y_r4w)")
+        val elements =
+            document.select("div.col article:not(.MovieSidebarItem_item__U15hi):not(.SerieSidebarItem_item__Y_r4w)")
         for (element in elements) {
             val linkElement = element.selectFirst("a")
             val href = linkElement?.attr("href") ?: continue
@@ -224,7 +226,7 @@ object CuevanaDosProvider : Provider {
             val title = article.selectFirst("h3")?.text() ?: return@mapNotNull null
             val href = linkElement?.attr("href") ?: return@mapNotNull null
             val poster = article.selectFirst("img")?.attr("src") ?: return@mapNotNull null
-            TvShow (
+            TvShow(
                 id = href.substringAfterLast("/"),
                 title = title,
                 poster = if (poster.startsWith("http")) poster else "https://www.cuevana2espanol.net$poster",
@@ -248,7 +250,8 @@ object CuevanaDosProvider : Provider {
         val runtimeText = document.select("div.movieInfo_extra__bP44U span")
             .firstOrNull { it.text().contains("Min.") }?.text()?.substringBefore(" Min.")?.trim()
         val ratingText = document.select("div.movieInfo_extra__bP44U span")
-            .firstOrNull { it.text().contains("⭐") }?.text()?.substringAfter("⭐")?.substringBefore("/")?.trim()
+            .firstOrNull { it.text().contains("⭐") }?.text()?.substringAfter("⭐")
+            ?.substringBefore("/")?.trim()
         val poster = document.selectFirst("div.movieInfo_image__LJrqk img")
             ?.attr("src")?.let { "https://www.cuevana2espanol.net$it" }
 
@@ -284,7 +287,10 @@ object CuevanaDosProvider : Provider {
 
     override suspend fun getTvShow(id: String): TvShow {
         val document = service.getTvShow(id)
-        val jsonData = document.selectFirst("script#__NEXT_DATA__")?.data() ?: return TvShow(id = id, title = "Unknown")
+        val jsonData = document.selectFirst("script#__NEXT_DATA__")?.data() ?: return TvShow(
+            id = id,
+            title = "Unknown"
+        )
 
         val json = JSONObject(jsonData)
             .getJSONObject("props")
@@ -341,9 +347,10 @@ object CuevanaDosProvider : Provider {
 
         val seasonsJson: JSONArray = seasonCache.getOrPut(slug) {
             val document = service.getTvShow(slug)
-            val jsonData = document.selectFirst("script#__NEXT_DATA__")?.data() ?: return emptyList<Episode>().also {
-                seasonCache.remove(slug)
-            }
+            val jsonData = document.selectFirst("script#__NEXT_DATA__")?.data()
+                ?: return emptyList<Episode>().also {
+                    seasonCache.remove(slug)
+                }
 
             val root = JSONObject(jsonData)
                 .getJSONObject("props")
@@ -363,7 +370,9 @@ object CuevanaDosProvider : Provider {
                 val ep = episodesJson.getJSONObject(idx)
                 val slugObj = ep.optJSONObject("slug") ?: return@mapNotNull null
 
-                val id = "${slugObj.optString("name")}/${slugObj.optString("season")}/${slugObj.optString("episode")}"
+                val id = "${slugObj.optString("name")}/${slugObj.optString("season")}/${
+                    slugObj.optString("episode")
+                }"
 
                 Episode(
                     id = id,
@@ -380,7 +389,8 @@ object CuevanaDosProvider : Provider {
 
     override suspend fun getGenre(id: String, page: Int): Genre {
         val document = service.getGenre(id, page)
-        val elements = document.select("div.col article:not(.MovieSidebarItem_item__U15hi):not(.SerieSidebarItem_item__Y_r4w)")
+        val elements =
+            document.select("div.col article:not(.MovieSidebarItem_item__U15hi):not(.SerieSidebarItem_item__Y_r4w)")
 
         val shows = mutableListOf<Show>()
 
@@ -404,6 +414,7 @@ object CuevanaDosProvider : Provider {
                     poster = poster,
                     banner = ""
                 )
+
                 href.startsWith("/series/") -> TvShow(
                     id = id,
                     title = title,
@@ -413,6 +424,7 @@ object CuevanaDosProvider : Provider {
                     poster = poster,
                     banner = ""
                 )
+
                 else -> null
             }
 
@@ -439,6 +451,7 @@ object CuevanaDosProvider : Provider {
             is Video.Type.Movie -> {
                 service.getMovie(id)
             }
+
             is Video.Type.Episode -> {
                 val splitString = id.split("/")
                 isSerie = true
@@ -450,7 +463,7 @@ object CuevanaDosProvider : Provider {
 
         val json = JSONObject(scriptJson)
         var players: JSONObject
-        if (isSerie){
+        if (isSerie) {
             players = json
                 .getJSONObject("props")
                 .getJSONObject("pageProps")
@@ -487,6 +500,7 @@ object CuevanaDosProvider : Provider {
 
         return servers
     }
+
     fun resolveRealProviderUrl(playerUrl: String): String? {
         val playerPage = Jsoup.connect(playerUrl)
             .header("Referer", URL)
@@ -506,6 +520,7 @@ object CuevanaDosProvider : Provider {
             else it.toString()
         }
     }
+
     override suspend fun getVideo(server: Video.Server): Video {
         val response = service.getRedirectLink(server.src)
             .let { response -> response.raw() as okhttp3.Response }
@@ -552,10 +567,13 @@ object CuevanaDosProvider : Provider {
 
         @GET(".")
         suspend fun getHome(): Document
+
         @GET("/search")
         suspend fun search(@Query("q") query: String): Document
+
         @GET("movies/{name}")
         suspend fun getMovie(@Path("name") id: String): Document
+
         @GET
         @Headers("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
         suspend fun getRedirectLink(@Url url: String): Response<ResponseBody>
@@ -565,12 +583,19 @@ object CuevanaDosProvider : Provider {
 
         @GET("archives/series/page/{page}")
         suspend fun getTvShows(@Path("page") page: Int): Document
+
         @GET("series/{name}")
         suspend fun getTvShow(@Path("name") id: String): Document
+
         @GET("series/{name}/seasons/{seasonNumber}/episodes/{episodeNumber}")
-        suspend fun getEpisode(@Path("name") name: String, @Path("seasonNumber") seasonNumber: String, @Path("episodeNumber") episodeNumber: String): Document
+        suspend fun getEpisode(
+            @Path("name") name: String,
+            @Path("seasonNumber") seasonNumber: String,
+            @Path("episodeNumber") episodeNumber: String
+        ): Document
+
         @GET("/genres/{genre}/page/{page}")
-        suspend fun getGenre(@Path("genre") genre: String,@Path("page") page: Int ): Document
+        suspend fun getGenre(@Path("genre") genre: String, @Path("page") page: Int): Document
 
     }
 
