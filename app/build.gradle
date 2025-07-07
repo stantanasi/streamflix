@@ -7,16 +7,16 @@ plugins {
 }
 
 android {
-    namespace 'com.tanasi.streamflix'
-    compileSdk 35
+    namespace = 'com.tanasi.streamflix'
+    compileSdk = 35
 
     def properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
 
     defaultConfig {
         applicationId "com.tanasi.streamflix"
-        minSdk 21
-        targetSdk 35
+        minSdk = 21
+        targetSdk = 35
         versionCode 60
         versionName "1.7.29"
 
@@ -59,8 +59,8 @@ android {
     }
 
     buildFeatures {
-        viewBinding true
-        buildConfig true
+        viewBinding = true
+        buildConfig = true
     }
 }
 

@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    namespace 'com.tanasi.navigation'
-    compileSdk 35
+    namespace = 'com.tanasi.navigation'
+    compileSdk = 35
 
     defaultConfig {
-        minSdk 21
-        targetSdk 35
+        minSdk = 21
+        targetSdk = 35
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
