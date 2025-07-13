@@ -62,6 +62,7 @@ abstract class Extractor {
             VidHideExtractor(),
             VeevExtractor(),
             RidooExtractor(),
+            USTRExtractor(),
         )
 
         suspend fun extract(link: String, server: Video.Server? = null): Video {
