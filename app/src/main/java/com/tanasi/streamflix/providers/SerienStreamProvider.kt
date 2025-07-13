@@ -136,6 +136,7 @@ object SerienStreamProvider : Provider {
     }
 
     override suspend fun getHome(): List<Category> {
+        preloadSeriesAlphabet()
         val document = service.getHome()
         val categories = mutableListOf<Category>()
         categories.add(
@@ -194,7 +195,6 @@ object SerienStreamProvider : Provider {
         throw Exception("Keine Filme verfügbar")
     }
 
-    private var preloadJob: Job? = null
 
     private val cacheLock = Any()
 
@@ -397,17 +397,6 @@ object SerienStreamProvider : Provider {
             seriesCache.clear()
             isSeriesCacheLoaded = false
         }
-    }
-
-    fun getSeriesChunk(pageIndex: Int): List<TvShow> {
-        val fromIndex = pageIndex * chunkSize
-        if (fromIndex >= seriesCache.size) return emptyList()
-        val toIndex = minOf(fromIndex + chunkSize, seriesCache.size)
-        return seriesCache.subList(fromIndex, toIndex)
-    }
-
-    fun getTotalPages(): Int {
-        return (seriesCache.size + chunkSize - 1) / chunkSize
     }
 
 

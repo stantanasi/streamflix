@@ -28,10 +28,29 @@ class CloseloadExtractor : Extractor() {
             .unpack()
             ?: throw Exception("Can't unpack JS")
 
-        val source = Regex("=\"(aHR.*?)\";").find(unpacked)
+        var source = Regex("=\"(aHR.*?)\";").find(unpacked)
             ?.groupValues?.get(1)
             ?.let { Base64.decode(it, Base64.DEFAULT).toString(Charsets.UTF_8) }
-            ?: throw Exception("Can't retrieve source")
+        if (source == null){
+            val myPlayerSrc = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
+            val videoSrcVarName = myPlayerSrc.find(unpacked)
+                ?.groupValues?.get(1)
+                ?: throw Exception("Can't find variable name used in myPlayer.src")
+
+            val encodedM3u8Regex = Regex("""var\s+$videoSrcVarName\s*=\s*dc_hello\("([^"]+)"\)""")
+            val encodedLink = encodedM3u8Regex.find(unpacked)
+                ?.groupValues?.get(1)
+                ?: throw Exception("Can't retrieve encoded dc_hello string")
+
+            val decodedLink = String(Base64.decode(encodedLink, Base64.DEFAULT))
+
+            val decodedLinkReversed = decodedLink.reversed()
+
+            val decodeDecodedLinkReversed = String(Base64.decode(decodedLinkReversed, Base64.DEFAULT))
+
+                source = decodeDecodedLinkReversed.split("|").getOrNull(1)
+                ?: throw Exception("Can't extract final URL")
+        }
 
         return Video(
             source = source,

@@ -61,6 +61,8 @@ abstract class Extractor {
             LoadXExtractor(),
             VidHideExtractor(),
             VeevExtractor(),
+            RidooExtractor(),
+            USTRExtractor(),
         )
 
         suspend fun extract(link: String, server: Video.Server? = null): Video {
@@ -68,10 +70,7 @@ abstract class Extractor {
             val compareUrl = link.lowercase().replace(urlRegex, "")
 
             for (extractor in extractors) {
-                if ((server?.name?.lowercase() ?: "").contains(extractor.name.lowercase())){
-                    return extractor.extract(link)
-                }
-                else if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, ""))) {
+                if (compareUrl.startsWith(extractor.mainUrl.replace(urlRegex, ""))) {
                     return extractor.extract(link)
                 } else {
                     for (aliasUrl in extractor.aliasUrls) {
@@ -102,6 +101,12 @@ abstract class Extractor {
                             return extractor.extract(link)
                         }
                     }
+                }
+            }
+
+            for (extractor in extractors){
+                if ((server?.name?.lowercase() ?: "").contains(extractor.name.lowercase())){
+                    return extractor.extract(link)
                 }
             }
             throw Exception("No extractors found")

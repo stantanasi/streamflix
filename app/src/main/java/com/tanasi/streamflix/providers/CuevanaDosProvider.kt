@@ -536,7 +536,7 @@ object CuevanaDosProvider : Provider {
             else -> videoUrl.toString()
         }
 
-        return Extractor.extract(link)
+        return Extractor.extract(link, server)
     }
 
 

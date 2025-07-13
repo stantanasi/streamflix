@@ -188,7 +188,8 @@ object RidomoviesProvider : Provider {
                 title = it.content.title,
                 overview = it.overview,
                 runtime = it.duration.toInt(),
-                poster = it.posterPath.let { path -> "$URL/$path" },
+                poster = it.posterPath.let { path ->
+                    "${URL.trimEnd('/')}/${path.trimStart('/')}"},
             )
         }
 
@@ -204,7 +205,8 @@ object RidomoviesProvider : Provider {
                 title = it.content.title,
                 overview = it.overview,
                 runtime = it.duration.toInt(),
-                poster = it.posterPath.let { path -> "$URL/$path" },
+                poster = it.posterPath.let { path ->
+                    "${URL.trimEnd('/')}/${path.trimStart('/')}" },
             )
         }
 

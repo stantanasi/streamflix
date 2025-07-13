@@ -97,6 +97,7 @@ object AniWorldProvider : Provider {
     }
 
     override suspend fun getHome(): List<Category> {
+        preloadSeriesAlphabet()
         val document = service.getHome()
 
         val categories = mutableListOf<Category>()
@@ -421,7 +422,6 @@ object AniWorldProvider : Provider {
         val elements = document.select(".genre > ul > li")
 
         val loadedShows = elements.map {
-            val title = Jsoup.parse(it.text()).text()
             TvShow(
                 id = it.selectFirst("a[data-alternative-title]")
                     ?.attr("href")?.substringAfter("/anime/stream/")
