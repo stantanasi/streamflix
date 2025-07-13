@@ -32,23 +32,23 @@ class CloseloadExtractor : Extractor() {
             ?.groupValues?.get(1)
             ?.let { Base64.decode(it, Base64.DEFAULT).toString(Charsets.UTF_8) }
         if (source == null){
-            val variableRegex = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
-            val variableName = variableRegex.find(unpacked)
+            val myPlayerSrc = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
+            val videoSrcVarName = myPlayerSrc.find(unpacked)
                 ?.groupValues?.get(1)
                 ?: throw Exception("Can't find variable name used in myPlayer.src")
 
-            val encodedRegex = Regex("""var\s+$variableName\s*=\s*dc_hello\("([^"]+)"\)""")
-            val encoded = encodedRegex.find(unpacked)
+            val encodedM3u8Regex = Regex("""var\s+$videoSrcVarName\s*=\s*dc_hello\("([^"]+)"\)""")
+            val encodedLink = encodedM3u8Regex.find(unpacked)
                 ?.groupValues?.get(1)
                 ?: throw Exception("Can't retrieve encoded dc_hello string")
 
-            val step1 = String(Base64.decode(encoded, Base64.DEFAULT))
+            val decodedLink = String(Base64.decode(encodedLink, Base64.DEFAULT))
 
-            val reversed = step1.reversed()
+            val decodedLinkReversed = decodedLink.reversed()
 
-            val step2 = String(Base64.decode(reversed, Base64.DEFAULT))
+            val decodeDecodedLinkReversed = String(Base64.decode(decodedLinkReversed, Base64.DEFAULT))
 
-                source = step2.split("|").getOrNull(1)
+                source = decodeDecodedLinkReversed.split("|").getOrNull(1)
                 ?: throw Exception("Can't extract final URL")
         }
 
