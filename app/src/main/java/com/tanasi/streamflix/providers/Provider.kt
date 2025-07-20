@@ -56,6 +56,7 @@ interface Provider {
             FrenchAnimeProvider,
             FilmPalastProvider,
             CuevanaDosProvider,
+            CuevanaEuProvider,
         )
     }
 }
