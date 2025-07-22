@@ -46,10 +46,9 @@ class CloseloadExtractor : Extractor() {
 
             val decodedLinkReversed = decodedLink.reversed()
 
-            val decodeDecodedLinkReversed = String(Base64.decode(decodedLinkReversed, Base64.DEFAULT))
-
-                source = decodeDecodedLinkReversed.split("|").getOrNull(1)
-                ?: throw Exception("Can't extract final URL")
+            val finalDecodedLink = String(Base64.decode(decodedLinkReversed, Base64.DEFAULT))
+            val urlRegex = Regex("""https://[^\s"]+""")
+            source = urlRegex.find(finalDecodedLink)?.value.toString()
         }
 
         return Video(
