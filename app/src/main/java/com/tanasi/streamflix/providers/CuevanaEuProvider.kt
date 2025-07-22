@@ -5,6 +5,8 @@ import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.extractors.Extractor
 import com.tanasi.streamflix.models.*
 import com.tanasi.streamflix.models.cuevanaeu.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.Cache
@@ -39,11 +41,9 @@ object CuevanaEuProvider : Provider {
             .cache(appCache)
             .readTimeout(30, TimeUnit.SECONDS)
             .connectTimeout(30, TimeUnit.SECONDS)
-
         val dns = DnsOverHttps.Builder().client(clientBuilder.build())
             .url("https://1.1.1.1/dns-query".toHttpUrl())
             .build()
-
         return clientBuilder.dns(dns).build()
     }
 
@@ -54,25 +54,109 @@ object CuevanaEuProvider : Provider {
 
     override suspend fun getHome(): List<Category> {
         return try {
-            val document = service.getPage("$baseUrl/peliculas/estrenos/page/1")
-            val script = document.selectFirst("script#__NEXT_DATA__")?.data() ?: return emptyList()
-            val responseJson = json.decodeFromString<ApiResponse>(script)
-            val movies = responseJson.props?.pageProps?.movies?.map { movieData ->
-                Movie(
-                    id = "ver-pelicula/${movieData.slug?.name}",
-                    title = movieData.titles?.name ?: "",
-                    poster = movieData.images?.poster?.let { if (it.startsWith("http")) it else "$baseUrl$it" }
+            coroutineScope {
+                val mainPageDeferred = async { service.getPage("$baseUrl/peliculas/estrenos/page/1") }
+                val moviesWeeklyDeferred = async { service.getPage("$baseUrl/peliculas/tendencias/semana") }
+                val seriesWeeklyDeferred = async { service.getPage("$baseUrl/series/tendencias/semana") }
+                val seriesDailyDeferred = async { service.getPage("$baseUrl/series/tendencias/dia") }
+
+                val mainDocument = mainPageDeferred.await()
+                val mainScript = mainDocument.selectFirst("script#__NEXT_DATA__")?.data()
+                val mainResponseJson = mainScript?.let { json.decodeFromString<ApiResponse>(it) }
+
+                val bannerShows = mainResponseJson?.props?.pageProps?.movies?.map { movieData ->
+                    TvShow(
+                        id = "ver-pelicula/${movieData.slug?.name}",
+                        title = movieData.titles?.name ?: "Sin Título",
+                        banner = movieData.images?.backdrop?.let { if (it.startsWith("http")) it else "$baseUrl$it" }
+                    )
+                }?.filter { it.id != "ver-pelicula/null" } ?: emptyList()
+
+                val homeMovies = mainResponseJson?.props?.pageProps?.movies?.map { movieData ->
+                    Movie(
+                        id = "ver-pelicula/${movieData.slug?.name}",
+                        title = movieData.titles?.name ?: "",
+                        poster = movieData.images?.poster?.let { if (it.startsWith("http")) it else "$baseUrl$it" }
+                    )
+                }?.filter { it.id != "ver-pelicula/null" } ?: emptyList()
+
+                val categories = mutableListOf(
+                    Category(name = Category.FEATURED, list = bannerShows),
+                    Category(name = "Estrenos", list = homeMovies)
                 )
-            }?.filter { it.id != "ver-pelicula/null" } ?: emptyList()
-            listOf(Category(name = "Estrenos", list = movies))
+
+                try {
+                    val moviesWeeklyDocument = moviesWeeklyDeferred.await()
+                    val moviesWeeklyScript = moviesWeeklyDocument.selectFirst("script#__NEXT_DATA__")?.data()
+                    val moviesWeeklyJson = moviesWeeklyScript?.let { json.decodeFromString<ApiResponse>(it) }
+                    val trendingMovies = moviesWeeklyJson?.props?.pageProps?.movies?.map { movieData ->
+                        Movie(
+                            id = "ver-pelicula/${movieData.slug?.name}",
+                            title = movieData.titles?.name ?: "",
+                            poster = movieData.images?.poster?.let { if (it.startsWith("http")) it else "$baseUrl$it" }
+                        )
+                    }?.filter { it.id != "ver-pelicula/null" } ?: emptyList()
+                    categories.add(Category(name = "Películas - Tendencias de la Semana", list = trendingMovies))
+                } catch (e: Exception) {}
+
+                try {
+                    val seriesWeeklyDocument = seriesWeeklyDeferred.await()
+                    val seriesWeeklyScript = seriesWeeklyDocument.selectFirst("script#__NEXT_DATA__")?.data()
+                    val seriesWeeklyJson = seriesWeeklyScript?.let { json.decodeFromString<ApiResponse>(it) }
+                    val trendingSeriesWeekly = seriesWeeklyJson?.props?.pageProps?.movies?.map { seriesData ->
+                        TvShow(
+                            id = "ver-serie/${seriesData.slug?.name}",
+                            title = seriesData.titles?.name ?: "",
+                            poster = seriesData.images?.poster?.let { if (it.startsWith("http")) it else "$baseUrl$it" }
+                        )
+                    }?.filter { it.id != "ver-serie/null" } ?: emptyList()
+                    categories.add(Category(name = "Series - Tendencias de la Semana", list = trendingSeriesWeekly))
+                } catch (e: Exception) {}
+
+                try {
+                    val seriesDailyDocument = seriesDailyDeferred.await()
+                    val seriesDailyScript = seriesDailyDocument.selectFirst("script#__NEXT_DATA__")?.data()
+                    val seriesDailyJson = seriesDailyScript?.let { json.decodeFromString<ApiResponse>(it) }
+                    val trendingSeriesDaily = seriesDailyJson?.props?.pageProps?.movies?.map { seriesData ->
+                        TvShow(
+                            id = "ver-serie/${seriesData.slug?.name}",
+                            title = seriesData.titles?.name ?: "",
+                            poster = seriesData.images?.poster?.let { if (it.startsWith("http")) it else "$baseUrl$it" }
+                        )
+                    }?.filter { it.id != "ver-serie/null" } ?: emptyList()
+                    categories.add(Category(name = "Series - Tendencias del Día", list = trendingSeriesDaily))
+                } catch (e: Exception) {}
+
+                categories
+            }
         } catch (e: Exception) {
             emptyList()
         }
     }
 
     override suspend fun search(query: String, page: Int): List<AppAdapter.Item> {
+        if (query.isBlank()) {
+            return listOf(
+                Genre("accion", "Acción"),
+                Genre("aventura", "Aventura"),
+                Genre("animacion", "Animación"),
+                Genre("ciencia-ficcion", "Ciencia Ficción"),
+                Genre("comedia", "Comedia"),
+                Genre("crimen", "Crimen"),
+                Genre("documental", "Documental"),
+                Genre("drama", "Drama"),
+                Genre("familia", "Familia"),
+                Genre("fantasia", "Fantasía"),
+                Genre("misterio", "Misterio"),
+                Genre("romance", "Romance"),
+                Genre("suspense", "Suspenso"),
+                Genre("terror", "Terror"),
+            )
+        }
+        if (page > 1) {
+            return emptyList()
+        }
         return try {
-            if (query.isBlank()) return emptyList()
             val document = service.getPage("$baseUrl/search?q=$query")
             val script = document.selectFirst("script#__NEXT_DATA__")?.data() ?: return emptyList()
             val responseJson = json.decodeFromString<ApiResponse>(script)
@@ -149,6 +233,7 @@ object CuevanaEuProvider : Provider {
             overview = data.overview ?: "",
             released = data.releaseDate?.substringBefore("-"),
             poster = data.images?.poster?.let { if (it.startsWith("http")) it else "$baseUrl$it" },
+            banner = data.images?.backdrop?.let { if (it.startsWith("http")) it else "$baseUrl$it" },
             genres = data.genres?.map { genreData ->
                 Genre(id = genreData.slug ?: "", name = genreData.name ?: "")
             } ?: emptyList(),
@@ -178,6 +263,7 @@ object CuevanaEuProvider : Provider {
             overview = data.overview ?: "",
             released = data.releaseDate?.substringBefore("-"),
             poster = data.images?.poster?.let { if (it.startsWith("http")) it else "$baseUrl$it" },
+            banner = data.images?.backdrop?.let { if (it.startsWith("http")) it else "$baseUrl$it" },
             genres = data.genres?.map { genreData ->
                 Genre(id = genreData.slug ?: "", name = genreData.name ?: "")
             } ?: emptyList(),
@@ -221,20 +307,17 @@ object CuevanaEuProvider : Provider {
                 is Video.Type.Episode -> responseJson.props?.pageProps?.episode?.videos
             }
             val servers = mutableListOf<Video.Server>()
-
             suspend fun fetchServer(videoInfo: VideoInfo, lang: String) {
                 try {
                     val embedPage = service.getPage(videoInfo.result!!)
                     val finalUrl = embedPage.select("script").firstOrNull {
                         it.data().contains("var url =")
                     }?.data()?.substringAfter("var url = '")?.substringBefore("'") ?: ""
-
                     if (finalUrl.isNotBlank()) {
                         servers.add(Video.Server(id = finalUrl, name = "${videoInfo.cyberlocker} [$lang]"))
                     }
                 } catch (_: Exception) {}
             }
-
             videosJson?.latino?.forEach { fetchServer(it, "LAT") }
             videosJson?.spanish?.forEach { fetchServer(it, "CAST") }
             servers
@@ -248,11 +331,12 @@ object CuevanaEuProvider : Provider {
     }
 
     override val logo: String get() = "$baseUrl/favicon.ico"
+
     override suspend fun getGenre(id: String, page: Int): Genre {
         return try {
             val document = service.getPage("$baseUrl/genero/$id/page/$page")
             val script = document.selectFirst("script#__NEXT_DATA__")?.data()
-                ?: throw Exception("No se encontró el script #__NEXT_DATA__ para el género.")
+                ?: throw Exception("No se encontró el script para el género.")
             val responseJson = json.decodeFromString<ApiResponse>(script)
             val shows = responseJson.props?.pageProps?.movies?.mapNotNull { itemData ->
                 val slugName = itemData.slug?.name
@@ -274,7 +358,6 @@ object CuevanaEuProvider : Provider {
                     null
                 }
             } ?: emptyList()
-
             Genre(id = id, name = id.replaceFirstChar { it.uppercaseChar() }, shows = shows)
         } catch (e: Exception) {
             Genre(id = id, name = id.replaceFirstChar { it.uppercaseChar() }, shows = emptyList())

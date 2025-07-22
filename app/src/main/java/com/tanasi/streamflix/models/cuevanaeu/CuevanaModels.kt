@@ -3,13 +3,11 @@ package com.tanasi.streamflix.models.cuevanaeu
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-// --- MODELOS PRINCIPALES DE RESPUESTA ---
 @Serializable
 data class ApiResponse(
     @SerialName("props") var props: Props? = Props(),
 )
 
-// --- ESTRUCTURA ANIDADA ---
 @Serializable
 data class Props(
     @SerialName("pageProps") var pageProps: PageProps? = PageProps(),
@@ -23,7 +21,6 @@ data class PageProps(
     @SerialName("episode") var episode: EpisodeInfo? = EpisodeInfo()
 )
 
-// --- MODELO UNIFICADO PARA PELÍCULA/SERIE ---
 @Serializable
 data class MediaItem(
     @SerialName("titles") var titles: Titles? = Titles(),
@@ -36,9 +33,9 @@ data class MediaItem(
     @SerialName("seasons") var seasons: ArrayList<SeasonInfo>? = arrayListOf(),
     @SerialName("slug") var slug: Slug? = Slug(),
     @SerialName("url") var url: Url? = Url(),
+    @SerialName("rate") var rate: Rate? = Rate(),
 )
 
-// --- MODELOS PARA EPISODIOS Y TEMPORADAS ---
 @Serializable
 data class SeasonInfo(
     @SerialName("number") var number: Int? = null,
@@ -59,7 +56,6 @@ data class EpisodeInfo(
     @SerialName("videos") var videos: Videos? = Videos()
 )
 
-// --- MODELOS PARA VIDEOS ---
 @Serializable
 data class VideoInfo(
     @SerialName("cyberlocker") var cyberlocker: String? = null,
@@ -74,7 +70,6 @@ data class Videos(
     @SerialName("japanese") var japanese: ArrayList<VideoInfo>? = arrayListOf()
 )
 
-// --- MODELOS AUXILIARES GENÉRICOS ---
 @Serializable
 data class Titles(
     @SerialName("name") var name: String? = null,
@@ -83,6 +78,7 @@ data class Titles(
 @Serializable
 data class Images(
     @SerialName("poster") var poster: String? = null,
+    @SerialName("backdrop") var backdrop: String? = null,
 )
 
 @Serializable
@@ -111,4 +107,9 @@ data class Slug(
     @SerialName("name") var name: String? = null,
     @SerialName("season") var season: String? = null,
     @SerialName("episode") var episode: String? = null,
+)
+
+@Serializable
+data class Rate(
+    @SerialName("average") var average: Double? = null,
 )

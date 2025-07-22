@@ -57,6 +57,8 @@ interface Provider {
             FilmPalastProvider,
             CuevanaDosProvider,
             CuevanaEuProvider,
+            LatanimeProvider,
+            DoramasflixProvider,
         )
     }
 }
