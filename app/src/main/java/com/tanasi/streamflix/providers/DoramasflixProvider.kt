@@ -12,9 +12,12 @@ import com.tanasi.streamflix.models.doramasflix.TokenModel
 import com.tanasi.streamflix.models.doramasflix.VideoToken
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import okhttp3.Cache
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.dnsoverhttps.DnsOverHttps
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -23,8 +26,10 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Url
+import java.io.File
 import java.net.URL
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 object DoramasflixProvider : Provider {
 
@@ -33,7 +38,7 @@ object DoramasflixProvider : Provider {
     private const val apiUrl = "https://sv1.fluxcedene.net/api/"
     override val language = "es"
 
-    private val client = OkHttpClient.Builder().build()
+    private val client = getOkHttpClient()
 
     private val service = Retrofit.Builder()
         .baseUrl(apiUrl)
@@ -48,6 +53,21 @@ object DoramasflixProvider : Provider {
         .client(client)
         .build()
         .create(DoramasflixService::class.java)
+
+    private fun getOkHttpClient(): OkHttpClient {
+        val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
+
+        val clientBuilder = OkHttpClient.Builder()
+            .cache(appCache)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+
+        val dns = DnsOverHttps.Builder().client(clientBuilder.build())
+            .url("https://1.1.1.1/dns-query".toHttpUrl())
+            .build()
+
+        return clientBuilder.dns(dns).build()
+    }
 
     private const val accessPlatform = "RxARncfg1S_MdpSrCvreoLu_SikCGMzE1NzQzODc3NjE2MQ=="
 
@@ -110,7 +130,7 @@ object DoramasflixProvider : Provider {
                     val bannerUrl = element.selectFirst("noscript img")?.attr("src")
                     val title = element.selectFirst("h2.styles__Title-sc-78uayx-1")?.text() ?: return@mapNotNull null
 
-                    val id = href.substringAfterLast("/")
+                    val id = href.removePrefix("/")
 
                     if (href.contains("/peliculas-online/")) {
                         Movie(
@@ -160,7 +180,7 @@ object DoramasflixProvider : Provider {
             response.data?.searchDorama?.forEach { show ->
                 results.add(
                     TvShow(
-                        id = show.slug,
+                        id = "doramas-online/${show.slug}",
                         title = "${show.name} (${show.nameEs ?: ""})".trim(),
                         poster = getPosterUrl(show.posterPath ?: show.poster)
                     )
@@ -170,7 +190,7 @@ object DoramasflixProvider : Provider {
             response.data?.searchMovie?.forEach { show ->
                 results.add(
                     Movie(
-                        id = show.slug,
+                        id = "peliculas-online/${show.slug}",
                         title = "${show.name} (${show.nameEs ?: ""})".trim(),
                         poster = getPosterUrl(show.posterPath ?: show.poster)
                     )
@@ -193,7 +213,7 @@ object DoramasflixProvider : Provider {
             val response = service.getApiResponse(body)
             response.data?.paginationMovie?.items?.map {
                 Movie(
-                    id = it.slug,
+                    id = "peliculas-online/${it.slug}",
                     title = "${it.name} (${it.nameEs ?: ""})".trim(),
                     poster = getPosterUrl(it.posterPath ?: it.poster)
                 )
@@ -213,7 +233,7 @@ object DoramasflixProvider : Provider {
             val response = service.getApiResponse(body)
             response.data?.paginationDorama?.items?.map {
                 TvShow(
-                    id = it.slug,
+                    id = "doramas-online/${it.slug}",
                     title = "${it.name} (${it.nameEs ?: ""})".trim(),
                     poster = getPosterUrl(it.posterPath ?: it.poster)
                 )
@@ -225,7 +245,7 @@ object DoramasflixProvider : Provider {
 
     override suspend fun getMovie(id: String): Movie {
         return try {
-            val url = "$baseUrl/peliculas-online/$id"
+            val url = if (id.startsWith("http")) id else "$baseUrl/$id"
             val document = serviceHtml.getPage(url)
             val script = document.selectFirst("script#__NEXT_DATA__")?.data()
                 ?: throw Exception("No se pudo encontrar el script de datos.")
@@ -251,7 +271,7 @@ object DoramasflixProvider : Provider {
 
     override suspend fun getTvShow(id: String): TvShow {
         return try {
-            val url = if (id.startsWith("/")) "$baseUrl$id" else "$baseUrl/doramas-online/$id"
+            val url = if (id.startsWith("http")) id else "$baseUrl/$id"
             val document = serviceHtml.getPage(url)
             val script = document.selectFirst("script#__NEXT_DATA__")?.data()
                 ?: throw Exception("No se pudo encontrar el script de datos.")
@@ -261,7 +281,7 @@ object DoramasflixProvider : Provider {
                 .getAsJsonObject("pageProps")
                 .getAsJsonObject("apolloState")
 
-            val doramaData = apolloState.entrySet().firstOrNull { (key, _) -> key.startsWith("Dorama:") }?.value?.asJsonObject
+            val doramaData = apolloState.entrySet().firstOrNull { (key, _) -> key.startsWith("Dorama:") || key.startsWith("Movie:") }?.value?.asJsonObject
                 ?: throw Exception("No se encontraron datos del dorama en el JSON.")
 
             val doramaId = doramaData.get("_id").asString
@@ -320,7 +340,7 @@ object DoramasflixProvider : Provider {
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         try {
             val url = when (videoType) {
-                is Video.Type.Movie -> "$baseUrl/peliculas-online/$id"
+                is Video.Type.Movie -> "$baseUrl/$id"
                 is Video.Type.Episode -> "$baseUrl/episodios/$id"
             }
 
@@ -393,7 +413,7 @@ object DoramasflixProvider : Provider {
     }
 
     override suspend fun getVideo(server: Video.Server): Video = Extractor.extract(server.id, server)
-    override val logo: String = "https://doramasflix.in/images/logo.png"
+    override val logo: String = "https://doramasflix.in/img/logo.png"
 
     override suspend fun getGenre(id: String, page: Int): Genre {
         val list: List<Show> = when (id) {
