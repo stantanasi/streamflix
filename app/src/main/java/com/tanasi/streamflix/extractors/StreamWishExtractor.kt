@@ -32,7 +32,7 @@ open class StreamWishExtractor : Extractor() {
     override suspend fun extract(link: String): Video {
         val service = Service.build(mainUrl)
 
-        val document = service.get(getEmbedUrl(link), referer = referer)
+        val document = service.get(link, referer = referer)
 
 
         val script = Regex("<script .*>(eval.*?)</script>", RegexOption.DOT_MATCHES_ALL).find(document.toString())
@@ -40,8 +40,11 @@ open class StreamWishExtractor : Extractor() {
             ?.let { JsUnpacker(it).unpack() }
             ?: throw Exception("Can't retrieve script")
 
-        val source = Regex("\"hls\\d+\":\\s*\"(.*?m3u8.*?)\"").findAll(script)
-            .map { it.groupValues.getOrNull(1) }
+        val source = Regex("\"hls(\\d+)\"\\s*:\\s*\"(https:[^\"]+\\.m3u8[^\"]*)\"")
+            .findAll(script)
+            .map { it.groupValues[1].toInt() to it.groupValues[2] }
+            .sortedBy { it.first }  // hls2 > hls3 > hls4
+            .map { it.second }
             .firstOrNull()
             ?: throw Exception("Can't retrieve m3u8")
 
@@ -62,22 +65,17 @@ open class StreamWishExtractor : Extractor() {
         val video = Video(
             source = source,
             subtitles = subtitles,
+            headers = mapOf(
+                "Referer" to referer,
+                "Origin" to mainUrl,
+                "User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:139.0) Gecko/20100101 Firefox/139.0",
+                "Accept" to "*/*",
+                "Accept-Language" to "en-US,en;q=0.5",
+                "Connection" to "keep-alive",
+            ),
         )
 
         return video
-    }
-
-    private fun getEmbedUrl(url: String): String {
-        return if (url.contains("/f/")) {
-            val videoId = url.substringAfter("/f/")
-            "$mainUrl/$videoId"
-        } else if (url.contains("/e/")){
-            val videoId = url.substringAfter("/e/")
-            "$mainUrl/$videoId"
-
-        } else {
-            url
-        }
     }
 
 
