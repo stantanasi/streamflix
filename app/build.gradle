@@ -4,6 +4,7 @@ plugins {
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.20"
 }
 
 android {
@@ -109,6 +110,7 @@ dependencies {
     ksp 'androidx.room:room-compiler:2.7.1'
 
     implementation("org.mozilla:rhino:1.8.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 }
 
 ksp {
