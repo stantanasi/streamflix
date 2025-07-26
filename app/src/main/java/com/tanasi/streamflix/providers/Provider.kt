@@ -59,6 +59,8 @@ interface Provider {
             CuevanaEuProvider,
             LatanimeProvider,
             DoramasflixProvider,
+            CineCalidadProvider,
+            FlixLatamProvider,
         )
     }
 }
