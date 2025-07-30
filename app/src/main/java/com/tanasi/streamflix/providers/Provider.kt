@@ -61,6 +61,10 @@ interface Provider {
             DoramasflixProvider,
             CineCalidadProvider,
             FlixLatamProvider,
+            AnimeBumProvider,
+            AnimefenixProvider,
+            AnimeFlvProvider,
+            AnimeIDProvider,
         )
     }
 }
