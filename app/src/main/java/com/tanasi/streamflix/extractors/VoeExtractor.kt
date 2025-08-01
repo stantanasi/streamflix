@@ -50,8 +50,14 @@ class VoeExtractor : Extractor() {
 
                 val retrofitVOEhtml =
                     retrofitVOEBuiled.getSource(originalLink.replace(baseUrl, "")).html()
-                val redirectBaseUrl =
-                    "https://" + retrofitVOEhtml.split("https://")[1].split("e/")[0]
+
+                val regex = Regex("""https://([a-zA-Z0-9.-]+)(?:/[^'"]*)?""")
+                val match = regex.find(retrofitVOEhtml)
+                val redirectBaseUrl = if (match != null) {
+                    "https://${match.groupValues[1]}/"
+                } else {
+                    throw Exception("Base url not found for VOE")
+                }
                 val retrofitRedirected = Retrofit.Builder()
                     .baseUrl(redirectBaseUrl)
                     .addConverterFactory(JsoupConverterFactory.create())

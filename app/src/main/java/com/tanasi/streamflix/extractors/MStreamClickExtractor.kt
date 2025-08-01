@@ -25,12 +25,17 @@ class MStreamClickExtractor : Extractor() {
         val service = MStreamClickExtractorService.build(mainUrl, link)
         val source = service.getSource(link.replace(mainUrl, ""))
         val html = source.html()
-        val packedSource =
-            "eval" + html.split("<script type=\"text/javascript\">eval")[1].split("</source>")[0]
-        val unpackedSource = JsUnpacker(packedSource).unpack().toString()
-        val url = unpackedSource.split("file:\"")[1].split("\"}]")[0]
+        val packedJS = Regex("(eval\\(function\\(p,a,c,k,e,d\\)(.|\\n)*?)</script>")
+            .find(html)
+            ?.groupValues?.get(1)
+            ?: throw Exception("Packed JS not found")
+        val script = JsUnpacker(packedJS).unpack() ?: html
 
-        return Video(source = url)
+        val m3u8 = Regex("""["']hls(?:2|3|4)["']\s*:\s*["']([^"']*?\.m3u8[^"']*)["']""")
+            .find(script)
+            ?.groupValues?.getOrNull(1)
+            ?: throw Exception("Can't find m3u8")
+        return Video(source = m3u8)
     }
 
     private interface MStreamClickExtractorService {
