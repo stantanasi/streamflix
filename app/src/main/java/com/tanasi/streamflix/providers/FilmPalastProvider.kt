@@ -93,7 +93,7 @@ object FilmPalastProvider : Provider {
         }
         return listOf(
             Category(name = "Featured", list = featured),
-            Category(name = "Mixed", list = main_content)
+            Category(name = "Filme", list = main_content)
         )
     }
 
@@ -355,7 +355,7 @@ object FilmPalastProvider : Provider {
             }
         }
 
-        @GET("/")
+        @GET("movies/new/page/1")
         suspend fun getHome(): Document
 
         @GET

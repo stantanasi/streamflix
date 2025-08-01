@@ -2,6 +2,8 @@ package com.tanasi.streamflix.utils;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -66,6 +68,26 @@ public class AADecoder {
         return toStringCases(txtResult.toString());
     }
 
+    public static String decodeWithRhino(String aaEncoded) {
+        Context cx = Context.enter();
+        try {
+            cx.setOptimizationLevel(-1);
+            Scriptable scope = cx.initStandardObjects();
+            Scriptable window = cx.newObject(scope);
+            ScriptableObject.putProperty(scope, "window", window);
+            cx.evaluateString(scope, aaEncoded, "AAEncoded", 1, null);
+            Object result = cx.evaluateString(scope, "JSON.stringify(window.svg)", "extract", 1, null);
+            if (result == null || result == Undefined.instance) {
+                return "[AADecoder] Error: window.svg not found";
+            }
+            return "window.svg=" + result + ";";
+
+        } catch (Exception e) {
+            return "[AADecoder] decode error: " + e.getMessage();
+        } finally {
+            Context.exit();
+        }
+    }
     public static int eval(String expression) {
         try {
             Context rhino = Context.enter();

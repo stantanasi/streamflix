@@ -37,11 +37,28 @@ class MStreamDayExtractor : Extractor() {
         encodedSource = encodedSource.replace("\\\\", "\\")
         encodedSource = encodedSource.replace("\\\"", "\"")
 
-        var decodedSoure = AADecoder.decode(encodedSource, true)
-        val urlEncoded = decodedSoure.split("window.svg={\"stream\":\"")[1].split("\",\"hash")[0]
+        var decodedSource = try {
+            AADecoder.decode(encodedSource, true)
+        } catch (e: Exception) {
+            null
+        }
 
-        val urlSigDecoded = sigDecode(urlEncoded)
-        return Video(source = urlSigDecoded)
+        if (decodedSource == null || !decodedSource.contains("window.svg")) {
+            decodedSource = try {
+                AADecoder.decodeWithRhino(encodedSource)
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        if (decodedSource != null && decodedSource.contains("window.svg={\"stream\":\"")) {
+            val urlEncoded = decodedSource
+                .split("window.svg={\"stream\":\"")[1]
+                .split("\",\"hash")[0]
+            val urlSigDecoded = sigDecode(urlEncoded)
+            return Video(source = urlSigDecoded)
+        }
+        throw Exception("Could not extract MStreamDayVideo")
     }
 
     private fun sigDecode(url: String): String {
