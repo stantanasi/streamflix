@@ -65,6 +65,7 @@ interface Provider {
             AnimefenixProvider,
             AnimeFlvProvider,
             AnimeIDProvider,
+            SoloLatinoProvider,
         )
     }
 }
