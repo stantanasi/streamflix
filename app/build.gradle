@@ -8,6 +8,18 @@ plugins {
 }
 
 android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true  // questa riga abilita il desugaring completo
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'  // libreria per supporto Java 8 su Android < 24
+}
+
+android {
     namespace 'com.tanasi.streamflix'
     compileSdk 35
 
