@@ -18,7 +18,6 @@ import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okhttp3.dnsoverhttps.DnsOverHttps
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.http.Body
@@ -31,7 +30,6 @@ import java.util.concurrent.TimeUnit
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
-import android.util.Log
 
 object SoloLatinoProvider : Provider {
 
@@ -81,7 +79,7 @@ object SoloLatinoProvider : Provider {
         ): Response<ResponseBody>
     }
 
-    override val logo = "$baseUrl/wp-content/uploads/2023/02/sololatino-logo-1.png"
+    override val logo = "$baseUrl/wp-content/uploads/2022/11/logo-final.png"
 
     override suspend fun getHome(): List<Category> = coroutineScope {
         val categories = mutableListOf<Category>()
@@ -95,71 +93,53 @@ object SoloLatinoProvider : Provider {
             "KDramas" to async { service.getPage("$baseUrl/genre_series/kdramas") }
         )
 
-        // --- CORRECCIÓN AQUÍ ---
-        // El banner se crea a partir de "Tendencias" usando una función de parseo especial
         try {
             val trendingDoc = deferredMap["Tendencias"]?.await()
             if (trendingDoc != null) {
-                // Usamos la nueva función parseBannerShows
                 val bannerShows = parseBannerShows(trendingDoc).take(12)
                 if (bannerShows.isNotEmpty()) {
                     categories.add(Category(Category.FEATURED, bannerShows))
                 }
             }
-        } catch (e: Exception) {
-            // No hacer nada si el banner falla
-        }
+        } catch (e: Exception) { /* Ignore */ }
 
-        // Creamos el resto de las categorías
         for ((categoryName, deferred) in deferredMap) {
             try {
                 val doc = deferred.await()
-                // Usamos la función de parseo normal para las filas
-                val shows = parseShows(doc).take(12)
+                val shows = if (categoryName.contains("Películas")) parseMovies(doc) else parseTvShows(doc)
                 if (shows.isNotEmpty()) {
-                    categories.add(Category(categoryName, shows))
+                    categories.add(Category(categoryName, shows.take(12)))
                 }
-            } catch (e: Exception) {
-                // Si una categoría falla, simplemente no se mostrará.
-            }
+            } catch (e: Exception) { /* Ignore */ }
         }
 
         categories
     }
 
-    // --- NUEVA FUNCIÓN PARA EL BANNER ---
     private fun parseBannerShows(document: Document): List<Show> {
-        return document.select("article.item").map { element ->
+        return document.select("article.item").mapNotNull { element ->
+            val linkElement = element.selectFirst("a") ?: return@mapNotNull null
+            val href = linkElement.attr("href")
+            val absoluteUrl = if (href.startsWith("http")) href else "$baseUrl$href"
             val imageUrl = element.selectFirst("img")?.attr("data-srcset") ?: ""
-            val linkElement = element.selectFirst("a")!!
+
             TvShow(
-                id = linkElement.attr("href"),
+                id = absoluteUrl,
                 title = element.selectFirst("img")!!.attr("alt"),
-                // Asignamos la imagen a la propiedad 'banner'
                 banner = if (imageUrl.startsWith("http")) imageUrl else "$baseUrl$imageUrl"
             )
         }
     }
 
-    // Funciones de ayuda para las filas (sin cambios)
-    private fun parseShows(document: Document): List<Show> {
-        return document.select("article.item").map { element ->
-            val posterUrl = element.selectFirst("img")?.attr("data-srcset") ?: ""
-            val linkElement = element.selectFirst("a")!!
-            TvShow(
-                id = linkElement.attr("href"),
-                title = element.selectFirst("img")!!.attr("alt"),
-                poster = if (posterUrl.startsWith("http")) posterUrl else "$baseUrl$posterUrl"
-            )
-        }
-    }
-
     private fun parseMovies(document: Document): List<Movie> {
-        return document.select("article.item").map { element ->
+        return document.select("article.item").mapNotNull { element ->
+            val linkElement = element.selectFirst("a") ?: return@mapNotNull null
+            val href = linkElement.attr("href")
+            val absoluteUrl = if (href.startsWith("http")) href else "$baseUrl$href"
             val posterUrl = element.selectFirst("img")?.attr("data-srcset") ?: ""
-            val linkElement = element.selectFirst("a")!!
+
             Movie(
-                id = linkElement.attr("href"),
+                id = absoluteUrl,
                 title = element.selectFirst("img")!!.attr("alt"),
                 poster = if (posterUrl.startsWith("http")) posterUrl else "$baseUrl$posterUrl"
             )
@@ -167,11 +147,14 @@ object SoloLatinoProvider : Provider {
     }
 
     private fun parseTvShows(document: Document): List<TvShow> {
-        return document.select("article.item").map { element ->
+        return document.select("article.item").mapNotNull { element ->
+            val linkElement = element.selectFirst("a") ?: return@mapNotNull null
+            val href = linkElement.attr("href")
+            val absoluteUrl = if (href.startsWith("http")) href else "$baseUrl$href"
             val posterUrl = element.selectFirst("img")?.attr("data-srcset") ?: ""
-            val linkElement = element.selectFirst("a")!!
+
             TvShow(
-                id = linkElement.attr("href"),
+                id = absoluteUrl,
                 title = element.selectFirst("img")!!.attr("alt"),
                 poster = if (posterUrl.startsWith("http")) posterUrl else "$baseUrl$posterUrl"
             )
@@ -212,7 +195,7 @@ object SoloLatinoProvider : Provider {
 
         return try {
             val document = service.getPage("$baseUrl/page/$page?s=$query")
-            parseShows(document)
+            parseTvShows(document) // Usamos TvShow como genérico para búsqueda
         } catch (e: Exception) {
             emptyList()
         }
@@ -239,7 +222,7 @@ object SoloLatinoProvider : Provider {
     override suspend fun getGenre(id: String, page: Int): Genre {
         return try {
             val document = service.getPage("$baseUrl/page/$page?s=$id")
-            val shows = parseShows(document)
+            val shows = parseTvShows(document)
             Genre(
                 id = id,
                 name = id.replaceFirstChar { it.uppercase() },
@@ -253,33 +236,23 @@ object SoloLatinoProvider : Provider {
     override suspend fun getMovie(id: String): Movie {
         return try {
             val document = service.getPage(id)
-
             val sheader = document.selectFirst("div.sheader")!!
+
             val posterUrl = sheader.selectFirst("div.poster > img")?.attr("src") ?: ""
             val title = sheader.selectFirst("div.data > h1")?.text() ?: "Sin Título"
             val genres = sheader.select("div.data > div.sgeneros > a").map {
-                Genre(
-                    id = it.attr("href").substringAfter("/genres/").removeSuffix("/"),
-                    name = it.text()
-                )
+                Genre(id = it.attr("href").substringAfter("/genres/").removeSuffix("/"), name = it.text())
             }
             val overview = document.selectFirst("div.wp-content > p")?.text()
+            val banner = document.selectFirst("div.wallpaper")?.attr("style")?.substringAfter("url(")?.substringBefore(")")
+            val rating = document.selectFirst("div.nota > span")?.text()?.substringBefore(" ")?.toDoubleOrNull()
 
-            // New data extraction
-            val banner = document.selectFirst("div.wallpaper")
-                ?.attr("style")
-                ?.substringAfter("url(")?.substringBefore(")")
-            val rating = document.selectFirst("div.nota > span")?.text()
-                ?.substringBefore(" ")?.toDoubleOrNull()
             val extraInfo = document.selectFirst("div.sbox.extra")
-            val runtime = extraInfo?.selectFirst("span.runtime")?.text()
-                ?.removeSuffix(" Min.")?.trim()?.toIntOrNull()
-            val released = sheader.selectFirst("span.date")?.text()
-                ?.split(", ")?.getOrNull(1)
-            val trailer = extraInfo?.selectFirst("li > span > a[href*=youtube]")
-                ?.attr("href")
+            val runtime = extraInfo?.selectFirst("span.runtime")?.text()?.removeSuffix(" Min.")?.trim()?.toIntOrNull()
+            val released = sheader.selectFirst("span.date")?.text()?.split(", ")?.getOrNull(1)
+            val trailer = extraInfo?.selectFirst("li > span > a[href*=youtube]")?.attr("href")
 
-            val cast = document.select("div.sbox.srepart > div.persons > div.person").map {
+            val cast = document.select("div.sbox.srepart div.person").map {
                 People(
                     id = it.selectFirst("a")?.attr("href") ?: "",
                     name = it.selectFirst(".name a")?.text() ?: "",
@@ -287,11 +260,16 @@ object SoloLatinoProvider : Provider {
                 )
             }
 
-            val recommendations = document.select("div.sbox.srelacionados article").map {
-                val recPoster = it.selectFirst("img")?.attr("data-srcset") ?: ""
+            val recommendations = document.select("div.sbox.srelacionados article").mapNotNull { article ->
+                val linkElement = article.selectFirst("a") ?: return@mapNotNull null
+                val imgElement = article.selectFirst("img") ?: return@mapNotNull null
+                val href = linkElement.attr("href")
+                val absoluteUrl = if (href.startsWith("http")) href else "$baseUrl$href"
+                val recPoster = imgElement.attr("data-srcset")
+
                 TvShow(
-                    id = it.selectFirst("a")!!.attr("href"),
-                    title = it.selectFirst("img")!!.attr("alt"),
+                    id = absoluteUrl,
+                    title = imgElement.attr("alt"),
                     poster = if (recPoster.startsWith("http")) recPoster else "$baseUrl$recPoster"
                 )
             }
@@ -318,42 +296,27 @@ object SoloLatinoProvider : Provider {
     override suspend fun getTvShow(id: String): TvShow {
         return try {
             val document = service.getPage(id)
-
             val sheader = document.selectFirst("div.sheader")!!
+
             val posterUrl = sheader.selectFirst("div.poster > img")?.attr("src") ?: ""
             val title = sheader.selectFirst("div.data > h1")?.text() ?: "Sin Título"
             val genres = sheader.select("div.data > div.sgeneros > a").map {
-                Genre(
-                    id = it.attr("href").substringAfter("/genres/").removeSuffix("/"),
-                    name = it.text()
-                )
+                Genre(id = it.attr("href").substringAfter("/genres/").removeSuffix("/"), name = it.text())
             }
             val overview = document.selectFirst("div.wp-content > p")?.text()
-
             val seasons = document.select("div#seasons div.se-c").map { seasonElement ->
                 val seasonNumber = seasonElement.attr("data-season").toIntOrNull() ?: 0
-                Season(
-                    id = "$id@$seasonNumber",
-                    number = seasonNumber,
-                    title = "Temporada $seasonNumber"
-                )
+                Season(id = "$id@$seasonNumber", number = seasonNumber, title = "Temporada $seasonNumber")
             }.filter { it.number != 0 }
 
-            // New data extraction
-            val banner = document.selectFirst("div.wallpaper")
-                ?.attr("style")
-                ?.substringAfter("url(")?.substringBefore(")")
-            val rating = document.selectFirst("div.nota > span")?.text()
-                ?.substringBefore(" ")?.toDoubleOrNull()
+            val banner = document.selectFirst("div.wallpaper")?.attr("style")?.substringAfter("url(")?.substringBefore(")")
+            val rating = document.selectFirst("div.nota > span")?.text()?.substringBefore(" ")?.toDoubleOrNull()
             val extraInfo = document.selectFirst("div.sbox.extra")
-            val runtime = extraInfo?.selectFirst("span.runtime")?.text()
-                ?.removeSuffix(" Min.")?.trim()?.toIntOrNull()
-            val released = sheader.selectFirst("span.date")?.text()
-                ?.split(", ")?.getOrNull(1)
-            val trailer = extraInfo?.selectFirst("li > span > a[href*=youtube]")
-                ?.attr("href")
+            val runtime = extraInfo?.selectFirst("span.runtime")?.text()?.removeSuffix(" Min.")?.trim()?.toIntOrNull()
+            val released = sheader.selectFirst("span.date")?.text()?.split(", ")?.getOrNull(1)
+            val trailer = extraInfo?.selectFirst("li > span > a[href*=youtube]")?.attr("href")
 
-            val cast = document.select("div.sbox.srepart > div.persons > div.person").map {
+            val cast = document.select("div.sbox.srepart div.person").map {
                 People(
                     id = it.selectFirst("a")?.attr("href") ?: "",
                     name = it.selectFirst(".name a")?.text() ?: "",
@@ -361,11 +324,16 @@ object SoloLatinoProvider : Provider {
                 )
             }
 
-            val recommendations = document.select("div.sbox.srelacionados article").map {
-                val recPoster = it.selectFirst("img")?.attr("data-srcset") ?: ""
+            val recommendations = document.select("div.sbox.srelacionados article").mapNotNull { article ->
+                val linkElement = article.selectFirst("a") ?: return@mapNotNull null
+                val imgElement = article.selectFirst("img") ?: return@mapNotNull null
+                val href = linkElement.attr("href")
+                val absoluteUrl = if (href.startsWith("http")) href else "$baseUrl$href"
+                val recPoster = imgElement.attr("data-srcset")
+
                 TvShow(
-                    id = it.selectFirst("a")!!.attr("href"),
-                    title = it.selectFirst("img")!!.attr("alt"),
+                    id = absoluteUrl,
+                    title = imgElement.attr("alt"),
                     poster = if (recPoster.startsWith("http")) recPoster else "$baseUrl$recPoster"
                 )
             }
@@ -395,8 +363,7 @@ object SoloLatinoProvider : Provider {
             val showId = seasonId.substringBefore("@")
             val seasonNumber = seasonId.substringAfter("@")
             val document = service.getPage(showId)
-            val seasonElement = document.select("div.se-c[data-season=$seasonNumber]")
-                .firstOrNull() ?: return emptyList()
+            val seasonElement = document.select("div.se-c[data-season=$seasonNumber]").firstOrNull() ?: return emptyList()
             seasonElement.select("ul.episodios li").map { episodeElement ->
                 val numerando = episodeElement.selectFirst("div.numerando")?.text() ?: "0 - 0"
                 val episodeNum = numerando.split("-").getOrNull(1)?.trim()?.toIntOrNull() ?: 0
@@ -483,8 +450,20 @@ object SoloLatinoProvider : Provider {
         return Extractor.extract(server.id, server)
     }
 
-    // Funciones no utilizadas por este proveedor
     override suspend fun getPeople(id: String, page: Int): People {
-        throw Exception("Not used")
+        return try {
+            val document = service.getPage(id)
+            val name = document.selectFirst(".data h1")?.text() ?: ""
+            val poster = document.selectFirst(".poster img")?.attr("src")
+            val filmography = parseTvShows(document) // La estructura de la lista es la misma
+            People(
+                id = id,
+                name = name,
+                image = poster?.let { if (it.startsWith("http")) it else "$baseUrl$it" },
+                filmography = filmography
+            )
+        } catch (e: Exception) {
+            throw e
+        }
     }
 }
