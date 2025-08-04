@@ -67,6 +67,7 @@ interface Provider {
             AnimeIDProvider,
             SoloLatinoProvider,
             Cine24hProvider,
+            PelisplustoProvider,
         )
     }
 }
