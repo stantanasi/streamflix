@@ -25,6 +25,7 @@ import com.tanasi.streamflix.utils.UserPreferences
         TvShow::class,
     ],
     version = 4,
+    exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
