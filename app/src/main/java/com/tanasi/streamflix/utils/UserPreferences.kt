@@ -14,6 +14,10 @@ object UserPreferences {
 
     private lateinit var prefs: SharedPreferences
 
+    // Default DoH Provider URL (Cloudflare)
+    private const val DEFAULT_DOH_PROVIDER_URL = "https://cloudflare-dns.com/dns-query"
+    const val DOH_DISABLED_VALUE = "" // Value to represent DoH being disabled
+
     fun setup(context: Context) {
         prefs = context.getSharedPreferences(
             "${BuildConfig.APPLICATION_ID}.preferences",
@@ -91,9 +95,9 @@ object UserPreferences {
         get() = Key.STREAMINGCOMMUNITY_DOMAIN.getString()
         set(value) = Key.STREAMINGCOMMUNITY_DOMAIN.setString(value)
 
-    var streamingcommunityDnsOverHttps: Boolean
-        get() = Key.STREAMINGCOMMUNITY_DNS_OVER_HTTPS.getBoolean()?: true
-        set(value) = Key.STREAMINGCOMMUNITY_DNS_OVER_HTTPS.setBoolean(value)
+    var dohProviderUrl: String
+        get() = Key.DOH_PROVIDER_URL.getString() ?: DEFAULT_DOH_PROVIDER_URL
+        set(value) = Key.DOH_PROVIDER_URL.setString(value)
 
 
     private enum class Key {
@@ -110,7 +114,7 @@ object UserPreferences {
         QUALITY_HEIGHT,
         SUBTITLE_NAME,
         STREAMINGCOMMUNITY_DOMAIN,
-        STREAMINGCOMMUNITY_DNS_OVER_HTTPS;
+        DOH_PROVIDER_URL; // Removed STREAMINGCOMMUNITY_DNS_OVER_HTTPS, added DOH_PROVIDER_URL
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)
@@ -132,8 +136,9 @@ object UserPreferences {
             else -> null
         }
 
+        // Modified getString to handle default for dohProviderUrl if needed, but getter handles it now
         fun getString(): String? = when {
-            prefs.contains(name) -> prefs.getString(name, "")
+            prefs.contains(name) -> prefs.getString(name, null) // Return null if not found initially
             else -> null
         }
 

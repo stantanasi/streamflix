@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_doh_provider_title">DNS over HTTPS (DoH)</string>
+
+    <string-array name="doh_provider_names">
+        <item>Disabilitato</item>
+        <item>Google</item>
+        <item>Cloudflare</item>
+        <item>OpenDNS</item>
+        <item>Quad9</item>
+        <item>CleanBrowsing (Family Filter)</item>
+    </string-array>
+
+    <string-array name="doh_provider_urls">
+        <item></item> <!-- Disabilitato -->
+        <item>https://dns.google/dns-query</item>
+        <item>https://cloudflare-dns.com/dns-query</item>
+        <item>https://doh.opendns.com/dns-query</item>
+        <item>https://dns.quad9.net/dns-query</item>
+        <item>https://doh.cleanbrowsing.org/doh/family-filter/</item>
+    </string-array>
+</resources>

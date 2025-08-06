@@ -2,14 +2,25 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="@string/settings_category_streamingcommunity">
+    <PreferenceCategory
+        android:key="pc_streamingcommunity_settings"
+        android:title="@string/settings_category_streamingcommunity">
         <EditTextPreference
             android:key="p_settings_streamingcommunity_domain"
             android:title="@string/settings_category_streamingcommunity_domain"
             android:inputType="text"/>
-        <SwitchPreference
-            android:key="p_settings_streamingcommunity_dnsOverHttps"
-            android:title="@string/settings_category_streamingcommunity_dnsOverHttps" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pc_network_settings"
+        android:title="@string/settings_category_network_title"> <!-- Dovremo creare questa stringa -->
+        <ListPreference
+            android:key="p_doh_provider_url"
+            android:title="@string/settings_doh_provider_title"
+            android:summary="%s"
+            android:entries="@array/doh_provider_names"
+            android:entryValues="@array/doh_provider_urls"
+            android:defaultValue="https://cloudflare-dns.com/dns-query" />
     </PreferenceCategory>
 
     <Preference
