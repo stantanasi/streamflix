@@ -1,18 +1,14 @@
 package com.tanasi.streamflix.fragments.settings
 
-import android.content.Intent
-import android.net.Uri
+import android.content.Intent // Import necessario per Intent
 import android.os.Bundle
-import android.text.InputType
-import android.view.inputmethod.EditorInfo
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
-import androidx.navigation.fragment.findNavController
-import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
 import androidx.preference.Preference
-import androidx.preference.SwitchPreference
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.providers.StreamingCommunityProvider
 import com.tanasi.streamflix.utils.UserPreferences
+// Rimuovi o commenta: import com.tanasi.streamflix.utils.restartApp
 
 class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
 
@@ -25,81 +21,40 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
     private fun displaySettings() {
         findPreference<Preference>("p_settings_about")?.apply {
             setOnPreferenceClickListener {
-                findNavController().navigate(
-                    SettingsMobileFragmentDirections.actionSettingsToSettingsAbout()
-                )
+                // TODO: Navigate to About screen for TV
                 true
             }
         }
 
-        findPreference<Preference>("p_settings_help")?.apply {
-            setOnPreferenceClickListener {
-                startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://github.com/stantanasi/streamflix")
-                    )
-                )
-                true
-            }
-        }
+        findPreference<ListPreference>("p_doh_provider_url")?.apply {
+            value = UserPreferences.dohProviderUrl ?: UserPreferences.DOH_DISABLED_VALUE
+            summary = entry // Imposta il sommario iniziale
 
-        findPreference<EditTextPreference>("p_settings_streamingcommunity_domain")?.apply {
-            summary = UserPreferences.streamingcommunityDomain
+            setOnPreferenceChangeListener { preference, newValue ->
+                val newUrl = newValue as String
+                UserPreferences.dohProviderUrl = newUrl
 
-            setOnBindEditTextListener { editText ->
-                editText.inputType = InputType.TYPE_CLASS_TEXT
-                editText.imeOptions = EditorInfo.IME_ACTION_DONE
-
-                editText.hint = "streamingcommunity.example"
-
-                val pref = UserPreferences.streamingcommunityDomain
-                if (pref.isNullOrEmpty())
-                    editText.setText("streamingcommunity.example")
-                else
-                    editText.setText(pref)
-            }
-
-            setOnPreferenceChangeListener { _, newValue ->
-                UserPreferences.streamingcommunityDomain = newValue as String
-                summary = newValue
-
-                when (UserPreferences.currentProvider) {
-                    is StreamingCommunityProvider -> {
-//                        re build service
-                        (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService(newValue)
-
-//                        restart activity
-                        requireActivity().apply {
-                            finish()
-                            startActivity(Intent(this, this::class.java))
-                        }
+                if (preference is ListPreference) {
+                    val index = preference.findIndexOfValue(newUrl)
+                    if (index >= 0 && preference.entries != null && index < preference.entries.size) {
+                        preference.summary = preference.entries[index]
+                    } else {
+                        preference.summary = null // o una stringa di default
                     }
                 }
-
-                true
-            }
-        }
-
-        findPreference<SwitchPreference>("p_settings_streamingcommunity_dnsOverHttps")?.apply {
-            isChecked = UserPreferences.streamingcommunityDnsOverHttps
-
-            setOnPreferenceChangeListener { _, newValue ->
-                UserPreferences.streamingcommunityDnsOverHttps = newValue as Boolean
 
                 when (UserPreferences.currentProvider) {
                     is StreamingCommunityProvider -> {
                         (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService()
-
+                        // Usa la stessa logica di riavvio del mobile
                         requireActivity().apply {
                             finish()
-                            startActivity(Intent(this, this::class.java))
+                            startActivity(Intent(this, this::class.java)) // Riga chiave per il riavvio
                         }
                     }
                 }
-
                 true
             }
-        }
-    }
-}
+        } // Chiusura del blocco apply per p_doh_provider_url
+    } // Chiusura del metodo displaySettings() <--- PARENTESI AGGIUNTA
+} // Chiusura della classe SettingsTvFragment <--- PARENTESI AGGIUNTA
