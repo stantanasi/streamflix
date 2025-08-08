@@ -503,13 +503,17 @@ object StreamingCommunityProvider : Provider {
                     .addInterceptor(UserAgentInterceptor(USER_AGENT))
                     .addNetworkInterceptor(RedirectInterceptor())
 
-                if (UserPreferences.streamingcommunityDnsOverHttps) {
-                    val bootstrapClient = OkHttpClient.Builder().build()
-                    val dohDns = DnsOverHttps.Builder().client(bootstrapClient)
-                        .url("https://cloudflare-dns.com/dns-query".toHttpUrl())
-                        .build()
-
-                    clientBuilder.dns(dohDns)
+                val dohProviderUrl = UserPreferences.dohProviderUrl
+                if (!dohProviderUrl.isNullOrEmpty() && dohProviderUrl != UserPreferences.DOH_DISABLED_VALUE) {
+                    try {
+                        val bootstrapClient = OkHttpClient.Builder().build()
+                        val dohDns = DnsOverHttps.Builder().client(bootstrapClient)
+                            .url(dohProviderUrl.toHttpUrl())
+                            .build()
+                        clientBuilder.dns(dohDns)
+                    } catch (e: IllegalArgumentException) {
+                        // Handle invalid URL, maybe log or fallback
+                    }
                 }
 
                 val client = clientBuilder.build()

@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 import com.tanasi.streamflix.database.dao.TvShowDao
 import com.tanasi.streamflix.models.TvShow
 
-@Database(entities = [TvShow::class], version = 4)
+@Database(entities = [TvShow::class], version = 4, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class SerienStreamDatabase: RoomDatabase() {
     abstract fun tvShowDao(): TvShowDao
