@@ -36,19 +36,31 @@ class CloseloadExtractor : Extractor() {
             val videoSrcVarName = myPlayerSrc.find(unpacked)
                 ?.groupValues?.get(1)
                 ?: throw Exception("Can't find variable name used in myPlayer.src")
-
             val encodedM3u8Regex = Regex("""var\s+$videoSrcVarName\s*=\s*dc_hello\("([^"]+)"\)""")
             val encodedLink = encodedM3u8Regex.find(unpacked)
                 ?.groupValues?.get(1)
-                ?: throw Exception("Can't retrieve encoded dc_hello string")
+                ?:""
+            if (!encodedLink.equals("")){
+                val decodedLink = String(Base64.decode(encodedLink, Base64.DEFAULT))
+                val decodedLinkReversed = decodedLink.reversed()
+                val finalDecodedLink = String(Base64.decode(decodedLinkReversed, Base64.DEFAULT))
+                val urlRegex = Regex("""https://[^\s"]+""")
+                source = urlRegex.find(finalDecodedLink)?.value.toString()
+            } else {
+                val playerSrcRegex = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
+                val playerSrcVar = playerSrcRegex.find(unpacked)?.groupValues?.get(1)
+                    ?: error("Couldn't find myPlayer.src variable")
 
-            val decodedLink = String(Base64.decode(encodedLink, Base64.DEFAULT))
+                val arrayDecoderRegex = Regex("""var\s+$playerSrcVar\s*=\s*(\w+)\(\[((?:\s*"[^"]+",?)+)\]\)""")
+                val match = arrayDecoderRegex.find(unpacked)
+                    ?: error("Couldn't match the decoding function with array")
 
-            val decodedLinkReversed = decodedLink.reversed()
+                val arrayParts = Regex("\"([^\"]+)\"").findAll(match.groupValues[2]).map { it.groupValues[1] }.toList()
 
-            val finalDecodedLink = String(Base64.decode(decodedLinkReversed, Base64.DEFAULT))
-            val urlRegex = Regex("""https://[^\s"]+""")
-            source = urlRegex.find(finalDecodedLink)?.value.toString()
+                val decodedUrl = decodeObfuscatedUrl(arrayParts)
+                source = decodedUrl
+            }
+
         }
 
         return Video(
@@ -59,6 +71,28 @@ class CloseloadExtractor : Extractor() {
             type = MimeTypes.APPLICATION_M3U8,
         )
     }
+    private fun decodeObfuscatedUrl(parts: List<String>): String {
+        val joined = parts.joinToString("")
+
+        val rot13 = joined.map {
+            when (it) {
+                in 'A'..'Z' -> 'A' + (it - 'A' + 13) % 26
+                in 'a'..'z' -> 'a' + (it - 'a' + 13) % 26
+                else -> it
+            }
+        }.joinToString("")
+
+        val base64Decoded = Base64.decode(rot13, Base64.DEFAULT)
+        val reversed = base64Decoded.reversed()
+
+        val finalBytes = reversed.mapIndexed { i, b ->
+            val adjusted = (b.toInt() - (399756995 % (i + 5)) + 256) % 256
+            adjusted.toByte()
+        }.toByteArray()
+
+        return String(finalBytes)
+    }
+
 
     private interface Service {
 

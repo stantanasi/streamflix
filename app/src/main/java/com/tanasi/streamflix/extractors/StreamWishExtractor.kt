@@ -1,41 +1,113 @@
 package com.tanasi.streamflix.extractors
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
+import com.tanasi.streamflix.StreamFlixApp
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.JsUnpacker
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import org.jsoup.nodes.Document
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Url
+import kotlin.coroutines.resume
+import kotlinx.coroutines.Dispatchers
 
 open class StreamWishExtractor : Extractor() {
 
     override val name = "Streamwish"
     override val mainUrl = "https://streamwish.to"
-    override val aliasUrls = listOf("https://streamwish.com","https://streamwish.to","https://ajmidyad.sbs","https://khadhnayad.sbs","https://yadmalik.sbs",
-        "https://hayaatieadhab.sbs","https://kharabnahs.sbs","https://atabkhha.sbs","https://atabknha.sbs","https://atabknhk.sbs",
-        "https://atabknhs.sbs","https://abkrzkr.sbs","https://abkrzkz.sbs","https://wishembed.pro","https://mwish.pro","https://strmwis.xyz",
-        "https://awish.pro","https://dwish.pro","https://vidmoviesb.xyz","https://embedwish.com","https://cilootv.store","https://uqloads.xyz",
-        "https://tuktukcinema.store","https://doodporn.xyz","https://ankrzkz.sbs","https://volvovideo.top","https://streamwish.site",
-        "https://wishfast.top","https://ankrznm.sbs","https://sfastwish.com","https://eghjrutf.sbs","https://eghzrutw.sbs",
-        "https://playembed.online","https://egsyxurh.sbs","https://egtpgrvh.sbs","https://flaswish.com","https://obeywish.com",
-        "https://cdnwish.com","https://javsw.me","https://cinemathek.online","https://trgsfjll.sbs","https://fsdcmo.sbs",
-        "https://anime4low.sbs","https://mohahhda.site","https://ma2d.store","https://dancima.shop","https://swhoi.com",
-        "https://gsfqzmqu.sbs","https://jodwish.com","https://swdyu.com","https://strwish.com","https://asnwish.com",
-        "https://wishonly.site","https://playerwish.com","https://katomen.store","https://hlswish.com","https://streamwish.fun",
-        "https://swishsrv.com","https://iplayerhls.com","https://hlsflast.com","https://4yftwvrdz7.sbs","https://ghbrisk.com",
-        "https://eb8gfmjn71.sbs","https://cybervynx.com","https://edbrdl7pab.sbs","https://stbhg.click","https://dhcplay.com","https://gradehgplus.com", "https://ultpreplayer.com")
+    override val aliasUrls = listOf(
+        "https://streamwish.com",
+        "https://streamwish.to",
+        "https://ajmidyad.sbs",
+        "https://khadhnayad.sbs",
+        "https://yadmalik.sbs",
+        "https://hayaatieadhab.sbs",
+        "https://kharabnahs.sbs",
+        "https://atabkhha.sbs",
+        "https://atabknha.sbs",
+        "https://atabknhk.sbs",
+        "https://atabknhs.sbs",
+        "https://abkrzkr.sbs",
+        "https://abkrzkz.sbs",
+        "https://wishembed.pro",
+        "https://mwish.pro",
+        "https://strmwis.xyz",
+        "https://awish.pro",
+        "https://dwish.pro",
+        "https://vidmoviesb.xyz",
+        "https://embedwish.com",
+        "https://cilootv.store",
+        "https://uqloads.xyz",
+        "https://tuktukcinema.store",
+        "https://doodporn.xyz",
+        "https://ankrzkz.sbs",
+        "https://volvovideo.top",
+        "https://streamwish.site",
+        "https://wishfast.top",
+        "https://ankrznm.sbs",
+        "https://sfastwish.com",
+        "https://eghjrutf.sbs",
+        "https://eghzrutw.sbs",
+        "https://playembed.online",
+        "https://egsyxurh.sbs",
+        "https://egtpgrvh.sbs",
+        "https://flaswish.com",
+        "https://obeywish.com",
+        "https://cdnwish.com",
+        "https://javsw.me",
+        "https://cinemathek.online",
+        "https://trgsfjll.sbs",
+        "https://fsdcmo.sbs",
+        "https://anime4low.sbs",
+        "https://mohahhda.site",
+        "https://ma2d.store",
+        "https://dancima.shop",
+        "https://swhoi.com",
+        "https://gsfqzmqu.sbs",
+        "https://jodwish.com",
+        "https://swdyu.com",
+        "https://strwish.com",
+        "https://asnwish.com",
+        "https://wishonly.site",
+        "https://playerwish.com",
+        "https://katomen.store",
+        "https://hlswish.com",
+        "https://streamwish.fun",
+        "https://swishsrv.com",
+        "https://iplayerhls.com",
+        "https://hlsflast.com",
+        "https://4yftwvrdz7.sbs",
+        "https://ghbrisk.com",
+        "https://eb8gfmjn71.sbs",
+        "https://cybervynx.com",
+        "https://edbrdl7pab.sbs",
+        "https://stbhg.click",
+        "https://dhcplay.com",
+        "https://gradehgplus.com",
+        "https://ultpreplayer.com"
+    )
 
     protected var referer = ""
+    val context = StreamFlixApp.instance.applicationContext
 
     override suspend fun extract(link: String): Video {
         val service = Service.build(mainUrl)
+        val redirectedUrl = resolveRedirectWithWebView(context, link, mainUrl)
+        val document = redirectedUrl.let { service.get(it, referer = referer) }
 
-        val document = service.get(link, referer = referer)
 
-
-        val script = Regex("<script .*>(eval.*?)</script>", RegexOption.DOT_MATCHES_ALL).find(document.toString())
+        val script = Regex(
+            "<script .*>(eval.*?)</script>",
+            RegexOption.DOT_MATCHES_ALL
+        ).find(document.toString())
             ?.groupValues?.get(1)
             ?.let { JsUnpacker(it).unpack() }
             ?: throw Exception("Can't retrieve script")
@@ -48,19 +120,20 @@ open class StreamWishExtractor : Extractor() {
             .firstOrNull()
             ?: throw Exception("Can't retrieve m3u8")
 
-        val subtitles = Regex("file:\\s*\"(.*?)\"(?:,label:\\s*\"(.*?)\")?,kind:\\s*\"(.*?)\"").findAll(
-            Regex("tracks:\\s*\\[(.*?)]").find(script)
-                ?.groupValues?.get(1)
-                ?: ""
-        )
-            .filter { it.groupValues[3] == "captions" }
-            .map {
-                Video.Subtitle(
-                    label = it.groupValues[2],
-                    file = it.groupValues[1],
-                )
-            }
-            .toList()
+        val subtitles =
+            Regex("file:\\s*\"(.*?)\"(?:,label:\\s*\"(.*?)\")?,kind:\\s*\"(.*?)\"").findAll(
+                Regex("tracks:\\s*\\[(.*?)]").find(script)
+                    ?.groupValues?.get(1)
+                    ?: ""
+            )
+                .filter { it.groupValues[3] == "captions" }
+                .map {
+                    Video.Subtitle(
+                        label = it.groupValues[2],
+                        file = it.groupValues[1],
+                    )
+                }
+                .toList()
 
         val video = Video(
             source = source,
@@ -78,6 +151,44 @@ open class StreamWishExtractor : Extractor() {
         return video
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
+    suspend fun resolveRedirectWithWebView(context: Context, url: String, mainUrl: String): String =
+        withContext(Dispatchers.Main) {
+            suspendCancellableCoroutine { cont ->
+                val webView = WebView(context)
+                webView.settings.javaScriptEnabled = true
+
+                webView.webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(
+                        view: WebView?,
+                        request: WebResourceRequest?
+                    ): Boolean {
+                        val newUrl = request?.url.toString()
+                        if (!newUrl.contains(mainUrl)) {
+                            if (cont.isActive) cont.resume(newUrl)
+                            webView.destroy()
+                            return true
+                        }
+                        return false
+                    }
+
+                    override fun onPageFinished(view: WebView?, url: String?) {
+                        if (url != null && url.contains(mainUrl)) {
+                            if (cont.isActive) cont.resume(url)
+                            webView.destroy()
+                        }
+                    }
+                }
+
+                webView.loadUrl(url)
+
+                cont.invokeOnCancellation {
+                    webView.stopLoading()
+                    webView.destroy()
+                }
+            }
+        }
+
 
     class UqloadsXyz : StreamWishExtractor() {
         override val name = "Uqloads"
@@ -88,7 +199,8 @@ open class StreamWishExtractor : Extractor() {
             return extract(link)
         }
     }
-    class SwiftPlayersExtractor : StreamWishExtractor(){
+
+    class SwiftPlayersExtractor : StreamWishExtractor() {
         override val name = "SwiftPlayer"
         override val mainUrl = "https://swiftplayers.com/"
     }
