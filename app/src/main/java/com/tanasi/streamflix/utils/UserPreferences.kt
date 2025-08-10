@@ -2,6 +2,7 @@ package com.tanasi.streamflix.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log // <-- Import Log
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.CaptionStyleCompat
 import com.tanasi.streamflix.BuildConfig
@@ -12,17 +13,28 @@ import com.tanasi.streamflix.providers.Provider.Companion.providers
 
 object UserPreferences {
 
+    private const val TAG = "UserPrefsDebug" // <-- TAG per i Log
+
     private lateinit var prefs: SharedPreferences
 
     // Default DoH Provider URL (Cloudflare)
     private const val DEFAULT_DOH_PROVIDER_URL = "https://cloudflare-dns.com/dns-query"
     const val DOH_DISABLED_VALUE = "" // Value to represent DoH being disabled
+    private const val DEFAULT_STREAMINGCOMMUNITY_DOMAIN = "streamingcommunityz.life"
 
     fun setup(context: Context) {
+        Log.d(TAG, "setup() called with context: $context")
+        val prefsName = "${BuildConfig.APPLICATION_ID}.preferences"
+        Log.d(TAG, "SharedPreferences name: $prefsName")
         prefs = context.getSharedPreferences(
-            "${BuildConfig.APPLICATION_ID}.preferences",
+            prefsName,
             Context.MODE_PRIVATE,
         )
+        if (::prefs.isInitialized) {
+            Log.d(TAG, "prefs initialized successfully in setup. Hash: ${prefs.hashCode()}")
+        } else {
+            Log.e(TAG, "prefs FAILED to initialize in setup.")
+        }
     }
 
 
@@ -91,9 +103,45 @@ object UserPreferences {
             Key.SUBTITLE_NAME.setString(value)
         }
 
-    var streamingcommunityDomain: String?
-        get() = Key.STREAMINGCOMMUNITY_DOMAIN.getString()
-        set(value) = Key.STREAMINGCOMMUNITY_DOMAIN.setString(value)
+    var streamingcommunityDomain: String
+        get() {
+            Log.d(TAG, "streamingcommunityDomain GET called")
+            if (!::prefs.isInitialized) {
+                Log.e(TAG, "streamingcommunityDomain GET: prefs IS NOT INITIALIZED!")
+                return "PREFS_NOT_INIT_ERROR" // Restituisce un valore di errore evidente
+            }
+            Log.d(TAG, "streamingcommunityDomain GET: prefs hash: ${prefs.hashCode()}")
+            val storedValue = prefs.getString(Key.STREAMINGCOMMUNITY_DOMAIN.name, null)
+            Log.d(TAG, "streamingcommunityDomain GET: storedValue from prefs: '$storedValue'")
+            val returnValue = if (storedValue.isNullOrEmpty()) {
+                Log.d(TAG, "streamingcommunityDomain GET: storedValue is null or empty, returning DEFAULT: '$DEFAULT_STREAMINGCOMMUNITY_DOMAIN'")
+                DEFAULT_STREAMINGCOMMUNITY_DOMAIN
+            } else {
+                Log.d(TAG, "streamingcommunityDomain GET: storedValue is NOT null or empty, returning storedValue: '$storedValue'")
+                storedValue
+            }
+            Log.d(TAG, "streamingcommunityDomain GET: final returnValue: '$returnValue'")
+            return returnValue
+        }
+        set(value) {
+            Log.d(TAG, "streamingcommunityDomain SET called with value: '$value'")
+            if (!::prefs.isInitialized) {
+                Log.e(TAG, "streamingcommunityDomain SET: prefs IS NOT INITIALIZED!")
+                return // Non fare nulla se prefs non è inizializzato
+            }
+            Log.d(TAG, "streamingcommunityDomain SET: prefs hash: ${prefs.hashCode()}")
+            with(prefs.edit()) {
+                if (value.isNullOrEmpty()) {
+                    Log.d(TAG, "streamingcommunityDomain SET: value is null or empty, REMOVING key: '${Key.STREAMINGCOMMUNITY_DOMAIN.name}'")
+                    remove(Key.STREAMINGCOMMUNITY_DOMAIN.name)
+                } else {
+                    Log.d(TAG, "streamingcommunityDomain SET: value is NOT null or empty, PUTTING STRING key: '${Key.STREAMINGCOMMUNITY_DOMAIN.name}', value: '$value'")
+                    putString(Key.STREAMINGCOMMUNITY_DOMAIN.name, value)
+                }
+                apply()
+                Log.d(TAG, "streamingcommunityDomain SET: prefs.edit().apply() called")
+            }
+        }
 
     var dohProviderUrl: String
         get() = Key.DOH_PROVIDER_URL.getString() ?: DEFAULT_DOH_PROVIDER_URL
@@ -114,7 +162,7 @@ object UserPreferences {
         QUALITY_HEIGHT,
         SUBTITLE_NAME,
         STREAMINGCOMMUNITY_DOMAIN,
-        DOH_PROVIDER_URL; // Removed STREAMINGCOMMUNITY_DNS_OVER_HTTPS, added DOH_PROVIDER_URL
+        DOH_PROVIDER_URL;
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)
@@ -136,9 +184,8 @@ object UserPreferences {
             else -> null
         }
 
-        // Modified getString to handle default for dohProviderUrl if needed, but getter handles it now
         fun getString(): String? = when {
-            prefs.contains(name) -> prefs.getString(name, null) // Return null if not found initially
+            prefs.contains(name) -> prefs.getString(name, null)
             else -> null
         }
 
