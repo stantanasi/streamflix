@@ -200,7 +200,7 @@
     </fragment>
     <fragment
         android:id="@+id/settings"
-        android:name="com.tanasi.streamflix.fragments.settings.mobile.SettingsMobileFragment"
+        android:name="com.tanasi.streamflix.fragments.settings.SettingsMobileFragment"
         android:label="fragment_settings_mobile" >
         <action
             android:id="@+id/action_settings_to_settings_about"
