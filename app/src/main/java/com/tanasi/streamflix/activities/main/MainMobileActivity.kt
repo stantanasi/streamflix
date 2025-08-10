@@ -42,7 +42,7 @@ class MainMobileActivity : FragmentActivity() {
             .findFragmentById(binding.navMainFragment.id) as NavHostFragment
         val navController = navHostFragment.navController
 
-//        UserPreferences.setup(this) // <<< MODIFIED: Commented out
+        UserPreferences.setup(this)
         AppDatabase.setup(this)
 
         when (BuildConfig.APP_LAYOUT) {

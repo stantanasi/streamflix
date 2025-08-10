@@ -6,7 +6,7 @@
         android:key="pc_streamingcommunity_settings"
         android:title="@string/settings_category_streamingcommunity">
         <EditTextPreference
-            android:key="provider_streamingcommunity_domain"
+            android:key="p_settings_streamingcommunity_domain"
             android:title="@string/settings_category_streamingcommunity_domain"
             android:inputType="text"/>
     </PreferenceCategory>
