@@ -24,13 +24,14 @@ import retrofit2.http.GET
 import retrofit2.http.Url
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.delay
 
 object PelisplustoProvider : Provider {
 
     override val name = "Pelisplusto"
     override val baseUrl = "https://pelisplus.to"
     override val language = "es"
-    override val logo = "https://pelisplus.to/wp-content/uploads/2023/05/pelisplus-logo.png"
+    override val logo = "https://pelisplus.to/images/logo2.png"
     private const val TAG = "PelisplustoProvider"
 
     private val client = OkHttpClient.Builder()
@@ -174,19 +175,19 @@ object PelisplustoProvider : Provider {
     }
 
     override suspend fun getMovies(page: Int): List<Movie> {
-        val url = "$baseUrl/peliculas" + if (page > 1) "/page/$page" else ""
+        val url = if (page == 1) "$baseUrl/peliculas" else "$baseUrl/peliculas/$page"
         val document = service.getPage(url)
         return parseShows(document).filterIsInstance<Movie>()
     }
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
-        val url = "$baseUrl/series" + if (page > 1) "/page/$page" else ""
+        val url = if (page == 1) "$baseUrl/series" else "$baseUrl/series/$page"
         val document = service.getPage(url)
         return parseShows(document).filterIsInstance<TvShow>()
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
-        val url = "$baseUrl/$id" + if (page > 1) "/page/$page" else ""
+        val url = if (page == 1) "$baseUrl/$id" else "$baseUrl/$id/page/$page"
         val document = service.getPage(url)
         val shows = parseShows(document).filterIsInstance<Show>()
         val genreName = id.substringAfter("genero/").replaceFirstChar { it.uppercase() }
@@ -303,7 +304,6 @@ object PelisplustoProvider : Provider {
                 val showId = videoType.tvShow.id
                 val season = videoType.season.number
                 val episode = videoType.number
-
                 val basePath = if (showId.startsWith("anime/")) "$baseUrl/$showId" else "$baseUrl/serie/$showId"
                 "$basePath/season/$season/episode/$episode"
             }
@@ -311,24 +311,42 @@ object PelisplustoProvider : Provider {
 
         try {
             val document = service.getPage(url)
-            return document.select(".bg-tabs ul li").mapNotNull { li ->
+            val serverElements = document.select(".bg-tabs ul li")
+
+            val servers = mutableListOf<Video.Server>()
+            for (li in serverElements) {
                 try {
                     val serverName = li.text()
-                    val encodedData = li.attr("data-server")
-                    if (encodedData.isEmpty()) return@mapNotNull null
-                    val decodedUrl = String(Base64.decode(encodedData, Base64.DEFAULT))
-                    val finalUrl = if (decodedUrl.contains("/player/")) {
-                        val playerUrl = if (decodedUrl.startsWith("http")) decodedUrl else "$baseUrl$decodedUrl"
+                    val dataServer = li.attr("data-server")
+                    if (dataServer.isEmpty()) continue
+
+                    val decodedUrl = String(Base64.decode(dataServer, Base64.DEFAULT))
+
+                    val finalUrl = if (!decodedUrl.contains("https://")) {
+                        val reEncoded = String(Base64.encode(dataServer.toByteArray(), Base64.DEFAULT)).trim()
+                        val playerUrl = "$baseUrl/player/$reEncoded"
                         val playerDoc = service.getPage(playerUrl)
-                        val scriptData = playerDoc.selectFirst("script:containsData(window.onload)")?.data() ?: ""
-                        Regex("""(https?://[^\s'"]+)""").find(scriptData)?.groupValues?.get(1) ?: return@mapNotNull null
+
+                        playerDoc.selectFirst("script:containsData(window.onload)")?.data()
+                            ?.let { Regex("""(https?://[^\s'"]+)""").find(it)?.groupValues?.get(1) }
                     } else {
                         decodedUrl
                     }
-                    Video.Server(id = finalUrl, name = serverName, src = finalUrl)
-                } catch (e: Exception) { null }
+
+                    if (!finalUrl.isNullOrEmpty()) {
+                        servers.add(Video.Server(id = finalUrl, name = serverName, src = finalUrl))
+                    }
+                } catch (e: Exception) {
+                    // Ignorar servidores individuales que fallen
+                }
+                // <-- LA VACUNA ANTI-BOTS: Pausa de 300ms entre cada servidor
+                delay(300L)
             }
-        } catch (e: Exception) { return emptyList() }
+            return servers
+
+        } catch (e: Exception) {
+            return emptyList()
+        }
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
