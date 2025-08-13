@@ -1,0 +1,51 @@
+name: "🐛 Bug Report"
+description: Create a new ticket for a bug.
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+      description: Please enter an explicit description of your issue
+      placeholder: Short and explicit description of your incident...
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Provider
+      description: On which provider does the error occur?
+      placeholder: SFlix, SoraStream...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Reproduction steps
+      description: Please enter an explicit description of your issue
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Operating system
+      description: Which operating system do you use? Please provide the version as well.
+      placeholder: Chromecast with Google TV, Android 12.0
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: Logs
+      description: Please copy and paste any relevant log output.
+      render: bash
+    validations:
+      required: false
+  - type: checkboxes
+    attributes:
+      label: Please confirm the following
+      options:
+      - label: I have searched the existing issues and this is a new ticket, **NOT** a duplicate or related to another open issue.
+        required: true
+      - label: If related to a provider, I have checked the site and it works, but not the app.
+        required: true

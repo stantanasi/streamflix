@@ -1,0 +1,124 @@
+name: Build & Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    name: Build & Release APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Setup JDK environment
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Access Secrets
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          RABBITSTREAM_SOURCE_API: ${{ secrets.RABBITSTREAM_SOURCE_API }}
+        run: |
+          echo TMDB_API_KEY=$TMDB_API_KEY >> local.properties
+          echo RABBITSTREAM_SOURCE_API=$RABBITSTREAM_SOURCE_API >> local.properties
+
+      - name: Make Gradle executable
+        run: chmod +x ./gradlew
+
+      - name: Build APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Sign APK
+        id: sign_apk
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.KEYSTORE }}
+          alias: ${{ secrets.SIGNING_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "34.0.0"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+
+      - name: Upload Release APK
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.sign_apk.outputs.signedReleaseFile }}
+          asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}.apk
+          asset_content_type: application/zip
+
+
+      - name: Set Mobile version
+        run: |
+          echo APP_LAYOUT=mobile >> local.properties
+
+      - name: Build APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Sign APK
+        id: sign_apk_mobile
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.KEYSTORE }}
+          alias: ${{ secrets.SIGNING_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "34.0.0"
+
+      - name: Upload Release APK
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.sign_apk_mobile.outputs.signedReleaseFile }}
+          asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-only-mobile.apk
+          asset_content_type: application/zip
+
+
+      - name: Set TV version
+        run: |
+          echo APP_LAYOUT=tv >> local.properties
+
+      - name: Build APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Sign APK
+        id: sign_apk_tv
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.KEYSTORE }}
+          alias: ${{ secrets.SIGNING_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "34.0.0"
+
+      - name: Upload Release APK
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.sign_apk_tv.outputs.signedReleaseFile }}
+          asset_name: ${{ github.event.repository.name }}-${{ github.ref_name }}-only-tv.apk
+          asset_content_type: application/zip

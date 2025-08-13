@@ -1,0 +1,17 @@
+name: "💡 Feature Request"
+description: Suggest a feature to improve the app
+labels: ["enhancement"]
+body:
+  - type: textarea
+    attributes:
+      label: Summary
+      description: Provide a brief explanation of the feature
+      placeholder: Describe in a few lines your feature request
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Please confirm the following
+      options:
+      - label: I have searched the existing issues and this is a new ticket, **NOT** a duplicate or related to another open issue.
+        required: true
