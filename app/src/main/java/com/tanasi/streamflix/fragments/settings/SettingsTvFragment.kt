@@ -100,6 +100,17 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
                 true
             }
         }
+
+        val networkSettingsCategory = findPreference<PreferenceCategory>("pc_network_settings")
+        if (networkSettingsCategory != null) {
+            val originalTitle = getString(R.string.settings_category_network_title)
+            val currentProviderName = UserPreferences.currentProvider?.name
+            if (currentProviderName != null && currentProviderName.isNotEmpty()) {
+                networkSettingsCategory.title = "$originalTitle $currentProviderName"
+            } else {
+                networkSettingsCategory.title = originalTitle
+            }
+        }
     }
 
     override fun onResume() {
@@ -125,6 +136,17 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
         // Aggiorna sommario DoH in onResume
         findPreference<ListPreference>("p_doh_provider_url")?.apply {
             summary = entry
+        }
+
+        val networkSettingsCategory = findPreference<PreferenceCategory>("pc_network_settings")
+        if (networkSettingsCategory != null) {
+            val originalTitle = getString(R.string.settings_category_network_title)
+            val currentProviderName = UserPreferences.currentProvider?.name
+            if (currentProviderName != null && currentProviderName.isNotEmpty()) {
+                networkSettingsCategory.title = "$originalTitle $currentProviderName"
+            } else {
+                networkSettingsCategory.title = originalTitle
+            }
         }
     }
 }
