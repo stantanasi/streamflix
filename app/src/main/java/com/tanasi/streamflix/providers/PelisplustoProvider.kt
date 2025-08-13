@@ -68,7 +68,6 @@ object PelisplustoProvider : Provider {
         try {
             val mainDocument = mainPageDeferred.await()
 
-            // <-- ¡CORRECCIÓN! Este es el selector correcto para el carrusel de banners.
             val bannerShows = mainDocument.select("div.home__slider_index div.swiper-slide article").mapNotNull {
                 val url = it.selectFirst("a")?.attr("href") ?: return@mapNotNull null
 
