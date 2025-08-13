@@ -64,11 +64,9 @@ interface Provider {
             AnimeBumProvider,
             AnimefenixProvider,
             AnimeFlvProvider,
-            AnimeIDProvider,
             SoloLatinoProvider,
             Cine24hProvider,
             PelisplustoProvider,
-            OtakuversoProvider,
         )
     }
 }

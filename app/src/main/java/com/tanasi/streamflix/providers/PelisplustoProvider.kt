@@ -316,7 +316,7 @@ object PelisplustoProvider : Provider {
             val servers = mutableListOf<Video.Server>()
             for (li in serverElements) {
                 try {
-                    val serverName = li.text()
+                    val serverName = li.text().replace(" Reproducir", "")
                     val dataServer = li.attr("data-server")
                     if (dataServer.isEmpty()) continue
 
@@ -337,14 +337,14 @@ object PelisplustoProvider : Provider {
                         servers.add(Video.Server(id = finalUrl, name = serverName, src = finalUrl))
                     }
                 } catch (e: Exception) {
-                    // Ignorar servidores individuales que fallen
+                    Log.e(TAG, "Fallo procesando un servidor individual: ${e.message}")
                 }
-                // <-- LA VACUNA ANTI-BOTS: Pausa de 300ms entre cada servidor
-                delay(300L)
+                delay(1500L)
             }
             return servers
 
         } catch (e: Exception) {
+            Log.e(TAG, "Fallo crítico en getServers: ${e.message}")
             return emptyList()
         }
     }
