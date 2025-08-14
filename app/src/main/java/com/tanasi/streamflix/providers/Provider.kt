@@ -59,6 +59,14 @@ interface Provider {
             CuevanaEuProvider,
             LatanimeProvider,
             DoramasflixProvider,
+            CineCalidadProvider,
+            FlixLatamProvider,
+            AnimeBumProvider,
+            AnimefenixProvider,
+            AnimeFlvProvider,
+            SoloLatinoProvider,
+            Cine24hProvider,
+            PelisplustoProvider,
         )
     }
 }
