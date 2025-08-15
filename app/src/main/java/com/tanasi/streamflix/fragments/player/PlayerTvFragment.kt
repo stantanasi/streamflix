@@ -40,6 +40,7 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.models.WatchItem
+import com.tanasi.streamflix.utils.EpisodeManager
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.getFileName
@@ -232,6 +233,25 @@ class PlayerTvFragment : Fragment() {
                 }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.autoplayEpisode
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { (videoType, id) ->
+                    binding.pvPlayer.controller.binding.tvExoTitle.text = when (videoType) {
+                        is Video.Type.Episode -> "${videoType.title?.substringBeforeLast(" ")} • S${videoType.season.number} E${videoType.number}"
+                        is Video.Type.Movie -> videoType.title.substringBeforeLast(" ")
+                        else -> ""
+                    }
+                    binding.pvPlayer.controller.binding.tvExoSubtitle.text = when(videoType){
+                        is Video.Type.Episode -> "S${videoType.season.number} E${videoType.number}  •  ${videoType.title}"
+                        is Video.Type.Movie -> videoType.title.substringBeforeLast(" ")
+                    }
+                    if (videoType is Video.Type.Episode) {
+                        viewModel.playEpisode(videoType)
+                    }
+                }
+        }
+
     }
 
     override fun onPause() {
@@ -341,6 +361,10 @@ class PlayerTvFragment : Fragment() {
     }
 
     private fun displayVideo(video: Video, server: Video.Server) {
+        val videoType = args.videoType
+        if (videoType is Video.Type.Episode){
+            EpisodeManager.setCurrentEpisode(videoType)
+        }
         val currentPosition = player.currentPosition
 
         httpDataSource.setDefaultRequestProperties(
@@ -394,6 +418,7 @@ class PlayerTvFragment : Fragment() {
                     binding.pvPlayer.controller.binding.exoPlayPause.nextFocusDownId = -1
                 }
             }
+            val bufferMs = 3000L
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 binding.pvPlayer.keepScreenOn = isPlaying
@@ -423,6 +448,8 @@ class PlayerTvFragment : Fragment() {
                             watchItem?.isWatched = true
                             watchItem?.watchedDate = Calendar.getInstance()
                             watchItem?.watchHistory = null
+
+
                         }
                     }
 
@@ -446,6 +473,15 @@ class PlayerTvFragment : Fragment() {
                                     merge(tvShow)
                                     isWatching = true
                                 })
+                            }
+                            if (player.hasFinished()){
+                                val currentPosition = player.currentPosition
+                                val duration = player.duration
+                                if (duration != C.TIME_UNSET && currentPosition >= duration - bufferMs) {
+                                    if (UserPreferences.autoplay) {
+                                        viewModel.tryAutoplayNext()
+                                    }
+                                }
                             }
                         }
                     }

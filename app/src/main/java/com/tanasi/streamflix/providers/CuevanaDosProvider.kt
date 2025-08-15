@@ -35,6 +35,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import androidx.core.net.toUri
 import com.tanasi.streamflix.models.Show
+import com.tanasi.streamflix.utils.EpisodeManager
 
 object CuevanaDosProvider : Provider {
 
@@ -345,12 +346,14 @@ object CuevanaDosProvider : Provider {
         val (slug, seasonNumStr) = seasonId.split("/")
         val seasonNumber = seasonNumStr.toIntOrNull() ?: return emptyList()
 
+        // Use getOrPut safely: inside the lambda return JSONArray
         val seasonsJson: JSONArray = seasonCache.getOrPut(slug) {
             val document = service.getTvShow(slug)
             val jsonData = document.selectFirst("script#__NEXT_DATA__")?.data()
-                ?: return emptyList<Episode>().also {
-                    seasonCache.remove(slug)
-                }
+            if (jsonData == null) {
+                seasonCache.remove(slug)
+                return@getOrPut JSONArray() // Return empty JSONArray for cache
+            }
 
             val root = JSONObject(jsonData)
                 .getJSONObject("props")
@@ -366,26 +369,49 @@ object CuevanaDosProvider : Provider {
 
             val episodesJson = seasonObj.optJSONArray("episodes") ?: return emptyList()
 
-            return (0 until episodesJson.length()).mapNotNull { idx ->
+            val episodes = (0 until episodesJson.length()).mapNotNull { idx ->
                 val ep = episodesJson.getJSONObject(idx)
                 val slugObj = ep.optJSONObject("slug") ?: return@mapNotNull null
 
-                val id = "${slugObj.optString("name")}/${slugObj.optString("season")}/${
-                    slugObj.optString("episode")
-                }"
+                val id = "${slugObj.optString("name")}/${slugObj.optString("season")}/${slugObj.optString("episode")}"
 
                 Episode(
                     id = id,
                     number = ep.optInt("number"),
                     title = ep.optString("title"),
                     poster = ep.optString("image"),
-                    released = ep.optString("releaseDate")?.take(10)
+                    released = ep.optString("releaseDate").take(10)
                 )
             }
+
+            // If you want to update EpisodeManager here
+            val videoEpisodes = episodes.map { ep ->
+                com.tanasi.streamflix.models.Video.Type.Episode(
+                    id = ep.id,
+                    number = ep.number,
+                    title = ep.title,
+                    poster = ep.poster,
+                    tvShow = com.tanasi.streamflix.models.Video.Type.Episode.TvShow(
+                        id = ep.tvShow?.id ?: slug,
+                        title = ep.tvShow?.title ?: slug,
+                        poster = ep.tvShow?.poster,
+                        banner = ep.tvShow?.banner
+                    ),
+                    season = com.tanasi.streamflix.models.Video.Type.Episode.Season(
+                        number = ep.season?.number ?: seasonNumber,
+                        title = ep.season?.title
+                    )
+                )
+            }
+            EpisodeManager.addEpisodes(videoEpisodes)
+
+            return episodes
         }
 
+        // If no matching season found, return empty list
         return emptyList()
     }
+
 
     override suspend fun getGenre(id: String, page: Int): Genre {
         val document = service.getGenre(id, page)

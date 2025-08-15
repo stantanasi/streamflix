@@ -4,21 +4,57 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.tanasi.streamflix.models.Video.Type.Episode
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.EpisodeManager
 import com.tanasi.streamflix.utils.OpenSubtitles
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
     videoType: Video.Type,
     id: String,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow<State>(State.LoadingServers)
     val state: Flow<State> = _state
+
+
+    private val _autoplayEpisode = MutableSharedFlow<Pair<Episode, String>>()
+    val autoplayEpisode: SharedFlow<Pair<Episode, String>> = _autoplayEpisode
+
+    fun tryAutoplayNext() {
+        if (UserPreferences.autoplay && EpisodeManager.hasNextEpisode()) {
+            EpisodeManager.getNextEpisode()?.let { ep ->
+                val videoType = Video.Type.Episode(
+                    id = ep.id,
+                    number = ep.number,
+                    title = ep.title,
+                    poster = ep.poster,
+                    tvShow = Video.Type.Episode.TvShow(
+                        id = ep.tvShow.id,
+                        title = ep.tvShow.title,
+                        poster = ep.tvShow.poster,
+                        banner = ep.tvShow.banner
+                    ),
+                    season = Video.Type.Episode.Season(
+                        number = ep.season.number,
+                        title = ep.season.title
+                    )
+                )
+                viewModelScope.launch {
+                    _autoplayEpisode.emit(videoType to ep.id)
+                }
+            }
+        }
+    }
+
+
 
     sealed class State {
         data object LoadingServers : State()
@@ -47,6 +83,11 @@ class PlayerViewModel(
     init {
         getServers(videoType, id)
         getSubtitles(videoType)
+    }
+
+    fun playEpisode(episode: Video.Type.Episode) {
+        getServers(episode, episode.id)
+        getSubtitles(episode)
     }
 
 

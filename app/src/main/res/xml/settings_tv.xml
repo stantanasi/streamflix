@@ -22,7 +22,14 @@
             android:entryValues="@array/doh_provider_urls"
             android:defaultValue="https://cloudflare-dns.com/dns-query" />
     </PreferenceCategory>
-
+    <PreferenceCategory android:title="Autoplay settings">
+    <SwitchPreference
+        android:key="p_settings_autoplay"
+        android:title="@string/settings_autoplay"
+        android:defaultValue="true"
+        android:summaryOn="@string/settings_autoplay_on"
+        android:summaryOff="@string/settings_autoplay_off" />
+    </PreferenceCategory>
     <Preference
         android:icon="@drawable/ic_settings_about"
         android:key="p_settings_about"
@@ -32,5 +39,7 @@
         android:icon="@drawable/ic_settings_help"
         android:key="p_settings_help"
         android:title="@string/settings_help" />
+
+
 
 </androidx.preference.PreferenceScreen>

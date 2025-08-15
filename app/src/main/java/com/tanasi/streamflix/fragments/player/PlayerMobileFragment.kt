@@ -60,6 +60,7 @@ import java.util.Calendar
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import androidx.core.net.toUri
+import com.tanasi.streamflix.utils.EpisodeManager
 
 class PlayerMobileFragment : Fragment() {
 
@@ -238,6 +239,25 @@ class PlayerMobileFragment : Fragment() {
                 }
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.autoplayEpisode
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { (videoType, id) ->
+                    binding.pvPlayer.controller.binding.tvExoTitle.text = when (videoType) {
+                        is Video.Type.Episode -> videoType.tvShow.title
+                        is Video.Type.Movie -> videoType.title.substringBeforeLast(" ")
+                        else -> ""
+                    }
+                    binding.pvPlayer.controller.binding.tvExoSubtitle.text = when(videoType){
+                        is Video.Type.Episode -> "S${videoType.season.number} E${videoType.number}  •  ${videoType.title}"
+                        is Video.Type.Movie -> videoType.title.substringBeforeLast(" ")
+                    }
+                    if (videoType is Video.Type.Episode) {
+                        viewModel.playEpisode(videoType)
+                    }
+                }
+        }
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
@@ -388,6 +408,10 @@ class PlayerMobileFragment : Fragment() {
     }
 
     private fun displayVideo(video: Video, server: Video.Server) {
+        val videoType = args.videoType
+        if (videoType is Video.Type.Episode){
+            EpisodeManager.setCurrentEpisode(videoType)
+        }
         val currentPosition = player.currentPosition
 
         httpDataSource.setDefaultRequestProperties(
@@ -432,7 +456,7 @@ class PlayerMobileFragment : Fragment() {
                 )
             )
         }
-
+        val bufferMs = 3000L
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 binding.pvPlayer.keepScreenOn = isPlaying
@@ -462,6 +486,14 @@ class PlayerMobileFragment : Fragment() {
                             watchItem?.isWatched = true
                             watchItem?.watchedDate = Calendar.getInstance()
                             watchItem?.watchHistory = null
+                            val currentPosition = player.currentPosition
+                            val duration = player.duration
+                            if (duration != C.TIME_UNSET && currentPosition >= duration - bufferMs) {
+                                if (UserPreferences.autoplay) {
+                                    viewModel.tryAutoplayNext()
+                                }
+                            }
+
                         }
                     }
 

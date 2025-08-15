@@ -195,4 +195,7 @@
     <string name="settings_close_app">Close app</string>
     <string name="settings_category_streamingcommunity_dnsOverHttps">Use secure DNS</string>
     <string name="settings_category_network_title">Network Settings</string>
+    <string name="settings_autoplay">Autoplay next episode</string>
+    <string name="settings_autoplay_on">Autoplay next episode On</string>
+    <string name="settings_autoplay_off">Autoplay next episode Off</string>
 </resources>

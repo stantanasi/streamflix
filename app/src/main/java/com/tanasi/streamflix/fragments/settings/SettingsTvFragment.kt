@@ -6,6 +6,7 @@ import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.SwitchPreference
 import androidx.preference.PreferenceCategory
 import com.tanasi.streamflix.R // Mantenuto per R.xml.settings_tv e altre preferenze
 import com.tanasi.streamflix.providers.StreamingCommunityProvider
@@ -71,6 +72,18 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
                 true
             }
         }
+        findPreference<SwitchPreference>("p_settings_autoplay")?.apply {
+            // Initialize the switch state from UserPreferences
+            isChecked = UserPreferences.autoplay
+
+            // Update UserPreferences when user toggles it
+            setOnPreferenceChangeListener { _, newValue ->
+                val enabled = newValue as Boolean
+                UserPreferences.autoplay = enabled
+                true // Returning true updates the UI toggle
+            }
+        }
+
 
         findPreference<ListPreference>("p_doh_provider_url")?.apply {
             value = UserPreferences.dohProviderUrl ?: UserPreferences.DOH_DISABLED_VALUE
@@ -126,5 +139,6 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
         findPreference<ListPreference>("p_doh_provider_url")?.apply {
             summary = entry
         }
+        findPreference<SwitchPreference>("p_settings_autoplay")?.isChecked = UserPreferences.autoplay
     }
 }

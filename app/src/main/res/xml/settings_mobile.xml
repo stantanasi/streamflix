@@ -11,6 +11,14 @@
             android:inputType="text"/>
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Autoplay settings">
+        <SwitchPreference
+            android:key="p_settings_autoplay"
+            android:title="@string/settings_autoplay"
+            android:defaultValue="true"
+            android:summaryOn="@string/settings_autoplay_on"
+            android:summaryOff="@string/settings_autoplay_off" />
+    </PreferenceCategory>
     <PreferenceCategory
         android:key="pc_network_settings"
         android:title="@string/settings_category_network_title">
