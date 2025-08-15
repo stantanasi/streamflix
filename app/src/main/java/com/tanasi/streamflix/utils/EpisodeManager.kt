@@ -8,6 +8,7 @@ object EpisodeManager {
     var currentIndex = 0
         private set
 
+    // Add episodes per season, clear every time we enter a new show,season, etc
     fun addEpisodes(list: List<Episode>) {
         episodes.clear()
         episodes.addAll(list)

@@ -21,60 +21,64 @@ class CloseloadExtractor : Extractor() {
 
     override suspend fun extract(link: String): Video {
         val service = Service.build(mainUrl)
-
         val document = service.get(link, RidomoviesProvider.URL)
 
-        val unpacked = JsUnpacker(document.toString())
-            .unpack()
-            ?: throw Exception("Can't unpack JS")
+        val unpacked = JsUnpacker(document.toString()).unpack()
+            ?: error("Can't unpack JS")
 
-        var source = Regex("=\"(aHR.*?)\";").find(unpacked)
-            ?.groupValues?.get(1)
-            ?.let { Base64.decode(it, Base64.DEFAULT).toString(Charsets.UTF_8) }
-        if (source == null){
-            val myPlayerSrc = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
-            val videoSrcVarName = myPlayerSrc.find(unpacked)
-                ?.groupValues?.get(1)
-                ?: throw Exception("Can't find variable name used in myPlayer.src")
-            val encodedM3u8Regex = Regex("""var\s+$videoSrcVarName\s*=\s*dc_hello\("([^"]+)"\)""")
-            val encodedLink = encodedM3u8Regex.find(unpacked)
-                ?.groupValues?.get(1)
-                ?:""
-            if (!encodedLink.equals("")){
-                val decodedLink = String(Base64.decode(encodedLink, Base64.DEFAULT))
-                val decodedLinkReversed = decodedLink.reversed()
-                val finalDecodedLink = String(Base64.decode(decodedLinkReversed, Base64.DEFAULT))
-                val urlRegex = Regex("""https://[^\s"]+""")
-                source = urlRegex.find(finalDecodedLink)?.value.toString()
-            } else {
-                val playerSrcRegex = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
-                val playerSrcVar = playerSrcRegex.find(unpacked)?.groupValues?.get(1)
-                    ?: error("Couldn't find myPlayer.src variable")
-
-                val arrayDecoderRegex = Regex("""var\s+$playerSrcVar\s*=\s*(\w+)\(\[((?:\s*"[^"]+",?)+)\]\)""")
-                val match = arrayDecoderRegex.find(unpacked)
-                    ?: error("Couldn't match the decoding function with array")
-
-                val arrayParts = Regex("\"([^\"]+)\"").findAll(match.groupValues[2]).map { it.groupValues[1] }.toList()
-
-                val decodedUrl = decodeObfuscatedUrl(arrayParts)
-                source = decodedUrl
-            }
-
-        }
+        val source = extractDirectBase64(unpacked)
+            ?: extractDcHelloEncoded(unpacked)
+            ?: extractArrayDecoded(unpacked)
+            ?: error("Unable to fetch video URL")
 
         return Video(
             source = source,
-            headers = mapOf(
-                "Referer" to mainUrl,
-            ),
-            type = MimeTypes.APPLICATION_M3U8,
+            headers = mapOf("Referer" to mainUrl),
+            type = MimeTypes.APPLICATION_M3U8
         )
     }
-    private fun decodeObfuscatedUrl(parts: List<String>): String {
-        val joined = parts.joinToString("")
+    private fun extractDirectBase64(unpacked: String): String? {
+        val match = Regex("=\"(aHR.*?)\";").find(unpacked)?.groupValues?.get(1) ?: return null
+        return Base64.decode(match, Base64.DEFAULT)
+            .toString(Charsets.UTF_8)
+            .takeIf { it.startsWith("http") }
+    }
 
-        val rot13 = joined.map {
+    private fun extractDcHelloEncoded(unpacked: String): String? {
+        val varName = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
+            .find(unpacked)?.groupValues?.get(1) ?: return null
+
+        val encodedLink = Regex("""var\s+$varName\s*=\s*dc_hello\("([^"]+)"\)""")
+            .find(unpacked)?.groupValues?.get(1).orEmpty()
+
+        if (encodedLink.isBlank()) return null
+
+        val decodedLink = Base64.decode(encodedLink, Base64.DEFAULT).toString(Charsets.UTF_8)
+        val reversed = decodedLink.reversed()
+        val finalDecoded = Base64.decode(reversed, Base64.DEFAULT).toString(Charsets.UTF_8)
+
+        return Regex("""https://[^\s"]+""").find(finalDecoded)?.value
+    }
+    private fun extractArrayDecoded(unpacked: String): String? {
+        val varName = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
+            .find(unpacked)?.groupValues?.get(1) ?: return null
+
+        val match = Regex("""var\s+$varName\s*=\s*(\w+)\(\[((?:\s*"[^"]+",?)+)\]\)""")
+            .find(unpacked) ?: return null
+
+        val arrayParts = Regex("\"([^\"]+)\"")
+            .findAll(match.groupValues[2])
+            .map { it.groupValues[1] }
+            .toList()
+
+        return decodeObfuscatedUrlRotFirst(arrayParts)
+            .takeIf { it.startsWith("http") }
+            ?: decodeObfuscatedUrlDecodeFirst(arrayParts)
+                .takeIf { it.startsWith("http") }
+    }
+
+    private fun decodeObfuscatedUrlRotFirst(parts: List<String>): String {
+        val rot13 = parts.joinToString("").map {
             when (it) {
                 in 'A'..'Z' -> 'A' + (it - 'A' + 13) % 26
                 in 'a'..'z' -> 'a' + (it - 'a' + 13) % 26
@@ -82,40 +86,50 @@ class CloseloadExtractor : Extractor() {
             }
         }.joinToString("")
 
-        val base64Decoded = Base64.decode(rot13, Base64.DEFAULT)
-        val reversed = base64Decoded.reversed()
-
+        val reversed = Base64.decode(rot13, Base64.DEFAULT).reversed()
         val finalBytes = reversed.mapIndexed { i, b ->
-            val adjusted = (b.toInt() - (399756995 % (i + 5)) + 256) % 256
+            val adjusted = (b.toInt() - (399_756_995 % (i + 5)) + 256) % 256
             adjusted.toByte()
         }.toByteArray()
 
-        return String(finalBytes)
+        return String(finalBytes, Charsets.UTF_8)
     }
 
+    private fun decodeObfuscatedUrlDecodeFirst(parts: List<String>): String {
+        val b64 = Base64.decode(parts.joinToString(""), Base64.DEFAULT)
+        val reversed = String(b64, Charsets.ISO_8859_1).reversed()
+        val rot13 = reversed.map {
+            when (it) {
+                in 'A'..'Z' -> 'A' + (it - 'A' + 13) % 26
+                in 'a'..'z' -> 'a' + (it - 'a' + 13) % 26
+                else -> it
+            }
+        }.joinToString("")
+
+        val finalBytes = ByteArray(rot13.length) { i ->
+            val code = rot13[i].code and 0xFF
+            val adj = 399_756_995 % (i + 5)
+            (((code - adj) % 256 + 256) % 256).toByte()
+        }
+
+        return String(finalBytes, Charsets.UTF_8)
+    }
 
     private interface Service {
-
         companion object {
             fun build(baseUrl: String): Service {
-                val client = OkHttpClient.Builder()
-                    .build()
-
+                val client = OkHttpClient.Builder().build()
                 val retrofit = Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
                     .build()
-
                 return retrofit.create(Service::class.java)
             }
         }
 
         @GET
-        suspend fun get(
-            @Url url: String,
-            @Header("referer") referer: String,
-        ): Document
+        suspend fun get(@Url url: String, @Header("referer") referer: String): Document
     }
 }

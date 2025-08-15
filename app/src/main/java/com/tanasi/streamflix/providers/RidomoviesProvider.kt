@@ -338,39 +338,14 @@ object RidomoviesProvider : Provider {
 
         val response = service.getEpisodes(tvShowId, id)
 
-        val episodes = mutableListOf<Episode>()
-        val videoEpisodes = mutableListOf<com.tanasi.streamflix.models.Video.Type.Episode>()
-
-        response.data.items.forEach { item ->
-            val episode = Episode(
-                id = item.id,
-                number = item.episodeNumber,
-                title = item.title,
-                released = item.releaseDate,
-            )
-
-            episodes += episode
-
-            videoEpisodes += com.tanasi.streamflix.models.Video.Type.Episode(
-                id = episode.id,
-                number = episode.number,
-                title = episode.title,
-                poster = episode.poster,
-                tvShow = com.tanasi.streamflix.models.Video.Type.Episode.TvShow(
-                    id = episode.tvShow?.id ?: tvShowId,
-                    title = episode.tvShow?.title ?: "",
-                    poster = episode.tvShow?.poster,
-                    banner = episode.tvShow?.banner
-                ),
-                season = com.tanasi.streamflix.models.Video.Type.Episode.Season(
-                    number = episode.season?.number ?: Integer.parseInt(id.last().toString()),
-                    title = episode.season?.title
-                )
+        val episodes = response.data.items.map {
+            Episode(
+                id = it.id,
+                number = it.episodeNumber,
+                title = it.title,
+                released = it.releaseDate,
             )
         }
-
-        EpisodeManager.addEpisodes(videoEpisodes)
-
         return episodes
     }
 

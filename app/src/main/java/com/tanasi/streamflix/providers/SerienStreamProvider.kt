@@ -279,7 +279,7 @@ object SerienStreamProvider : Provider {
         val seasonNumber = linkWithSplitData[1]
 
         val document = service.getTvShowEpisodes(showName, seasonNumber)
-        var episodeList = document.select("tbody tr").map {
+        return document.select("tbody tr").map {
             Episode(
                 id = it.selectFirst("a")?.attr("href")?.let { it1 -> getEpisodeIdFromLink(it1) }
                     ?: "",
@@ -287,29 +287,6 @@ object SerienStreamProvider : Provider {
                 title = it.selectFirst("strong")?.text(),
             )
         }
-        val videoEpisodes = episodeList.map { ep ->
-            com.tanasi.streamflix.models.Video.Type.Episode(
-                id = ep.id,
-                number = ep.number,
-                title = ep.title,
-                poster = ep.poster,
-                tvShow = com.tanasi.streamflix.models.Video.Type.Episode.TvShow(
-                    id = ep.tvShow?.id ?: showName,
-                    title = ep.tvShow?.title ?: showName,
-                    poster = ep.tvShow?.poster,
-                    banner = ep.tvShow?.banner
-                ),
-                season = com.tanasi.streamflix.models.Video.Type.Episode.Season(
-                    number = ep.season?.number ?: Integer.parseInt(seasonNumber),
-                    title = ep.season?.title
-                )
-            )
-        }
-
-        EpisodeManager.addEpisodes(videoEpisodes)
-
-
-        return episodeList
     }
 
     override suspend fun getGenre(id: String, page: Int): Genre {
