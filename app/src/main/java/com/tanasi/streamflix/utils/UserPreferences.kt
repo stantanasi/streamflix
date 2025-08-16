@@ -55,15 +55,15 @@ object UserPreferences {
         }
 
     var autoplay: Boolean
-        get() = Key.AUTOPLAY.getBoolean() ?: true
+        get() = Key.AUTOPLAY.getBoolean() ?: false
         set(value) {
             Key.AUTOPLAY.setBoolean(value)
         }
 
-    var bufferMs: Long
-        get() = Key.BUFFER_MS.getLong() ?: 3000L
+    var bufferS: Long
+        get() = (Key.BUFFER_S.getLong()) ?: 3
         set(value) {
-            Key.BUFFER_MS.setLong(value)
+            Key.BUFFER_S.setLong(value)
         }
     enum class PlayerResize(
         val stringRes: Int,
@@ -175,7 +175,7 @@ object UserPreferences {
         STREAMINGCOMMUNITY_DOMAIN,
         DOH_PROVIDER_URL, // Removed STREAMINGCOMMUNITY_DNS_OVER_HTTPS, added DOH_PROVIDER_URL
         AUTOPLAY,
-        BUFFER_MS;
+        BUFFER_S;
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)

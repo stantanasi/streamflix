@@ -2,6 +2,8 @@ package com.tanasi.streamflix.fragments.settings
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
+import android.view.inputmethod.EditorInfo
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
@@ -73,17 +75,26 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
             }
         }
         findPreference<SwitchPreference>("p_settings_autoplay")?.apply {
-            // Initialize the switch state from UserPreferences
             isChecked = UserPreferences.autoplay
 
-            // Update UserPreferences when user toggles it
             setOnPreferenceChangeListener { _, newValue ->
                 val enabled = newValue as Boolean
                 UserPreferences.autoplay = enabled
-                true // Returning true updates the UI toggle
+                true
             }
         }
+        findPreference<EditTextPreference>("p_settings_autoplay_buffer")?.apply {
+            setOnBindEditTextListener { editText ->
+                editText.inputType = InputType.TYPE_CLASS_NUMBER
+                editText.imeOptions = EditorInfo.IME_ACTION_DONE
+            }
 
+            setOnPreferenceChangeListener { preference, newValue ->
+                val seconds = (newValue as? String)?.toLongOrNull() ?: 3L
+                UserPreferences.bufferS = seconds
+                true
+            }
+        }
 
         findPreference<ListPreference>("p_doh_provider_url")?.apply {
             value = UserPreferences.dohProviderUrl ?: UserPreferences.DOH_DISABLED_VALUE

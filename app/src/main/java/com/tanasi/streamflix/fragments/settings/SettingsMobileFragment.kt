@@ -32,16 +32,28 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
         }
 
         findPreference<SwitchPreference>("p_settings_autoplay")?.apply {
-            // Initialize the switch state from UserPreferences
             isChecked = UserPreferences.autoplay
-
-            // Update UserPreferences when user toggles it
             setOnPreferenceChangeListener { _, newValue ->
                 val enabled = newValue as Boolean
                 UserPreferences.autoplay = enabled
-                true // Returning true updates the UI toggle
+                true
             }
         }
+        findPreference<EditTextPreference>("p_settings_autoplay_buffer")?.apply {
+            setOnBindEditTextListener { editText ->
+                editText.inputType = InputType.TYPE_CLASS_NUMBER
+                editText.imeOptions = EditorInfo.IME_ACTION_DONE
+            }
+
+            setOnPreferenceChangeListener { preference, newValue ->
+                val seconds = (newValue as? String)?.toLongOrNull() ?: 3L
+                UserPreferences.bufferS = seconds
+                true
+            }
+        }
+
+
+
 
         findPreference<Preference>("p_settings_about")?.apply {
             setOnPreferenceClickListener {

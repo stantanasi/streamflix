@@ -29,6 +29,13 @@
         android:defaultValue="true"
         android:summaryOn="@string/settings_autoplay_on"
         android:summaryOff="@string/settings_autoplay_off" />
+        <EditTextPreference
+            android:key="p_settings_autoplay_buffer"
+            android:title="Autoplay buffer (s)"
+            android:defaultValue="3"
+            android:inputType="number"
+            android:singleLine="true"
+            android:imeOptions="actionDone" />
     </PreferenceCategory>
     <Preference
         android:icon="@drawable/ic_settings_about"

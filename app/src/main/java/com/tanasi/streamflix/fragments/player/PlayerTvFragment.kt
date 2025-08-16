@@ -493,7 +493,7 @@ class PlayerTvFragment : Fragment() {
                             if (player.hasFinished()) {
                                 val currentPosition = player.currentPosition
                                 val duration = player.duration
-                                if (duration != C.TIME_UNSET && currentPosition >= duration - UserPreferences.bufferMs) {
+                                if (duration != C.TIME_UNSET && currentPosition >= duration - UserPreferences.bufferS) {
                                     if (UserPreferences.autoplay) {
                                         viewModel.tryAutoplayNext()
                                     }
