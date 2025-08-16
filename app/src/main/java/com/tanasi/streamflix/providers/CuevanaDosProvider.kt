@@ -346,13 +346,12 @@ object CuevanaDosProvider : Provider {
         val (slug, seasonNumStr) = seasonId.split("/")
         val seasonNumber = seasonNumStr.toIntOrNull() ?: return emptyList()
 
-        // Use getOrPut safely: inside the lambda return JSONArray
         val seasonsJson: JSONArray = seasonCache.getOrPut(slug) {
             val document = service.getTvShow(slug)
             val jsonData = document.selectFirst("script#__NEXT_DATA__")?.data()
             if (jsonData == null) {
                 seasonCache.remove(slug)
-                return@getOrPut JSONArray() // Return empty JSONArray for cache
+                return@getOrPut JSONArray()
             }
 
             val root = JSONObject(jsonData)
@@ -380,35 +379,11 @@ object CuevanaDosProvider : Provider {
                     number = ep.optInt("number"),
                     title = ep.optString("title"),
                     poster = ep.optString("image"),
-                    released = ep.optString("releaseDate").take(10)
+                    released = ep.optString("releaseDate").take(10),
                 )
             }
-
-            // If you want to update EpisodeManager here
-            val videoEpisodes = episodes.map { ep ->
-                com.tanasi.streamflix.models.Video.Type.Episode(
-                    id = ep.id,
-                    number = ep.number,
-                    title = ep.title,
-                    poster = ep.poster,
-                    tvShow = com.tanasi.streamflix.models.Video.Type.Episode.TvShow(
-                        id = ep.tvShow?.id ?: slug,
-                        title = ep.tvShow?.title ?: slug,
-                        poster = ep.tvShow?.poster,
-                        banner = ep.tvShow?.banner
-                    ),
-                    season = com.tanasi.streamflix.models.Video.Type.Episode.Season(
-                        number = ep.season?.number ?: seasonNumber,
-                        title = ep.season?.title
-                    )
-                )
-            }
-            EpisodeManager.addEpisodes(videoEpisodes)
-
             return episodes
         }
-
-        // If no matching season found, return empty list
         return emptyList()
     }
 

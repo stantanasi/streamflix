@@ -243,21 +243,38 @@ class PlayerMobileFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.autoplayEpisode
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect { (videoType, id) ->
-                    binding.pvPlayer.controller.binding.tvExoTitle.text = when (videoType) {
-                        is Video.Type.Episode -> videoType.tvShow.title
-                        is Video.Type.Movie -> videoType.title.substringBeforeLast(" ")
-                        else -> ""
-                    }
-                    binding.pvPlayer.controller.binding.tvExoSubtitle.text = when(videoType){
-                        is Video.Type.Episode -> "S${videoType.season.number} E${videoType.number}  •  ${videoType.title}"
-                        is Video.Type.Movie -> videoType.title.substringBeforeLast(" ")
-                    }
-                    if (videoType is Video.Type.Episode) {
-                        viewModel.playEpisode(videoType)
+                .collect { (videoType) ->
+                    val episode = database.episodeDao().getById(videoType.id)
+                    val controllerBinding = binding.pvPlayer.controller.binding
+
+                    when (videoType) {
+                        is Video.Type.Episode -> {
+                            val title = episode?.tvShow?.title ?: videoType.tvShow.title
+                            val subtitle = episode?.let {
+                                "S${it.season?.number} E${it.number}  •  ${it.title}"
+                            }
+                                ?: "S${videoType.season.number} E${videoType.number}  •  ${videoType.title}"
+
+                            controllerBinding.tvExoTitle.text = title
+                            controllerBinding.tvExoSubtitle.text = subtitle
+
+                            viewModel.playEpisode(videoType)
+                        }
+
+                        is Video.Type.Movie -> {
+                            val trimmedTitle = videoType.title.substringBeforeLast(" ")
+                            controllerBinding.tvExoTitle.text = trimmedTitle
+                            controllerBinding.tvExoSubtitle.text = trimmedTitle
+                        }
+
+                        else -> {
+                            controllerBinding.tvExoTitle.text = ""
+                            controllerBinding.tvExoSubtitle.text = ""
+                        }
                     }
                 }
         }
+
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
@@ -409,7 +426,7 @@ class PlayerMobileFragment : Fragment() {
 
     private fun displayVideo(video: Video, server: Video.Server) {
         val videoType = args.videoType
-        if (videoType is Video.Type.Episode){
+        if (videoType is Video.Type.Episode) {
             EpisodeManager.setCurrentEpisode(videoType)
         }
         val currentPosition = player.currentPosition
@@ -456,7 +473,6 @@ class PlayerMobileFragment : Fragment() {
                 )
             )
         }
-        val bufferMs = 3000L
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 binding.pvPlayer.keepScreenOn = isPlaying
@@ -488,7 +504,7 @@ class PlayerMobileFragment : Fragment() {
                             watchItem?.watchHistory = null
                             val currentPosition = player.currentPosition
                             val duration = player.duration
-                            if (duration != C.TIME_UNSET && currentPosition >= duration - bufferMs) {
+                            if (duration != C.TIME_UNSET && currentPosition >= duration - UserPreferences.bufferMs) {
                                 if (UserPreferences.autoplay) {
                                     viewModel.tryAutoplayNext()
                                 }

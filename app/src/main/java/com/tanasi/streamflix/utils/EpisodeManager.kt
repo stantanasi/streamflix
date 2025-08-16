@@ -1,6 +1,5 @@
 package com.tanasi.streamflix.utils
 
-import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.models.Video.Type.Episode
 
 object EpisodeManager {
@@ -28,7 +27,6 @@ object EpisodeManager {
         }
         return null
     }
-
     fun hasNextEpisode(): Boolean =
         currentIndex + 1 < episodes.size
 }
