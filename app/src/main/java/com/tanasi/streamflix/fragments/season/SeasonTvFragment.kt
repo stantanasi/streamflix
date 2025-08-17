@@ -104,24 +104,33 @@ class SeasonTvFragment : Fragment() {
         }
     }
 
+    private var focusedEpisodeIndex: Int? = null
+
     private fun displaySeason(episodes: List<Episode>) {
         val preparedEpisodes = episodes.onEach { episode ->
             episode.itemType = AppAdapter.Type.EPISODE_TV_ITEM
         }
 
-        val episodeIndex = episodes
+        val lastWatchedIndex = episodes
             .filter { it.watchHistory != null }
             .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
             .firstOrNull()
             ?.let { episodes.indexOf(it) }
             ?: episodes.indexOfLast { it.isWatched }
 
-
-
         appAdapter.submitList(preparedEpisodes)
-        episodeIndex.let { binding.hgvEpisodes.scrollAndFocus(it-1) }
 
+        if (focusedEpisodeIndex == null) {
+            val scrollIndex = when {
+                lastWatchedIndex == -1 -> 0
+                lastWatchedIndex < episodes.lastIndex -> lastWatchedIndex + 1
+                else -> lastWatchedIndex
+            }
+            binding.hgvEpisodes.scrollAndFocus(scrollIndex)
+            focusedEpisodeIndex = scrollIndex
+        }
     }
+
     private fun RecyclerView.scrollAndFocus(position: Int) {
         scrollToPosition(position)
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
