@@ -24,13 +24,13 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="Autoplay settings">
     <SwitchPreference
-        android:key="p_settings_autoplay"
+        android:key="AUTOPLAY"
         android:title="@string/settings_autoplay"
         android:defaultValue="true"
         android:summaryOn="@string/settings_autoplay_on"
         android:summaryOff="@string/settings_autoplay_off" />
         <EditTextPreference
-            android:key="p_settings_autoplay_buffer"
+            android:key="BUFFER_S"
             android:title="Autoplay buffer delay (seconds)"
             android:summary="%s seconds"
             android:defaultValue="3"
