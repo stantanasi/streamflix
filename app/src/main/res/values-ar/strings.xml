@@ -107,5 +107,9 @@
 	<string name="settings_about_version_name">الإصدار %s</string>
 	<string name="settings_about_donate">تبرع</string>
 	<string name="settings_help">مساعدة</string>
+    <string name="settings_category_network_title">إعدادات الشبكة</string>
+	<string name="settings_autoplay">تشغيل الحلقة التالية تلقائيًا</string>
+	<string name="settings_autoplay_on">تشغيل الحلقة التالية تلقائيًا: تشغيل</string>
+	<string name="settings_autoplay_off">تشغيل الحلقة التالية تلقائيًا: إيقاف</string>
 </resources>
 

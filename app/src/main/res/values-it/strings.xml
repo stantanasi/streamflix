@@ -194,4 +194,8 @@
     <string name="settings_category_streamingcommunity_domain">Nome di dominio StreamingCommunity</string>
     <string name="settings_close_app">Chiudi applicazione</string>
     <string name="settings_category_streamingcommunity_dnsOverHttps">Usa DNS sicuro</string>
+    <string name="settings_category_network_title">Impostazioni di rete</string>
+    <string name="settings_autoplay">Riproduzione automatica del prossimo episodio</string>
+    <string name="settings_autoplay_on">Riproduzione automatica del prossimo episodio: Attiva</string>
+    <string name="settings_autoplay_off">Riproduzione automatica del prossimo episodio: Disattiva</string>
 </resources>
