@@ -3,6 +3,7 @@ package com.tanasi.streamflix.fragments.settings
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.EditTextPreference
@@ -74,24 +75,26 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
                 true
             }
         }
-        findPreference<SwitchPreference>("p_settings_autoplay")?.apply {
-            isChecked = UserPreferences.autoplay
 
+        findPreference<SwitchPreference>("AUTOPLAY")?.apply {
+            isChecked = UserPreferences.autoplay
             setOnPreferenceChangeListener { _, newValue ->
-                val enabled = newValue as Boolean
-                UserPreferences.autoplay = enabled
+                UserPreferences.autoplay = newValue as Boolean
                 true
             }
         }
-        findPreference<EditTextPreference>("p_settings_autoplay_buffer")?.apply {
+
+        findPreference<EditTextPreference>("BUFFER_S")?.apply {
+            val initialSeconds = (UserPreferences.bufferS / 1000).toInt()
+            summary = "$initialSeconds seconds"
             setOnBindEditTextListener { editText ->
                 editText.inputType = InputType.TYPE_CLASS_NUMBER
                 editText.imeOptions = EditorInfo.IME_ACTION_DONE
             }
-
             setOnPreferenceChangeListener { preference, newValue ->
-                val seconds = (newValue as? String)?.toLongOrNull() ?: 3L
-                UserPreferences.bufferS = seconds
+                val seconds = (newValue as? String)?.toLongOrNull() ?: 3000L
+                UserPreferences.bufferS = seconds.times(1000)
+                preference.summary = "$seconds seconds"
                 true
             }
         }
@@ -150,6 +153,11 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
         findPreference<ListPreference>("p_doh_provider_url")?.apply {
             summary = entry
         }
-        findPreference<SwitchPreference>("p_settings_autoplay")?.isChecked = UserPreferences.autoplay
+        findPreference<SwitchPreference>("AUTOPLAY")?.isChecked = UserPreferences.autoplay
+        val bufferPref: EditTextPreference? = findPreference("p_settings_autoplay_buffer")
+        bufferPref?.summaryProvider = Preference.SummaryProvider<EditTextPreference> { pref ->
+            val value = pref.text?.toLongOrNull() ?: 3L
+            "$value s"
+        }
     }
 }

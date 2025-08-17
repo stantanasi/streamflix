@@ -55,13 +55,13 @@ object UserPreferences {
         }
 
     var autoplay: Boolean
-        get() = Key.AUTOPLAY.getBoolean() ?: false
+        get() = Key.AUTOPLAY.getBoolean() ?: true
         set(value) {
             Key.AUTOPLAY.setBoolean(value)
         }
 
     var bufferS: Long
-        get() = (Key.BUFFER_S.getLong()) ?: 3
+        get() = (Key.BUFFER_S.getLong()) ?: 3000L
         set(value) {
             Key.BUFFER_S.setLong(value)
         }

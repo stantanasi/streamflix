@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.text.InputType
+import android.util.Log
 import android.view.inputmethod.EditorInfo
 import androidx.navigation.fragment.findNavController
 import androidx.preference.EditTextPreference
@@ -13,7 +14,7 @@ import androidx.preference.PreferenceCategory // Importa PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.fragments.settings.mobile.SettingsMobileFragmentDirections
+//import com.tanasi.streamflix.fragments.settings.mobile.SettingsMobileFragmentDirections
 import com.tanasi.streamflix.providers.StreamingCommunityProvider
 import com.tanasi.streamflix.utils.UserPreferences
 
@@ -30,24 +31,25 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
         findPreference<PreferenceCategory>("pc_streamingcommunity_settings")?.apply {
             isVisible = UserPreferences.currentProvider is StreamingCommunityProvider
         }
-
-        findPreference<SwitchPreference>("p_settings_autoplay")?.apply {
+        findPreference<SwitchPreference>("AUTOPLAY")?.apply {
             isChecked = UserPreferences.autoplay
             setOnPreferenceChangeListener { _, newValue ->
-                val enabled = newValue as Boolean
-                UserPreferences.autoplay = enabled
+                UserPreferences.autoplay = newValue as Boolean
                 true
             }
         }
-        findPreference<EditTextPreference>("p_settings_autoplay_buffer")?.apply {
+
+        findPreference<EditTextPreference>("BUFFER_S")?.apply {
+            val initialSeconds = (UserPreferences.bufferS / 1000).toInt()
+            summary = "$initialSeconds seconds"
             setOnBindEditTextListener { editText ->
                 editText.inputType = InputType.TYPE_CLASS_NUMBER
                 editText.imeOptions = EditorInfo.IME_ACTION_DONE
             }
-
             setOnPreferenceChangeListener { preference, newValue ->
-                val seconds = (newValue as? String)?.toLongOrNull() ?: 3L
-                UserPreferences.bufferS = seconds
+                val seconds = (newValue as? String)?.toLongOrNull() ?: 3000L
+                UserPreferences.bufferS = seconds.times(1000)
+                preference.summary = "$seconds seconds"
                 true
             }
         }
@@ -150,6 +152,11 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
         // Aggiorna la visibilità quando il fragment diventa visibile
         findPreference<PreferenceCategory>("pc_streamingcommunity_settings")?.isVisible =
             UserPreferences.currentProvider is StreamingCommunityProvider
-        findPreference<SwitchPreference>("p_settings_autoplay")?.isChecked = UserPreferences.autoplay
+        findPreference<SwitchPreference>("AUTOPLAY")?.isChecked = UserPreferences.autoplay
+        val bufferPref: EditTextPreference? = findPreference("p_settings_autoplay_buffer")
+        bufferPref?.summaryProvider = Preference.SummaryProvider<EditTextPreference> { pref ->
+            val value = pref.text?.toLongOrNull() ?: 3L
+            "$value seconds"
+        }
     }
 }

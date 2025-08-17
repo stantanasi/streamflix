@@ -31,7 +31,8 @@
         android:summaryOff="@string/settings_autoplay_off" />
         <EditTextPreference
             android:key="p_settings_autoplay_buffer"
-            android:title="Autoplay buffer (s)"
+            android:title="Autoplay buffer delay (seconds)"
+            android:summary="%s seconds"
             android:defaultValue="3"
             android:inputType="number"
             android:singleLine="true"

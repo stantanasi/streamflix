@@ -244,16 +244,13 @@ class PlayerMobileFragment : Fragment() {
             viewModel.autoplayEpisode
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { (videoType) ->
-                    val episode = database.episodeDao().getById(videoType.id)
                     val controllerBinding = binding.pvPlayer.controller.binding
-
                     when (videoType) {
                         is Video.Type.Episode -> {
-                            val title = episode?.tvShow?.title ?: videoType.tvShow.title
-                            val subtitle = episode?.let {
-                                "S${it.season?.number} E${it.number}  •  ${it.title}"
+                            val title = videoType.tvShow.title
+                            val subtitle = videoType.let {
+                                "S${it.season.number} E${it.number}  •  ${it.title}"
                             }
-                                ?: "S${videoType.season.number} E${videoType.number}  •  ${videoType.title}"
 
                             controllerBinding.tvExoTitle.text = title
                             controllerBinding.tvExoSubtitle.text = subtitle
@@ -502,14 +499,6 @@ class PlayerMobileFragment : Fragment() {
                             watchItem?.isWatched = true
                             watchItem?.watchedDate = Calendar.getInstance()
                             watchItem?.watchHistory = null
-                            val currentPosition = player.currentPosition
-                            val duration = player.duration
-                            if (duration != C.TIME_UNSET && currentPosition >= duration - UserPreferences.bufferS) {
-                                if (UserPreferences.autoplay) {
-                                    viewModel.tryAutoplayNext()
-                                }
-                            }
-
                         }
                     }
 
@@ -533,6 +522,15 @@ class PlayerMobileFragment : Fragment() {
                                     merge(tvShow)
                                     isWatching = true
                                 })
+                            }
+                            if (player.hasFinished()) {
+                                val currentPosition = player.currentPosition
+                                val duration = player.duration
+                                if (duration != C.TIME_UNSET && currentPosition >= duration - UserPreferences.bufferS) {
+                                    if (UserPreferences.autoplay) {
+                                        viewModel.tryAutoplayNext()
+                                    }
+                                }
                             }
                         }
                     }

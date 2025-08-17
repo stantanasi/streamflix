@@ -237,16 +237,13 @@ class PlayerTvFragment : Fragment() {
             viewModel.autoplayEpisode
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { (videoType) ->
-                    val episode = database.episodeDao().getById(videoType.id)
                     val controllerBinding = binding.pvPlayer.controller.binding
-
                     when (videoType) {
                         is Video.Type.Episode -> {
-                            val title = episode?.tvShow?.title ?: videoType.tvShow.title
-                            val subtitle = episode?.let {
-                                "S${it.season?.number} E${it.number}  •  ${it.title}"
+                            val title = videoType.tvShow.title
+                            val subtitle = videoType.let {
+                                "S${it.season.number} E${it.number}  •  ${it.title}"
                             }
-                                ?: "S${videoType.season.number} E${videoType.number}  •  ${videoType.title}"
 
                             controllerBinding.tvExoTitle.text = title
                             controllerBinding.tvExoSubtitle.text = subtitle

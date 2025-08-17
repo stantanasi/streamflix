@@ -13,14 +13,15 @@
 
     <PreferenceCategory android:title="Autoplay settings">
         <SwitchPreference
-            android:key="p_settings_autoplay"
+                android:key="AUTOPLAY"
             android:title="@string/settings_autoplay"
             android:defaultValue="true"
             android:summaryOn="@string/settings_autoplay_on"
             android:summaryOff="@string/settings_autoplay_off" />
         <EditTextPreference
-            android:key="p_settings_autoplay_buffer"
-            android:title="Autoplay buffer (s)"
+            android:key="BUFFER_S"
+            android:summary="%s seconds"
+            android:title="Autoplay buffer delay (seconds)"
             android:defaultValue="3"
             android:inputType="number"
             android:singleLine="true"
