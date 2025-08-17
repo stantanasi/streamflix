@@ -29,6 +29,7 @@ class CloseloadExtractor : Extractor() {
         val source = extractDirectBase64(unpacked)
             ?: extractDcHelloEncoded(unpacked)
             ?: extractArrayDecoded(unpacked)
+            ?: extractArrayDecodedNew(unpacked)
             ?: error("Unable to fetch video URL")
 
         return Video(
@@ -37,6 +38,7 @@ class CloseloadExtractor : Extractor() {
             type = MimeTypes.APPLICATION_M3U8
         )
     }
+
     private fun extractDirectBase64(unpacked: String): String? {
         val match = Regex("=\"(aHR.*?)\";").find(unpacked)?.groupValues?.get(1) ?: return null
         return Base64.decode(match, Base64.DEFAULT)
@@ -59,6 +61,7 @@ class CloseloadExtractor : Extractor() {
 
         return Regex("""https://[^\s"]+""").find(finalDecoded)?.value
     }
+
     private fun extractArrayDecoded(unpacked: String): String? {
         val varName = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
             .find(unpacked)?.groupValues?.get(1) ?: return null
@@ -76,7 +79,43 @@ class CloseloadExtractor : Extractor() {
             ?: decodeObfuscatedUrlDecodeFirst(arrayParts)
                 .takeIf { it.startsWith("http") }
     }
+    private fun extractArrayDecodedNew(unpacked: String): String? {
+        val varName = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
+            .find(unpacked)?.groupValues?.get(1) ?: return null
 
+        val match = Regex("""var\s+$varName\s*=\s*(\w+)\(\[((?:\s*"[^"]+",?)+)\]\)""")
+            .find(unpacked) ?: return null
+
+        val arrayParts = Regex("\"([^\"]+)\"")
+            .findAll(match.groupValues[2])
+            .map { it.groupValues[1] }
+            .toList()
+
+        return decodeObfuscatedUrl(arrayParts)
+            .takeIf { it.startsWith("http") }
+    }
+
+    private fun decodeObfuscatedUrl(parts: List<String>): String {
+        val joined = parts.joinToString("")
+        val rot13 = joined.map { c ->
+            when (c) {
+                in 'A'..'Z' -> 'A' + (c - 'A' + 13) % 26
+                in 'a'..'z' -> 'a' + (c - 'a' + 13) % 26
+                else -> c
+            }
+        }.joinToString("")
+
+        val reversed = rot13.reversed()
+
+        val decoded = Base64.decode(reversed, Base64.DEFAULT)
+        val finalBytes = decoded.mapIndexed { i, b ->
+            val adjustment = 399_756_995 % (i + 5)
+            val adjusted = (b.toInt() - adjustment + 256) % 256
+            adjusted.toByte()
+        }.toByteArray()
+
+        return String(finalBytes, Charsets.UTF_8)
+    }
     private fun decodeObfuscatedUrlRotFirst(parts: List<String>): String {
         val rot13 = parts.joinToString("").map {
             when (it) {
