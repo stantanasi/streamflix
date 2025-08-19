@@ -354,8 +354,6 @@ class EpisodeViewHolder(
                         id = episode.tvShow?.id ?: "",
                     )
                 )
-                EpisodeManager.setEpisodesForSeason(episode.tvShow?.id ?: "",
-                    episode.season?.number ?: 1, episode.id)
                 findNavController().navigate(
                     TvShowTvFragmentDirections.actionTvShowToPlayer(
                         id = episode.id,

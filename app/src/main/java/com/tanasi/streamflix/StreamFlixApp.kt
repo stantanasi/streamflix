@@ -20,12 +20,7 @@ class StreamFlixApp : Application() {
         super.onCreate()
         instance = this
 
-        // Initialize UserPreferences first
         UserPreferences.setup(this)
-
-        // Now you can safely build the database
-        database = AppDatabase.getInstance(this)
-        EpisodeManager.init(database) // initialize EpisodeManager with the database
 
         SerienStreamProvider.initialize(this)
         AniWorldProvider.initialize(this)

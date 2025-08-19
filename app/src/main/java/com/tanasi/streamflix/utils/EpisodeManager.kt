@@ -6,17 +6,10 @@ import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.models.Video.Type.Episode
 
 object EpisodeManager {
-
-
-    private lateinit var episodeDao: EpisodeDao
     private val episodes = mutableListOf<Episode>()
     var currentIndex = 0
         private set
 
-    fun init(database: AppDatabase) {
-        episodeDao = database.episodeDao()
-    }
-    // Add episodes per season, clear every time we enter a new show,season, etc
     fun addEpisodes(list: List<Episode>) {
         episodes.clear()
         episodes.addAll(list)
@@ -49,33 +42,6 @@ object EpisodeManager {
 
     fun hasNextEpisode(): Boolean {
         return currentIndex < episodes.size - 1
-    }
-    fun setEpisodesForSeason(tvShowId: String, seasonNumber: Int, episodeId: String) {
-        val seasonEpisodes = episodeDao.getEpisodesByTvShowId(tvShowId)
-            .filter { it.season?.number == seasonNumber }
-
-        episodes.clear()
-        seasonEpisodes.forEach { ep ->
-            episodes.add(
-                Video.Type.Episode(
-                    id = ep.id,
-                    number = ep.number,
-                    title = ep.title,
-                    poster = ep.poster,
-                    tvShow = Video.Type.Episode.TvShow(
-                        id = ep.tvShow?.id ?: "",
-                        title = ep.tvShow?.title ?: "",
-                        poster = ep.tvShow?.poster,
-                        banner = ep.tvShow?.banner
-                    ),
-                    season = Video.Type.Episode.Season(
-                        number = ep.season?.number ?: 0,
-                        title = ep.season?.title
-                    )
-                )
-            )
-        }
-        currentIndex = episodes.indexOfFirst { it.id == episodeId }.takeIf { it >= 0 } ?: 0
     }
 
 
