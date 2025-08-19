@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.fragments.player
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -9,11 +10,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -30,6 +34,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.SubtitleView
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.tanasi.streamflix.R
@@ -60,6 +65,7 @@ class PlayerTvFragment : Fragment() {
 
     private var _binding: FragmentPlayerTvBinding? = null
     private val binding get() = _binding!!
+    private var isSetupDone = false
 
     private val PlayerControlView.binding
         get() = ContentExoControllerTvBinding.bind(this.findViewById(R.id.cl_exo_controller))
@@ -111,6 +117,20 @@ class PlayerTvFragment : Fragment() {
         )
         player.seekTo(currentPosition)
         player.play()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isSetupDone) {
+            requireActivity().requestedOrientation =
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            val window = requireActivity().window
+            val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+            insetsController.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            insetsController.hide(WindowInsetsCompat.Type.systemBars())
+            isSetupDone = true
+        }
     }
 
     override fun onCreateView(
@@ -234,35 +254,28 @@ class PlayerTvFragment : Fragment() {
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.autoplayEpisode
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect { (videoType) ->
-                    val controllerBinding = binding.pvPlayer.controller.binding
-                    when (videoType) {
-                        is Video.Type.Episode -> {
-                            val title = videoType.tvShow.title
-                            val subtitle = videoType.let {
-                                "S${it.season.number} E${it.number}  •  ${it.title}"
-                            }
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.autoplayEpisode.collect { nextEpisode ->
+                    player.release()
+                    mediaSession.release()
+                    isSetupDone = false
+                    val action = PlayerMobileFragmentDirections
+                        .actionPlayerMobileFragmentSelf(
+                            id = nextEpisode.id,
+                            videoType = nextEpisode,
+                            title = nextEpisode.tvShow.title,
+                            subtitle = "S${nextEpisode.season.number} E${nextEpisode.number}  •  ${nextEpisode.title}"
+                        )
 
-                            controllerBinding.tvExoTitle.text = title
-                            controllerBinding.tvExoSubtitle.text = subtitle
-
-                            viewModel.playEpisode(videoType)
-                        }
-
-                        is Video.Type.Movie -> {
-                            val trimmedTitle = videoType.title.substringBeforeLast(" ")
-                            controllerBinding.tvExoTitle.text = trimmedTitle
-                            controllerBinding.tvExoSubtitle.text = trimmedTitle
-                        }
-
-                        else -> {
-                            controllerBinding.tvExoTitle.text = ""
-                            controllerBinding.tvExoSubtitle.text = ""
-                        }
-                    }
+                    findNavController().navigate(
+                        action,
+                        NavOptions.Builder()
+                            .setPopUpTo(findNavController().currentDestination?.id ?: return@collect, true)
+                            .setLaunchSingleTop(false) // false so we create a new fragment
+                            .build()
+                    )
                 }
+            }
         }
 
 
@@ -278,6 +291,7 @@ class PlayerTvFragment : Fragment() {
         player.release()
         mediaSession.release()
         _binding = null
+        isSetupDone = false
     }
 
     fun onBackPressed(): Boolean = when {
@@ -497,6 +511,13 @@ class PlayerTvFragment : Fragment() {
                                 }
                             }
                         }
+
+                    }
+                    if (player.hasReallyFinished(UserPreferences.bufferS)){
+                        if (UserPreferences.autoplay){
+                            viewModel.tryAutoplayNext()
+                        }
+
                     }
                 }
             }
@@ -531,5 +552,9 @@ class PlayerTvFragment : Fragment() {
 
     private fun ExoPlayer.hasFinished(): Boolean {
         return (this.currentPosition > (this.duration * 0.90))
+    }
+    private fun ExoPlayer.hasReallyFinished(bufferMs: Long): Boolean {
+        return this.duration > 0 &&
+                this.currentPosition >= this.duration - bufferMs
     }
 }

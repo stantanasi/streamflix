@@ -1,6 +1,7 @@
 package com.tanasi.streamflix.fragments.player
 
 import android.app.PictureInPictureParams
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
@@ -60,12 +61,16 @@ import java.util.Calendar
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import androidx.core.net.toUri
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavOptions
+import com.tanasi.streamflix.activities.main.MainMobileActivity
 import com.tanasi.streamflix.utils.EpisodeManager
 
 class PlayerMobileFragment : Fragment() {
 
     private var _binding: FragmentPlayerMobileBinding? = null
     private val binding get() = _binding!!
+    private var isSetupDone = false
 
     private val PlayerControlView.binding
         get() = ContentExoControllerMobileBinding.bind(this.findViewById(R.id.cl_exo_controller))
@@ -127,7 +132,19 @@ class PlayerMobileFragment : Fragment() {
         _binding = FragmentPlayerMobileBinding.inflate(inflater, container, false)
         return binding.root
     }
-
+    override fun onResume() {
+        super.onResume()
+        if (!isSetupDone) {
+            requireActivity().requestedOrientation =
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            val window = requireActivity().window
+            val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+            insetsController.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            insetsController.hide(WindowInsetsCompat.Type.systemBars())
+            isSetupDone = true
+        }
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -239,40 +256,38 @@ class PlayerMobileFragment : Fragment() {
                 }
             }
         }
-
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.autoplayEpisode
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect { (videoType) ->
-                    val controllerBinding = binding.pvPlayer.controller.binding
-                    when (videoType) {
-                        is Video.Type.Episode -> {
-                            val title = videoType.tvShow.title
-                            val subtitle = videoType.let {
-                                "S${it.season.number} E${it.number}  •  ${it.title}"
-                            }
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.autoplayEpisode.collect { nextEpisode ->
+                    player.release()
+                    mediaSession.release()
+                    isSetupDone = false
+                    val action = PlayerMobileFragmentDirections
+                        .actionPlayerMobileFragmentSelf(
+                            id = nextEpisode.id,
+                            videoType = nextEpisode,
+                            title = nextEpisode.tvShow.title,
+                            subtitle = "S${nextEpisode.season.number} E${nextEpisode.number}  •  ${nextEpisode.title}"
+                        )
 
-                            controllerBinding.tvExoTitle.text = title
-                            controllerBinding.tvExoSubtitle.text = subtitle
-
-                            viewModel.playEpisode(videoType)
-                        }
-
-                        is Video.Type.Movie -> {
-                            val trimmedTitle = videoType.title.substringBeforeLast(" ")
-                            controllerBinding.tvExoTitle.text = trimmedTitle
-                            controllerBinding.tvExoSubtitle.text = trimmedTitle
-                        }
-
-                        else -> {
-                            controllerBinding.tvExoTitle.text = ""
-                            controllerBinding.tvExoSubtitle.text = ""
-                        }
-                    }
+                    findNavController().navigate(
+                        action,
+                        NavOptions.Builder()
+                            .setPopUpTo(findNavController().currentDestination?.id ?: return@collect, true)
+                            .setLaunchSingleTop(false) // false so we create a new fragment
+                            .build()
+                    )
                 }
+            }
         }
 
+
+
+
+
+
     }
+
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
         binding.pvPlayer.useController = !isInPictureInPictureMode
@@ -303,7 +318,10 @@ class PlayerMobileFragment : Fragment() {
         player.release()
         mediaSession.release()
         _binding = null
+        isSetupDone = false
     }
+
+
 
 
     private fun initializeVideo() {
@@ -523,16 +541,13 @@ class PlayerMobileFragment : Fragment() {
                                     isWatching = true
                                 })
                             }
-                            if (player.hasFinished()) {
-                                val currentPosition = player.currentPosition
-                                val duration = player.duration
-                                if (duration != C.TIME_UNSET && currentPosition >= duration - UserPreferences.bufferS) {
-                                    if (UserPreferences.autoplay) {
-                                        viewModel.tryAutoplayNext()
-                                    }
-                                }
-                            }
                         }
+                    }
+                    if (player.hasReallyFinished(UserPreferences.bufferS)){
+                        if (UserPreferences.autoplay){
+                            viewModel.tryAutoplayNext()
+                        }
+
                     }
                 }
             }
@@ -577,5 +592,9 @@ class PlayerMobileFragment : Fragment() {
 
     private fun ExoPlayer.hasFinished(): Boolean {
         return (this.currentPosition > (this.duration * 0.90))
+    }
+    private fun ExoPlayer.hasReallyFinished(bufferMs: Long): Boolean {
+        return this.duration > 0 &&
+                this.currentPosition >= this.duration - bufferMs
     }
 }

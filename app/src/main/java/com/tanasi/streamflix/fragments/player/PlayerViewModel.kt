@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
 import com.tanasi.streamflix.models.Video.Type.Episode
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.EpisodeManager
@@ -20,17 +21,23 @@ class PlayerViewModel(
     videoType: Video.Type,
     id: String,
 ) : ViewModel() {
+
     private val _state = MutableStateFlow<State>(State.LoadingServers)
     val state: Flow<State> = _state
 
 
-    private val _autoplayEpisode = MutableSharedFlow<Pair<Episode, String>>()
-    val autoplayEpisode: SharedFlow<Pair<Episode, String>> = _autoplayEpisode
+    private val _autoplayEpisode = MutableSharedFlow<Video.Type.Episode>()
+    val autoplayEpisode: SharedFlow<Video.Type.Episode> = _autoplayEpisode
+
+    init {
+        getServers(videoType, id)
+        getSubtitles(videoType)
+    }
 
     fun tryAutoplayNext() {
         if (UserPreferences.autoplay && EpisodeManager.hasNextEpisode()) {
             EpisodeManager.getNextEpisode()?.let { ep ->
-                val videoType = Video.Type.Episode(
+                val nextEpisode = Video.Type.Episode(
                     id = ep.id,
                     number = ep.number,
                     title = ep.title,
@@ -46,42 +53,12 @@ class PlayerViewModel(
                         title = ep.season.title
                     )
                 )
+                playEpisode(nextEpisode)
                 viewModelScope.launch {
-                    _autoplayEpisode.emit(videoType to ep.id)
+                    _autoplayEpisode.emit(nextEpisode)
                 }
             }
         }
-    }
-
-
-
-    sealed class State {
-        data object LoadingServers : State()
-        data class SuccessLoadingServers(val servers: List<Video.Server>) : State()
-        data class FailedLoadingServers(val error: Exception) : State()
-
-        data class LoadingVideo(val server: Video.Server) : State()
-        data class SuccessLoadingVideo(val video: Video, val server: Video.Server) : State()
-        data class FailedLoadingVideo(val error: Exception, val server: Video.Server) : State()
-
-        data object LoadingSubtitles : State()
-        data class SuccessLoadingSubtitles(val subtitles: List<OpenSubtitles.Subtitle>) : State()
-        data class FailedLoadingSubtitles(val error: Exception) : State()
-
-        data object DownloadingOpenSubtitle : State()
-        data class SuccessDownloadingOpenSubtitle(
-            val subtitle: OpenSubtitles.Subtitle,
-            val uri: Uri
-        ) : State()
-        data class FailedDownloadingOpenSubtitle(
-            val error: Exception,
-            val subtitle: OpenSubtitles.Subtitle
-        ) : State()
-    }
-
-    init {
-        getServers(videoType, id)
-        getSubtitles(videoType)
     }
 
     fun playEpisode(episode: Video.Type.Episode) {
@@ -89,18 +66,11 @@ class PlayerViewModel(
         getSubtitles(episode)
     }
 
-
-    private fun getServers(
-        videoType: Video.Type,
-        id: String,
-    ) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getServers(videoType: Video.Type, id: String) = viewModelScope.launch(Dispatchers.IO) {
         _state.emit(State.LoadingServers)
-
         try {
             val servers = UserPreferences.currentProvider!!.getServers(id, videoType)
-
             if (servers.isEmpty()) throw Exception("No servers found")
-
             _state.emit(State.SuccessLoadingServers(servers))
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "getServers: ", e)
@@ -110,10 +80,8 @@ class PlayerViewModel(
 
     fun getVideo(server: Video.Server) = viewModelScope.launch(Dispatchers.IO) {
         _state.emit(State.LoadingVideo(server))
-
         try {
             val video = UserPreferences.currentProvider!!.getVideo(server)
-
             if (video.source.isEmpty()) throw Exception("No source found")
 
             video.subtitles
@@ -129,7 +97,6 @@ class PlayerViewModel(
 
     private fun getSubtitles(videoType: Video.Type) = viewModelScope.launch(Dispatchers.IO) {
         _state.emit(State.LoadingSubtitles)
-
         try {
             val subtitles = when (videoType) {
                 is Video.Type.Episode -> OpenSubtitles.search(
@@ -137,12 +104,8 @@ class PlayerViewModel(
                     season = videoType.season.number,
                     episode = videoType.number,
                 )
-
-                is Video.Type.Movie -> OpenSubtitles.search(
-                    query = videoType.title
-                )
+                is Video.Type.Movie -> OpenSubtitles.search(query = videoType.title)
             }.sortedWith(compareBy({ it.languageName }, { it.subDownloadsCnt }))
-
             _state.emit(State.SuccessLoadingSubtitles(subtitles))
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "getSubtitles: ", e)
@@ -152,14 +115,27 @@ class PlayerViewModel(
 
     fun downloadSubtitle(subtitle: OpenSubtitles.Subtitle) = viewModelScope.launch(Dispatchers.IO) {
         _state.emit(State.DownloadingOpenSubtitle)
-
         try {
             val uri = OpenSubtitles.download(subtitle)
-
             _state.emit(State.SuccessDownloadingOpenSubtitle(subtitle, uri))
         } catch (e: Exception) {
             Log.e("PlayerViewModel", "downloadSubtitle: ", e)
             _state.emit(State.FailedDownloadingOpenSubtitle(e, subtitle))
         }
+    }
+
+    sealed class State {
+        data object LoadingServers : State()
+        data class SuccessLoadingServers(val servers: List<Video.Server>) : State()
+        data class FailedLoadingServers(val error: Exception) : State()
+        data class LoadingVideo(val server: Video.Server) : State()
+        data class SuccessLoadingVideo(val video: Video, val server: Video.Server) : State()
+        data class FailedLoadingVideo(val error: Exception, val server: Video.Server) : State()
+        data object LoadingSubtitles : State()
+        data class SuccessLoadingSubtitles(val subtitles: List<OpenSubtitles.Subtitle>) : State()
+        data class FailedLoadingSubtitles(val error: Exception) : State()
+        data object DownloadingOpenSubtitle : State()
+        data class SuccessDownloadingOpenSubtitle(val subtitle: OpenSubtitles.Subtitle, val uri: Uri) : State()
+        data class FailedDownloadingOpenSubtitle(val error: Exception, val subtitle: OpenSubtitles.Subtitle) : State()
     }
 }
