@@ -326,7 +326,10 @@ class PlayerTvFragment : Fragment() {
                 mediaSession = MediaSession.Builder(requireContext(), player)
                     .build()
             }
-        EpisodeManager.setCurrentEpisode(args.videoType as Video.Type.Episode)
+        when (val type = args.videoType) {
+            is Video.Type.Episode -> EpisodeManager.setCurrentEpisode(type)
+            is Video.Type.Movie -> { }
+        }
         binding.pvPlayer.player = player
         binding.settings.player = player
         binding.settings.subtitleView = binding.pvPlayer.subtitleView

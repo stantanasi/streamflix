@@ -39,11 +39,25 @@ class CloseloadExtractor : Extractor() {
         )
     }
 
+    private fun safeBase64Decode(str: String): ByteArray? = try {
+        Base64.decode(str, Base64.DEFAULT)
+    } catch (e: IllegalArgumentException) {
+        null
+    }
+
+    private fun rot13(input: String): String = input.map {
+        when (it) {
+            in 'A'..'Z' -> 'A' + (it - 'A' + 13) % 26
+            in 'a'..'z' -> 'a' + (it - 'a' + 13) % 26
+            else -> it
+        }
+    }.joinToString("")
+
     private fun extractDirectBase64(unpacked: String): String? {
         val match = Regex("=\"(aHR.*?)\";").find(unpacked)?.groupValues?.get(1) ?: return null
-        return Base64.decode(match, Base64.DEFAULT)
-            .toString(Charsets.UTF_8)
-            .takeIf { it.startsWith("http") }
+        val decoded = safeBase64Decode(match) ?: return null
+        val url = String(decoded, Charsets.UTF_8)
+        return url.takeIf { it.startsWith("http") }
     }
 
     private fun extractDcHelloEncoded(unpacked: String): String? {
@@ -55,11 +69,11 @@ class CloseloadExtractor : Extractor() {
 
         if (encodedLink.isBlank()) return null
 
-        val decodedLink = Base64.decode(encodedLink, Base64.DEFAULT).toString(Charsets.UTF_8)
-        val reversed = decodedLink.reversed()
-        val finalDecoded = Base64.decode(reversed, Base64.DEFAULT).toString(Charsets.UTF_8)
+        val step1 = safeBase64Decode(encodedLink)?.toString(Charsets.UTF_8) ?: return null
+        val step2 = step1.reversed()
+        val step3 = safeBase64Decode(step2)?.toString(Charsets.UTF_8) ?: return null
 
-        return Regex("""https://[^\s"]+""").find(finalDecoded)?.value
+        return Regex("""https://[^\s"]+""").find(step3)?.value
     }
 
     private fun extractArrayDecoded(unpacked: String): String? {
@@ -74,11 +88,15 @@ class CloseloadExtractor : Extractor() {
             .map { it.groupValues[1] }
             .toList()
 
-        return decodeObfuscatedUrlRotFirst(arrayParts)
-            .takeIf { it.startsWith("http") }
-            ?: decodeObfuscatedUrlDecodeFirst(arrayParts)
-                .takeIf { it.startsWith("http") }
+        val candidates = listOfNotNull(
+            decodeObfuscatedUrlRotFirst(arrayParts),
+            decodeObfuscatedUrl(arrayParts),
+            decodeObfuscatedUrlDecodeFirst(arrayParts),
+            decodeObfuscatedUrlReverseFirst(arrayParts) // <-- new fallback
+        )
+        return candidates.firstOrNull { it.startsWith("http") }
     }
+
     private fun extractArrayDecodedNew(unpacked: String): String? {
         val varName = Regex("""myPlayer\.src\(\{\s*src:\s*(\w+)\s*,""")
             .find(unpacked)?.groupValues?.get(1) ?: return null
@@ -91,66 +109,66 @@ class CloseloadExtractor : Extractor() {
             .map { it.groupValues[1] }
             .toList()
 
-        return decodeObfuscatedUrl(arrayParts)
-            .takeIf { it.startsWith("http") }
+        return decodeObfuscatedUrl(arrayParts)?.takeIf { it.startsWith("http") }
     }
 
-    private fun decodeObfuscatedUrl(parts: List<String>): String {
+    private fun decodeObfuscatedUrl(parts: List<String>): String? {
         val joined = parts.joinToString("")
-        val rot13 = joined.map { c ->
-            when (c) {
-                in 'A'..'Z' -> 'A' + (c - 'A' + 13) % 26
-                in 'a'..'z' -> 'a' + (c - 'a' + 13) % 26
-                else -> c
-            }
-        }.joinToString("")
+        val rot = rot13(joined)
+        val reversed = rot.reversed()
+        val decoded = safeBase64Decode(reversed) ?: return null
 
-        val reversed = rot13.reversed()
-
-        val decoded = Base64.decode(reversed, Base64.DEFAULT)
-        val finalBytes = decoded.mapIndexed { i, b ->
+        val finalBytes = ByteArray(decoded.size) { i ->
+            val b = decoded[i]
             val adjustment = 399_756_995 % (i + 5)
-            val adjusted = (b.toInt() - adjustment + 256) % 256
-            adjusted.toByte()
-        }.toByteArray()
-
-        return String(finalBytes, Charsets.UTF_8)
-    }
-    private fun decodeObfuscatedUrlRotFirst(parts: List<String>): String {
-        val rot13 = parts.joinToString("").map {
-            when (it) {
-                in 'A'..'Z' -> 'A' + (it - 'A' + 13) % 26
-                in 'a'..'z' -> 'a' + (it - 'a' + 13) % 26
-                else -> it
-            }
-        }.joinToString("")
-
-        val reversed = Base64.decode(rot13, Base64.DEFAULT).reversed()
-        val finalBytes = reversed.mapIndexed { i, b ->
-            val adjusted = (b.toInt() - (399_756_995 % (i + 5)) + 256) % 256
-            adjusted.toByte()
-        }.toByteArray()
-
+            ((b.toInt() - adjustment + 256) % 256).toByte()
+        }
         return String(finalBytes, Charsets.UTF_8)
     }
 
-    private fun decodeObfuscatedUrlDecodeFirst(parts: List<String>): String {
-        val b64 = Base64.decode(parts.joinToString(""), Base64.DEFAULT)
+    private fun decodeObfuscatedUrlRotFirst(parts: List<String>): String? {
+        val rot = rot13(parts.joinToString(""))
+        val decoded = safeBase64Decode(rot) ?: return null
+
+        val finalBytes = ByteArray(decoded.size) { i ->
+            val b = decoded[i]
+            val adjustment = 399_756_995 % (i + 5)
+            ((b.toInt() - adjustment + 256) % 256).toByte()
+        }
+        return String(finalBytes, Charsets.UTF_8)
+    }
+
+    private fun decodeObfuscatedUrlDecodeFirst(parts: List<String>): String? {
+        val b64 = safeBase64Decode(parts.joinToString("")) ?: return null
         val reversed = String(b64, Charsets.ISO_8859_1).reversed()
-        val rot13 = reversed.map {
-            when (it) {
-                in 'A'..'Z' -> 'A' + (it - 'A' + 13) % 26
-                in 'a'..'z' -> 'a' + (it - 'a' + 13) % 26
-                else -> it
-            }
-        }.joinToString("")
+        val rot = rot13(reversed)
 
-        val finalBytes = ByteArray(rot13.length) { i ->
-            val code = rot13[i].code and 0xFF
+        val finalBytes = ByteArray(rot.length) { i ->
+            val code = rot[i].code and 0xFF
             val adj = 399_756_995 % (i + 5)
             (((code - adj) % 256 + 256) % 256).toByte()
         }
+        return String(finalBytes, Charsets.UTF_8)
+    }
 
+    private fun decodeObfuscatedUrlReverseFirst(parts: List<String>): String? {
+        val joined = parts.joinToString("")
+        val reversed = joined.reversed()
+        val b64Decoded = safeBase64Decode(reversed) ?: return null
+
+        val rot13Bytes = b64Decoded.map { b ->
+            val c = b.toInt().toChar()
+            when (c) {
+                in 'A'..'Z' -> (((c - 'A' + 13) % 26) + 'A'.code).toByte()
+                in 'a'..'z' -> (((c - 'a' + 13) % 26) + 'a'.code).toByte()
+                else -> b
+            }
+        }.toByteArray()
+
+        val finalBytes = ByteArray(rot13Bytes.size) { i ->
+            val adjustment = 399_756_995 % (i + 5)
+            ((rot13Bytes[i].toInt() - adjustment + 256) % 256).toByte()
+        }
         return String(finalBytes, Charsets.UTF_8)
     }
 
@@ -167,7 +185,6 @@ class CloseloadExtractor : Extractor() {
                 return retrofit.create(Service::class.java)
             }
         }
-
         @GET
         suspend fun get(@Url url: String, @Header("referer") referer: String): Document
     }

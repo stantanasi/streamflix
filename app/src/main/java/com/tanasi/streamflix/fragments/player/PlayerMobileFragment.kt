@@ -327,7 +327,10 @@ class PlayerMobileFragment : Fragment() {
             hide(WindowInsetsCompat.Type.systemBars())
         }
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        EpisodeManager.setCurrentEpisode(args.videoType as Video.Type.Episode)
+        when (val type = args.videoType) {
+            is Video.Type.Episode -> EpisodeManager.setCurrentEpisode(type)
+            is Video.Type.Movie -> { }
+        }
         httpDataSource = DefaultHttpDataSource.Factory()
         dataSourceFactory = DefaultDataSource.Factory(requireContext(), httpDataSource)
         player = ExoPlayer.Builder(requireContext())
