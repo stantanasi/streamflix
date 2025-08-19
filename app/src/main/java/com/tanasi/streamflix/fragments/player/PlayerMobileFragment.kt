@@ -1,7 +1,6 @@
 package com.tanasi.streamflix.fragments.player
 
 import android.app.PictureInPictureParams
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.net.Uri
@@ -11,6 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.WindowCompat
@@ -63,7 +63,6 @@ import kotlin.time.Duration.Companion.seconds
 import androidx.core.net.toUri
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavOptions
-import com.tanasi.streamflix.activities.main.MainMobileActivity
 import com.tanasi.streamflix.utils.EpisodeManager
 
 class PlayerMobileFragment : Fragment() {
@@ -258,7 +257,7 @@ class PlayerMobileFragment : Fragment() {
         }
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.autoplayEpisode.collect { nextEpisode ->
+                viewModel.playPreviousOrNextEpisode.collect { nextEpisode ->
                     player.release()
                     mediaSession.release()
                     isSetupDone = false
@@ -282,12 +281,7 @@ class PlayerMobileFragment : Fragment() {
         }
 
 
-
-
-
-
     }
-
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
         binding.pvPlayer.useController = !isInPictureInPictureMode
@@ -333,7 +327,7 @@ class PlayerMobileFragment : Fragment() {
             hide(WindowInsetsCompat.Type.systemBars())
         }
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-
+        EpisodeManager.setCurrentEpisode(args.videoType as Video.Type.Episode)
         httpDataSource = DefaultHttpDataSource.Factory()
         dataSourceFactory = DefaultDataSource.Factory(requireContext(), httpDataSource)
         player = ExoPlayer.Builder(requireContext())
@@ -356,12 +350,12 @@ class PlayerMobileFragment : Fragment() {
         binding.pvPlayer.player = player
         binding.settings.player = player
         binding.settings.subtitleView = binding.pvPlayer.subtitleView
-
         binding.pvPlayer.resizeMode = UserPreferences.playerResize.resizeMode
         binding.pvPlayer.subtitleView?.apply {
             setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
             setStyle(UserPreferences.captionStyle)
         }
+        setupEpisodeNavigationButtons()
 
         binding.pvPlayer.controller.binding.btnExoBack.setOnClickListener {
             findNavController().navigateUp()
@@ -438,12 +432,72 @@ class PlayerMobileFragment : Fragment() {
             viewModel.downloadSubtitle(subtitle.openSubtitle)
         }
     }
+    fun setupEpisodeNavigationButtons() {
+        val btnPrevious = binding.pvPlayer.controller.binding.btnCustomPrev
+        val btnNext = binding.pvPlayer.controller.binding.btnCustomNext
+
+        fun handleNavigationButton(
+            button: ImageView,
+            hasEpisode: () -> Boolean,
+            playEpisode: () -> Unit
+        ) {
+            if (!hasEpisode()) {
+                button.visibility = View.GONE
+                return
+            }
+
+            button.setOnClickListener {
+                if (!hasEpisode()) return@setOnClickListener
+
+                val watchItem = when (val videoType = args.videoType as Video.Type) {
+                    is Video.Type.Movie -> database.movieDao().getById(videoType.id)
+                    is Video.Type.Episode -> database.episodeDao().getById(videoType.id)
+                }
+
+                watchItem?.apply {
+                    isWatched = false
+                    watchedDate = null
+                    watchHistory = WatchItem.WatchHistory(
+                        lastEngagementTimeUtcMillis = System.currentTimeMillis(),
+                        lastPlaybackPositionMillis = player.currentPosition,
+                        durationMillis = player.duration
+                    )
+                }
+
+                when (val videoType = args.videoType as Video.Type) {
+                    is Video.Type.Movie -> {
+                        watchItem?.let { database.movieDao().update(it as Movie) }
+                    }
+                    is Video.Type.Episode -> {
+                        watchItem?.let { episode ->
+                            if (player.hasFinished()) {
+                                database.episodeDao().resetProgressionFromEpisode(videoType.id)
+                            }
+                            database.episodeDao().update(episode as Episode)
+
+                            (episode as Episode).tvShow?.let { tvShow ->
+                                database.tvShowDao().getById(tvShow.id)
+                            }?.let { tvShow ->
+                                database.tvShowDao().save(tvShow.copy().apply {
+                                    merge(tvShow)
+                                    isWatching = true
+                                })
+                            }
+                        }
+                    }
+                }
+
+                playEpisode()
+            }
+        }
+
+        handleNavigationButton(btnPrevious, EpisodeManager::hasPreviousEpisode, viewModel::playPreviousEpisode)
+        handleNavigationButton(btnNext, EpisodeManager::hasNextEpisode, viewModel::playNextEpisode)
+    }
+
 
     private fun displayVideo(video: Video, server: Video.Server) {
         val videoType = args.videoType
-        if (videoType is Video.Type.Episode) {
-            EpisodeManager.setCurrentEpisode(videoType)
-        }
         val currentPosition = player.currentPosition
 
         httpDataSource.setDefaultRequestProperties(
@@ -543,9 +597,9 @@ class PlayerMobileFragment : Fragment() {
                             }
                         }
                     }
-                    if (player.hasReallyFinished(UserPreferences.bufferS)){
+                    if (player.hasReallyFinished()){
                         if (UserPreferences.autoplay){
-                            viewModel.tryAutoplayNext()
+                            viewModel.autoplayNextEpisode()
                         }
 
                     }
@@ -593,8 +647,8 @@ class PlayerMobileFragment : Fragment() {
     private fun ExoPlayer.hasFinished(): Boolean {
         return (this.currentPosition > (this.duration * 0.90))
     }
-    private fun ExoPlayer.hasReallyFinished(bufferMs: Long): Boolean {
+    private fun ExoPlayer.hasReallyFinished(): Boolean {
         return this.duration > 0 &&
-                this.currentPosition >= this.duration - bufferMs
+                this.currentPosition >= this.duration
     }
 }

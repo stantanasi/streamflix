@@ -196,6 +196,8 @@
     <string name="settings_category_streamingcommunity_dnsOverHttps">Sichere DNS-Auflösung verwenden</string>
     <string name="settings_category_network_title">Netzwerkeinstellungen</string>
     <string name="settings_autoplay">Automatisches Abspielen der nächsten Folge</string>
-    <string name="settings_autoplay_on">Automatisches Abspielen der nächsten Folge: An</string>
-    <string name="settings_autoplay_off">Automatisches Abspielen der nächsten Folge: Aus</string>
+    <string name="settings_autoplay_on">An</string>
+    <string name="settings_autoplay_off">Aus</string>
+    <string name="autoplay_settings">Automatische Wiedergabeeinstellungen</string>
+    <string name="miscelaneous_title">Sonstiges</string>
 </resources>

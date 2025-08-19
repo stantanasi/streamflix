@@ -11,21 +11,13 @@
             android:inputType="text"/>
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="Autoplay settings">
+    <PreferenceCategory android:title="@string/autoplay_settings">
         <SwitchPreference
                 android:key="AUTOPLAY"
             android:title="@string/settings_autoplay"
             android:defaultValue="true"
             android:summaryOn="@string/settings_autoplay_on"
             android:summaryOff="@string/settings_autoplay_off" />
-        <EditTextPreference
-            android:key="BUFFER_S"
-            android:summary="%s seconds"
-            android:title="Autoplay buffer delay (seconds)"
-            android:defaultValue="3"
-            android:inputType="number"
-            android:singleLine="true"
-            android:imeOptions="actionDone" />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pc_network_settings"
@@ -38,7 +30,7 @@
             android:entryValues="@array/doh_provider_urls"
             android:defaultValue="https://cloudflare-dns.com/dns-query" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="Miscellaneous">
+    <PreferenceCategory android:title="@string/miscelaneous_title">
     <Preference
         android:icon="@drawable/ic_settings_about"
         android:key="p_settings_about"

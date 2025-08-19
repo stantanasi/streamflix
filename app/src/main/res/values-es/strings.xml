@@ -180,6 +180,8 @@
     <string name="settings_category_streamingcommunity_dnsOverHttps">Usar DNS seguro</string>
     <string name="settings_category_network_title">Ajusted de red</string>
     <string name="settings_autoplay">Reproducción automática del siguiente episodio</string>
-    <string name="settings_autoplay_on">Reproducción automática del siguiente episodio: Activada</string>
-    <string name="settings_autoplay_off">Reproducción automática del siguiente episodio: Desactivada</string>
+    <string name="settings_autoplay_on">Activada</string>
+    <string name="settings_autoplay_off">Desactivada</string>
+    <string name="autoplay_settings">Ajustes de reproducción automatica</string>
+    <string name="miscelaneous_title">Varios</string>
 </resources>

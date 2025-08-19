@@ -4,8 +4,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
-import com.tanasi.streamflix.models.Video.Type.Episode
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.utils.EpisodeManager
 import com.tanasi.streamflix.utils.OpenSubtitles
@@ -24,43 +22,63 @@ class PlayerViewModel(
 
     private val _state = MutableStateFlow<State>(State.LoadingServers)
     val state: Flow<State> = _state
-
-
-    private val _autoplayEpisode = MutableSharedFlow<Video.Type.Episode>()
-    val autoplayEpisode: SharedFlow<Video.Type.Episode> = _autoplayEpisode
+    private val _playPreviousOrNextEpisode = MutableSharedFlow<Video.Type.Episode>()
+    val playPreviousOrNextEpisode: SharedFlow<Video.Type.Episode> = _playPreviousOrNextEpisode
 
     init {
         getServers(videoType, id)
         getSubtitles(videoType)
     }
 
-    fun tryAutoplayNext() {
-        if (UserPreferences.autoplay && EpisodeManager.hasNextEpisode()) {
-            EpisodeManager.getNextEpisode()?.let { ep ->
-                val nextEpisode = Video.Type.Episode(
-                    id = ep.id,
-                    number = ep.number,
-                    title = ep.title,
-                    poster = ep.poster,
-                    tvShow = Video.Type.Episode.TvShow(
-                        id = ep.tvShow.id,
-                        title = ep.tvShow.title,
-                        poster = ep.tvShow.poster,
-                        banner = ep.tvShow.banner
-                    ),
-                    season = Video.Type.Episode.Season(
-                        number = ep.season.number,
-                        title = ep.season.title
-                    )
-                )
-                playEpisode(nextEpisode)
-                viewModelScope.launch {
-                    _autoplayEpisode.emit(nextEpisode)
-                }
-            }
+    fun playEpisode(direction: Direction) {
+        val hasEpisode = when (direction) {
+            Direction.PREVIOUS -> EpisodeManager.hasPreviousEpisode()
+            Direction.NEXT -> EpisodeManager.hasNextEpisode()
+        }
+
+        if (!hasEpisode) return
+
+        val ep = when (direction) {
+            Direction.PREVIOUS -> EpisodeManager.getPreviousEpisode()
+            Direction.NEXT -> EpisodeManager.getNextEpisode()
+        } ?: return
+
+        val nextEpisode = Video.Type.Episode(
+            id = ep.id,
+            number = ep.number,
+            title = ep.title,
+            poster = ep.poster,
+            tvShow = Video.Type.Episode.TvShow(
+                id = ep.tvShow.id,
+                title = ep.tvShow.title,
+                poster = ep.tvShow.poster,
+                banner = ep.tvShow.banner
+            ),
+            season = Video.Type.Episode.Season(
+                number = ep.season.number,
+                title = ep.season.title
+            )
+        )
+
+        playEpisode(nextEpisode)
+
+        viewModelScope.launch {
+            _playPreviousOrNextEpisode.emit(nextEpisode)
         }
     }
 
+    enum class Direction { PREVIOUS, NEXT }
+    fun playPreviousEpisode() =
+        playEpisode(Direction.PREVIOUS)
+
+    fun playNextEpisode() =
+        playEpisode(Direction.NEXT)
+
+    fun autoplayNextEpisode() {
+        if (UserPreferences.autoplay) {
+            playEpisode(Direction.NEXT)
+        }
+    }
     fun playEpisode(episode: Video.Type.Episode) {
         getServers(episode, episode.id)
         getSubtitles(episode)

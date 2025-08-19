@@ -84,21 +84,6 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
             }
         }
 
-        findPreference<EditTextPreference>("BUFFER_S")?.apply {
-            val initialSeconds = (UserPreferences.bufferS / 1000).toInt()
-            summary = "$initialSeconds seconds"
-            setOnBindEditTextListener { editText ->
-                editText.inputType = InputType.TYPE_CLASS_NUMBER
-                editText.imeOptions = EditorInfo.IME_ACTION_DONE
-            }
-            setOnPreferenceChangeListener { preference, newValue ->
-                val seconds = (newValue as? String)?.toLongOrNull() ?: 3000L
-                UserPreferences.bufferS = seconds.times(1000)
-                preference.summary = "$seconds seconds"
-                true
-            }
-        }
-
         findPreference<ListPreference>("p_doh_provider_url")?.apply {
             value = UserPreferences.dohProviderUrl ?: UserPreferences.DOH_DISABLED_VALUE
             summary = entry // Imposta il sommario iniziale

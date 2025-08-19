@@ -71,7 +71,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_exo_title"
         tools:ignore="ContentDescription,UseAppTint" />
-
+    <ImageView
+        android:id="@+id/btn_custom_prev"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="16dp"
+        android:padding="10dp"
+        android:src="@drawable/ic_previous"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/exo_rew"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#FFFFFF" />
     <ImageView
         android:id="@+id/exo_rew"
         android:layout_width="60dp"
@@ -113,7 +124,18 @@
         app:layout_constraintStart_toEndOf="@id/exo_play_pause"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
-
+    <ImageView
+        android:id="@+id/btn_custom_next"
+        android:layout_width="60dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:padding="10dp"
+        android:src="@drawable/ic_next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toEndOf="@id/exo_ffwd"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#FFFFFF" />
     <androidx.media3.ui.DefaultTimeBar
         android:id="@+id/exo_progress"
         android:layout_width="0dp"

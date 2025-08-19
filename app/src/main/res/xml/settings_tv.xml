@@ -29,14 +29,6 @@
         android:defaultValue="true"
         android:summaryOn="@string/settings_autoplay_on"
         android:summaryOff="@string/settings_autoplay_off" />
-        <EditTextPreference
-            android:key="BUFFER_S"
-            android:title="Autoplay buffer delay (seconds)"
-            android:summary="%s seconds"
-            android:defaultValue="3"
-            android:inputType="number"
-            android:singleLine="true"
-            android:imeOptions="actionDone" />
     </PreferenceCategory>
     <PreferenceCategory android:title="Miscellaneous">
     <Preference
