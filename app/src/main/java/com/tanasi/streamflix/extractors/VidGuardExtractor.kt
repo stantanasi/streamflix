@@ -1,10 +1,8 @@
 package com.tanasi.streamflix.extractors
 
 import android.util.Base64
-import android.util.Log
-import com.tanasi.retrofit_jsoup.converter.JsoupConverterFactory
 import com.tanasi.streamflix.models.Video
-import com.tanasi.streamflix.utils.PlaylistUtils
+import com.tanasi.streamflix.utils.JsUnpacker
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -12,7 +10,7 @@ import retrofit2.http.GET
 import retrofit2.http.Url
 
 class VidGuardExtractor : Extractor() {
-    override val name = "VidG"
+    override val name = "VidGuard"
     override val mainUrl = "https://vidguard.to"
     override val aliasUrls = listOf(
         "vembed.net", "bembed.cc", "vgfplay.com", "listeamed.net", "vidguard.to"
@@ -32,26 +30,35 @@ class VidGuardExtractor : Extractor() {
     }
 
     override suspend fun extract(link: String): Video {
-        Log.d("VidGuardExtractor", "--- INICIANDO ESPIONAJE DE SCRIPT (Extractor ENCONTRADO) ---")
-        Log.d("VidGuardExtractor", "URL recibida por el extractor: $link")
-
         val pageHtml = try {
             service.get(link)
         } catch (e: Exception) {
+            // A veces la URL viene sin el protocolo https
             service.get("https:$link")
         }
 
-        val scriptData = pageHtml.substringAfter("eval(function(p,a,c,k,e,d)").substringBefore("</script>")
+        val scriptData = pageHtml
+            .substringAfter("eval(function(p,a,c,k,e,d)")
+            .substringBefore("</script>")
             .let { "eval(function(p,a,c,k,e,d)$it" }
 
         if (!scriptData.startsWith("eval")) {
             throw Exception("No se encontró el script eval. El HTML puede haber cambiado.")
         }
 
-        Log.d("VidGuardExtractor", "Script 'eval' capturado: $scriptData")
-        Log.d("VidGuardExtractor", "--- FIN DEL ESPIONAJE ---")
+        val unpackedScript = JsUnpacker(scriptData).unpack()
+            ?: throw Exception("No se pudo desempacar el script.")
 
-        throw Exception("Misión de espionaje completada. Por favor, envía el log al asistente.")
+        val urlEncoded = unpackedScript
+            .substringAfter("window.svg={\"stream\":\"")
+            .substringBefore("\",\"hash")
+
+        val finalUrl = sigDecode(urlEncoded)
+
+        return Video(
+            source = finalUrl,
+            headers = mapOf("Referer" to mainUrl)
+        )
     }
 
     private fun sigDecode(url: String): String {
