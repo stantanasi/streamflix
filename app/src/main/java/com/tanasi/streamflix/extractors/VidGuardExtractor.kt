@@ -47,7 +47,7 @@ class VidGuardExtractor : Extractor() {
         }
 
         val unpackedScript = JsUnpacker(scriptData).unpack()
-            ?: throw Exception("No se pudo desempacar el script.")
+            ?: throw Exception("No se pudo desempacar el script..")
 
         val urlEncoded = unpackedScript
             .substringAfter("window.svg={\"stream\":\"")
