@@ -23,6 +23,7 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.ui.ShowOptionsMobileDialog
 import com.tanasi.streamflix.ui.ShowOptionsTvDialog
+import com.tanasi.streamflix.utils.EpisodeManager
 import com.tanasi.streamflix.utils.format
 import com.tanasi.streamflix.utils.getCurrentFragment
 import com.tanasi.streamflix.utils.toActivity

@@ -1,19 +1,24 @@
 package com.tanasi.streamflix.fragments.player
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -30,6 +35,7 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerControlView
 import androidx.media3.ui.SubtitleView
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.tanasi.streamflix.R
@@ -40,6 +46,7 @@ import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.Video
 import com.tanasi.streamflix.models.WatchItem
+import com.tanasi.streamflix.utils.EpisodeManager
 import com.tanasi.streamflix.utils.MediaServer
 import com.tanasi.streamflix.utils.UserPreferences
 import com.tanasi.streamflix.utils.getFileName
@@ -59,6 +66,7 @@ class PlayerTvFragment : Fragment() {
 
     private var _binding: FragmentPlayerTvBinding? = null
     private val binding get() = _binding!!
+    private var isSetupDone = false
 
     private val PlayerControlView.binding
         get() = ContentExoControllerTvBinding.bind(this.findViewById(R.id.cl_exo_controller))
@@ -110,6 +118,20 @@ class PlayerTvFragment : Fragment() {
         )
         player.seekTo(currentPosition)
         player.play()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isSetupDone) {
+            requireActivity().requestedOrientation =
+                ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            val window = requireActivity().window
+            val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+            insetsController.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            insetsController.hide(WindowInsetsCompat.Type.systemBars())
+            isSetupDone = true
+        }
     }
 
     override fun onCreateView(
@@ -232,6 +254,32 @@ class PlayerTvFragment : Fragment() {
                 }
             }
         }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.playPreviousOrNextEpisode.collect { nextEpisode ->
+                    player.release()
+                    mediaSession.release()
+                    isSetupDone = false
+                    val action = PlayerTvFragmentDirections
+                        .actionPlayerTvFragmentSelf(
+                            id = nextEpisode.id,
+                            videoType = nextEpisode,
+                            title = nextEpisode.tvShow.title,
+                            subtitle = "S${nextEpisode.season.number} E${nextEpisode.number}  •  ${nextEpisode.title}"
+                        )
+
+                    findNavController().navigate(
+                        action,
+                        NavOptions.Builder()
+                            .setPopUpTo(findNavController().currentDestination?.id ?: return@collect, true)
+                            .setLaunchSingleTop(false) // false so we create a new fragment
+                            .build()
+                    )
+                }
+            }
+        }
+
+
     }
 
     override fun onPause() {
@@ -244,6 +292,7 @@ class PlayerTvFragment : Fragment() {
         player.release()
         mediaSession.release()
         _binding = null
+        isSetupDone = false
     }
 
     fun onBackPressed(): Boolean = when {
@@ -277,11 +326,14 @@ class PlayerTvFragment : Fragment() {
                 mediaSession = MediaSession.Builder(requireContext(), player)
                     .build()
             }
-
+        when (val type = args.videoType) {
+            is Video.Type.Episode -> EpisodeManager.setCurrentEpisode(type)
+            is Video.Type.Movie -> { }
+        }
         binding.pvPlayer.player = player
         binding.settings.player = player
         binding.settings.subtitleView = binding.pvPlayer.subtitleView
-
+        setupEpisodeNavigationButtons()
         binding.pvPlayer.resizeMode = UserPreferences.playerResize.resizeMode
         binding.pvPlayer.subtitleView?.apply {
             setFractionalTextSize(SubtitleView.DEFAULT_TEXT_SIZE_FRACTION * UserPreferences.captionTextSize)
@@ -340,7 +392,71 @@ class PlayerTvFragment : Fragment() {
         }
     }
 
+    fun setupEpisodeNavigationButtons() {
+        val btnPrevious = binding.pvPlayer.controller.binding.btnCustomPrev
+        val btnNext = binding.pvPlayer.controller.binding.btnCustomNext
+
+        fun handleNavigationButton(
+            button: ImageView,
+            hasEpisode: () -> Boolean,
+            playEpisode: () -> Unit
+        ) {
+            if (!hasEpisode()) {
+                button.visibility = View.GONE
+                return
+            }
+
+            button.setOnClickListener {
+                if (!hasEpisode()) return@setOnClickListener
+
+                val watchItem = when (val videoType = args.videoType as Video.Type) {
+                    is Video.Type.Movie -> database.movieDao().getById(videoType.id)
+                    is Video.Type.Episode -> database.episodeDao().getById(videoType.id)
+                }
+
+                watchItem?.apply {
+                    isWatched = false
+                    watchedDate = null
+                    watchHistory = WatchItem.WatchHistory(
+                        lastEngagementTimeUtcMillis = System.currentTimeMillis(),
+                        lastPlaybackPositionMillis = player.currentPosition,
+                        durationMillis = player.duration
+                    )
+                }
+
+                when (val videoType = args.videoType as Video.Type) {
+                    is Video.Type.Movie -> {
+                        watchItem?.let { database.movieDao().update(it as Movie) }
+                    }
+                    is Video.Type.Episode -> {
+                        watchItem?.let { episode ->
+                            if (player.hasFinished()) {
+                                database.episodeDao().resetProgressionFromEpisode(videoType.id)
+                            }
+                            database.episodeDao().update(episode as Episode)
+
+                            (episode as Episode).tvShow?.let { tvShow ->
+                                database.tvShowDao().getById(tvShow.id)
+                            }?.let { tvShow ->
+                                database.tvShowDao().save(tvShow.copy().apply {
+                                    merge(tvShow)
+                                    isWatching = true
+                                })
+                            }
+                        }
+                    }
+                }
+
+                playEpisode()
+            }
+        }
+
+        handleNavigationButton(btnPrevious, EpisodeManager::hasPreviousEpisode, viewModel::playPreviousEpisode)
+        handleNavigationButton(btnNext, EpisodeManager::hasNextEpisode, viewModel::playNextEpisode)
+    }
+
     private fun displayVideo(video: Video, server: Video.Server) {
+        val videoType = args.videoType
         val currentPosition = player.currentPosition
 
         httpDataSource.setDefaultRequestProperties(
@@ -423,6 +539,8 @@ class PlayerTvFragment : Fragment() {
                             watchItem?.isWatched = true
                             watchItem?.watchedDate = Calendar.getInstance()
                             watchItem?.watchHistory = null
+
+
                         }
                     }
 
@@ -448,6 +566,13 @@ class PlayerTvFragment : Fragment() {
                                 })
                             }
                         }
+
+                    }
+                    if (player.hasReallyFinished()){
+                        if (UserPreferences.autoplay){
+                            viewModel.autoplayNextEpisode()
+                        }
+
                     }
                 }
             }
@@ -482,5 +607,9 @@ class PlayerTvFragment : Fragment() {
 
     private fun ExoPlayer.hasFinished(): Boolean {
         return (this.currentPosition > (this.duration * 0.90))
+    }
+    private fun ExoPlayer.hasReallyFinished(): Boolean {
+        return this.duration > 0 &&
+                this.currentPosition >= this.duration
     }
 }

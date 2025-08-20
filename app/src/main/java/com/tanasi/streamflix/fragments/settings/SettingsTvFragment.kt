@@ -2,10 +2,14 @@ package com.tanasi.streamflix.fragments.settings
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
+import android.util.Log
+import android.view.inputmethod.EditorInfo
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.SwitchPreference
 import androidx.preference.PreferenceCategory
 import com.tanasi.streamflix.R // Mantenuto per R.xml.settings_tv e altre preferenze
 import com.tanasi.streamflix.providers.StreamingCommunityProvider
@@ -68,6 +72,14 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
         findPreference<Preference>("p_settings_about")?.apply {
             setOnPreferenceClickListener {
                 // TODO: Navigate to About screen for TV
+                true
+            }
+        }
+
+        findPreference<SwitchPreference>("AUTOPLAY")?.apply {
+            isChecked = UserPreferences.autoplay
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.autoplay = newValue as Boolean
                 true
             }
         }
@@ -149,6 +161,12 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
             } else {
                 networkSettingsCategory.title = originalTitle
             }
+        }
+        findPreference<SwitchPreference>("AUTOPLAY")?.isChecked = UserPreferences.autoplay
+        val bufferPref: EditTextPreference? = findPreference("p_settings_autoplay_buffer")
+        bufferPref?.summaryProvider = Preference.SummaryProvider<EditTextPreference> { pref ->
+            val value = pref.text?.toLongOrNull() ?: 3L
+            "$value s"
         }
     }
 }

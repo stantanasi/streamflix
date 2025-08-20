@@ -11,6 +11,7 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.EpisodeManager
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.dnsoverhttps.DnsOverHttps
@@ -345,9 +346,9 @@ object RidomoviesProvider : Provider {
                 released = it.releaseDate,
             )
         }
-
         return episodes
     }
+
 
     override suspend fun getGenre(id: String, page: Int): Genre {
         val response = service.getGenre(id, page)

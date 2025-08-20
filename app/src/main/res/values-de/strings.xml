@@ -193,5 +193,11 @@
     <string name="settings_category_streamingcommunity">StreamingCommunity - Einstellungen</string>
     <string name="settings_category_streamingcommunity_domain">StreamingCommunity - Domain-Name</string>
     <string name="settings_close_app">App schließen</string>
-    <string name="settings_category_streamingcommunity_dnsOverHttps">Sichere DNS-Auflösung verwenden</string>																																				  																																	
+    <string name="settings_category_streamingcommunity_dnsOverHttps">Sichere DNS-Auflösung verwenden</string>
+    <string name="settings_category_network_title">Netzwerkeinstellungen</string>
+    <string name="settings_autoplay">Automatisches Abspielen der nächsten Folge</string>
+    <string name="settings_autoplay_on">An</string>
+    <string name="settings_autoplay_off">Aus</string>
+    <string name="autoplay_settings">Automatische Wiedergabeeinstellungen</string>
+    <string name="miscelaneous_title">Sonstiges</string>
 </resources>

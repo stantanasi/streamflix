@@ -11,12 +11,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tanasi.streamflix.R
 import com.tanasi.streamflix.adapters.AppAdapter
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.databinding.FragmentSeasonTvBinding
 import com.tanasi.streamflix.models.Episode
+import com.tanasi.streamflix.utils.dp
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.coroutines.launch
 
@@ -102,25 +104,33 @@ class SeasonTvFragment : Fragment() {
         }
     }
 
+    private var focusedEpisodeIndex: Int? = null
+
     private fun displaySeason(episodes: List<Episode>) {
         val preparedEpisodes = episodes.onEach { episode ->
             episode.itemType = AppAdapter.Type.EPISODE_TV_ITEM
         }
 
-        val episodeIndex = episodes
+        val lastWatchedIndex = episodes
             .filter { it.watchHistory != null }
             .sortedByDescending { it.watchHistory?.lastEngagementTimeUtcMillis }
-            .firstOrNull { it.watchHistory != null }
+            .firstOrNull()
             ?.let { episodes.indexOf(it) }
             ?: episodes.indexOfLast { it.isWatched }
-                .takeIf { it != -1 && it + 1 < episodes.size }
-                ?.plus(1)
 
         appAdapter.submitList(preparedEpisodes)
 
-        episodeIndex?.let { binding.hgvEpisodes.scrollAndFocus(it) }
-
+        if (focusedEpisodeIndex == null) {
+            val scrollIndex = when {
+                lastWatchedIndex == -1 -> 0
+                lastWatchedIndex < episodes.lastIndex -> lastWatchedIndex + 1
+                else -> lastWatchedIndex
+            }
+            binding.hgvEpisodes.scrollAndFocus(scrollIndex)
+            focusedEpisodeIndex = scrollIndex +1
+        }
     }
+
     private fun RecyclerView.scrollAndFocus(position: Int) {
         scrollToPosition(position)
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {

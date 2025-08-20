@@ -197,10 +197,15 @@
         <argument
             android:name="videoType"
             app:argType="com.tanasi.streamflix.models.Video$Type" />
+        <action
+            android:id="@+id/action_playerMobileFragment_self"
+            app:destination="@id/player"
+            app:popUpTo="@id/player"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/settings"
-        android:name="com.tanasi.streamflix.fragments.settings.mobile.SettingsMobileFragment"
+        android:name="com.tanasi.streamflix.fragments.settings.SettingsMobileFragment"
         android:label="fragment_settings_mobile" >
         <action
             android:id="@+id/action_settings_to_settings_about"

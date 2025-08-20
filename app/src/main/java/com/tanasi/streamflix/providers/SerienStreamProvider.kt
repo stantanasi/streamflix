@@ -22,7 +22,9 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.utils.EpisodeManager
 import com.tanasi.streamflix.utils.SerienStreamUpdateTvShowWorker
+import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

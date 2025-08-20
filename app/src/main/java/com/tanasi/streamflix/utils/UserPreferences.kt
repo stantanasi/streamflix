@@ -10,6 +10,7 @@ import com.tanasi.streamflix.R
 import com.tanasi.streamflix.fragments.player.settings.PlayerSettingsView
 import com.tanasi.streamflix.providers.Provider
 import com.tanasi.streamflix.providers.Provider.Companion.providers
+import androidx.core.content.edit
 
 object UserPreferences {
 
@@ -53,6 +54,11 @@ object UserPreferences {
             Key.CAPTION_TEXT_SIZE.setFloat(value)
         }
 
+    var autoplay: Boolean
+        get() = Key.AUTOPLAY.getBoolean() ?: true
+        set(value) {
+            Key.AUTOPLAY.setBoolean(value)
+        }
     enum class PlayerResize(
         val stringRes: Int,
         val resizeMode: Int,
@@ -102,7 +108,6 @@ object UserPreferences {
         set(value) {
             Key.SUBTITLE_NAME.setString(value)
         }
-
     var streamingcommunityDomain: String
         get() {
             Log.d(TAG, "streamingcommunityDomain GET called")
@@ -162,7 +167,8 @@ object UserPreferences {
         QUALITY_HEIGHT,
         SUBTITLE_NAME,
         STREAMINGCOMMUNITY_DOMAIN,
-        DOH_PROVIDER_URL;
+        DOH_PROVIDER_URL, // Removed STREAMINGCOMMUNITY_DNS_OVER_HTTPS, added DOH_PROVIDER_URL
+        AUTOPLAY;
 
         fun getBoolean(): Boolean? = when {
             prefs.contains(name) -> prefs.getBoolean(name, false)

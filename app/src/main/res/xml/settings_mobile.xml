@@ -11,6 +11,14 @@
             android:inputType="text"/>
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="@string/autoplay_settings">
+        <SwitchPreference
+                android:key="AUTOPLAY"
+            android:title="@string/settings_autoplay"
+            android:defaultValue="true"
+            android:summaryOn="@string/settings_autoplay_on"
+            android:summaryOff="@string/settings_autoplay_off" />
+    </PreferenceCategory>
     <PreferenceCategory
         android:key="pc_network_settings"
         android:title="@string/settings_category_network_title">
@@ -22,7 +30,7 @@
             android:entryValues="@array/doh_provider_urls"
             android:defaultValue="https://cloudflare-dns.com/dns-query" />
     </PreferenceCategory>
-
+    <PreferenceCategory android:title="@string/miscelaneous_title">
     <Preference
         android:icon="@drawable/ic_settings_about"
         android:key="p_settings_about"
@@ -32,5 +40,6 @@
         android:icon="@drawable/ic_settings_help"
         android:key="p_settings_help"
         android:title="@string/settings_help" />
+    </PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

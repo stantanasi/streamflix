@@ -1,160 +1,144 @@
-package com.tanasi.streamflix.fragments.settings.mobile
+package com.tanasi.streamflix.fragments.settings
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
+import android.view.inputmethod.EditorInfo
+import androidx.navigation.fragment.findNavController
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
-import androidx.preference.PreferenceCategory
+import androidx.preference.Preference
+import androidx.preference.PreferenceCategory // Importa PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 import com.tanasi.streamflix.R
-import com.tanasi.streamflix.providers.StreamingCommunityProvider // Assicurati che l'import sia corretto
+//import com.tanasi.streamflix.fragments.settings.mobile.SettingsMobileFragmentDirections
+import com.tanasi.streamflix.providers.StreamingCommunityProvider
 import com.tanasi.streamflix.utils.UserPreferences
 
 class SettingsMobileFragment : PreferenceFragmentCompat() {
 
-    companion object {
-        private const val TAG = "SettingsMobileFragment" // Tag per i log specifici di questo fragment
-        private const val DEBUG_PROVIDER_TAG = "SettingsMobileDebug" // Tag per i log di debug del provider
-    }
-
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.settings_mobile, rootKey)
-        Log.d(TAG, "onCreatePreferences: Preferences set from XML")
 
-        setupStreamingCommunityDomainPreference()
-        updateNetworkSettingsTitle()
-        updateStreamingCommunityCategoryVisibility()
-        setupDohPreference()
+        displaySettings()
+    }
+
+    private fun displaySettings() {
+        // Gestione visibilità categoria StreamingCommunity
+        findPreference<PreferenceCategory>("pc_streamingcommunity_settings")?.apply {
+            isVisible = UserPreferences.currentProvider is StreamingCommunityProvider
+        }
+        findPreference<SwitchPreference>("AUTOPLAY")?.apply {
+            isChecked = UserPreferences.autoplay
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.autoplay = newValue as Boolean
+                true
+            }
+        }
+
+        findPreference<Preference>("p_settings_about")?.apply {
+            setOnPreferenceClickListener {
+                findNavController().navigate(
+                    SettingsMobileFragmentDirections.actionSettingsToSettingsAbout()
+                )
+                true
+            }
+        }
+
+        findPreference<Preference>("p_settings_help")?.apply {
+            setOnPreferenceClickListener {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/stantanasi/streamflix")
+                    )
+                )
+                true
+            }
+        }
+
+        findPreference<EditTextPreference>("p_settings_streamingcommunity_domain")?.apply {
+            summary = UserPreferences.streamingcommunityDomain
+
+            setOnBindEditTextListener { editText ->
+                editText.inputType = InputType.TYPE_CLASS_TEXT
+                editText.imeOptions = EditorInfo.IME_ACTION_DONE
+
+                editText.hint = "streamingcommunity.example" // Potrebbe essere una stringa di risorsa
+
+                // Mantieni la logica per pre-popolare il testo se necessario
+                val pref = UserPreferences.streamingcommunityDomain
+                if (pref.isNullOrEmpty()) {
+                    // Considera se vuoi impostare un testo di default o lasciare l'hint
+                    // editText.setText("streamingcommunity.to") // Esempio se vuoi un default
+                } else {
+                    editText.setText(pref)
+                }
+            }
+
+            setOnPreferenceChangeListener { _, newValue ->
+                val newDomain = newValue as String
+                UserPreferences.streamingcommunityDomain = newDomain
+                summary = newDomain
+
+                // Se il provider corrente è StreamingCommunity, ricostruisci il servizio e riavvia
+                if (UserPreferences.currentProvider is StreamingCommunityProvider) {
+                    (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService(newDomain)
+                    requireActivity().apply {
+                        finish()
+                        startActivity(Intent(this, this::class.java))
+                    }
+                }
+                true
+            }
+        }
+
+        findPreference<ListPreference>("p_doh_provider_url")?.apply {
+            value = UserPreferences.dohProviderUrl ?: UserPreferences.DOH_DISABLED_VALUE
+            summary = entry
+
+            setOnPreferenceChangeListener { preference, newValue ->
+                val newUrl = newValue as String
+                UserPreferences.dohProviderUrl = newUrl
+
+                if (preference is ListPreference) {
+                    val index = preference.findIndexOfValue(newUrl)
+                    if (index >= 0 && preference.entries != null && index < preference.entries.size) {
+                        preference.summary = preference.entries[index]
+                    } else {
+                        preference.summary = null
+                    }
+                }
+
+                // Logica di riavvio: valuta se è sempre necessaria dopo cambio DoH
+                // o solo se StreamingCommunity è attivo (come è ora).
+                // Per coerenza con SettingsTvFragment e il commento precedente,
+                // lascio la logica condizionale, ma potrebbe essere generalizzata.
+                if (UserPreferences.currentProvider is StreamingCommunityProvider) {
+                    (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService() // Usa il dominio da UserPreferences
+                    requireActivity().apply {
+                        finish()
+                        startActivity(Intent(this, this::class.java))
+                    }
+                }
+                true
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d(DEBUG_PROVIDER_TAG, "onResume START")
-        Log.d(DEBUG_PROVIDER_TAG, "Current provider name from UserPreferences: ${UserPreferences.currentProvider?.name}")
-        Log.d(DEBUG_PROVIDER_TAG, "Current provider class from UserPreferences: ${UserPreferences.currentProvider?.javaClass?.name}")
-        val isStreamingCommunity = UserPreferences.currentProvider is StreamingCommunityProvider
-        Log.d(DEBUG_PROVIDER_TAG, "Is StreamingCommunityProvider active? $isStreamingCommunity")
-
-        updateNetworkSettingsTitle()
-        updateStreamingCommunityCategoryVisibility() // Assicura che la visibilità sia aggiornata
-        updateDohPreferenceVisibility() // Aggiunto per aggiornare la visibilità DoH
-        updateSummaries() // Aggiorna i sommari delle preferenze che potrebbero cambiare
-    }
-
-    private fun setupStreamingCommunityDomainPreference() {
-        val domainPreference = findPreference<EditTextPreference>("provider_streamingcommunity_domain")
-        if (domainPreference == null) {
-            Log.e(TAG, "Preference 'provider_streamingcommunity_domain' NOT FOUND.")
-            return
+        // Aggiorna la visibilità quando il fragment diventa visibile
+        findPreference<PreferenceCategory>("pc_streamingcommunity_settings")?.isVisible =
+            UserPreferences.currentProvider is StreamingCommunityProvider
+        findPreference<SwitchPreference>("AUTOPLAY")?.isChecked = UserPreferences.autoplay
+        val bufferPref: EditTextPreference? = findPreference("p_settings_autoplay_buffer")
+        bufferPref?.summaryProvider = Preference.SummaryProvider<EditTextPreference> { pref ->
+            val value = pref.text?.toLongOrNull() ?: 3L
+            "$value seconds"
         }
-
-        domainPreference.summary = UserPreferences.streamingcommunityDomain ?: "Nessun dominio impostato"
-
-        domainPreference.setOnBindEditTextListener { editText ->
-            val currentValue = UserPreferences.streamingcommunityDomain
-            editText.setText(currentValue)
-            editText.setSelection(currentValue.length)
-            Log.d(TAG, "setOnBindEditTextListener: EditText bound with value: $currentValue")
-        }
-
-        domainPreference.setOnPreferenceChangeListener { preference, newValue ->
-            val newDomain = newValue as? String ?: ""
-            UserPreferences.streamingcommunityDomain = newDomain
-            preference.summary = if (newDomain.isNotEmpty()) newDomain else "Nessun dominio impostato (default)"
-            Log.d(TAG, "setOnPreferenceChangeListener: Domain set to '$newDomain', summary updated.")
-            true
-        }
-    }
-
-    private fun updateNetworkSettingsTitle() {
-        val networkSettingsCategory = findPreference<PreferenceCategory>("pc_network_settings")
-        if (networkSettingsCategory == null) {
-            Log.e(TAG, "PreferenceCategory 'pc_network_settings' NOT FOUND.")
-            return
-        }
-
-        try {
-            val originalTitle = getString(R.string.settings_category_network_title)
-            val currentProviderName = UserPreferences.currentProvider?.name
-            if (!currentProviderName.isNullOrEmpty()) {
-                networkSettingsCategory.title = "$originalTitle $currentProviderName"
-                Log.d(TAG, "Network settings title updated to include provider: $currentProviderName")
-            } else {
-                networkSettingsCategory.title = originalTitle
-                Log.d(TAG, "Network settings title set to original (no provider name).")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting string R.string.settings_category_network_title. Make sure it exists.", e)
-            networkSettingsCategory.title = "Network Settings" // Fallback title
-        }
-    }
-
-    private fun updateStreamingCommunityCategoryVisibility() {
-        val streamingCommunitySettingsCategory = findPreference<PreferenceCategory>("pc_streamingcommunity_settings")
-        if (streamingCommunitySettingsCategory == null) {
-            Log.e(TAG, "PreferenceCategory 'pc_streamingcommunity_settings' NOT FOUND.")
-            return
-        }
-        val isVisible = UserPreferences.currentProvider is StreamingCommunityProvider
-        streamingCommunitySettingsCategory.isVisible = isVisible
-        Log.d(TAG, "StreamingCommunity settings category visibility set to: $isVisible")
-    }
-
-    private fun setupDohPreference() {
-        val dohPreference = findPreference<ListPreference>("p_doh_provider_url")
-        if (dohPreference == null) {
-            Log.d(TAG, "ListPreference 'p_doh_provider_url' NOT FOUND. Skipping DOH setup.")
-            return
-        }
-
-        dohPreference.isVisible = UserPreferences.currentProvider is StreamingCommunityProvider // Imposta visibilità iniziale
-        dohPreference.value = UserPreferences.dohProviderUrl ?: UserPreferences.DOH_DISABLED_VALUE // Assumendo che DOH_DISABLED_VALUE esista in UserPreferences
-        dohPreference.summary = dohPreference.entry // Imposta sommario iniziale
-
-        dohPreference.setOnPreferenceChangeListener { preference, newValue ->
-            val newUrl = newValue as String
-            UserPreferences.dohProviderUrl = newUrl
-
-            // Aggiorna il sommario per riflettere la nuova selezione
-            val listPreference = preference as ListPreference
-            val index = listPreference.findIndexOfValue(newUrl)
-            if (index >= 0) {
-                listPreference.summary = listPreference.entries[index]
-            } else {
-                listPreference.summary = null // O un sommario di default se il valore non è trovato
-            }
-            Log.d(TAG, "DOH provider URL set to: $newUrl, summary updated.")
-            true
-        }
-    }
-
-    private fun updateDohPreferenceVisibility() {
-        val dohPreference = findPreference<ListPreference>("p_doh_provider_url")
-        if (dohPreference == null) {
-            Log.d(TAG, "ListPreference 'p_doh_provider_url' NOT FOUND during visibility update.")
-            return
-        }
-        dohPreference.isVisible = UserPreferences.currentProvider is StreamingCommunityProvider
-        Log.d(TAG, "DoH preference visibility updated to: ${dohPreference.isVisible}")
-    }
-
-    private fun updateSummaries() {
-        // Aggiorna il sommario per il dominio StreamingCommunity
-        val domainPreference = findPreference<EditTextPreference>("provider_streamingcommunity_domain")
-        domainPreference?.summary = UserPreferences.streamingcommunityDomain ?: "Nessun dominio impostato"
-
-        // Aggiorna il sommario per DoH
-        val dohPreference = findPreference<ListPreference>("p_doh_provider_url")
-        if (dohPreference != null && dohPreference.isVisible) { // Controlla anche isVisible
-            val currentValue = UserPreferences.dohProviderUrl ?: UserPreferences.DOH_DISABLED_VALUE
-            val currentIndex = dohPreference.findIndexOfValue(currentValue)
-            if (currentIndex >= 0) {
-                dohPreference.summary = dohPreference.entries[currentIndex]
-            } else {
-                 // Potrebbe essere necessario cercare il valore di default o un testo placeholder
-                dohPreference.summary = "Seleziona provider DoH"
-            }
-        }
-        Log.d(TAG, "Summaries updated in onResume.")
     }
 }

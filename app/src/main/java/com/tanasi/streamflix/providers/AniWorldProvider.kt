@@ -19,14 +19,18 @@ import com.tanasi.streamflix.models.People
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
 import com.tanasi.streamflix.models.Video
+import com.tanasi.streamflix.providers.SerienStreamProvider.SerienStreamService
 import com.tanasi.streamflix.utils.AniWorldUpdateTvShowWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import okhttp3.Cache
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
+import okhttp3.dnsoverhttps.DnsOverHttps
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import retrofit2.Response
@@ -39,8 +43,14 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Url
+import java.io.File
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 object AniWorldProvider : Provider {
 
@@ -195,7 +205,7 @@ object AniWorldProvider : Provider {
             var cachedShows = emptyList<TvShow>()
             try {
                 cachedShows = getDao().getAll().first()
-            } catch (exception: Exception){
+            } catch (exception: Exception) {
                 // ignore for now
             }
             if (cachedShows.isNotEmpty()) {
@@ -455,6 +465,7 @@ object AniWorldProvider : Provider {
             isSeriesCacheLoaded = false
         }
     }
+
     fun getSeriesChunk(pageIndex: Int): List<TvShow> {
         val fromIndex = pageIndex * chunkSize
         if (fromIndex >= seriesCache.size) return emptyList()
@@ -468,21 +479,83 @@ object AniWorldProvider : Provider {
 
 
     private interface Service {
-
         companion object {
-            fun build(): Service {
-                val client = OkHttpClient.Builder()
+            private const val DNS_QUERY_URL = "https://1.1.1.1/dns-query"
+
+            private fun getOkHttpClient(): OkHttpClient {
+                val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
+                val clientBuilder = OkHttpClient.Builder()
+                    .cache(appCache)
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
-                    .build()
+                val client = clientBuilder.build()
 
+                val dns = DnsOverHttps.Builder()
+                    .client(client)
+                    .url(DNS_QUERY_URL.toHttpUrl())
+                    .build()
+                return clientBuilder
+                    .dns(dns)
+                    .build()
+            }
+
+            private fun getUnsafeOkHttpClient(): OkHttpClient {
+                try {
+                    val trustAllCerts = arrayOf<TrustManager>(
+                        object : X509TrustManager {
+                            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
+                            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
+                            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+                        }
+                    )
+                    val sslContext = SSLContext.getInstance("SSL")
+                    sslContext.init(null, trustAllCerts, SecureRandom())
+                    val sslSocketFactory = sslContext.socketFactory
+
+                    val appCache = Cache(File("cacheDir", "okhttpcache"), 10 * 1024 * 1024)
+                    val clientBuilder = OkHttpClient.Builder()
+                        .cache(appCache)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
+                        .hostnameVerifier { _, _ -> true }
+
+                    val client = clientBuilder.build()
+
+                    val dns = DnsOverHttps.Builder()
+                        .client(client)
+                        .url(DNS_QUERY_URL.toHttpUrl())
+                        .build()
+
+                    return clientBuilder
+                        .dns(dns)
+                        .followRedirects(true)
+                        .followSslRedirects(true)
+                        .build()
+                } catch (e: Exception) {
+                    throw RuntimeException(e)
+                }
+            }
+
+            fun build(): Service {
+                val client = getOkHttpClient()
                 val retrofit = Retrofit.Builder()
                     .baseUrl(URL)
                     .addConverterFactory(JsoupConverterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
                     .client(client)
                     .build()
+                return retrofit.create(Service::class.java)
+            }
 
+            fun buildUnsafe(): Service {
+                val client = getUnsafeOkHttpClient()
+                val retrofit = Retrofit.Builder()
+                    .baseUrl(URL)
+                    .addConverterFactory(JsoupConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .client(client)
+                    .build()
                 return retrofit.create(Service::class.java)
             }
         }

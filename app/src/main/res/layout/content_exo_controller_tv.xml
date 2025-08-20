@@ -65,14 +65,33 @@
         tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
 
     <ImageView
+        android:id="@+id/btn_custom_prev"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:background="@drawable/bg_btn_exoplayer_tv"
+        android:layout_marginEnd="16dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:nextFocusRight="@id/exo_play_pause"
+        android:nextFocusUp="@id/tv_exo_subtitle"
+        android:nextFocusDown="@id/exo_bottom_bar"
+        android:padding="10dp"
+        android:src="@drawable/ic_previous"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toStartOf="@id/exo_play_pause"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#FFFFFF" />
+
+    <ImageView
         android:id="@id/exo_play_pause"
         android:layout_width="130dp"
         android:layout_height="130dp"
         android:background="@drawable/bg_btn_exoplayer_tv"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:nextFocusLeft="@id/exo_play_pause"
-        android:nextFocusRight="@id/exo_play_pause"
+        android:nextFocusLeft="@id/btn_custom_prev"
+        android:nextFocusRight="@id/btn_custom_next"
         android:nextFocusDown="@id/exo_settings"
         android:padding="2dp"
         android:src="@drawable/exo_styled_controls_play"
@@ -82,6 +101,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
+
+    <ImageView
+        android:id="@+id/btn_custom_next"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:background="@drawable/bg_btn_exoplayer_tv"
+        android:layout_marginStart="16dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:nextFocusLeft="@id/exo_play_pause"
+        android:nextFocusUp="@id/tv_exo_subtitle"
+        android:nextFocusDown="@id/exo_bottom_bar"
+        android:padding="10dp"
+        android:src="@drawable/ic_next"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintStart_toEndOf="@id/exo_play_pause"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#FFFFFF" />
 
     <androidx.media3.ui.DefaultTimeBar
         android:id="@id/exo_progress"

@@ -7,6 +7,7 @@ import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.models.Episode
 import com.tanasi.streamflix.models.Season
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.utils.EpisodeManager
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,8 +23,10 @@ class SeasonViewModel(
     private val tvShowId: String,
     private val database: AppDatabase,
 ) : ViewModel() {
-
+    var seasonNumber = 0
+    var tvShowTitle = ""
     private val _state = MutableStateFlow<State>(State.LoadingEpisodes)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val state: Flow<State> = combine(
         _state,
@@ -33,12 +36,15 @@ class SeasonViewModel(
                     database.episodeDao().getByIdsAsFlow(state.episodes.map { it.id })
                         .collect { emit(it) }
                 }
+
                 else -> emit(emptyList<Episode>())
             }
         },
         database.tvShowDao().getByIdAsFlow(tvShowId),
         database.seasonDao().getByIdAsFlow(seasonId),
     ) { state, episodesDb, tvShow, season ->
+        season?.number?.let { seasonNumber = it }
+        tvShow?.title?.let { tvShowTitle = it }
         when (state) {
             is State.SuccessLoadingEpisodes -> {
                 State.SuccessLoadingEpisodes(
@@ -89,10 +95,39 @@ class SeasonViewModel(
 
             database.episodeDao().insertAll(episodes)
 
+            addEpisodesForSeasonToEpisodeManager(episodes)
             _state.emit(State.SuccessLoadingEpisodes(episodes))
         } catch (e: Exception) {
             Log.e("SeasonViewModel", "getSeasonEpisodes: ", e)
             _state.emit(State.FailedLoadingEpisodes(e))
         }
+    }
+
+    fun addEpisodesForSeasonToEpisodeManager(episodes: List<Episode>) {
+
+        val videoEpisodes = episodes.map { ep ->
+            var seasonId = ep.season?.id ?: ""
+            var tvShowId = ep.tvShow?.id ?: ""
+            var seasonFromDb = database.seasonDao().getById(seasonId)
+            var tvShowFromDb = database.tvShowDao().getById(tvShowId)
+            com.tanasi.streamflix.models.Video.Type.Episode(
+                id = ep.id,
+                number = ep.number,
+                title = ep.title,
+                poster = ep.poster,
+                tvShow = com.tanasi.streamflix.models.Video.Type.Episode.TvShow(
+                    id = tvShowFromDb?.id ?: tvShowId,
+                    title = tvShowFromDb?.title ?: tvShowTitle,
+                    poster = tvShowFromDb?.poster ?: ep.tvShow?.poster,
+                    banner = tvShowFromDb?.banner ?: ep.tvShow?.banner
+                ),
+                season = com.tanasi.streamflix.models.Video.Type.Episode.Season(
+                    number = seasonFromDb?.number ?: seasonNumber,
+                    title = seasonFromDb?.title ?: ep.season?.title
+                )
+            )
+        }
+
+        EpisodeManager.addEpisodes(videoEpisodes)
     }
 }
