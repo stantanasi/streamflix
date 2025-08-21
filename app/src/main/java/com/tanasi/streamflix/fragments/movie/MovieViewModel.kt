@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.tanasi.streamflix.database.AppDatabase
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.utils.EpisodeManager
 import com.tanasi.streamflix.utils.UserPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -78,6 +79,7 @@ class MovieViewModel(id: String, private val database: AppDatabase) : ViewModel(
     }
 
     init {
+        EpisodeManager.clearEpisodes()
         getMovie(id)
     }
 

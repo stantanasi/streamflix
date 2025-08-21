@@ -15,6 +15,10 @@ object EpisodeManager {
         episodes.addAll(list)
         currentIndex = 0
     }
+    fun clearEpisodes(){
+        episodes.clear()
+        currentIndex = 0
+    }
     fun setCurrentEpisode(episode: Episode) {
         currentIndex = episodes.indexOfFirst { it.id == episode.id }
     }

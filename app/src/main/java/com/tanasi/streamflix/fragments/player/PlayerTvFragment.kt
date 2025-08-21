@@ -431,8 +431,12 @@ class PlayerTvFragment : Fragment() {
                     is Video.Type.Episode -> {
                         watchItem?.let { episode ->
                             if (player.hasFinished()) {
+                                episode.isWatched = true
+                                episode.watchedDate = Calendar.getInstance()
+                                episode.watchHistory = null
                                 database.episodeDao().resetProgressionFromEpisode(videoType.id)
                             }
+
                             database.episodeDao().update(episode as Episode)
 
                             (episode as Episode).tvShow?.let { tvShow ->
