@@ -39,7 +39,6 @@ object CineCalidadProvider : Provider {
         return clientBuilder.dns(dns).build()
     }
 
-    // Interfaz de servicio de Retrofit
     private interface CineCalidadService {
         @GET
         suspend fun getPage(@Url url: String): Document
@@ -63,7 +62,6 @@ object CineCalidadProvider : Provider {
             val img = element.selectFirst("div.poster img") ?: return@mapNotNull null
             val title = img.attr("alt")
 
-            // Priorizamos 'data-src' para imágenes de carga diferida (lazy load)
             val posterUrl = img.attr("data-src").ifEmpty { img.attr("src") }
 
             if (href.contains("/ver-pelicula/")) {
@@ -79,7 +77,7 @@ object CineCalidadProvider : Provider {
                     poster = posterUrl
                 )
             } else {
-                null // Ignoramos otros elementos que no son ni película ni serie
+                null
             }
         }
     }
@@ -87,28 +85,22 @@ object CineCalidadProvider : Provider {
     override suspend fun getHome(): List<Category> {
         return try {
             coroutineScope {
-                // Lanzamos todas las peticiones de red en paralelo para máxima eficiencia
                 val mainPageDeferred = async { service.getPage(baseUrl) }
                 val actionPageDeferred = async { service.getPage("$baseUrl/genero-de-la-pelicula/accion/") }
                 val comedyPageDeferred = async { service.getPage("$baseUrl/genero-de-la-pelicula/comedia/") }
 
-                // Esperamos a que todas las peticiones terminen
                 val mainDocument = mainPageDeferred.await()
                 val actionDocument = actionPageDeferred.await()
                 val comedyDocument = comedyPageDeferred.await()
 
                 val categories = mutableListOf<Category>()
 
-                // 1. Usamos la sección "Destacadas" como nuestro banner/FEATURED
                 val featuredShows = mainDocument.select("aside#dtw_content_featured-3 li").mapNotNull {
                     val a = it.selectFirst("a") ?: return@mapNotNull null
                     val href = a.attr("href")
                     val title = a.attr("title")
-                    // --- CORRECCIÓN AQUÍ ---
-                    // La imagen está en el estilo background-image de un span
                     val imageUrl = a.selectFirst("img")?.attr("data-src")
 
-                    // Para la categoría FEATURED, usamos el campo 'banner' para que se vea más grande
                     if (href.contains("/ver-pelicula/")) {
                         Movie(id = href, title = title, banner = imageUrl)
                     } else if (href.contains("/ver-serie/")) {
@@ -121,19 +113,16 @@ object CineCalidadProvider : Provider {
                     categories.add(Category(Category.FEATURED, featuredShows))
                 }
 
-                // 2. Categoría de Últimos Estrenos (la que ya teníamos)
                 val latestReleases = parseShows(mainDocument.select("article.item[id^=post-]"))
                 if (latestReleases.isNotEmpty()) {
                     categories.add(Category("Últimos Estrenos", latestReleases))
                 }
 
-                // 3. Categoría de Acción
                 val actionShows = parseShows(actionDocument.select("article.item[id^=post-]"))
                 if (actionShows.isNotEmpty()) {
                     categories.add(Category("Acción", actionShows))
                 }
 
-                // 4. Categoría de Comedia
                 val comedyShows = parseShows(comedyDocument.select("article.item[id^=post-]"))
                 if (comedyShows.isNotEmpty()) {
                     categories.add(Category("Comedia", comedyShows))
@@ -183,10 +172,9 @@ object CineCalidadProvider : Provider {
 
     override suspend fun getMovies(page: Int): List<Movie> {
         return try {
-            // La página principal del sitio parece ser un listado de películas por defecto
             val document = service.getPage("$baseUrl/page/$page")
             parseShows(document.select("article.item[id^=post-]"))
-                .filterIsInstance<Movie>() // Nos quedamos solo con las películas
+                .filterIsInstance<Movie>()
         } catch (e: Exception) {
             emptyList()
         }
@@ -194,10 +182,9 @@ object CineCalidadProvider : Provider {
 
     override suspend fun getTvShows(page: Int): List<TvShow> {
         return try {
-            // Navegamos a la sección de series y paginamos
             val document = service.getPage("$baseUrl/ver-serie/page/$page")
             parseShows(document.select("article.item[id^=post-]"))
-                .filterIsInstance<TvShow>() // Nos quedamos solo con las series
+                .filterIsInstance<TvShow>()
         } catch (e: Exception) {
             emptyList()
         }
@@ -217,10 +204,8 @@ object CineCalidadProvider : Provider {
         var genres: List<Genre> = emptyList()
         var cast: List<People> = emptyList()
 
-        // Buscamos el párrafo que contiene los spans de detalles
         val detailsParagraph = detailsTd?.selectFirst("p:has(span:contains(Género))")
 
-        // Iteramos sobre los spans dentro de ese párrafo
         detailsParagraph?.children()?.forEach { span ->
             val text = span.text()
             if (text.startsWith("Género:")) {
@@ -250,8 +235,6 @@ object CineCalidadProvider : Provider {
 
         val detailsTd = document.selectFirst(".single_left td[style*=justify]")
 
-        // --- LÓGICA MEJORADA PARA LA DESCRIPCIÓN ---
-        // Buscamos el bloque de párrafos y encontramos el que contiene la descripción.
         val overview = detailsTd?.select("p")?.find { p ->
             p.hasText() && p.selectFirst("span") == null
         }?.text()?.trim()
@@ -296,39 +279,32 @@ object CineCalidadProvider : Provider {
 
     override suspend fun getEpisodesBySeason(seasonId: String): List<Episode> {
         val (showId, seasonNumberStr) = seasonId.split('|')
-        val seasonNumber = seasonNumberStr.toIntOrNull() ?: 1
-
+        val seasonNumber = seasonNumberStr.toInt()
         val document = service.getPage(showId)
 
-        return document.select(".mark-1").filter { element -> // 'it' ahora se llama 'element'
-            // Esta línea ahora debería ser más clara para el editor
-            element.selectFirst(".numerando")?.text()?.startsWith("S$seasonNumber-") == true
-        }.map { element -> // 'it' aquí también se llama 'element'
+        return document.select(".mark-1").filter {
+            it.selectFirst(".numerando")?.text()?.startsWith("S$seasonNumber-") == true
+        }.map { element ->
             val a = element.selectFirst(".episodiotitle a")
             val numerando = element.selectFirst(".numerando")?.text() ?: ""
-            val posterUrl = element.selectFirst("div.imagen img")?.attr("data-src")
-
             val episodeNumber = numerando.substringAfter("-E").toIntOrNull() ?: 0
-            val episodeTitle = a?.text() ?: "Episodio $episodeNumber"
 
             Episode(
                 id = a?.attr("href") ?: "",
                 number = episodeNumber,
-                title = episodeTitle,
-                poster = posterUrl
+                title = a?.text() ?: "Episodio $episodeNumber",
+                poster = element.selectFirst("div.imagen img")?.attr("data-src")
             )
-        }.reversed()
+        }
     }
 
     override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
         return try {
-            // El 'id' que recibimos es la URL directa a la página del episodio o película.
             val document = service.getPage(id)
 
             document.select("#playeroptionsul li[data-option]")
                 .map { element ->
                     val serverUrl = element.attr("data-option")
-                    // El nombre del servidor es el texto dentro de la etiqueta li.
                     val serverName = element.text()
 
                     Video.Server(
@@ -347,7 +323,6 @@ object CineCalidadProvider : Provider {
 
     override suspend fun getGenre(id: String, page: Int): Genre {
         return try {
-            // El ID que guardamos es la ruta URL del género
             val document = service.getPage("$baseUrl/$id/page/$page")
 
             val shows = parseShows(document.select("article.item[id^=post-]"))
