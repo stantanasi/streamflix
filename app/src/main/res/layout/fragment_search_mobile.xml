@@ -59,6 +59,19 @@
             android:tint="#FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toStartOf="@id/btn_search_voice"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
+
+        <ImageView
+            android:id="@+id/btn_search_voice"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:padding="12dp"
+            android:src="@drawable/ic_mic"
+            android:tint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription,PrivateResource,UseAppTint" />
