@@ -82,6 +82,8 @@ class PlayerMobileFragment : Fragment() {
     private lateinit var httpDataSource: HttpDataSource.Factory
     private lateinit var dataSourceFactory: DataSource.Factory
     private lateinit var mediaSession: MediaSession
+    private lateinit var progressHandler: android.os.Handler
+    private lateinit var progressRunnable: Runnable
 
     private var servers = listOf<Video.Server>()
 
@@ -434,6 +436,10 @@ class PlayerMobileFragment : Fragment() {
         binding.settings.setOnOpenSubtitleSelectedListener { subtitle ->
             viewModel.downloadSubtitle(subtitle.openSubtitle)
         }
+        binding.pvPlayer.controller.binding.btnSkipIntro.setOnClickListener {
+            player.seekTo(player.currentPosition + 85000)
+            it.visibility = View.GONE
+        }
     }
     fun setupEpisodeNavigationButtons() {
         val btnPrevious = binding.pvPlayer.controller.binding.btnCustomPrev
@@ -547,7 +553,14 @@ class PlayerMobileFragment : Fragment() {
         }
         player.addListener(object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
+                super.onIsPlayingChanged(isPlaying)
                 binding.pvPlayer.keepScreenOn = isPlaying
+
+                if (isPlaying) {
+                    startProgressHandler()
+                } else {
+                    stopProgressHandler()
+                }
 
                 val hasUri = player.currentMediaItem?.localConfiguration?.uri
                     ?.toString()?.isNotEmpty()
@@ -653,5 +666,40 @@ class PlayerMobileFragment : Fragment() {
     private fun ExoPlayer.hasReallyFinished(): Boolean {
         return this.duration > 0 &&
                 this.currentPosition >= this.duration
+    }
+    private fun startProgressHandler() {
+        progressHandler = android.os.Handler(android.os.Looper.getMainLooper())
+        progressRunnable = Runnable {
+            if (player.isPlaying) {
+                val show = player.currentPosition in 3000..120000
+                showSkipIntroButton(show)
+            }
+            progressHandler.postDelayed(progressRunnable, 1000)
+        }
+        progressHandler.post(progressRunnable)
+    }
+
+    private fun stopProgressHandler() {
+        if (::progressHandler.isInitialized) {
+            progressHandler.removeCallbacks(progressRunnable)
+        }
+    }
+
+    private fun showSkipIntroButton(show: Boolean) {
+        val btnSkipIntro = binding.pvPlayer.controller.binding.btnSkipIntro
+        if (show && btnSkipIntro.visibility == View.GONE) {
+            val fadeIn = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+            btnSkipIntro.startAnimation(fadeIn)
+            btnSkipIntro.visibility = View.VISIBLE
+        } else if (!show && btnSkipIntro.visibility == View.VISIBLE) {
+            val fadeOut = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
+            btnSkipIntro.startAnimation(fadeOut)
+            btnSkipIntro.visibility = View.GONE
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopProgressHandler()
     }
 }

@@ -184,4 +184,5 @@
     <string name="settings_autoplay_off">Desactivada</string>
     <string name="autoplay_settings">Ajustes de reproducción automatica</string>
     <string name="miscelaneous_title">Varios</string>
+    <string name="player_skip_intro">Omitir intro</string>
 </resources>

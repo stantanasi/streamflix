@@ -79,6 +79,8 @@ class PlayerTvFragment : Fragment() {
     private lateinit var httpDataSource: HttpDataSource.Factory
     private lateinit var dataSourceFactory: DataSource.Factory
     private lateinit var mediaSession: MediaSession
+    private lateinit var progressHandler: android.os.Handler
+    private lateinit var progressRunnable: Runnable
 
     private var servers = listOf<Video.Server>()
 
@@ -285,12 +287,14 @@ class PlayerTvFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         player.pause()
+        stopProgressHandler()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         player.release()
         mediaSession.release()
+        stopProgressHandler()
         _binding = null
         isSetupDone = false
     }
@@ -369,6 +373,11 @@ class PlayerTvFragment : Fragment() {
         binding.pvPlayer.controller.binding.exoSettings.setOnClickListener {
             binding.pvPlayer.controllerShowTimeoutMs = binding.pvPlayer.controllerShowTimeoutMs
             binding.settings.show()
+        }
+
+        binding.pvPlayer.controller.binding.btnSkipIntro.setOnClickListener {
+            player.seekTo(player.currentPosition + 85000) // Jump 85 seconds
+            it.visibility = View.GONE
         }
 
         binding.settings.setOnLocalSubtitlesClickedListener {
@@ -514,6 +523,11 @@ class PlayerTvFragment : Fragment() {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 binding.pvPlayer.keepScreenOn = isPlaying
 
+                if (isPlaying) {
+                    startProgressHandler()
+                } else {
+                    stopProgressHandler()
+                }
                 val hasUri = player.currentMediaItem?.localConfiguration?.uri
                     ?.toString()?.isNotEmpty()
                     ?: false
@@ -611,5 +625,33 @@ class PlayerTvFragment : Fragment() {
     private fun ExoPlayer.hasReallyFinished(): Boolean {
         return this.duration > 0 &&
                 this.currentPosition >= this.duration
+    }
+    private fun startProgressHandler() {
+        progressHandler = android.os.Handler(android.os.Looper.getMainLooper())
+        progressRunnable = Runnable {
+            if (player.isPlaying) {
+                val show = player.currentPosition in 3000..120000
+                showSkipIntroButton(show)
+            }
+            progressHandler.postDelayed(progressRunnable, 1000)
+        }
+        progressHandler.post(progressRunnable)
+    }
+    private fun stopProgressHandler() {
+        if (::progressHandler.isInitialized) {
+            progressHandler.removeCallbacks(progressRunnable)
+        }
+    }
+    private fun showSkipIntroButton(show: Boolean) {
+        val btnSkipIntro = binding.pvPlayer.controller.binding.btnSkipIntro
+        if (show && btnSkipIntro.visibility == View.GONE) {
+            val fadeIn = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+            btnSkipIntro.startAnimation(fadeIn)
+            btnSkipIntro.visibility = View.VISIBLE
+        } else if (!show && btnSkipIntro.visibility == View.VISIBLE) {
+            val fadeOut = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.fade_out)
+            btnSkipIntro.startAnimation(fadeOut)
+            btnSkipIntro.visibility = View.GONE
+        }
     }
 }

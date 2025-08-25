@@ -200,4 +200,5 @@
     <string name="settings_autoplay_off">Off</string>
     <string name="autoplay_settings">Autoplay settings</string>
     <string name="miscelaneous_title">Miscellaneous</string>
+    <string name="player_skip_intro">Skip intro</string>
 </resources>
