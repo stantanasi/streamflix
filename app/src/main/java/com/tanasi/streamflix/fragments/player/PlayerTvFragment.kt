@@ -327,8 +327,16 @@ class PlayerTvFragment : Fragment() {
                     .build()
             }
         when (val type = args.videoType) {
-            is Video.Type.Episode -> EpisodeManager.setCurrentEpisode(type)
-            is Video.Type.Movie -> { }
+            is Video.Type.Episode -> {
+
+                if (EpisodeManager.listIsEmpty(type)) {
+                    EpisodeManager.addEpisodesFromDb(type, database)
+                }
+                EpisodeManager.setCurrentEpisode(type)
+            }
+            is Video.Type.Movie -> {
+                EpisodeManager.clearEpisodes()
+            }
         }
         binding.pvPlayer.player = player
         binding.settings.player = player

@@ -95,7 +95,7 @@ class SeasonViewModel(
 
             database.episodeDao().insertAll(episodes)
 
-            addEpisodesForSeasonToEpisodeManager(episodes)
+            EpisodeManager.addEpisodes(EpisodeManager.convertToVideoTypeEpisodes(episodes, database, seasonNumber))
             _state.emit(State.SuccessLoadingEpisodes(episodes))
         } catch (e: Exception) {
             Log.e("SeasonViewModel", "getSeasonEpisodes: ", e)
@@ -103,31 +103,4 @@ class SeasonViewModel(
         }
     }
 
-    fun addEpisodesForSeasonToEpisodeManager(episodes: List<Episode>) {
-
-        val videoEpisodes = episodes.map { ep ->
-            var seasonId = ep.season?.id ?: ""
-            var tvShowId = ep.tvShow?.id ?: ""
-            var seasonFromDb = database.seasonDao().getById(seasonId)
-            var tvShowFromDb = database.tvShowDao().getById(tvShowId)
-            com.tanasi.streamflix.models.Video.Type.Episode(
-                id = ep.id,
-                number = ep.number,
-                title = ep.title,
-                poster = ep.poster,
-                tvShow = com.tanasi.streamflix.models.Video.Type.Episode.TvShow(
-                    id = tvShowFromDb?.id ?: tvShowId,
-                    title = tvShowFromDb?.title ?: tvShowTitle,
-                    poster = tvShowFromDb?.poster ?: ep.tvShow?.poster,
-                    banner = tvShowFromDb?.banner ?: ep.tvShow?.banner
-                ),
-                season = com.tanasi.streamflix.models.Video.Type.Episode.Season(
-                    number = seasonFromDb?.number ?: seasonNumber,
-                    title = seasonFromDb?.title ?: ep.season?.title
-                )
-            )
-        }
-
-        EpisodeManager.addEpisodes(videoEpisodes)
-    }
 }

@@ -127,7 +127,7 @@ class SeasonTvFragment : Fragment() {
                 else -> lastWatchedIndex
             }
             binding.hgvEpisodes.scrollAndFocus(scrollIndex)
-            focusedEpisodeIndex = scrollIndex +1
+            focusedEpisodeIndex = scrollIndex
         }
     }
 

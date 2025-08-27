@@ -338,8 +338,13 @@ class PlayerMobileFragment : Fragment() {
         }
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         when (val type = args.videoType) {
-            is Video.Type.Episode -> EpisodeManager.setCurrentEpisode(type)
-            is Video.Type.Movie -> {}
+            is Video.Type.Episode -> {
+                if (EpisodeManager.listIsEmpty(type)) {
+                    EpisodeManager.addEpisodesFromDb(type, database)
+                }
+                EpisodeManager.setCurrentEpisode(type)
+            }
+            is Video.Type.Movie -> {EpisodeManager.clearEpisodes()}
         }
         httpDataSource = DefaultHttpDataSource.Factory()
         dataSourceFactory = DefaultDataSource.Factory(requireContext(), httpDataSource)
