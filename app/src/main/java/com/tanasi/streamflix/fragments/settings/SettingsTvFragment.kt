@@ -2,9 +2,6 @@ package com.tanasi.streamflix.fragments.settings
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputType
-import android.util.Log
-import android.view.inputmethod.EditorInfo
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
@@ -38,7 +35,7 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
             summary = currentValue
 
             // Logica per il testo nel dialogo EditTextPreference
-            // Lascia vuoto se è il default o errore (per mostrare l'hint),
+            // Lascia vuoto se è il default o errore (per mostrare l'hint'),
             // altrimenti pre-compila con il dominio personalizzato.
             if (currentValue == DEFAULT_DOMAIN_VALUE || currentValue == PREFS_ERROR_VALUE) {
                 text = null
@@ -85,8 +82,7 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
         }
 
         findPreference<ListPreference>("p_doh_provider_url")?.apply {
-            isVisible = UserPreferences.currentProvider is StreamingCommunityProvider
-            value = UserPreferences.dohProviderUrl ?: UserPreferences.DOH_DISABLED_VALUE
+            value = UserPreferences.dohProviderUrl // Modificato: operatore Elvis rimosso
             summary = entry // Imposta il sommario iniziale
 
             setOnPreferenceChangeListener { preference, newValue ->
@@ -148,7 +144,6 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
 
         // Aggiorna visibilità e sommario DoH in onResume
         findPreference<ListPreference>("p_doh_provider_url")?.apply {
-            isVisible = UserPreferences.currentProvider is StreamingCommunityProvider
             summary = entry
         }
 
