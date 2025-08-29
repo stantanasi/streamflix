@@ -200,4 +200,15 @@
     <string name="settings_autoplay_off">Aus</string>
     <string name="autoplay_settings">Automatische Wiedergabeeinstellungen</string>
     <string name="miscelaneous_title">Sonstiges</string>
+    <string name="voice_search">Sprachsuche</string>
+    <string name="voice_error_no_match">Nichts erkannt</string>
+    <string name="voice_error_timeout">Zeitüberschreitung</string>
+    <string name="voice_error_audio">Audiofehler</string>
+    <string name="voice_error_generic">Beim Starten der Spracherkennung ist ein Fehler aufgetreten.</string>
+    <string name="voice_error_permission_denied">Mikrofonberechtigung verweigert</string>
+    <string name="voice_permission_title">Berechtigung erforderlich</string>
+    <string name="voice_permission_rationale">Zugriff auf das Mikrofon ist erforderlich, um die Sprachsuche zu verwenden.</string>
+    <string name="voice_error_no_result">Es wurde keine Spracheingabe erkannt.</string>
+    <string name="voice_prompt">Sprich jetzt</string>
+
 </resources>

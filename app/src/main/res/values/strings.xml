@@ -201,4 +201,15 @@
     <string name="autoplay_settings">Autoplay settings</string>
     <string name="miscelaneous_title">Miscellaneous</string>
     <string name="player_skip_intro">Skip intro</string>
+    <string name="miscelaneous_title">Miscellaneous</string>    
+    <string name="voice_search">Voice search</string>
+    <string name="voice_error_no_match">Nothing was recognized</string>
+    <string name="voice_error_timeout">Timeout occurred</string>
+    <string name="voice_error_audio">Audio error</string>
+    <string name="voice_error_permission_denied">Microphone permission denied</string>
+    <string name="voice_permission_title">Permission Required</string>
+    <string name="voice_permission_rationale">Microphone access is needed to use voice search.</string>
+    <string name="voice_error_generic">An error occurred while starting voice recognition.</string>
+    <string name="voice_error_no_result">No voice input was detected.</string>
+    <string name="voice_prompt">Speak now</string>
 </resources>

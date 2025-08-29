@@ -200,4 +200,15 @@
     <string name="settings_autoplay_off">Disattiva</string>
     <string name="autoplay_settings">Impostazioni di riproduzione automatica</string>
     <string name="miscelaneous_title">Varie</string>
+    <string name="voice_search">Ricerca vocale</string>
+    <string name="voice_error_no_match">Nessun risultato riconosciuto</string>
+    <string name="voice_error_timeout">Tempo scaduto</string>
+    <string name="voice_error_audio">Errore audio</string>
+    <string name="voice_error_generic">Si è verificato un errore durante l\'avvio del riconoscimento vocale.</string>
+    <string name="voice_error_permission_denied">Autorizzazione microfono negata</string>
+    <string name="voice_permission_title">Autorizzazione richiesta</string>
+    <string name="voice_permission_rationale">È necessario l\'accesso al microfono per utilizzare la ricerca vocale.</string>
+    <string name="voice_error_no_result">Nessun input vocale rilevato.</string>
+    <string name="voice_prompt">Parla ora</string>
+
 </resources>
