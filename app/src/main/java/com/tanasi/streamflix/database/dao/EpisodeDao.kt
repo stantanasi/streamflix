@@ -100,4 +100,13 @@ interface EpisodeDao {
     """
     )
     fun resetProgressionFromEpisode(id: String)
+
+    @Query("""
+    SELECT e.* 
+    FROM episodes e
+    JOIN seasons s ON s.id = e.season
+    WHERE e.tvShow = :tvShowId AND s.number = :seasonNumber
+    ORDER BY s.number, e.number
+""")
+    fun getByTvShowIdAndSeasonNumber(tvShowId: String, seasonNumber: Int): List<Episode>
 }

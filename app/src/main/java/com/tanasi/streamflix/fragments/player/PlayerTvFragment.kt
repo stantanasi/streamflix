@@ -331,8 +331,16 @@ class PlayerTvFragment : Fragment() {
                     .build()
             }
         when (val type = args.videoType) {
-            is Video.Type.Episode -> EpisodeManager.setCurrentEpisode(type)
-            is Video.Type.Movie -> { }
+            is Video.Type.Episode -> {
+
+                if (EpisodeManager.listIsEmpty(type)) {
+                    EpisodeManager.addEpisodesFromDb(type, database)
+                }
+                EpisodeManager.setCurrentEpisode(type)
+            }
+            is Video.Type.Movie -> {
+                EpisodeManager.clearEpisodes()
+            }
         }
         binding.pvPlayer.player = player
         binding.settings.player = player
@@ -440,8 +448,12 @@ class PlayerTvFragment : Fragment() {
                     is Video.Type.Episode -> {
                         watchItem?.let { episode ->
                             if (player.hasFinished()) {
+                                episode.isWatched = true
+                                episode.watchedDate = Calendar.getInstance()
+                                episode.watchHistory = null
                                 database.episodeDao().resetProgressionFromEpisode(videoType.id)
                             }
+
                             database.episodeDao().update(episode as Episode)
 
                             (episode as Episode).tvShow?.let { tvShow ->

@@ -99,24 +99,26 @@ class PlayerMobileFragment : Fragment() {
         val fileName = uri.getFileName(requireContext()) ?: uri.toString()
 
         val currentPosition = player.currentPosition
-        val currentSubtitleConfigurations = player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
-            MediaItem.SubtitleConfiguration.Builder(it.uri)
-                .setMimeType(it.mimeType)
-                .setLabel(it.label)
-                .setLanguage(it.language)
-                .setSelectionFlags(0)
-                .build()
-        } ?: listOf()
+        val currentSubtitleConfigurations =
+            player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
+                MediaItem.SubtitleConfiguration.Builder(it.uri)
+                    .setMimeType(it.mimeType)
+                    .setLabel(it.label)
+                    .setLanguage(it.language)
+                    .setSelectionFlags(0)
+                    .build()
+            } ?: listOf()
         player.setMediaItem(
             MediaItem.Builder()
                 .setUri(player.currentMediaItem?.localConfiguration?.uri)
                 .setMimeType(player.currentMediaItem?.localConfiguration?.mimeType)
-                .setSubtitleConfigurations(currentSubtitleConfigurations
-                        + MediaItem.SubtitleConfiguration.Builder(uri)
-                    .setMimeType(fileName.toSubtitleMimeType())
-                    .setLabel(fileName)
-                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                    .build()
+                .setSubtitleConfigurations(
+                    currentSubtitleConfigurations
+                            + MediaItem.SubtitleConfiguration.Builder(uri)
+                        .setMimeType(fileName.toSubtitleMimeType())
+                        .setLabel(fileName)
+                        .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                        .build()
                 )
                 .setMediaMetadata(player.mediaMetadata)
                 .build()
@@ -133,6 +135,7 @@ class PlayerMobileFragment : Fragment() {
         _binding = FragmentPlayerMobileBinding.inflate(inflater, container, false)
         return binding.root
     }
+
     override fun onResume() {
         super.onResume()
         if (!isSetupDone) {
@@ -146,6 +149,7 @@ class PlayerMobileFragment : Fragment() {
             isSetupDone = true
         }
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -213,40 +217,46 @@ class PlayerMobileFragment : Fragment() {
                     is PlayerViewModel.State.SuccessLoadingSubtitles -> {
                         binding.settings.openSubtitles = state.subtitles
                     }
+
                     is PlayerViewModel.State.FailedLoadingSubtitles -> {}
 
                     PlayerViewModel.State.DownloadingOpenSubtitle -> {}
                     is PlayerViewModel.State.SuccessDownloadingOpenSubtitle -> {
-                        val fileName = state.uri.getFileName(requireContext()) ?: state.uri.toString()
+                        val fileName =
+                            state.uri.getFileName(requireContext()) ?: state.uri.toString()
 
                         val currentPosition = player.currentPosition
-                        val currentSubtitleConfigurations = player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
-                            MediaItem.SubtitleConfiguration.Builder(it.uri)
-                                .setMimeType(it.mimeType)
-                                .setLabel(it.label)
-                                .setLanguage(it.language)
-                                .setSelectionFlags(0)
-                                .build()
-                        } ?: listOf()
+                        val currentSubtitleConfigurations =
+                            player.currentMediaItem?.localConfiguration?.subtitleConfigurations?.map {
+                                MediaItem.SubtitleConfiguration.Builder(it.uri)
+                                    .setMimeType(it.mimeType)
+                                    .setLabel(it.label)
+                                    .setLanguage(it.language)
+                                    .setSelectionFlags(0)
+                                    .build()
+                            } ?: listOf()
                         player.setMediaItem(
                             MediaItem.Builder()
                                 .setUri(player.currentMediaItem?.localConfiguration?.uri)
                                 .setMimeType(player.currentMediaItem?.localConfiguration?.mimeType)
-                                .setSubtitleConfigurations(currentSubtitleConfigurations
-                                        + MediaItem.SubtitleConfiguration.Builder(state.uri)
-                                    .setMimeType(fileName.toSubtitleMimeType())
-                                    .setLabel(fileName)
-                                    .setLanguage(state.subtitle.languageName)
-                                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                                    .build()
+                                .setSubtitleConfigurations(
+                                    currentSubtitleConfigurations
+                                            + MediaItem.SubtitleConfiguration.Builder(state.uri)
+                                        .setMimeType(fileName.toSubtitleMimeType())
+                                        .setLabel(fileName)
+                                        .setLanguage(state.subtitle.languageName)
+                                        .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                                        .build()
                                 )
                                 .setMediaMetadata(player.mediaMetadata)
                                 .build()
                         )
-                        UserPreferences.subtitleName = (state.subtitle.languageName ?: fileName).substringBefore(" ")
+                        UserPreferences.subtitleName =
+                            (state.subtitle.languageName ?: fileName).substringBefore(" ")
                         player.seekTo(currentPosition)
                         player.play()
                     }
+
                     is PlayerViewModel.State.FailedDownloadingOpenSubtitle -> {
                         Toast.makeText(
                             requireContext(),
@@ -274,7 +284,9 @@ class PlayerMobileFragment : Fragment() {
                     findNavController().navigate(
                         action,
                         NavOptions.Builder()
-                            .setPopUpTo(findNavController().currentDestination?.id ?: return@collect, true)
+                            .setPopUpTo(
+                                findNavController().currentDestination?.id ?: return@collect, true
+                            )
                             .setLaunchSingleTop(false) // false so we create a new fragment
                             .build()
                     )
@@ -318,8 +330,6 @@ class PlayerMobileFragment : Fragment() {
     }
 
 
-
-
     private fun initializeVideo() {
         WindowCompat.getInsetsController(
             requireActivity().window,
@@ -330,8 +340,13 @@ class PlayerMobileFragment : Fragment() {
         }
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         when (val type = args.videoType) {
-            is Video.Type.Episode -> EpisodeManager.setCurrentEpisode(type)
-            is Video.Type.Movie -> { }
+            is Video.Type.Episode -> {
+                if (EpisodeManager.listIsEmpty(type)) {
+                    EpisodeManager.addEpisodesFromDb(type, database)
+                }
+                EpisodeManager.setCurrentEpisode(type)
+            }
+            is Video.Type.Movie -> {EpisodeManager.clearEpisodes()}
         }
         httpDataSource = DefaultHttpDataSource.Factory()
         dataSourceFactory = DefaultDataSource.Factory(requireContext(), httpDataSource)
@@ -441,6 +456,7 @@ class PlayerMobileFragment : Fragment() {
             it.visibility = View.GONE
         }
     }
+
     fun setupEpisodeNavigationButtons() {
         val btnPrevious = binding.pvPlayer.controller.binding.btnCustomPrev
         val btnNext = binding.pvPlayer.controller.binding.btnCustomNext
@@ -477,9 +493,13 @@ class PlayerMobileFragment : Fragment() {
                     is Video.Type.Movie -> {
                         watchItem?.let { database.movieDao().update(it as Movie) }
                     }
+
                     is Video.Type.Episode -> {
                         watchItem?.let { episode ->
                             if (player.hasFinished()) {
+                                episode.isWatched = true
+                                episode.watchedDate = Calendar.getInstance()
+                                episode.watchHistory = null
                                 database.episodeDao().resetProgressionFromEpisode(videoType.id)
                             }
                             database.episodeDao().update(episode as Episode)
@@ -500,7 +520,11 @@ class PlayerMobileFragment : Fragment() {
             }
         }
 
-        handleNavigationButton(btnPrevious, EpisodeManager::hasPreviousEpisode, viewModel::playPreviousEpisode)
+        handleNavigationButton(
+            btnPrevious,
+            EpisodeManager::hasPreviousEpisode,
+            viewModel::playPreviousEpisode
+        )
         handleNavigationButton(btnNext, EpisodeManager::hasNextEpisode, viewModel::playNextEpisode)
     }
 
@@ -538,10 +562,12 @@ class PlayerMobileFragment : Fragment() {
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(Uri.parse(video.source), "video/*")
 
-                putExtra("title", when (val videoType = args.videoType as Video.Type) {
-                    is Video.Type.Movie -> videoType.title
-                    is Video.Type.Episode -> "${videoType.tvShow.title} • S${videoType.season.number} E${videoType.number}"
-                })
+                putExtra(
+                    "title", when (val videoType = args.videoType as Video.Type) {
+                        is Video.Type.Movie -> videoType.title
+                        is Video.Type.Episode -> "${videoType.tvShow.title} • S${videoType.season.number} E${videoType.number}"
+                    }
+                )
                 putExtra("position", currentPosition)
             }
             startActivity(
@@ -613,8 +639,8 @@ class PlayerMobileFragment : Fragment() {
                             }
                         }
                     }
-                    if (player.hasReallyFinished()){
-                        if (UserPreferences.autoplay){
+                    if (player.hasReallyFinished()) {
+                        if (UserPreferences.autoplay) {
                             viewModel.autoplayNextEpisode()
                         }
 
@@ -663,6 +689,7 @@ class PlayerMobileFragment : Fragment() {
     private fun ExoPlayer.hasFinished(): Boolean {
         return (this.currentPosition > (this.duration * 0.90))
     }
+
     private fun ExoPlayer.hasReallyFinished(): Boolean {
         return this.duration > 0 &&
                 this.currentPosition >= this.duration
