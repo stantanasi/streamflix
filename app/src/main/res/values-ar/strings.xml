@@ -113,5 +113,16 @@
 	<string name="settings_autoplay_off">إيقاف</string>
 	<string name="autoplay_settings">إعدادات التشغيل التلقائي</string>
 	<string name="miscelaneous_title">متفرقات</string>
+	<string name="voice_search">بحث صوتي</string>
+	<string name="voice_error_no_match">لم يتم التعرف على أي شيء</string>
+	<string name="voice_error_timeout">انتهت المهلة</string>
+	<string name="voice_error_audio">خطأ في الصوت</string>
+	<string name="voice_error_generic">خطأ في التعرف: %1$d</string>
+	<string name="voice_error_permission_denied">تم رفض إذن الميكروفون</string>
+	<string name="voice_permission_title">مطلوب إذن</string>
+	<string name="voice_permission_rationale">يلزم الوصول إلى الميكروفون لاستخدام البحث الصوتي.</string>
+	<string name="voice_error_no_result">لم يتم اكتشاف أي إدخال صوتي.</string>
+	<string name="voice_prompt">تحدث الآن</string>
+
 </resources>
 

@@ -184,4 +184,16 @@
     <string name="settings_autoplay_off">Desactivada</string>
     <string name="autoplay_settings">Ajustes de reproducción automatica</string>
     <string name="miscelaneous_title">Varios</string>
+    <string name="voice_search">Búsqueda por voz</string>
+    <string name="voice_error_no_match">No se reconoció nada</string>
+    <string name="voice_error_timeout">Tiempo de espera agotado</string>
+    <string name="voice_error_audio">Error de audio</string>
+    <string name="voice_permission_title">Permiso requerido</string>
+    <string name="voice_permission_rationale">Se necesita acceso al micrófono para usar la búsqueda por voz.</string>
+    <string name="voice_error_permission_denied">No se concedió el permiso de micrófono.</string>
+    <string name="voice_error_generic">Ocurrió un error al iniciar el reconocimiento de voz.</string>
+    <string name="voice_error_no_result">No se detectó ninguna entrada de voz.</string>
+    <string name="voice_prompt">Habla ahora</string>
+
+
 </resources>

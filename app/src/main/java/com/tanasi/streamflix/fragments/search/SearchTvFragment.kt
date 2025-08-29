@@ -1,9 +1,13 @@
 package com.tanasi.streamflix.fragments.search
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -18,6 +22,7 @@ import com.tanasi.streamflix.databinding.FragmentSearchTvBinding
 import com.tanasi.streamflix.models.Genre
 import com.tanasi.streamflix.models.Movie
 import com.tanasi.streamflix.models.TvShow
+import com.tanasi.streamflix.utils.VoiceRecognitionHelper
 import com.tanasi.streamflix.utils.hideKeyboard
 import com.tanasi.streamflix.utils.viewModelsFactory
 import kotlinx.coroutines.launch
@@ -31,6 +36,8 @@ class SearchTvFragment : Fragment() {
     private val viewModel by viewModelsFactory { SearchViewModel(database) }
 
     private var appAdapter = AppAdapter()
+
+    private lateinit var voiceHelper: VoiceRecognitionHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,6 +102,7 @@ class SearchTvFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        voiceHelper.stopRecognition()
         _binding = null
     }
 
@@ -115,10 +123,60 @@ class SearchTvFragment : Fragment() {
                     else -> false
                 }
             }
+
+            addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) {
+                   if(s.isNullOrBlank()){
+                       binding.etSearch.hint = getString(R.string.search_input_hint)
+                   }
+
+                }
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            })
+
         }
+
+        val blink = AlphaAnimation(1f, 0.3f).apply {
+            duration = 500
+            repeatCount = Animation.INFINITE
+            repeatMode = Animation.REVERSE
+        }
+
+        voiceHelper = VoiceRecognitionHelper(
+            fragment = this,
+            onResult = { query ->
+                binding.btnSearchVoice.clearAnimation()
+                binding.etSearch.setText(query)
+                viewModel.search(query)
+            },
+            onError = { msg ->
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                binding.btnSearchVoice.clearAnimation()
+                binding.etSearch.hint = getString(R.string.search_input_hint)
+            },
+            onListeningStateChanged = { isListening ->
+                binding.btnSearchVoice.startAnimation(blink)
+                binding.etSearch.hint = getString(R.string.voice_prompt)
+            }
+        )
+
+        binding.btnSearchVoice.apply {
+            requestFocus()
+            visibility =
+                if (voiceHelper.isAvailable()) View.VISIBLE else View.GONE
+
+            setOnClickListener {
+                if (!voiceHelper.isListening) {
+                    voiceHelper.startWithPermissionCheck()
+                }
+            }
+        }
+
 
         binding.btnSearchClear.setOnClickListener {
             binding.etSearch.setText("")
+            binding.etSearch.hint = getString(R.string.search_input_hint)
             viewModel.search("")
         }
 
