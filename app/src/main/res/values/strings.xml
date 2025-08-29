@@ -199,6 +199,8 @@
     <string name="settings_autoplay_on">On</string>
     <string name="settings_autoplay_off">Off</string>
     <string name="autoplay_settings">Autoplay settings</string>
+    <string name="miscelaneous_title">Miscellaneous</string>
+    <string name="player_skip_intro">Skip intro</string>
     <string name="miscelaneous_title">Miscellaneous</string>    
     <string name="voice_search">Voice search</string>
     <string name="voice_error_no_match">Nothing was recognized</string>

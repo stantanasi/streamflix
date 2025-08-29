@@ -24,7 +24,6 @@ object LatanimeProvider : Provider {
     override val baseUrl = "https://latanime.org"
     override val language = "es"
 
-    // --- NUEVA CONFIGURACIÓN DE RED PROFESIONAL ---
     private val client = getOkHttpClient()
     private val retrofit = Retrofit.Builder()
         .baseUrl(baseUrl)
@@ -251,11 +250,11 @@ object LatanimeProvider : Provider {
                 val posterUrl = element.selectFirst("img")?.attr("data-src")
                 Episode(
                     id = element.attr("href"),
-                    number = title.substringAfter("Capitulo ").toIntOrNull() ?: 1,
+                    number = title.substringAfter("Capitulo ").toIntOrNull() ?: 0,
                     title = title.replace("- ", ""),
                     poster = posterUrl?.let { if (it.startsWith("http")) it else "$baseUrl$it" }
                 )
-            }.reversed()
+            }
         } catch (e: Exception) {
             emptyList()
         }

@@ -184,6 +184,7 @@
     <string name="settings_autoplay_off">Desactivada</string>
     <string name="autoplay_settings">Ajustes de reproducción automatica</string>
     <string name="miscelaneous_title">Varios</string>
+    <string name="player_skip_intro">Omitir intro</string>
     <string name="voice_search">Búsqueda por voz</string>
     <string name="voice_error_no_match">No se reconoció nada</string>
     <string name="voice_error_timeout">Tiempo de espera agotado</string>
@@ -194,6 +195,4 @@
     <string name="voice_error_generic">Ocurrió un error al iniciar el reconocimiento de voz.</string>
     <string name="voice_error_no_result">No se detectó ninguna entrada de voz.</string>
     <string name="voice_prompt">Habla ahora</string>
-
-
 </resources>
