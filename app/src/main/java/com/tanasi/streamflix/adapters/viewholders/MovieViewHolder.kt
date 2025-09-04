@@ -3,12 +3,13 @@ package com.tanasi.streamflix.adapters.viewholders
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
+// import android.net.Uri // Removed unused import
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri // Added KTX import
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -596,8 +597,8 @@ class MovieViewHolder(
                     return@setOnClickListener
                 }
 
-                val youtubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
-                val smartTubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                val youtubeIntent = Intent(Intent.ACTION_VIEW, trailer.toUri())
+                val smartTubeIntent = Intent(Intent.ACTION_VIEW, trailer.toUri())
                 smartTubeIntent.setPackage("com.teamsmart.videomanager.tv")
                 Log.d(TAG, "MovieMobile: Intents created. YouTube: $youtubeIntent, SmartTube: $smartTubeIntent")
 
@@ -605,7 +606,7 @@ class MovieViewHolder(
                     context.packageManager.getPackageInfo("com.teamsmart.videomanager.tv", 0)
                     Log.d(TAG, "MovieMobile: SmartTube package info found.")
                     true
-                } catch (e: PackageManager.NameNotFoundException) {
+                } catch (_: PackageManager.NameNotFoundException) { // Changed e to _
                     Log.d(TAG, "MovieMobile: SmartTube package info NOT found.")
                     false
                 }
@@ -773,8 +774,8 @@ class MovieViewHolder(
                     return@setOnClickListener
                 }
 
-                val youtubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
-                val smartTubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                val youtubeIntent = Intent(Intent.ACTION_VIEW, trailer.toUri())
+                val smartTubeIntent = Intent(Intent.ACTION_VIEW, trailer.toUri())
                 smartTubeIntent.setPackage("com.teamsmart.videomanager.tv")
                 Log.d(TAG, "MovieTv: Intents created. YouTube: $youtubeIntent, SmartTube: $smartTubeIntent")
 
@@ -782,7 +783,7 @@ class MovieViewHolder(
                     context.packageManager.getPackageInfo("com.teamsmart.videomanager.tv", 0)
                     Log.d(TAG, "MovieTv: SmartTube package info found.")
                     true
-                } catch (e: PackageManager.NameNotFoundException) {
+                } catch (_: PackageManager.NameNotFoundException) { // Changed e to _
                     Log.d(TAG, "MovieTv: SmartTube package info NOT found.")
                     false
                 }
