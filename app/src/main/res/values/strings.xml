@@ -211,4 +211,8 @@
     <string name="voice_error_generic">An error occurred while starting voice recognition.</string>
     <string name="voice_error_no_result">No voice input was detected.</string>
     <string name="voice_prompt">Speak now</string>
+
+    <string name="watch_trailer_with">Watch trailer with...</string>
+    <string name="youtube">YouTube</string>
+    <string name="smarttube">SmartTube</string>
 </resources>

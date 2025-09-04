@@ -1,7 +1,10 @@
 package com.tanasi.streamflix.adapters.viewholders
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
@@ -76,6 +79,7 @@ class TvShowViewHolder(
     private val context = itemView.context
     private val database = AppDatabase.getInstance(context)
     private lateinit var tvShow: TvShow
+    private val TAG = "TrailerChoiceDebug" // Logging Tag
 
     val childRecyclerView: RecyclerView?
         get() = when (_binding) {
@@ -622,19 +626,65 @@ class TvShowViewHolder(
 
         binding.btnTvShowTrailer.apply {
             val trailer = tvShow.trailer
+            Log.d(TAG, "TvShowMobile: btnTvShowTrailer.apply called. Trailer URL: $trailer")
 
             setOnClickListener {
-                context.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(trailer)
-                    )
-                )
+                Log.d(TAG, "TvShowMobile: setOnClickListener called.")
+                if (trailer == null) {
+                    Log.d(TAG, "TvShowMobile: Trailer is null, doing nothing.")
+                    return@setOnClickListener
+                }
+
+                val youtubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                val smartTubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                smartTubeIntent.setPackage("com.teamsmart.videomanager.tv")
+                Log.d(TAG, "TvShowMobile: Intents created. YouTube: $youtubeIntent, SmartTube: $smartTubeIntent")
+
+                val smartTubeInstalled = try {
+                    context.packageManager.getPackageInfo("com.teamsmart.videomanager.tv", 0)
+                    Log.d(TAG, "TvShowMobile: SmartTube package info found.")
+                    true
+                } catch (e: PackageManager.NameNotFoundException) {
+                    Log.d(TAG, "TvShowMobile: SmartTube package info NOT found.")
+                    false
+                }
+                Log.d(TAG, "TvShowMobile: smartTubeInstalled = $smartTubeInstalled")
+
+                if (smartTubeInstalled) {
+                    Log.d(TAG, "TvShowMobile: SmartTube is installed. Building AlertDialog.")
+                    AlertDialog.Builder(context)
+                        .setTitle(context.getString(R.string.watch_trailer_with))
+                        .setItems(
+                            arrayOf(
+                                context.getString(R.string.youtube),
+                                context.getString(R.string.smarttube)
+                            )
+                        ) { _, which ->
+                            Log.d(TAG, "TvShowMobile: AlertDialog item selected: $which")
+                            when (which) {
+                                0 -> {
+                                    Log.d(TAG, "TvShowMobile: Launching YouTube.")
+                                    context.startActivity(youtubeIntent)
+                                }
+                                1 -> {
+                                    Log.d(TAG, "TvShowMobile: Launching SmartTube.")
+                                    context.startActivity(smartTubeIntent)
+                                }
+                            }
+                        }
+                        .show()
+                } else {
+                    Log.d(TAG, "TvShowMobile: SmartTube not installed. Launching YouTube directly.")
+                    context.startActivity(youtubeIntent)
+                }
             }
 
             visibility = when {
                 trailer != null -> View.VISIBLE
-                else -> View.GONE
+                else -> {
+                    Log.d(TAG, "TvShowMobile: Trailer is null, setting button visibility to GONE.")
+                    View.GONE
+                }
             }
         }
 
@@ -808,19 +858,65 @@ class TvShowViewHolder(
 
         binding.btnTvShowTrailer.apply {
             val trailer = tvShow.trailer
+            Log.d(TAG, "TvShowTv: btnTvShowTrailer.apply called. Trailer URL: $trailer")
 
             setOnClickListener {
-                context.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(trailer)
-                    )
-                )
+                Log.d(TAG, "TvShowTv: setOnClickListener called.")
+                if (trailer == null) {
+                    Log.d(TAG, "TvShowTv: Trailer is null, doing nothing.")
+                    return@setOnClickListener
+                }
+
+                val youtubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                val smartTubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                smartTubeIntent.setPackage("com.teamsmart.videomanager.tv")
+                Log.d(TAG, "TvShowTv: Intents created. YouTube: $youtubeIntent, SmartTube: $smartTubeIntent")
+
+                val smartTubeInstalled = try {
+                    context.packageManager.getPackageInfo("com.teamsmart.videomanager.tv", 0)
+                    Log.d(TAG, "TvShowTv: SmartTube package info found.")
+                    true
+                } catch (e: PackageManager.NameNotFoundException) {
+                    Log.d(TAG, "TvShowTv: SmartTube package info NOT found.")
+                    false
+                }
+                Log.d(TAG, "TvShowTv: smartTubeInstalled = $smartTubeInstalled")
+
+                if (smartTubeInstalled) {
+                    Log.d(TAG, "TvShowTv: SmartTube is installed. Building AlertDialog.")
+                    AlertDialog.Builder(context)
+                        .setTitle(context.getString(R.string.watch_trailer_with))
+                        .setItems(
+                            arrayOf(
+                                context.getString(R.string.youtube),
+                                context.getString(R.string.smarttube)
+                            )
+                        ) { _, which ->
+                            Log.d(TAG, "TvShowTv: AlertDialog item selected: $which")
+                            when (which) {
+                                0 -> {
+                                    Log.d(TAG, "TvShowTv: Launching YouTube.")
+                                    context.startActivity(youtubeIntent)
+                                }
+                                1 -> {
+                                    Log.d(TAG, "TvShowTv: Launching SmartTube.")
+                                    context.startActivity(smartTubeIntent)
+                                }
+                            }
+                        }
+                        .show()
+                } else {
+                    Log.d(TAG, "TvShowTv: SmartTube not installed. Launching YouTube directly.")
+                    context.startActivity(youtubeIntent)
+                }
             }
 
             visibility = when {
                 trailer != null -> View.VISIBLE
-                else -> View.GONE
+                else -> {
+                    Log.d(TAG, "TvShowTv: Trailer is null, setting button visibility to GONE.")
+                    View.GONE
+                }
             }
         }
 

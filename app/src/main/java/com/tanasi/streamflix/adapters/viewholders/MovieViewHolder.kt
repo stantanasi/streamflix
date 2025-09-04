@@ -1,7 +1,10 @@
 package com.tanasi.streamflix.adapters.viewholders
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
@@ -74,6 +77,7 @@ class MovieViewHolder(
     private val context = itemView.context
     private val database = AppDatabase.getInstance(context)
     private lateinit var movie: Movie
+    private val TAG = "TrailerChoiceDebug" // Logging Tag
 
     val childRecyclerView: RecyclerView?
         get() = when (_binding) {
@@ -583,19 +587,65 @@ class MovieViewHolder(
 
         binding.btnMovieTrailer.apply {
             val trailer = movie.trailer
+            Log.d(TAG, "MovieMobile: btnMovieTrailer.apply called. Trailer URL: $trailer")
 
             setOnClickListener {
-                context.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(trailer)
-                    )
-                )
+                Log.d(TAG, "MovieMobile: setOnClickListener called.")
+                if (trailer == null) {
+                    Log.d(TAG, "MovieMobile: Trailer is null, doing nothing.")
+                    return@setOnClickListener
+                }
+
+                val youtubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                val smartTubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                smartTubeIntent.setPackage("com.teamsmart.videomanager.tv")
+                Log.d(TAG, "MovieMobile: Intents created. YouTube: $youtubeIntent, SmartTube: $smartTubeIntent")
+
+                val smartTubeInstalled = try {
+                    context.packageManager.getPackageInfo("com.teamsmart.videomanager.tv", 0)
+                    Log.d(TAG, "MovieMobile: SmartTube package info found.")
+                    true
+                } catch (e: PackageManager.NameNotFoundException) {
+                    Log.d(TAG, "MovieMobile: SmartTube package info NOT found.")
+                    false
+                }
+                Log.d(TAG, "MovieMobile: smartTubeInstalled = $smartTubeInstalled")
+
+                if (smartTubeInstalled) {
+                    Log.d(TAG, "MovieMobile: SmartTube is installed. Building AlertDialog.")
+                    AlertDialog.Builder(context)
+                        .setTitle(context.getString(R.string.watch_trailer_with))
+                        .setItems(
+                            arrayOf(
+                                context.getString(R.string.youtube),
+                                context.getString(R.string.smarttube)
+                            )
+                        ) { _, which ->
+                            Log.d(TAG, "MovieMobile: AlertDialog item selected: $which")
+                            when (which) {
+                                0 -> {
+                                    Log.d(TAG, "MovieMobile: Launching YouTube.")
+                                    context.startActivity(youtubeIntent)
+                                }
+                                1 -> {
+                                    Log.d(TAG, "MovieMobile: Launching SmartTube.")
+                                    context.startActivity(smartTubeIntent)
+                                }
+                            }
+                        }
+                        .show()
+                } else {
+                    Log.d(TAG, "MovieMobile: SmartTube not installed. Launching YouTube directly.")
+                    context.startActivity(youtubeIntent)
+                }
             }
 
             visibility = when {
                 trailer != null -> View.VISIBLE
-                else -> View.GONE
+                else -> {
+                    Log.d(TAG, "MovieMobile: Trailer is null, setting button visibility to GONE.")
+                    View.GONE
+                }
             }
         }
 
@@ -714,19 +764,65 @@ class MovieViewHolder(
 
         binding.btnMovieTrailer.apply {
             val trailer = movie.trailer
+            Log.d(TAG, "MovieTv: btnMovieTrailer.apply called. Trailer URL: $trailer")
 
             setOnClickListener {
-                context.startActivity(
-                    Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse(trailer)
-                    )
-                )
+                Log.d(TAG, "MovieTv: setOnClickListener called.")
+                if (trailer == null) {
+                    Log.d(TAG, "MovieTv: Trailer is null, doing nothing.")
+                    return@setOnClickListener
+                }
+
+                val youtubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                val smartTubeIntent = Intent(Intent.ACTION_VIEW, Uri.parse(trailer))
+                smartTubeIntent.setPackage("com.teamsmart.videomanager.tv")
+                Log.d(TAG, "MovieTv: Intents created. YouTube: $youtubeIntent, SmartTube: $smartTubeIntent")
+
+                val smartTubeInstalled = try {
+                    context.packageManager.getPackageInfo("com.teamsmart.videomanager.tv", 0)
+                    Log.d(TAG, "MovieTv: SmartTube package info found.")
+                    true
+                } catch (e: PackageManager.NameNotFoundException) {
+                    Log.d(TAG, "MovieTv: SmartTube package info NOT found.")
+                    false
+                }
+                Log.d(TAG, "MovieTv: smartTubeInstalled = $smartTubeInstalled")
+
+                if (smartTubeInstalled) {
+                    Log.d(TAG, "MovieTv: SmartTube is installed. Building AlertDialog.")
+                    AlertDialog.Builder(context)
+                        .setTitle(context.getString(R.string.watch_trailer_with))
+                        .setItems(
+                            arrayOf(
+                                context.getString(R.string.youtube),
+                                context.getString(R.string.smarttube)
+                            )
+                        ) { _, which ->
+                            Log.d(TAG, "MovieTv: AlertDialog item selected: $which")
+                            when (which) {
+                                0 -> {
+                                    Log.d(TAG, "MovieTv: Launching YouTube.")
+                                    context.startActivity(youtubeIntent)
+                                }
+                                1 -> {
+                                    Log.d(TAG, "MovieTv: Launching SmartTube.")
+                                    context.startActivity(smartTubeIntent)
+                                }
+                            }
+                        }
+                        .show()
+                } else {
+                    Log.d(TAG, "MovieTv: SmartTube not installed. Launching YouTube directly.")
+                    context.startActivity(youtubeIntent)
+                }
             }
 
             visibility = when {
                 trailer != null -> View.VISIBLE
-                else -> View.GONE
+                else -> {
+                    Log.d(TAG, "MovieTv: Trailer is null, setting button visibility to GONE.")
+                    View.GONE
+                }
             }
         }
 
