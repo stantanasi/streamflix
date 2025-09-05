@@ -1,15 +1,16 @@
 package com.tanasi.streamflix.adapters.viewholders
 
 import android.app.AlertDialog
+import android.content.Context // Added for SharedPreferences
 import android.content.Intent
+import android.content.SharedPreferences // Added for SharedPreferences
 import android.content.pm.PackageManager
-// import android.net.Uri // Removed unused import
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri // Added KTX import
+import androidx.core.net.toUri
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
@@ -79,6 +80,13 @@ class MovieViewHolder(
     private val database = AppDatabase.getInstance(context)
     private lateinit var movie: Movie
     private val TAG = "TrailerChoiceDebug" // Logging Tag
+
+    companion object {
+        private const val PREFS_NAME = "TrailerPlayerPrefs"
+        private const val KEY_PREFERRED_PLAYER = "preferred_player"
+        private const val PLAYER_YOUTUBE = "youtube"
+        private const val PLAYER_SMARTTUBE = "smarttube"
+    }
 
     val childRecyclerView: RecyclerView?
         get() = when (_binding) {
@@ -606,38 +614,60 @@ class MovieViewHolder(
                     context.packageManager.getPackageInfo("com.teamsmart.videomanager.tv", 0)
                     Log.d(TAG, "MovieMobile: SmartTube package info found.")
                     true
-                } catch (_: PackageManager.NameNotFoundException) { // Changed e to _
+                } catch (_: PackageManager.NameNotFoundException) {
                     Log.d(TAG, "MovieMobile: SmartTube package info NOT found.")
                     false
                 }
                 Log.d(TAG, "MovieMobile: smartTubeInstalled = $smartTubeInstalled")
 
-                if (smartTubeInstalled) {
-                    Log.d(TAG, "MovieMobile: SmartTube is installed. Building AlertDialog.")
-                    AlertDialog.Builder(context)
-                        .setTitle(context.getString(R.string.watch_trailer_with))
-                        .setItems(
-                            arrayOf(
-                                context.getString(R.string.youtube),
-                                context.getString(R.string.smarttube)
-                            )
-                        ) { _, which ->
-                            Log.d(TAG, "MovieMobile: AlertDialog item selected: $which")
-                            when (which) {
-                                0 -> {
-                                    Log.d(TAG, "MovieMobile: Launching YouTube.")
-                                    context.startActivity(youtubeIntent)
-                                }
-                                1 -> {
-                                    Log.d(TAG, "MovieMobile: Launching SmartTube.")
-                                    context.startActivity(smartTubeIntent)
-                                }
-                            }
-                        }
-                        .show()
-                } else {
-                    Log.d(TAG, "MovieMobile: SmartTube not installed. Launching YouTube directly.")
+                val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                val preferredPlayer = prefs.getString(KEY_PREFERRED_PLAYER, null)
+                Log.d(TAG, "MovieMobile: Preferred player from prefs: $preferredPlayer")
+
+                if (preferredPlayer == PLAYER_SMARTTUBE && smartTubeInstalled) {
+                    Log.d(TAG, "MovieMobile: Preferred player is SmartTube and it's installed. Launching SmartTube.")
+                    context.startActivity(smartTubeIntent)
+                } else if (preferredPlayer == PLAYER_SMARTTUBE && !smartTubeInstalled) {
+                    Log.d(TAG, "MovieMobile: Preferred player was SmartTube, but it's not installed. Launching YouTube.")
+                    context.startActivity(youtubeIntent) // Launch YouTube but don't change preference
+                } else if (preferredPlayer == PLAYER_YOUTUBE) {
+                    Log.d(TAG, "MovieMobile: Preferred player is YouTube. Launching YouTube.")
                     context.startActivity(youtubeIntent)
+                } else {
+                    // No valid preference or SmartTube preferred but not installed the first time
+                    if (smartTubeInstalled) {
+                        Log.d(TAG, "MovieMobile: No valid preference or SmartTube not installed previously. SmartTube IS installed now. Showing dialog.")
+                        AlertDialog.Builder(context)
+                            .setTitle(context.getString(R.string.watch_trailer_with))
+                            .setItems(
+                                arrayOf(
+                                    context.getString(R.string.youtube),
+                                    context.getString(R.string.smarttube)
+                                )
+                            ) { _, which ->
+                                Log.d(TAG, "MovieMobile: AlertDialog item selected: $which")
+                                val editor = prefs.edit()
+                                when (which) {
+                                    0 -> {
+                                        Log.d(TAG, "MovieMobile: Launching YouTube and saving preference.")
+                                        editor.putString(KEY_PREFERRED_PLAYER, PLAYER_YOUTUBE)
+                                        context.startActivity(youtubeIntent)
+                                    }
+                                    1 -> {
+                                        Log.d(TAG, "MovieMobile: Launching SmartTube and saving preference.")
+                                        editor.putString(KEY_PREFERRED_PLAYER, PLAYER_SMARTTUBE)
+                                        context.startActivity(smartTubeIntent)
+                                    }
+                                }
+                                editor.apply()
+                            }
+                            .show()
+                    } else {
+                        Log.d(TAG, "MovieMobile: No preference and SmartTube not installed. Launching YouTube directly.")
+                        context.startActivity(youtubeIntent)
+                        // Optionally, save YouTube as default here if desired
+                        // prefs.edit().putString(KEY_PREFERRED_PLAYER, PLAYER_YOUTUBE).apply()
+                    }
                 }
             }
 
@@ -783,38 +813,60 @@ class MovieViewHolder(
                     context.packageManager.getPackageInfo("com.teamsmart.videomanager.tv", 0)
                     Log.d(TAG, "MovieTv: SmartTube package info found.")
                     true
-                } catch (_: PackageManager.NameNotFoundException) { // Changed e to _
+                } catch (_: PackageManager.NameNotFoundException) {
                     Log.d(TAG, "MovieTv: SmartTube package info NOT found.")
                     false
                 }
                 Log.d(TAG, "MovieTv: smartTubeInstalled = $smartTubeInstalled")
 
-                if (smartTubeInstalled) {
-                    Log.d(TAG, "MovieTv: SmartTube is installed. Building AlertDialog.")
-                    AlertDialog.Builder(context)
-                        .setTitle(context.getString(R.string.watch_trailer_with))
-                        .setItems(
-                            arrayOf(
-                                context.getString(R.string.youtube),
-                                context.getString(R.string.smarttube)
-                            )
-                        ) { _, which ->
-                            Log.d(TAG, "MovieTv: AlertDialog item selected: $which")
-                            when (which) {
-                                0 -> {
-                                    Log.d(TAG, "MovieTv: Launching YouTube.")
-                                    context.startActivity(youtubeIntent)
-                                }
-                                1 -> {
-                                    Log.d(TAG, "MovieTv: Launching SmartTube.")
-                                    context.startActivity(smartTubeIntent)
-                                }
-                            }
-                        }
-                        .show()
-                } else {
-                    Log.d(TAG, "MovieTv: SmartTube not installed. Launching YouTube directly.")
+                val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                val preferredPlayer = prefs.getString(KEY_PREFERRED_PLAYER, null)
+                Log.d(TAG, "MovieTv: Preferred player from prefs: $preferredPlayer")
+
+                if (preferredPlayer == PLAYER_SMARTTUBE && smartTubeInstalled) {
+                    Log.d(TAG, "MovieTv: Preferred player is SmartTube and it's installed. Launching SmartTube.")
+                    context.startActivity(smartTubeIntent)
+                } else if (preferredPlayer == PLAYER_SMARTTUBE && !smartTubeInstalled) {
+                    Log.d(TAG, "MovieTv: Preferred player was SmartTube, but it's not installed. Launching YouTube.")
+                    context.startActivity(youtubeIntent) // Launch YouTube but don't change preference
+                } else if (preferredPlayer == PLAYER_YOUTUBE) {
+                    Log.d(TAG, "MovieTv: Preferred player is YouTube. Launching YouTube.")
                     context.startActivity(youtubeIntent)
+                } else {
+                    // No valid preference or SmartTube preferred but not installed the first time
+                    if (smartTubeInstalled) {
+                        Log.d(TAG, "MovieTv: No valid preference or SmartTube not installed previously. SmartTube IS installed now. Showing dialog.")
+                        AlertDialog.Builder(context)
+                            .setTitle(context.getString(R.string.watch_trailer_with))
+                            .setItems(
+                                arrayOf(
+                                    context.getString(R.string.youtube),
+                                    context.getString(R.string.smarttube)
+                                )
+                            ) { _, which ->
+                                Log.d(TAG, "MovieTv: AlertDialog item selected: $which")
+                                val editor = prefs.edit()
+                                when (which) {
+                                    0 -> {
+                                        Log.d(TAG, "MovieTv: Launching YouTube and saving preference.")
+                                        editor.putString(KEY_PREFERRED_PLAYER, PLAYER_YOUTUBE)
+                                        context.startActivity(youtubeIntent)
+                                    }
+                                    1 -> {
+                                        Log.d(TAG, "MovieTv: Launching SmartTube and saving preference.")
+                                        editor.putString(KEY_PREFERRED_PLAYER, PLAYER_SMARTTUBE)
+                                        context.startActivity(smartTubeIntent)
+                                    }
+                                }
+                                editor.apply()
+                            }
+                            .show()
+                    } else {
+                        Log.d(TAG, "MovieTv: No preference and SmartTube not installed. Launching YouTube directly.")
+                        context.startActivity(youtubeIntent)
+                        // Optionally, save YouTube as default here if desired
+                        // prefs.edit().putString(KEY_PREFERRED_PLAYER, PLAYER_YOUTUBE).apply()
+                    }
                 }
             }
 
