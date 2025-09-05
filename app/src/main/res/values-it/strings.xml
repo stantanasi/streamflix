@@ -211,4 +211,5 @@
     <string name="voice_error_no_result">Nessun input vocale rilevato.</string>
     <string name="voice_prompt">Parla ora</string>
 
+    <string name="watch_trailer_with">Guarda il trailer con...</string>
 </resources>

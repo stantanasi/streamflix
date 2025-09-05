@@ -20,6 +20,7 @@
         <intent>
             <action android:name="android.speech.RecognitionService" />
         </intent>
+        <package android:name="com.teamsmart.videomanager.tv" />
     </queries>
 
     <application

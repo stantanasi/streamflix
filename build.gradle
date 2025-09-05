@@ -1,23 +1,23 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '2.1.20'
+    ext.kotlin_version = '2.2.10' // Updated Kotlin version
 
     repositories {
         google()
     }
     dependencies {
-        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.8.5'
+        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.9.3' // Updated navigation plugin
     }
 }
 
 plugins {
-    id 'com.android.application' version '8.12.1' apply false
-    id 'com.android.library' version '8.12.1' apply false
-    id 'org.jetbrains.kotlin.android' version '2.1.20' apply false
-    id 'com.google.devtools.ksp' version '2.1.20-1.0.32' apply false
+    id 'com.android.application' version '8.13.0' apply false
+    id 'com.android.library' version '8.13.0' apply false
+    id 'org.jetbrains.kotlin.android' version '2.2.10' apply false // Updated Kotlin plugin
+    id 'com.google.devtools.ksp' version '2.2.10-2.0.2' apply false // Updated KSP plugin
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+tasks.register('clean', Delete) {
+    delete layout.buildDirectory
 }
